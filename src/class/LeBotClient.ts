@@ -6,12 +6,14 @@ import { BaseCommand } from "./BaseCommand";
 import type { CommandOptions } from "../interfaces/CommandOptions";
 import { PermissionService } from "../services/PermissionService";
 import { EPermission } from "../enums/EPermission";
+import { Logger } from "../utils/Logger";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export class LeBotClient<ready = false> extends Client {
 	public commands = new Collection<string, { instance: BaseCommand; options: CommandOptions }>();
+	private logger = new Logger('LeBotClient');
 
 	constructor() {
 		super({
@@ -31,13 +33,13 @@ export class LeBotClient<ready = false> extends Client {
 
 	public async deployCommands() {
 		if (!this.token || !this.user) {
-			console.error("Client not logged in or token missing.");
+			this.logger.error("Client not logged in or token missing.");
 			return;
 		}
 
 		const guildId = process.env.DISCORD_GUILD_ID;
 		if (!guildId) {
-			console.error("DISCORD_GUILD_ID is missing in environment variables.");
+			this.logger.error("DISCORD_GUILD_ID is missing in environment variables.");
 			return;
 		}
 
@@ -48,7 +50,7 @@ export class LeBotClient<ready = false> extends Client {
 			.filter((p): p is EPermission => !!p);
 
 		try {
-			console.log(
+			this.logger.log(
 				`Started refreshing ${commandsData.length} application (/) commands for guild ${guildId}.`
 			);
 
@@ -58,11 +60,11 @@ export class LeBotClient<ready = false> extends Client {
 				body: commandsData,
 			});
 
-			console.log(
+			this.logger.log(
 				`Successfully reloaded ${commandsData.length} application (/) commands.`
 			);
 		} catch (error) {
-			console.error(error);
+			this.logger.error(error);
 		}
 	}
 

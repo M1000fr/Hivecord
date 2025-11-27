@@ -1,6 +1,9 @@
 import { prismaClient } from "./prismaService";
+import { Logger } from "../utils/Logger";
 
 export class PermissionService {
+    private static logger = new Logger('PermissionService');
+
     static async hasPermission(userRoleIds: string[], requiredPermission: string): Promise<boolean> {
         const groups = await prismaClient.group.findMany({
             where: {
@@ -71,7 +74,7 @@ export class PermissionService {
                 data: newPermissions.map(name => ({ name })),
                 skipDuplicates: true
             });
-            console.log(`Registered ${newPermissions.length} new permissions (including wildcards).`);
+            this.logger.log(`Registered ${newPermissions.length} new permissions (including wildcards).`);
         }
     }
 }

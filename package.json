@@ -18,6 +18,6 @@
     "prisma": "^7.0.1"
   },
   "scripts": {
-    "dev": "bun --watch ."
+    "dev": "bun ."
   }
 }

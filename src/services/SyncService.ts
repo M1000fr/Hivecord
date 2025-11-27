@@ -1,12 +1,15 @@
 import { Guild } from "discord.js";
 import { prismaClient } from "./prismaService";
+import { Logger } from "../utils/Logger";
 
 export class SyncService {
+    private static logger = new Logger('SyncService');
+
     static async syncGuild(guild: Guild) {
-        console.log(`Syncing guild ${guild.name}...`);
+        this.logger.log(`Syncing guild ${guild.name}...`);
         await this.syncRoles(guild);
         await this.syncMembers(guild);
-        console.log(`Guild ${guild.name} synced.`);
+        this.logger.log(`Guild ${guild.name} synced.`);
     }
 
     static async syncRoles(guild: Guild) {
