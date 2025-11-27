@@ -4,7 +4,11 @@ import { Logger } from "../utils/Logger";
 export class PermissionService {
     private static logger = new Logger('PermissionService');
 
-    static async hasPermission(userRoleIds: string[], requiredPermission: string): Promise<boolean> {
+    static async hasPermission(userId: string, userRoleIds: string[], requiredPermission: string): Promise<boolean> {
+        if (process.env.DISCORD_OWNER_ID && userId === process.env.DISCORD_OWNER_ID) {
+            return true;
+        }
+
         const groups = await prismaClient.group.findMany({
             where: {
                 roleId: {

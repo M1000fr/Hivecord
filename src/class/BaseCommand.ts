@@ -24,7 +24,7 @@ export abstract class BaseCommand {
                         }
                     }
 
-                    const hasPermission = await PermissionService.hasPermission(roleIds, permission);
+                    const hasPermission = await PermissionService.hasPermission(interaction.user.id, roleIds, permission);
                     if (!hasPermission) {
                         await interaction.reply({ 
                             content: `You need the permission \`${permission}\` to perform this action.`, 
@@ -50,7 +50,7 @@ export abstract class BaseCommand {
                         }
                     }
 
-                    const hasPermission = await PermissionService.hasPermission(roleIds, permission);
+                    const hasPermission = await PermissionService.hasPermission(interaction.user.id, roleIds, permission);
                     if (!hasPermission) {
                         await interaction.reply({ 
                             content: `You need the permission \`${permission}\` to perform this action.`, 
