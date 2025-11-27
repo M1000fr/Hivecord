@@ -67,10 +67,21 @@ export class LeBotClient<ready = false> extends Client {
 		const files = this.getFiles(eventsPath);
 
 		for (const file of files) {
-			const event = (await import(pathToFileURL(file).toString()))
-				.default;
-			if (event instanceof EventBuilder) {
-				const { name, handler, once } = event.build();
+			const eventModule = await import(pathToFileURL(file).toString());
+			const EventClass = eventModule.default;
+
+			if (EventClass && (EventClass as any).eventOptions) {
+				const options = (EventClass as any).eventOptions;
+				const instance = new EventClass();
+
+				if (options.once) {
+					this.once(options.name, (...args) => instance.run(this, ...args));
+				} else {
+					this.on(options.name, (...args) => instance.run(this, ...args));
+				}
+			} else if (EventClass instanceof EventBuilder) {
+				// Backward compatibility for EventBuilder
+				const { name, handler, once } = EventClass.build();
 				if (once) {
 					this.once(name, (...args) => handler(this, ...args));
 				} else {
