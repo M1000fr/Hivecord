@@ -14,10 +14,12 @@ enum ChannelType {
 }
 
 model User {
-    id       String    @id
-    leftAt   DateTime?
+    id     String    @id
+    leftAt DateTime?
 
-    Groups UserGroup[]
+    Groups            UserGroup[]
+    SanctionsReceived Sanction[]  @relation("UserSanctions")
+    SanctionsApplied  Sanction[]  @relation("ModeratorSanctions")
 }
 
 model Channel {
@@ -66,4 +68,24 @@ model Group {
 
     UserGroups  UserGroup[]
     Permissions GroupPermission[]
+}
+
+enum SanctionType {
+    WARN
+    MUTE
+    KICK
+    BAN
+}
+
+model Sanction {
+    id          Int          @id @default(autoincrement())
+    userId      String
+    moderatorId String
+    type        SanctionType
+    reason      String
+    createdAt   DateTime     @default(now())
+    expiresAt   DateTime?
+
+    User      User @relation("UserSanctions", fields: [userId], references: [id])
+    Moderator User @relation("ModeratorSanctions", fields: [moderatorId], references: [id])
 }
