@@ -39,6 +39,26 @@ export abstract class BaseCommand {
         } else {
             const defaultCommand = (this.constructor as any).defaultCommand;
             if (defaultCommand) {
+                const permission = (this.constructor as any).defaultCommandPermission;
+                if (permission) {
+                    let roleIds: string[] = [];
+                    if (interaction.member) {
+                        if (Array.isArray(interaction.member.roles)) {
+                            roleIds = interaction.member.roles;
+                        } else {
+                            roleIds = interaction.member.roles.cache.map((r) => r.id);
+                        }
+                    }
+
+                    const hasPermission = await PermissionService.hasPermission(roleIds, permission);
+                    if (!hasPermission) {
+                        await interaction.reply({ 
+                            content: `You need the permission \`${permission}\` to perform this action.`, 
+                            flags: [MessageFlags.Ephemeral] 
+                        });
+                        return;
+                    }
+                }
                 await (this as any)[defaultCommand](client, interaction);
             }
         }

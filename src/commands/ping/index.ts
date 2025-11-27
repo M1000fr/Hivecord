@@ -5,9 +5,9 @@ import { DefaultCommand } from "../../decorators/DefaultCommand";
 import { EPermission } from "../../enums/EPermission";
 import { pingOptions } from "./pingOptions";
 
-@Command(pingOptions, EPermission.CommandsPing)
+@Command(pingOptions)
 export default class PingCommand extends BaseCommand {
-    @DefaultCommand()
+    @DefaultCommand(EPermission.CommandsPing)
     async run(client: Client, interaction: ChatInputCommandInteraction) {
         await interaction.reply("Pong!");
     }

@@ -21,32 +21,6 @@ export default class InteractionCreateEvent extends BaseEvent<Events.Interaction
             return;
         }
 
-        const commandClass = command.instance.constructor as any;
-        const permission = commandClass.permission;
-
-        if (permission) {
-            let roleIds: string[] = [];
-            if (interaction.member) {
-                if (Array.isArray(interaction.member.roles)) {
-                    roleIds = interaction.member.roles;
-                } else {
-                    roleIds = interaction.member.roles.cache.map((r) => r.id);
-                }
-            }
-
-            const hasPermission = await PermissionService.hasPermission(
-                roleIds,
-                permission,
-            );
-            if (!hasPermission) {
-                await interaction.reply({
-                    content: "You do not have permission to use this command.",
-                    flags: [MessageFlags.Ephemeral],
-                });
-                return;
-            }
-        }
-
         try {
             await command.instance.execute(client, interaction);
         } catch (error) {
