@@ -36,4 +36,42 @@ export class PermissionService {
         }
         return false;
     }
+
+    static async registerPermissions(permissions: string[]) {
+        if (permissions.length === 0) return;
+
+        const permissionsToRegister = new Set<string>(permissions);
+
+        // Generate wildcards
+        for (const permission of permissions) {
+            const parts = permission.split('.');
+            // If permission is "a.b.c", we want "a.b.*" and "a.*"
+            // We iterate from length-1 down to 1
+            for (let i = parts.length - 1; i >= 1; i--) {
+                const wildcard = parts.slice(0, i).join('.') + '.*';
+                permissionsToRegister.add(wildcard);
+            }
+        }
+
+        const finalPermissions = Array.from(permissionsToRegister);
+
+        const existingPermissions = await prismaClient.permission.findMany({
+            where: {
+                name: {
+                    in: finalPermissions
+                }
+            }
+        });
+
+        const existingPermissionNames = existingPermissions.map(p => p.name);
+        const newPermissions = finalPermissions.filter(p => !existingPermissionNames.includes(p));
+
+        if (newPermissions.length > 0) {
+            await prismaClient.permission.createMany({
+                data: newPermissions.map(name => ({ name })),
+                skipDuplicates: true
+            });
+            console.log(`Registered ${newPermissions.length} new permissions (including wildcards).`);
+        }
+    }
 }

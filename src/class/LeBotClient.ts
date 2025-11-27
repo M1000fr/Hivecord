@@ -4,6 +4,8 @@ import fs from "fs";
 import { fileURLToPath, pathToFileURL } from "url";
 import { BaseCommand } from "./BaseCommand";
 import type { CommandOptions } from "../interfaces/CommandOptions";
+import { PermissionService } from "../services/PermissionService";
+import { EPermission } from "../enums/EPermission";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,11 +43,16 @@ export class LeBotClient<ready = false> extends Client {
 
 		const rest = new REST().setToken(this.token);
 		const commandsData = this.commands.map((c) => c.options);
+		const permissions = this.commands
+			.map((c) => c.options.permission)
+			.filter((p): p is EPermission => !!p);
 
 		try {
 			console.log(
 				`Started refreshing ${commandsData.length} application (/) commands for guild ${guildId}.`
 			);
+
+			await PermissionService.registerPermissions(permissions);
 
 			await rest.put(Routes.applicationGuildCommands(this.user.id, guildId), {
 				body: commandsData,
