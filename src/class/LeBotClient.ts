@@ -1,13 +1,17 @@
-import { Client, IntentsBitField } from "discord.js";
+import { Client, IntentsBitField, Collection, REST, Routes } from "discord.js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath, pathToFileURL } from "url";
 import { EventBuilder } from "./EventBuilder";
+import { BaseCommand } from "./BaseCommand";
+import type { CommandOptions } from "../interfaces/CommandOptions";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export class LeBotClient<ready = false> extends Client {
+	public commands = new Collection<string, { instance: BaseCommand; options: CommandOptions }>();
+
 	constructor() {
 		super({
 			intents: [
@@ -20,7 +24,34 @@ export class LeBotClient<ready = false> extends Client {
 
 	public async start(token: string): Promise<string> {
 		await this.loadEvents();
+		await this.loadCommands();
 		return this.login(token);
+	}
+
+	public async deployCommands() {
+		if (!this.token || !this.user) {
+			console.error("Client not logged in or token missing.");
+			return;
+		}
+
+		const rest = new REST().setToken(this.token);
+		const commandsData = this.commands.map((c) => c.options);
+
+		try {
+			console.log(
+				`Started refreshing ${commandsData.length} application (/) commands.`
+			);
+
+			await rest.put(Routes.applicationCommands(this.user.id), {
+				body: commandsData,
+			});
+
+			console.log(
+				`Successfully reloaded ${commandsData.length} application (/) commands.`
+			);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	private async loadEvents() {
@@ -39,6 +70,24 @@ export class LeBotClient<ready = false> extends Client {
 				} else {
 					this.on(name, (...args) => handler(this, ...args));
 				}
+			}
+		}
+	}
+
+	private async loadCommands() {
+		const commandsPath = path.join(__dirname, "../commands");
+		if (!fs.existsSync(commandsPath)) return;
+
+		const files = this.getFiles(commandsPath);
+
+		for (const file of files) {
+			const commandModule = await import(pathToFileURL(file).toString());
+			const CommandClass = commandModule.default;
+
+			if (CommandClass && (CommandClass as any).commandOptions) {
+				const options = (CommandClass as any).commandOptions as CommandOptions;
+				const instance = new CommandClass() as BaseCommand;
+				this.commands.set(options.name, { instance, options });
 			}
 		}
 	}
