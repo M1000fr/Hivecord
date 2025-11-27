@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, GuildMember, MessageFlags } from "discord.js";
+import { ChatInputCommandInteraction, Client, GuildMember, MessageFlags, PermissionsBitField } from "discord.js";
 import { BaseCommand } from "../../class/BaseCommand";
 import { Command } from "../../decorators/Command";
 import { DefaultCommand } from "../../decorators/DefaultCommand";
@@ -8,10 +8,12 @@ import { DurationParser } from "../../utils/DurationParser";
 import { prismaClient } from "../../services/prismaService";
 import { SanctionType } from "../../prisma/client/enums";
 import { ConfigService } from "../../services/ConfigService";
+import { BotPermission } from "../../decorators/BotPermission";
 
 @Command(tempMuteOptions)
 export default class TempMuteCommand extends BaseCommand {
     @DefaultCommand(EPermission.TempMute)
+    @BotPermission(PermissionsBitField.Flags.ManageRoles)
     async run(client: Client, interaction: ChatInputCommandInteraction) {
         const user = interaction.options.getUser("user", true);
         const durationString = interaction.options.getString("duration", true);
