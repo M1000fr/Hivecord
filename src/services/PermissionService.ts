@@ -1,33 +1,27 @@
 import { prismaClient } from "./prismaService";
 
 export class PermissionService {
-    static async hasPermission(userId: string, requiredPermission: string): Promise<boolean> {
-        const user = await prismaClient.user.findUnique({
-            where: { id: userId },
+    static async hasPermission(userRoleIds: string[], requiredPermission: string): Promise<boolean> {
+        const groups = await prismaClient.group.findMany({
+            where: {
+                roleId: {
+                    in: userRoleIds
+                }
+            },
             include: {
-                Groups: {
+                Permissions: {
                     include: {
-                        Groups: {
-                            include: {
-                                Permissions: {
-                                    include: {
-                                        Permissions: true
-                                    }
-                                }
-                            }
-                        }
+                        Permissions: true
                     }
                 }
             }
         });
 
-        if (!user) return false;
-
-        const userPermissions = user.Groups.flatMap(ug => 
-            ug.Groups.Permissions.map(gp => gp.Permissions.name)
+        const permissions = groups.flatMap(g => 
+            g.Permissions.map(gp => gp.Permissions.name)
         );
 
-        return this.checkPermission(userPermissions, requiredPermission);
+        return this.checkPermission(permissions, requiredPermission);
     }
 
     private static checkPermission(userPermissions: string[], requiredPermission: string): boolean {

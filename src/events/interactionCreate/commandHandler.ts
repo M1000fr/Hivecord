@@ -16,8 +16,17 @@ export default new EventBuilder(Events.InteractionCreate).setHandler(
 		}
 
 		if (command.options.permission) {
+			let roleIds: string[] = [];
+			if (interaction.member) {
+				if (Array.isArray(interaction.member.roles)) {
+					roleIds = interaction.member.roles;
+				} else {
+					roleIds = interaction.member.roles.cache.map((r) => r.id);
+				}
+			}
+
 			const hasPermission = await PermissionService.hasPermission(
-				interaction.user.id,
+				roleIds,
 				command.options.permission,
 			);
 			if (!hasPermission) {
