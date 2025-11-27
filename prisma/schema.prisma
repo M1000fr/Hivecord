@@ -1,0 +1,68 @@
+generator client {
+    provider = "prisma-client"
+    output   = "../src/prisma/client"
+}
+
+datasource db {
+    provider = "mysql"
+}
+
+enum ChannelType {
+    TEXT
+    VOICE
+    CATEGORY
+}
+
+model User {
+    id String @id
+
+    Groups UserGroup[]
+}
+
+model Channel {
+    id   String      @id
+    type ChannelType
+}
+
+model Role {
+    id   String @id
+    name String
+
+    Groups Group[]
+}
+
+model Permission {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    GroupsPermissions GroupPermission[]
+}
+
+model UserGroup {
+    id      Int    @id @default(autoincrement())
+    userId  String
+    groupId Int
+
+    Users  User  @relation(fields: [userId], references: [id])
+    Groups Group @relation(fields: [groupId], references: [id])
+}
+
+model GroupPermission {
+    id           Int @id @default(autoincrement())
+    groupId      Int
+    permissionId Int
+
+    Groups      Group      @relation(fields: [groupId], references: [id])
+    Permissions Permission @relation(fields: [permissionId], references: [id])
+}
+
+model Group {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    roleId String
+    Role   Role   @relation(fields: [roleId], references: [id])
+
+    UserGroups  UserGroup[]
+    Permissions GroupPermission[]
+}

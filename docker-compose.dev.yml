@@ -1,0 +1,16 @@
+name: LeBot Development Environment
+services:
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: lebot_db
+      MYSQL_USER: lebot_user
+      MYSQL_PASSWORD: lebot_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data_dev:/var/lib/mysql
+
+volumes:
+  mariadb_data_dev:
