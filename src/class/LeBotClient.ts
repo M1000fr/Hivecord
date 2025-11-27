@@ -23,6 +23,17 @@ export class LeBotClient<ready = false> extends Client {
 				IntentsBitField.Flags.GuildMessageReactions,
 			],
 		});
+		this.handleProcessEvents();
+	}
+
+	private handleProcessEvents() {
+		process.on("uncaughtException", (error) => {
+			this.logger.error(error.message, error.stack, "UncaughtException");
+		});
+
+		process.on("unhandledRejection", (reason) => {
+			this.logger.error(reason, undefined, "UnhandledRejection");
+		});
 	}
 
 	public async start(token: string): Promise<string> {
