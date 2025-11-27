@@ -21,7 +21,10 @@ export default class InteractionCreateEvent extends BaseEvent<Events.Interaction
             return;
         }
 
-        if (command.options.permission) {
+        const commandClass = command.instance.constructor as any;
+        const permission = commandClass.permission;
+
+        if (permission) {
             let roleIds: string[] = [];
             if (interaction.member) {
                 if (Array.isArray(interaction.member.roles)) {
@@ -33,7 +36,7 @@ export default class InteractionCreateEvent extends BaseEvent<Events.Interaction
 
             const hasPermission = await PermissionService.hasPermission(
                 roleIds,
-                command.options.permission,
+                permission,
             );
             if (!hasPermission) {
                 await interaction.reply({

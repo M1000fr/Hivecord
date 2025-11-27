@@ -56,9 +56,7 @@ export class LeBotClient<ready = false> extends Client {
 
 		const rest = new REST().setToken(this.token);
 		const commandsData = this.commands.map((c) => c.options);
-		const permissions = this.commands
-			.map((c) => c.options.permission)
-			.filter((p): p is EPermission => !!p);
+		const permissions = Object.values(EPermission);
 
 		try {
 			this.logger.log(
