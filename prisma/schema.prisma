@@ -14,7 +14,8 @@ enum ChannelType {
 }
 
 model User {
-    id String @id
+    id       String    @id
+    leftAt   DateTime?
 
     Groups UserGroup[]
 }
@@ -25,7 +26,8 @@ model Channel {
 }
 
 model Role {
-    id String @id
+    id        String    @id
+    deletedAt DateTime?
 
     Groups Group[]
 }
