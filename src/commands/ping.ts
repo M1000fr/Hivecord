@@ -5,6 +5,7 @@ import { SlashCommand } from "../decorators/SlashCommand";
 @SlashCommand({
     name: "ping",
     description: "Replies with Pong!",
+    permission: "commands.ping"
 })
 export default class PingCommand extends BaseCommand {
     async execute(client: Client, interaction: ChatInputCommandInteraction) {

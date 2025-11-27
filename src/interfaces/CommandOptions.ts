@@ -6,6 +6,7 @@ import type {
 export interface CommandOptions {
 	name: string;
 	description: string;
+	permission?: string;
 	options?: ApplicationCommandOptionData[];
 	defaultMemberPermissions?: PermissionResolvable;
 	dmPermission?: boolean;

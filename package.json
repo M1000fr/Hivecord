@@ -1,6 +1,6 @@
 {
   "name": "lebot",
-  "module": "index.ts",
+  "module": "src/index.ts",
   "type": "module",
   "private": true,
   "devDependencies": {
@@ -16,5 +16,8 @@
     "discord.js": "^14.25.1",
     "mysql2": "^3.15.3",
     "prisma": "^7.0.1"
+  },
+  "scripts": {
+    "dev": "bun --watch ."
   }
 }

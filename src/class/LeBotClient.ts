@@ -34,15 +34,21 @@ export class LeBotClient<ready = false> extends Client {
 			return;
 		}
 
+		const guildId = process.env.DISCORD_GUILD_ID;
+		if (!guildId) {
+			console.error("DISCORD_GUILD_ID is missing in environment variables.");
+			return;
+		}
+
 		const rest = new REST().setToken(this.token);
 		const commandsData = this.commands.map((c) => c.options);
 
 		try {
 			console.log(
-				`Started refreshing ${commandsData.length} application (/) commands.`
+				`Started refreshing ${commandsData.length} application (/) commands for guild ${guildId}.`
 			);
 
-			await rest.put(Routes.applicationCommands(this.user.id), {
+			await rest.put(Routes.applicationGuildCommands(this.user.id, guildId), {
 				body: commandsData,
 			});
 
