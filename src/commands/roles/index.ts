@@ -8,7 +8,7 @@ import { prismaClient } from "../../services/prismaService";
 
 @Command(replaceRoleOptions)
 export default class ReplaceRoleCommand extends BaseCommand {
-    @DefaultCommand(EPermission.CommandsReplaceRole)
+    @DefaultCommand(EPermission.ReplaceRole)
     async run(client: Client, interaction: ChatInputCommandInteraction) {
         const oldRoleId = interaction.options.getString("old-role-id", true);
         const newRole = interaction.options.getRole("new-role", true) as Role;

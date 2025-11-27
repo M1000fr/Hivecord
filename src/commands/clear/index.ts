@@ -12,7 +12,7 @@ import { clearOptions } from "./pingOptions";
 
 @Command(clearOptions)
 export default class ClearCommand extends BaseCommand {
-	@DefaultCommand(EPermission.CommandsClear)
+	@DefaultCommand(EPermission.ChannelClear)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const amount = interaction.options.getString("amount", true);
 		const user = interaction.options.getUser("user");

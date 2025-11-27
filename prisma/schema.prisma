@@ -89,3 +89,8 @@ model Sanction {
     User      User @relation("UserSanctions", fields: [userId], references: [id])
     Moderator User @relation("ModeratorSanctions", fields: [moderatorId], references: [id])
 }
+
+model Configuration {
+    key   String @id
+    value String
+}

@@ -26,7 +26,7 @@ export default class GroupCommand extends BaseCommand {
         await interaction.reply({ content: `**Groups List:**\n${groupList}`, flags: [MessageFlags.Ephemeral]  });
     }
 
-    @Subcommand({ name: "create", permission: EPermission.GroupsCreate })
+    @Subcommand({ name: "create", permission: EPermission.roupsCreate })
     private async createGroup(client: Client, interaction: ChatInputCommandInteraction) {
         const name = interaction.options.getString("name", true);
         const role = interaction.options.getRole("role", true);

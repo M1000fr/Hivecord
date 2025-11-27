@@ -7,7 +7,7 @@ import { pingOptions } from "./pingOptions";
 
 @Command(pingOptions)
 export default class PingCommand extends BaseCommand {
-    @DefaultCommand(EPermission.CommandsPing)
+    @DefaultCommand(EPermission.Ping)
     async run(client: Client, interaction: ChatInputCommandInteraction) {
         await interaction.reply("Pong!");
     }
