@@ -1,5 +1,5 @@
-import { EventOptions } from "../interfaces/EventOptions";
-import { ClientEvents } from "discord.js";
+import type { EventOptions } from "../interfaces/EventOptions";
+import type { ClientEvents } from "discord.js";
 
 export function Event<K extends keyof ClientEvents>(options: EventOptions<K>) {
     return function (target: Function) {
