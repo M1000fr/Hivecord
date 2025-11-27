@@ -2,7 +2,6 @@ import { Client, IntentsBitField, Collection, REST, Routes } from "discord.js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath, pathToFileURL } from "url";
-import { EventBuilder } from "./EventBuilder";
 import { BaseCommand } from "./BaseCommand";
 import type { CommandOptions } from "../interfaces/CommandOptions";
 
@@ -78,14 +77,6 @@ export class LeBotClient<ready = false> extends Client {
 					this.once(options.name, (...args) => instance.run(this, ...args));
 				} else {
 					this.on(options.name, (...args) => instance.run(this, ...args));
-				}
-			} else if (EventClass instanceof EventBuilder) {
-				// Backward compatibility for EventBuilder
-				const { name, handler, once } = EventClass.build();
-				if (once) {
-					this.once(name, (...args) => handler(this, ...args));
-				} else {
-					this.on(name, (...args) => handler(this, ...args));
 				}
 			}
 		}
