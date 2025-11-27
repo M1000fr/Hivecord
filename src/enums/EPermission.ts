@@ -4,4 +4,5 @@ export enum EPermission {
     GroupsUpdate = "groups.update",
     GroupsDelete = "groups.delete",
     GroupsList = "groups.list",
+    CommandsReplaceRole = "commands.replaceRole",
 }
