@@ -13,4 +13,5 @@ export enum EPermission {
 	Config = "commands.config",
 	SyncBackup = "commands.sync.backup",
 	SyncRestore = "commands.sync.restore",
+	SanctionsList = "commands.sanctions.list",
 }
