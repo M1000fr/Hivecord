@@ -19,97 +19,131 @@ import { Event } from "../../../../decorators/Event";
 import { LeBotClient } from "../../../../class/LeBotClient";
 import { ConfigService } from "../../../../services/ConfigService";
 
+const TYPE_NAMES: Record<ApplicationCommandOptionType, string> = {
+	[ApplicationCommandOptionType.String]: "Text",
+	[ApplicationCommandOptionType.Role]: "Role",
+	[ApplicationCommandOptionType.Channel]: "Channel",
+	[ApplicationCommandOptionType.User]: "User",
+	[ApplicationCommandOptionType.Integer]: "Number",
+	[ApplicationCommandOptionType.Boolean]: "Boolean",
+	[ApplicationCommandOptionType.Subcommand]: "Subcommand",
+	[ApplicationCommandOptionType.SubcommandGroup]: "SubcommandGroup",
+	[ApplicationCommandOptionType.Number]: "Number",
+	[ApplicationCommandOptionType.Mentionable]: "Mentionable",
+	[ApplicationCommandOptionType.Attachment]: "Attachment",
+};
+
+class ConfigHelper {
+	static toSnakeCase(str: string): string {
+		return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+	}
+
+	static truncate(str: string, maxLength: number): string {
+		return str.length > maxLength ? `${str.substring(0, maxLength - 3)}...` : str;
+	}
+
+	static formatValue(value: string, type: ApplicationCommandOptionType): string {
+		if (type === ApplicationCommandOptionType.Role) return `<@&${value}>`;
+		if (type === ApplicationCommandOptionType.Channel) return `<#${value}>`;
+		return this.truncate(value, 100);
+	}
+
+	static async fetchValue(key: string, type: ApplicationCommandOptionType): Promise<string | null> {
+		const snakeKey = this.toSnakeCase(key);
+		if (type === ApplicationCommandOptionType.Role) return ConfigService.getRole(snakeKey);
+		if (type === ApplicationCommandOptionType.Channel) return ConfigService.getChannel(snakeKey);
+		return ConfigService.get(snakeKey);
+	}
+
+	static async saveValue(key: string, value: string, type: ApplicationCommandOptionType): Promise<void> {
+		const snakeKey = this.toSnakeCase(key);
+		if (type === ApplicationCommandOptionType.Role) return ConfigService.setRole(snakeKey, value);
+		if (type === ApplicationCommandOptionType.Channel) return ConfigService.setChannel(snakeKey, value);
+		return ConfigService.set(snakeKey, value);
+	}
+
+	static buildCustomId(parts: string[]): string {
+		return parts.join(":");
+	}
+
+	static parseCustomId(customId: string): string[] {
+		return customId.split(":");
+	}
+}
+
 @Event({
 	name: Events.InteractionCreate,
 })
 export default class ModuleConfigInteractionHandler extends BaseEvent<Events.InteractionCreate> {
-	private async getCurrentValue(
-		key: string,
-		type: ApplicationCommandOptionType,
-	): Promise<string> {
+	private async getCurrentValue(key: string, type: ApplicationCommandOptionType): Promise<string> {
 		try {
-			const snakeCaseKey = key.replace(
-				/[A-Z]/g,
-				(letter: string) => `_${letter.toLowerCase()}`,
-			);
-
-			if (type === ApplicationCommandOptionType.Role) {
-				const roleId = await ConfigService.getRole(snakeCaseKey);
-				if (roleId) return `<@&${roleId}>`;
-			} else if (type === ApplicationCommandOptionType.Channel) {
-				const channelId = await ConfigService.getChannel(snakeCaseKey);
-				if (channelId) return `<#${channelId}>`;
-			} else {
-				const value = await ConfigService.get(snakeCaseKey);
-				if (value)
-					return value.length > 100
-						? value.substring(0, 97) + "..."
-						: value;
-			}
-		} catch (error) {
-			// Ignore errors
+			const value = await ConfigHelper.fetchValue(key, type);
+			return value ? ConfigHelper.formatValue(value, type) : "*Not set*";
+		} catch {
+			return "*Not set*";
 		}
-		return "*Not set*";
 	}
 
-	private async buildModuleConfigEmbed(
-		client: LeBotClient<true>,
-		moduleName: string,
-	) {
+	private async buildModuleConfigEmbed(client: LeBotClient<true>, moduleName: string) {
 		const module = client.modules.get(moduleName.toLowerCase());
-		if (!module || !module.options.config) return null;
+		if (!module?.options.config) return null;
 
-		const configClass = module.options.config;
-		const configProperties = (configClass as any).configProperties || {};
+		const configProperties = (module.options.config as any).configProperties || {};
 
 		const embed = new EmbedBuilder()
 			.setTitle(`⚙️ Configuration: ${module.options.name}`)
-			.setDescription(
-				`Select a property to configure for the **${module.options.name}** module.`,
-			)
+			.setDescription(`Select a property to configure for the **${module.options.name}** module.`)
 			.setColor("#5865F2")
 			.setTimestamp();
 
-		let index = 1;
-		for (const [key, options] of Object.entries(configProperties)) {
+		for (const [idx, [key, options]] of Object.entries(configProperties).entries()) {
 			const opt = options as any;
-			const typeNames: { [key: number]: string } = {
-				[ApplicationCommandOptionType.String]: "Text",
-				[ApplicationCommandOptionType.Role]: "Role",
-				[ApplicationCommandOptionType.Channel]: "Channel",
-				[ApplicationCommandOptionType.User]: "User",
-				[ApplicationCommandOptionType.Integer]: "Number",
-				[ApplicationCommandOptionType.Boolean]: "Boolean",
-			};
-
 			const currentValue = await this.getCurrentValue(key, opt.type);
 
 			embed.addFields({
-				name: `${index}. ${opt.displayName || key}`,
-				value: `${opt.description}\nType: \`${typeNames[opt.type] || "Unknown"}\`\nCurrent: ${currentValue}`,
+				name: `${idx + 1}. ${opt.displayName || key}`,
+				value: `${opt.description}\nType: \`${TYPE_NAMES[opt.type as ApplicationCommandOptionType] || "Unknown"}\`\nCurrent: ${currentValue}`,
 				inline: false,
 			});
-			index++;
 		}
 
 		const selectMenu = new StringSelectMenuBuilder()
-			.setCustomId(`module_config:${moduleName.toLowerCase()}`)
+			.setCustomId(ConfigHelper.buildCustomId(["module_config", moduleName.toLowerCase()]))
 			.setPlaceholder("Select a property to configure")
 			.addOptions(
 				Object.entries(configProperties).map(([key, options], idx) => {
 					const opt = options as any;
 					return new StringSelectMenuOptionBuilder()
 						.setLabel(`${idx + 1}. ${opt.displayName || key}`)
-						.setDescription(opt.description.substring(0, 100))
+						.setDescription(ConfigHelper.truncate(opt.description, 100))
 						.setValue(key);
 				}),
 			);
 
-		const row =
-			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-				selectMenu,
-			);
-		return { embed, row };
+		return { 
+			embed, 
+			row: new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu) 
+		};
+	}
+
+	private async respondToInteraction(interaction: any, content: string, isError = false) {
+		const payload = { content, flags: [MessageFlags.Ephemeral] };
+		if (interaction.replied || interaction.deferred) {
+			await interaction.followUp(payload);
+		} else if (interaction.isModalSubmit()) {
+			await interaction.reply(payload);
+		} else {
+			await interaction.update({ ...payload, embeds: [], components: [] });
+		}
+	}
+
+	private async getMainMessage(interaction: any): Promise<Message | null> {
+		if (interaction.isModalSubmit()) return interaction.message;
+		
+		const refId = interaction.message.reference?.messageId;
+		if (!refId) return null;
+
+		return await interaction.channel?.messages.fetch(refId).catch(() => null) || null;
 	}
 
 	private async updateConfig(
@@ -120,274 +154,137 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		value: string,
 		type: ApplicationCommandOptionType,
 	) {
-		const snakeCaseKey = propertyKey.replace(
-			/[A-Z]/g,
-			(letter: string) => `_${letter.toLowerCase()}`,
-		);
-		let saved = false;
-		let displayValue = value;
-
 		try {
-			if (type === ApplicationCommandOptionType.Role) {
-				await ConfigService.setRole(snakeCaseKey, value);
-				saved = true;
-				displayValue = `<@&${value}>`;
-			} else if (type === ApplicationCommandOptionType.Channel) {
-				await ConfigService.setChannel(snakeCaseKey, value);
-				saved = true;
-				displayValue = `<#${value}>`;
-			} else {
-				await ConfigService.set(snakeCaseKey, value);
-				saved = true;
-			}
+			await ConfigHelper.saveValue(propertyKey, value, type);
+			const displayValue = ConfigHelper.formatValue(value, type);
 
-			if (saved) {
-				// Reply/Update interaction
-				const replyContent = `✅ Successfully updated **${propertyKey}** to ${displayValue}`;
-				if (interaction.isModalSubmit()) {
-					await interaction.reply({
-						content: replyContent,
-						flags: [MessageFlags.Ephemeral],
-					});
-				} else {
-					await interaction.update({
-						content: replyContent,
-						embeds: [],
-						components: [],
-					});
-				}
+			await this.respondToInteraction(
+				interaction, 
+				`✅ Successfully updated **${propertyKey}** to ${displayValue}`
+			);
 
-				// Update main message
-				let mainMessage: Message | null = null;
-
-				if (interaction.isModalSubmit()) {
-					// For modal submit, the message is directly available
-					mainMessage = interaction.message;
-				} else {
-					// For select menus (ephemeral), try to find the main message
-					// This is best effort as we don't have a direct link
-					if (interaction.message.reference?.messageId) {
-						mainMessage =
-							(await interaction.channel?.messages
-								.fetch(interaction.message.reference.messageId)
-								.catch(() => null)) || null;
-					}
-				}
-
-				if (mainMessage) {
-					const config = await this.buildModuleConfigEmbed(
-						client,
-						moduleName,
-					);
-					if (config) {
-						await mainMessage.edit({
-							embeds: [config.embed],
-							components: [config.row],
-						});
-					}
+			const mainMessage = await this.getMainMessage(interaction);
+			if (mainMessage) {
+				const config = await this.buildModuleConfigEmbed(client, moduleName);
+				if (config) {
+					await mainMessage.edit({ embeds: [config.embed], components: [config.row] });
 				}
 			}
 		} catch (error) {
 			console.error(error);
-			const errorContent =
-				"An error occurred while saving the configuration.";
-			if (interaction.isModalSubmit()) {
-				await interaction.reply({
-					content: errorContent,
-					flags: [MessageFlags.Ephemeral],
-				});
-			} else {
-				await interaction.update({
-					content: errorContent,
-					embeds: [],
-					components: [],
-				});
-			}
+			await this.respondToInteraction(
+				interaction, 
+				"An error occurred while saving the configuration.", 
+				true
+			);
 		}
 	}
 
 	async run(client: LeBotClient<true>, interaction: Interaction) {
-		if (interaction.isStringSelectMenu()) {
-			const [action, moduleName] = interaction.customId.split(":");
-			if (action === "module_config" && moduleName) {
-				await this.handlePropertySelection(
-					client,
-					interaction,
-					moduleName,
-				);
-			}
-		} else if (interaction.isRoleSelectMenu()) {
-			const [action, moduleName, propertyKey] =
-				interaction.customId.split(":");
-			if (
-				action === "module_config_role" &&
-				moduleName &&
-				propertyKey &&
-				interaction.values[0]
-			) {
-				await this.updateConfig(
-					client,
-					interaction,
-					moduleName,
-					propertyKey,
-					interaction.values[0],
-					ApplicationCommandOptionType.Role,
-				);
-			}
-		} else if (interaction.isChannelSelectMenu()) {
-			const [action, moduleName, propertyKey] =
-				interaction.customId.split(":");
-			if (
-				action === "module_config_channel" &&
-				moduleName &&
-				propertyKey &&
-				interaction.values[0]
-			) {
-				await this.updateConfig(
-					client,
-					interaction,
-					moduleName,
-					propertyKey,
-					interaction.values[0],
-					ApplicationCommandOptionType.Channel,
-				);
-			}
-		} else if (interaction.isModalSubmit()) {
-			const [action, moduleName, propertyKey] =
-				interaction.customId.split(":");
-			if (action === "module_config_modal" && moduleName && propertyKey) {
-				await this.updateConfig(
-					client,
-					interaction,
-					moduleName,
-					propertyKey,
-					interaction.fields.getTextInputValue("value"),
-					ApplicationCommandOptionType.String,
-				);
-			}
+		if (!("customId" in interaction)) return;
+		
+		const [action, moduleName, propertyKey] = ConfigHelper.parseCustomId(interaction.customId);
+
+		if (interaction.isStringSelectMenu() && action === "module_config" && moduleName) {
+			await this.handlePropertySelection(client, interaction, moduleName);
+		} else if (interaction.isRoleSelectMenu() && action === "module_config_role" && moduleName && propertyKey && interaction.values[0]) {
+			await this.updateConfig(client, interaction, moduleName, propertyKey, interaction.values[0], ApplicationCommandOptionType.Role);
+		} else if (interaction.isChannelSelectMenu() && action === "module_config_channel" && moduleName && propertyKey && interaction.values[0]) {
+			await this.updateConfig(client, interaction, moduleName, propertyKey, interaction.values[0], ApplicationCommandOptionType.Channel);
+		} else if (interaction.isModalSubmit() && action === "module_config_modal" && moduleName && propertyKey) {
+			await this.updateConfig(client, interaction, moduleName, propertyKey, interaction.fields.getTextInputValue("value"), ApplicationCommandOptionType.String);
 		}
 	}
 
-	private async handlePropertySelection(
-		client: LeBotClient<true>,
-		interaction: any,
-		moduleName: string,
-	) {
+	private buildPropertyEmbed(propertyOptions: any, selectedProperty: string, currentValue: string) {
+		return new EmbedBuilder()
+			.setTitle(`⚙️ Configure: ${propertyOptions.displayName || selectedProperty}`)
+			.setDescription(`${propertyOptions.description}\n\n**Current value:** ${currentValue}`)
+			.setColor("#5865F2")
+			.setTimestamp();
+	}
+
+	private buildSelectComponent(type: ApplicationCommandOptionType, moduleName: string, selectedProperty: string) {
+		const customId = ConfigHelper.buildCustomId([
+			type === ApplicationCommandOptionType.Role ? "module_config_role" : "module_config_channel",
+			moduleName,
+			selectedProperty
+		]);
+		const placeholder = type === ApplicationCommandOptionType.Role ? "Select a role" : "Select a channel";
+
+		const component = type === ApplicationCommandOptionType.Role
+			? new RoleSelectMenuBuilder()
+			: new ChannelSelectMenuBuilder();
+
+		return component.setCustomId(customId).setPlaceholder(placeholder).setMinValues(1).setMaxValues(1);
+	}
+
+	private async handleRoleOrChannelProperty(interaction: any, propertyOptions: any, selectedProperty: string, moduleName: string) {
+		const currentValue = await this.getCurrentValue(selectedProperty, propertyOptions.type);
+		const embed = this.buildPropertyEmbed(propertyOptions, selectedProperty, currentValue);
+		const component = this.buildSelectComponent(propertyOptions.type, moduleName, selectedProperty);
+
+		await interaction.reply({
+			embeds: [embed],
+			components: [new ActionRowBuilder<any>().addComponents(component)],
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
+
+	private async handleTextProperty(interaction: any, propertyOptions: any, selectedProperty: string, moduleName: string) {
+		const rawValue = await ConfigHelper.fetchValue(selectedProperty, ApplicationCommandOptionType.String) || "";
+		const labelText = ConfigHelper.truncate(propertyOptions.description, 45);
+
+		const input = new TextInputBuilder({
+			customId: "value",
+			label: labelText,
+			style: TextInputStyle.Paragraph,
+			required: propertyOptions.required ?? false,
+			placeholder: "Enter text value",
+		});
+
+		if (rawValue) input.setValue(rawValue);
+
+		const modal = new ModalBuilder({
+			customId: ConfigHelper.buildCustomId(["module_config_modal", moduleName, selectedProperty]),
+			title: ConfigHelper.truncate(`Configure: ${propertyOptions.displayName || selectedProperty}`, 45),
+			components: [new ActionRowBuilder<TextInputBuilder>().addComponents(input).toJSON()],
+		});
+
+		await interaction.showModal(modal);
+	}
+
+	private async handlePropertySelection(client: LeBotClient<true>, interaction: any, moduleName: string) {
 		const module = client.modules.get(moduleName.toLowerCase());
-		if (!module || !module.options.config) {
-			await interaction.reply({
-				content: "Module not found.",
-				flags: [MessageFlags.Ephemeral],
-			});
+		if (!module?.options.config) {
+			await this.respondToInteraction(interaction, "Module not found.");
 			return;
 		}
 
 		const selectedProperty = interaction.values[0];
+		const configProperties = (module.options.config as any).configProperties || {};
+		const propertyOptions = configProperties[selectedProperty];
 
-		// Reset the select menu to allow re-selection of the same property
+		if (!propertyOptions) {
+			await this.respondToInteraction(interaction, "Property not found.");
+			return;
+		}
+
 		try {
 			const config = await this.buildModuleConfigEmbed(client, moduleName);
 			if (config && interaction.message) {
-				await interaction.message.edit({
-					embeds: [config.embed],
-					components: [config.row],
-				});
+				await interaction.message.edit({ embeds: [config.embed], components: [config.row] });
 			}
 		} catch (error) {
 			console.error("Failed to reset select menu:", error);
 		}
 
-		const configProperties =
-			(module.options.config as any).configProperties || {};
-		const propertyOptions = configProperties[selectedProperty];
-
-		if (!propertyOptions) {
-			await interaction.reply({
-				content: "Property not found.",
-				flags: [MessageFlags.Ephemeral],
-			});
-			return;
-		}
-
-		if (
-			propertyOptions.type === ApplicationCommandOptionType.Role ||
-			propertyOptions.type === ApplicationCommandOptionType.Channel
-		) {
-			const currentValue = await this.getCurrentValue(
-				selectedProperty,
-				propertyOptions.type,
-			);
-
-			const embed = new EmbedBuilder()
-				.setTitle(`⚙️ Configure: ${propertyOptions.displayName || selectedProperty}`)
-				.setDescription(
-					`${propertyOptions.description}\n\n**Current value:** ${currentValue}`,
-				)
-				.setColor("#5865F2")
-				.setTimestamp();
-
-			let component;
-			if (propertyOptions.type === ApplicationCommandOptionType.Role) {
-				component = new RoleSelectMenuBuilder()
-					.setCustomId(
-						`module_config_role:${moduleName}:${selectedProperty}`,
-					)
-					.setPlaceholder("Select a role")
-					.setMinValues(1)
-					.setMaxValues(1);
-			} else {
-				component = new ChannelSelectMenuBuilder()
-					.setCustomId(
-						`module_config_channel:${moduleName}:${selectedProperty}`,
-					)
-					.setPlaceholder("Select a channel")
-					.setMinValues(1)
-					.setMaxValues(1);
-			}
-
-			const row = new ActionRowBuilder<any>().addComponents(component);
-			await interaction.reply({
-				embeds: [embed],
-				components: [row],
-				flags: [MessageFlags.Ephemeral],
-			});
+		const isRoleOrChannel = [ApplicationCommandOptionType.Role, ApplicationCommandOptionType.Channel].includes(propertyOptions.type);
+		
+		if (isRoleOrChannel) {
+			await this.handleRoleOrChannelProperty(interaction, propertyOptions, selectedProperty, moduleName);
 		} else {
-			const snakeCaseKey = selectedProperty.replace(
-				/[A-Z]/g,
-				(letter: string) => `_${letter.toLowerCase()}`,
-			);
-			let rawValue = "";
-			const val = await ConfigService.get(snakeCaseKey);
-			if (val) rawValue = val;
-
-			const labelText =
-				propertyOptions.description.length > 45
-					? propertyOptions.description.substring(0, 42) + "..."
-					: propertyOptions.description;
-
-			const input = new TextInputBuilder({
-				customId: "value",
-				label: labelText,
-				style: TextInputStyle.Paragraph,
-				required: propertyOptions.required ?? false,
-				placeholder: "Enter text value",
-			});
-
-			if (rawValue) {
-				input.setValue(rawValue);
-			}
-
-			const row = new ActionRowBuilder<TextInputBuilder>().addComponents(
-				input,
-			);
-
-			const modal = new ModalBuilder({
-				customId: `module_config_modal:${moduleName}:${selectedProperty}`,
-				title: `Configure: ${propertyOptions.displayName || selectedProperty}`,
-				components: [row.toJSON()],
-			});
-
-			await interaction.showModal(modal);
+			await this.handleTextProperty(interaction, propertyOptions, selectedProperty, moduleName);
 		}
 	}
 }
