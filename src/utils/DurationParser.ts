@@ -17,6 +17,12 @@ export class DurationParser {
 				return value * 60 * 60 * 1000;
 			case "d":
 				return value * 24 * 60 * 60 * 1000;
+			case "w":
+				return value * 7 * 24 * 60 * 60 * 1000;
+			case "M":
+				return value * 30 * 24 * 60 * 60 * 1000;
+			case "y":
+				return value * 365 * 24 * 60 * 60 * 1000;
 			default:
 				return null;
 		}
