@@ -3,6 +3,7 @@ import {
 	Client,
 	MessageFlags,
 	AttachmentBuilder,
+	EmbedBuilder,
 } from "discord.js";
 import { BaseCommand } from "../../class/BaseCommand";
 import { Command } from "../../decorators/Command";
@@ -11,7 +12,11 @@ import { Subcommand } from "../../decorators/Subcommand";
 import { EPermission } from "../../enums/EPermission";
 import { configOptions } from "./configOptions";
 import { ConfigService } from "../../services/ConfigService";
-import { EConfigKey, EChannelConfigKey, ERoleConfigKey } from "../../enums/EConfigKey";
+import {
+	EConfigKey,
+	EChannelConfigKey,
+	ERoleConfigKey,
+} from "../../enums/EConfigKey";
 import { ChannelType } from "../../prisma/client/enums";
 import { ChannelType as DiscordChannelType } from "discord.js";
 
@@ -27,11 +32,16 @@ export default class ConfigCommand extends BaseCommand {
 		permission: EPermission.Config,
 	})
 	async showConfig(client: Client, interaction: ChatInputCommandInteraction) {
-		const muteRoleId = await ConfigService.getRole(ERoleConfigKey.MuteRoleId);
+		const muteRoleId = await ConfigService.getRole(
+			ERoleConfigKey.MuteRoleId,
+		);
 		const welcomeChannelId = await ConfigService.getChannel(
 			EChannelConfigKey.WelcomeChannelId,
 		);
 		const welcomeMessage = await ConfigService.get(
+			EConfigKey.WelcomeMessage,
+		);
+		const welcomeMessageImage = await ConfigService.get(
 			EConfigKey.WelcomeMessageImage,
 		);
 
@@ -42,27 +52,42 @@ export default class ConfigCommand extends BaseCommand {
 			? interaction.guild?.channels.cache.get(welcomeChannelId)
 			: null;
 
-		let content = "**Current Configuration**\n\n";
-		content += `**Mute Role:** ${
-			muteRole
-				? muteRole
-				: muteRoleId
-				? muteRoleId + " (Not found)"
-				: "Not set"
-		}\n`;
-		content += `**Welcome Channel:** ${
-			welcomeChannel
-				? welcomeChannel
-				: welcomeChannelId
-				? welcomeChannelId + " (Not found)"
-				: "Not set"
-		}\n`;
-		content += `**Welcome Message:** ${
-			welcomeMessage ? welcomeMessage : "Not set"
-		}\n`;
+		const embed = new EmbedBuilder()
+			.setTitle("Current Configuration")
+			.setColor("Blue")
+			.addFields(
+				{
+					name: "Mute Role",
+					value: muteRole
+						? muteRole.toString()
+						: muteRoleId
+							? `${muteRoleId} (Not found)`
+							: "Not set",
+					inline: true,
+				},
+				{
+					name: "Welcome Channel",
+					value: welcomeChannel
+						? welcomeChannel.toString()
+						: welcomeChannelId
+							? `${welcomeChannelId} (Not found)`
+							: "Not set",
+					inline: true,
+				},
+				{
+					name: "Welcome Message Image",
+					value: welcomeMessageImage || "Not set",
+					inline: false,
+				},
+				{
+					name: "Welcome Message",
+					value: welcomeMessage || "Not set",
+					inline: false,
+				},
+			);
 
 		await interaction.reply({
-			content,
+			embeds: [embed],
 			flags: [MessageFlags.Ephemeral],
 		});
 	}
@@ -103,7 +128,7 @@ export default class ConfigCommand extends BaseCommand {
 				await ConfigService.setChannel(
 					EChannelConfigKey.WelcomeChannelId,
 					channel.id,
-					ChannelType.TEXT
+					ChannelType.TEXT,
 				);
 				updates.push(`Welcome channel set to ${channel}`);
 			}
@@ -146,10 +171,7 @@ export default class ConfigCommand extends BaseCommand {
 	) {
 		const file = interaction.options.getAttachment("file", true);
 
-		if (
-			!file.name.endsWith(".enc") &&
-			!file.name.endsWith(".json")
-		) {
+		if (!file.name.endsWith(".enc") && !file.name.endsWith(".json")) {
 			await interaction.reply({
 				content: "Please upload a valid backup file (.enc or .json).",
 				flags: [MessageFlags.Ephemeral],
@@ -160,7 +182,7 @@ export default class ConfigCommand extends BaseCommand {
 		try {
 			const response = await fetch(file.url);
 			if (!response.ok) throw new Error("Failed to fetch file");
-			
+
 			let json: any;
 			if (file.name.endsWith(".enc")) {
 				const text = await response.text();
@@ -174,7 +196,10 @@ export default class ConfigCommand extends BaseCommand {
 				throw new Error("Invalid JSON format");
 			}
 
-			if ('configuration' in json && Array.isArray((json as any).configuration)) {
+			if (
+				"configuration" in json &&
+				Array.isArray((json as any).configuration)
+			) {
 				await ConfigService.restoreFullBackup(json);
 				await interaction.reply({
 					content: "Full backup imported successfully.",
@@ -190,7 +215,8 @@ export default class ConfigCommand extends BaseCommand {
 		} catch (error) {
 			console.error(error);
 			await interaction.reply({
-				content: "Failed to import configuration. Ensure the file is valid and the encryption key matches.",
+				content:
+					"Failed to import configuration. Ensure the file is valid and the encryption key matches.",
 				flags: [MessageFlags.Ephemeral],
 			});
 		}
