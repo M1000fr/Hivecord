@@ -24,7 +24,8 @@
 	},
 	"scripts": {
 		"dev": "bun .",
-		"start": "bunx prisma migrate deploy && bun ."
+		"start": "bunx prisma migrate deploy && bun .",
+		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
 	},
 	"trustedDependencies": [
 		"skia-canvas"
