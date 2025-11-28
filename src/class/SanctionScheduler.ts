@@ -2,7 +2,7 @@ import { Client } from "discord.js";
 import { prismaClient } from "../services/prismaService";
 import { SanctionType } from "../prisma/client/enums";
 import { ConfigService } from "../services/ConfigService";
-import { EConfigKey } from "../enums/EConfigKey";
+import { EConfigKey, ERoleConfigKey } from "../enums/EConfigKey";
 import { Logger } from "../utils/Logger";
 
 export class SanctionScheduler {
@@ -28,7 +28,7 @@ export class SanctionScheduler {
 		const guild = await this.client.guilds.fetch(guildId).catch(() => null);
 		if (!guild) return;
 
-		const muteRoleId = await ConfigService.get(EConfigKey.MuteRoleId);
+		const muteRoleId = await ConfigService.getRole(ERoleConfigKey.MuteRoleId);
 		if (!muteRoleId) return;
 
 		const muteRole = guild.roles.cache.get(muteRoleId);
@@ -98,8 +98,8 @@ export class SanctionScheduler {
 				if (!guild) continue;
 
 				if (sanction.type === SanctionType.MUTE) {
-					const muteRoleId = await ConfigService.get(
-						EConfigKey.MuteRoleId,
+					const muteRoleId = await ConfigService.getRole(
+						ERoleConfigKey.MuteRoleId,
 					);
 					if (muteRoleId) {
 						const member = await guild.members

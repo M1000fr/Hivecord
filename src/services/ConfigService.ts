@@ -1,6 +1,7 @@
 import { prismaClient } from "./prismaService";
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto';
-import { EConfigKey } from "../enums/EConfigKey";
+import { EConfigKey, EChannelConfigKey, ERoleConfigKey } from "../enums/EConfigKey";
+import { ChannelType } from "../prisma/client/enums";
 
 export class ConfigService {
     private static getAlgorithm() {
@@ -51,11 +52,62 @@ export class ConfigService {
         });
     }
 
+    static async getChannel(key: EChannelConfigKey): Promise<string | null> {
+        const config = await prismaClient.channelConfiguration.findUnique({
+            where: { key },
+        });
+        return config ? config.channelId : null;
+    }
+
+    static async setChannel(key: EChannelConfigKey, channelId: string, channelType: ChannelType = ChannelType.TEXT): Promise<void> {
+        await prismaClient.channel.upsert({
+            where: { id: channelId },
+            update: { type: channelType },
+            create: { id: channelId, type: channelType },
+        });
+
+        await prismaClient.channelConfiguration.upsert({
+            where: { key },
+            update: { channelId },
+            create: { key, channelId },
+        });
+    }
+
+    static async getRole(key: ERoleConfigKey): Promise<string | null> {
+        const config = await prismaClient.roleConfiguration.findUnique({
+            where: { key },
+        });
+        return config ? config.roleId : null;
+    }
+
+    static async setRole(key: ERoleConfigKey, roleId: string): Promise<void> {
+        await prismaClient.role.upsert({
+            where: { id: roleId },
+            update: {},
+            create: { id: roleId },
+        });
+
+        await prismaClient.roleConfiguration.upsert({
+            where: { key },
+            update: { roleId },
+            create: { key, roleId },
+        });
+    }
+
     static async getAll(): Promise<Record<string, string>> {
         const configs = await prismaClient.configuration.findMany();
+        const channelConfigs = await prismaClient.channelConfiguration.findMany();
+        const roleConfigs = await prismaClient.roleConfiguration.findMany();
+        
         const result: Record<string, string> = {};
         for (const config of configs) {
             result[config.key] = config.value;
+        }
+        for (const config of channelConfigs) {
+            result[config.key] = config.channelId;
+        }
+        for (const config of roleConfigs) {
+            result[config.key] = config.roleId;
         }
         return result;
     }
@@ -70,7 +122,10 @@ export class ConfigService {
             userGroups,
             groupPermissions,
             sanctions,
-            configuration
+            configuration,
+            channelConfiguration,
+            roleConfiguration,
+            userConfiguration
         ] = await Promise.all([
             prismaClient.user.findMany(),
             prismaClient.channel.findMany(),
@@ -80,7 +135,10 @@ export class ConfigService {
             prismaClient.userGroup.findMany(),
             prismaClient.groupPermission.findMany(),
             prismaClient.sanction.findMany(),
-            prismaClient.configuration.findMany()
+            prismaClient.configuration.findMany(),
+            prismaClient.channelConfiguration.findMany(),
+            prismaClient.roleConfiguration.findMany(),
+            prismaClient.userConfiguration.findMany()
         ]);
 
         return {
@@ -92,13 +150,24 @@ export class ConfigService {
             userGroups,
             groupPermissions,
             sanctions,
-            configuration
+            configuration,
+            channelConfiguration,
+            roleConfiguration,
+            userConfiguration
         };
     }
 
     static async import(configs: Record<string, string>): Promise<void> {
+        // This is a simplified import, it might need to be smarter to know which key belongs to which table
+        // For now, we can try to check if the key exists in the enums
         for (const [key, value] of Object.entries(configs)) {
-            await this.set(key as EConfigKey, value);
+            if (Object.values(EConfigKey).includes(key as EConfigKey)) {
+                await this.set(key as EConfigKey, value);
+            } else if (Object.values(EChannelConfigKey).includes(key as EChannelConfigKey)) {
+                await this.setChannel(key as EChannelConfigKey, value);
+            } else if (Object.values(ERoleConfigKey).includes(key as ERoleConfigKey)) {
+                await this.setRole(key as ERoleConfigKey, value);
+            }
         }
     }
 
@@ -215,6 +284,39 @@ export class ConfigService {
                     where: { key: config.key },
                     update: { value: config.value },
                     create: { key: config.key, value: config.value }
+                });
+            }
+        }
+
+        // 10. ChannelConfiguration
+        if (backup.channelConfiguration) {
+            for (const config of backup.channelConfiguration) {
+                await prismaClient.channelConfiguration.upsert({
+                    where: { key: config.key },
+                    update: { channelId: config.channelId },
+                    create: { key: config.key, channelId: config.channelId }
+                });
+            }
+        }
+
+        // 11. RoleConfiguration
+        if (backup.roleConfiguration) {
+            for (const config of backup.roleConfiguration) {
+                await prismaClient.roleConfiguration.upsert({
+                    where: { key: config.key },
+                    update: { roleId: config.roleId },
+                    create: { key: config.key, roleId: config.roleId }
+                });
+            }
+        }
+
+        // 12. UserConfiguration
+        if (backup.userConfiguration) {
+            for (const config of backup.userConfiguration) {
+                await prismaClient.userConfiguration.upsert({
+                    where: { key: config.key },
+                    update: { userId: config.userId },
+                    create: { key: config.key, userId: config.userId }
                 });
             }
         }

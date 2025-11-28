@@ -1,6 +1,7 @@
-import { Guild } from "discord.js";
+import { Guild, ChannelType as DiscordChannelType } from "discord.js";
 import { prismaClient } from "./prismaService";
 import { Logger } from "../utils/Logger";
+import { ChannelType } from "../prisma/client/enums";
 
 export class SyncService {
     private static logger = new Logger('SyncService');
@@ -9,6 +10,7 @@ export class SyncService {
         this.logger.log(`Syncing guild ${guild.name}...`);
         await this.syncRoles(guild);
         await this.syncMembers(guild);
+        await this.syncChannels(guild);
         this.logger.log(`Guild ${guild.name} synced.`);
     }
 
@@ -40,6 +42,32 @@ export class SyncService {
                 create: {
                     id,
                 }
+            });
+        }
+    }
+
+    static async syncChannels(guild: Guild) {
+        const channels = await guild.channels.fetch();
+
+        for (const [id, channel] of channels) {
+            if (!channel) continue;
+            
+            let type: ChannelType;
+            if (channel.type === DiscordChannelType.GuildText) {
+                type = ChannelType.TEXT;
+            } else if (channel.type === DiscordChannelType.GuildVoice) {
+                type = ChannelType.VOICE;
+            } else if (channel.type === DiscordChannelType.GuildCategory) {
+                type = ChannelType.CATEGORY;
+            } else {
+                // Skip other channel types for now or map them to a default if needed
+                continue; 
+            }
+
+            await prismaClient.channel.upsert({
+                where: { id },
+                update: { type },
+                create: { id, type }
             });
         }
     }

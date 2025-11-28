@@ -2,7 +2,7 @@ import { Guild, User } from "discord.js";
 import { prismaClient } from "./prismaService";
 import { SanctionType } from "../prisma/client/enums";
 import { ConfigService } from "./ConfigService";
-import { EConfigKey } from "../enums/EConfigKey";
+import { EConfigKey, ERoleConfigKey } from "../enums/EConfigKey";
 
 export class SanctionService {
     static async mute(guild: Guild, targetUser: User, moderator: User, duration: number, durationString: string, reason: string): Promise<void> {
@@ -31,7 +31,7 @@ export class SanctionService {
             throw new Error("I cannot mute this user.");
         }
 
-        const muteRoleId = await ConfigService.get(EConfigKey.MuteRoleId);
+        const muteRoleId = await ConfigService.getRole(ERoleConfigKey.MuteRoleId);
         if (!muteRoleId) {
             throw new Error("Mute role is not configured. Please ask an administrator to configure it using `/config mute-role set`.");
         }
@@ -102,7 +102,7 @@ export class SanctionService {
             }
         }
 
-        const muteRoleId = await ConfigService.get(EConfigKey.MuteRoleId);
+        const muteRoleId = await ConfigService.getRole(ERoleConfigKey.MuteRoleId);
         if (!muteRoleId) {
             throw new Error("Mute role is not configured.");
         }

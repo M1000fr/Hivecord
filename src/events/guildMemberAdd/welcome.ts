@@ -9,7 +9,7 @@ import { BaseEvent } from "../../class/BaseEvent";
 import { Event } from "../../decorators/Event";
 import { LeBotClient } from "../../class/LeBotClient";
 import { ConfigService } from "../../services/ConfigService";
-import { EConfigKey } from "../../enums/EConfigKey";
+import { EConfigKey, EChannelConfigKey } from "../../enums/EConfigKey";
 import { Logger } from "../../utils/Logger";
 import { Canvas, loadImage, Image, GlobalFonts } from "@napi-rs/canvas";
 import GIFEncoder from "gifencoder";
@@ -26,8 +26,8 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 
 	async run(client: LeBotClient<true>, member: GuildMember) {
 		try {
-			const welcomeChannelId = await ConfigService.get(
-				EConfigKey.WelcomeChannelId,
+			const welcomeChannelId = await ConfigService.getChannel(
+				EChannelConfigKey.WelcomeChannelId,
 			);
 			if (!welcomeChannelId) {
 				this.logger.warn(

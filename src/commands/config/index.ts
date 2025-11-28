@@ -11,7 +11,9 @@ import { Subcommand } from "../../decorators/Subcommand";
 import { EPermission } from "../../enums/EPermission";
 import { configOptions } from "./configOptions";
 import { ConfigService } from "../../services/ConfigService";
-import { EConfigKey } from "../../enums/EConfigKey";
+import { EConfigKey, EChannelConfigKey, ERoleConfigKey } from "../../enums/EConfigKey";
+import { ChannelType } from "../../prisma/client/enums";
+import { ChannelType as DiscordChannelType } from "discord.js";
 
 @Command(configOptions)
 export default class ConfigCommand extends BaseCommand {
@@ -25,9 +27,9 @@ export default class ConfigCommand extends BaseCommand {
 		permission: EPermission.Config,
 	})
 	async showConfig(client: Client, interaction: ChatInputCommandInteraction) {
-		const muteRoleId = await ConfigService.get(EConfigKey.MuteRoleId);
-		const welcomeChannelId = await ConfigService.get(
-			EConfigKey.WelcomeChannelId,
+		const muteRoleId = await ConfigService.getRole(ERoleConfigKey.MuteRoleId);
+		const welcomeChannelId = await ConfigService.getChannel(
+			EChannelConfigKey.WelcomeChannelId,
 		);
 		const welcomeMessage = await ConfigService.get(
 			EConfigKey.WelcomeMessageImage,
@@ -85,7 +87,7 @@ export default class ConfigCommand extends BaseCommand {
 		const updates: string[] = [];
 
 		if (role) {
-			await ConfigService.set(EConfigKey.MuteRoleId, role.id);
+			await ConfigService.setRole(ERoleConfigKey.MuteRoleId, role.id);
 			updates.push(`Mute role set to ${role}`);
 		}
 
@@ -98,9 +100,10 @@ export default class ConfigCommand extends BaseCommand {
 					`Failed to set welcome channel: ${channelOption} is not a text channel.`,
 				);
 			} else {
-				await ConfigService.set(
-					EConfigKey.WelcomeChannelId,
+				await ConfigService.setChannel(
+					EChannelConfigKey.WelcomeChannelId,
 					channel.id,
+					ChannelType.TEXT
 				);
 				updates.push(`Welcome channel set to ${channel}`);
 			}

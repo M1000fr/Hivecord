@@ -17,21 +17,25 @@ model User {
     id     String    @id
     leftAt DateTime?
 
-    Groups            UserGroup[]
-    SanctionsReceived Sanction[]  @relation("UserSanctions")
-    SanctionsApplied  Sanction[]  @relation("ModeratorSanctions")
+    Groups             UserGroup[]
+    SanctionsReceived  Sanction[]          @relation("UserSanctions")
+    SanctionsApplied   Sanction[]          @relation("ModeratorSanctions")
+    UserConfigurations UserConfiguration[]
 }
 
 model Channel {
     id   String      @id
     type ChannelType
+
+    ChannelConfigurations ChannelConfiguration[]
 }
 
 model Role {
     id        String    @id
     deletedAt DateTime?
 
-    Groups Group[]
+    Groups             Group[]
+    RoleConfigurations RoleConfiguration[]
 }
 
 model Permission {
@@ -94,4 +98,22 @@ model Sanction {
 model Configuration {
     key   String @id
     value String
+}
+
+model ChannelConfiguration {
+    key       String  @id
+    channelId String
+    Channel   Channel @relation(fields: [channelId], references: [id])
+}
+
+model RoleConfiguration {
+    key    String @id
+    roleId String
+    Role   Role   @relation(fields: [roleId], references: [id])
+}
+
+model UserConfiguration {
+    key    String @id
+    userId String
+    User   User   @relation(fields: [userId], references: [id])
 }
