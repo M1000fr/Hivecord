@@ -418,28 +418,29 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 				flags: [MessageFlags.Ephemeral],
 			});
 		} else {
-			const modal = new ModalBuilder()
-				.setCustomId(
-					`module_config_modal:${moduleName}:${selectedProperty}`,
-				)
-				.setTitle(`Configure: ${selectedProperty}`);
-
 			const labelText =
 				propertyOptions.description.length > 45
 					? propertyOptions.description.substring(0, 42) + "..."
 					: propertyOptions.description;
 
-			const input = new TextInputBuilder()
-				.setCustomId("value")
-				.setLabel(labelText)
-				.setStyle(TextInputStyle.Short)
-				.setRequired(propertyOptions.required ?? false)
-				.setPlaceholder("Enter text value");
+			const input = new TextInputBuilder({
+				customId: "value",
+				label: labelText,
+				style: TextInputStyle.Short,
+				required: propertyOptions.required ?? false,
+				placeholder: "Enter text value",
+			});
 
 			const row = new ActionRowBuilder<TextInputBuilder>().addComponents(
 				input,
 			);
-			modal.addComponents(row);
+
+			const modal = new ModalBuilder({
+				customId: `module_config_modal:${moduleName}:${selectedProperty}`,
+				title: `Configure: ${selectedProperty}`,
+				components: [row.toJSON()],
+			});
+
 			await interaction.showModal(modal);
 		}
 	}
