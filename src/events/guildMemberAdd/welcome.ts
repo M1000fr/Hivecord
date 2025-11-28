@@ -4,6 +4,7 @@ import {
 	AttachmentBuilder,
 	TextChannel,
 	EmbedBuilder,
+	Colors,
 } from "discord.js";
 import { BaseEvent } from "../../class/BaseEvent";
 import { Event } from "../../decorators/Event";
@@ -192,8 +193,13 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 			const attachment = new AttachmentBuilder(buffer, {
 				name: "welcome.gif",
 			});
+			const embed = new EmbedBuilder()
+				.setImage("attachment://welcome.gif")
+				.setColor(Colors.Green);
+
 			await channel.send({
 				content: welcomeMessage,
+				embeds: [embed],
 				files: [attachment],
 			});
 		} catch (error) {
