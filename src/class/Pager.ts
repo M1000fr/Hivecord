@@ -18,7 +18,7 @@ export interface PagerOptions<T> {
 		items: T[],
 		pageIndex: number,
 		totalPages: number,
-	) => Promise<{ embeds: EmbedBuilder[]; components: any[] }>;
+	) => Promise<{ embeds: EmbedBuilder[]; components: any[]; files?: any[] }>;
 	filter?: (interaction: any) => boolean;
 	time?: number;
 	onComponent?: (
@@ -37,7 +37,7 @@ export class Pager<T> {
 		items: T[],
 		pageIndex: number,
 		totalPages: number,
-	) => Promise<{ embeds: EmbedBuilder[]; components: any[] }>;
+	) => Promise<{ embeds: EmbedBuilder[]; components: any[]; files?: any[] }>;
 	private filter: (interaction: any) => boolean;
 	private time: number;
 	private onComponent?: (
@@ -74,7 +74,7 @@ export class Pager<T> {
 			const end = start + this.itemsPerPage;
 			const pageItems = this.items.slice(start, end);
 
-			const { embeds, components } = await this.renderPage(
+			const { embeds, components, files } = await this.renderPage(
 				pageItems,
 				this.currentPage,
 				totalPages,
@@ -98,7 +98,7 @@ export class Pager<T> {
 				components.push(navigationRow);
 			}
 
-			return { embeds, components };
+			return { embeds, components, files: files || [] };
 		};
 
 		const initialContent = await getPageContent();
@@ -195,7 +195,7 @@ export class Pager<T> {
 				const end = start + state.itemsPerPage;
 				const pageItems = state.items.slice(start, end);
 
-				const { embeds, components } = await definition.renderPage(
+				const { embeds, components, files } = await definition.renderPage(
 					pageItems,
 					state.currentPage,
 					totalPages
@@ -218,7 +218,7 @@ export class Pager<T> {
 					components.push(navigationRow);
 				}
 
-				await interaction.update({ embeds, components });
+				await interaction.update({ embeds, components, files: files || [] });
 			} else {
 				await interaction.deferUpdate();
 			}
@@ -233,7 +233,7 @@ export class Pager<T> {
 				const end = start + state.itemsPerPage;
 				const pageItems = state.items.slice(start, end);
 
-				const { embeds, components } = await definition.renderPage(
+				const { embeds, components, files } = await definition.renderPage(
 					pageItems,
 					state.currentPage,
 					totalPages
@@ -256,7 +256,7 @@ export class Pager<T> {
 					components.push(navigationRow);
 				}
 
-				await interaction.update({ embeds, components });
+				await interaction.update({ embeds, components, files: files || [] });
 			} else {
 				await interaction.deferUpdate();
 			}

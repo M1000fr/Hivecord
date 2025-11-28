@@ -1,7 +1,9 @@
 import {
 	ActionRowBuilder,
+	AttachmentBuilder,
 	ButtonInteraction,
 	ChannelSelectMenuBuilder,
+	Colors,
 	ComponentType,
 	ChannelType as DiscordChannelType,
 	EmbedBuilder,
@@ -22,6 +24,7 @@ import {
 import { ConfigService } from "../../services/ConfigService";
 import { ChannelType as PrismaChannelType } from "../../prisma/client/enums";
 import { PagerRegistry } from "../../services/PagerRegistry";
+import { SpacerService } from "../../services/SpacerService";
 
 type ConfigType = "string" | "channel" | "role" | "roles";
 
@@ -89,9 +92,15 @@ export const renderConfigPage = async (
 	pageIndex: number,
 	totalPages: number,
 ) => {
+	const spacerBuffer = await SpacerService.generateSpacer(Colors.Purple);
+	const spacerImageAttachment = new AttachmentBuilder(spacerBuffer, {
+		name: "spacer.png",
+	});
+
 	const embed = new EmbedBuilder()
 		.setTitle(`Configuration - Page ${pageIndex + 1}/${totalPages}`)
-		.setColor("#0099ff");
+		.setColor(Colors.Purple)
+		.setImage("attachment://spacer.png");
 
 	const options: StringSelectMenuOptionBuilder[] = [];
 
@@ -143,13 +152,17 @@ export const renderConfigPage = async (
 		selectMenu,
 	);
 
-	return { embeds: [embed], components: [row] };
+	return {
+		embeds: [embed],
+		components: [row],
+		files: [spacerImageAttachment],
+	};
 };
 
 export const handleConfigComponent = async (
 	interaction: StringSelectMenuInteraction | ButtonInteraction,
 	items: any[],
-    pageIndex: number
+	pageIndex: number,
 ) => {
 	if (!interaction.isStringSelectMenu()) return;
 	if (interaction.customId !== "config_select") return;
@@ -183,7 +196,7 @@ export const handleConfigComponent = async (
 		const row = new ActionRowBuilder<TextInputBuilder>().addComponents(
 			input,
 		);
-        // Use setComponents to avoid deprecation warning
+		// Use setComponents to avoid deprecation warning
 		modal.setComponents(row);
 
 		await interaction.showModal(modal);
@@ -198,10 +211,7 @@ export const handleConfigComponent = async (
 
 			const newValue = submitted.fields.getTextInputValue("value");
 			if (newValue) {
-				await ConfigService.set(
-					configDef.key as EConfigKey,
-					newValue,
-				);
+				await ConfigService.set(configDef.key as EConfigKey, newValue);
 				await submitted.reply({
 					content: `Updated ${configDef.label}.`,
 					flags: [MessageFlags.Ephemeral],
@@ -213,15 +223,14 @@ export const handleConfigComponent = async (
 					flags: [MessageFlags.Ephemeral],
 				});
 			}
-            
-            // Refresh the pager message to show new value
-            // We can't easily refresh the pager message from here because we are in a modal interaction.
-            // But the pager message is the one that triggered the select menu.
-            // We can try to edit it if we have access to it.
-            // interaction.message is the pager message.
-            // But we can't edit it from the modal submit interaction directly without fetching it.
-            // However, the user will see the updated value next time they navigate or if we force refresh.
-            
+
+			// Refresh the pager message to show new value
+			// We can't easily refresh the pager message from here because we are in a modal interaction.
+			// But the pager message is the one that triggered the select menu.
+			// We can try to edit it if we have access to it.
+			// interaction.message is the pager message.
+			// But we can't edit it from the modal submit interaction directly without fetching it.
+			// However, the user will see the updated value next time they navigate or if we force refresh.
 		} catch (e) {
 			// Timeout or error
 		}
@@ -263,8 +272,7 @@ export const handleConfigComponent = async (
 
 				if (selectedChannel) {
 					if (
-						selectedChannel.type ===
-						DiscordChannelType.GuildVoice
+						selectedChannel.type === DiscordChannelType.GuildVoice
 					) {
 						prismaType = PrismaChannelType.VOICE;
 					} else if (
@@ -303,10 +311,9 @@ export const handleConfigComponent = async (
 			.setMinValues(0)
 			.setMaxValues(configDef.type === "roles" ? 25 : 1);
 
-		const row =
-			new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
-				select,
-			);
+		const row = new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
+			select,
+		);
 
 		await interaction.reply({
 			content: `Select role(s) for ${configDef.label}`,

@@ -4,7 +4,7 @@ export type PagerRenderer<T = any> = (
 	items: T[],
 	pageIndex: number,
 	totalPages: number,
-) => Promise<{ embeds: EmbedBuilder[]; components: any[] }>;
+) => Promise<{ embeds: EmbedBuilder[]; components: any[]; files?: any[] }>;
 
 export type PagerComponentHandler = (
 	interaction: any,

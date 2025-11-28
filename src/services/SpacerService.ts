@@ -72,7 +72,7 @@ export class SpacerService {
 
 		return (
 			"#" +
-			(g | (b << 8) | (r << 16)).toString(16).padStart(6, "0")
+			((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")
 		);
 	}
 }
