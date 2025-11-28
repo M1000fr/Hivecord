@@ -11,15 +11,22 @@ import { Logger } from "../../../../utils/Logger";
 export default class InteractionCreateEvent extends BaseEvent<Events.InteractionCreate> {
 	private logger = new Logger("InteractionCreateEvent");
 
+	private async sendErrorResponse(interaction: any, message: string): Promise<void> {
+		const payload = { content: message, flags: [MessageFlags.Ephemeral] };
+		if (interaction.replied || interaction.deferred) {
+			await interaction.followUp(payload);
+		} else {
+			await interaction.reply(payload);
+		}
+	}
+
 	async run(client: LeBotClient<true>, interaction: Interaction) {
 		if (!interaction.isChatInputCommand()) return;
 
 		const command = client.commands.get(interaction.commandName);
 
 		if (!command) {
-			this.logger.error(
-				`No command matching ${interaction.commandName} was found.`,
-			);
+			this.logger.error(`No command matching ${interaction.commandName} was found.`);
 			return;
 		}
 
@@ -27,17 +34,7 @@ export default class InteractionCreateEvent extends BaseEvent<Events.Interaction
 			await command.instance.execute(client, interaction);
 		} catch (error) {
 			this.logger.error(error);
-			if (interaction.replied || interaction.deferred) {
-				await interaction.followUp({
-					content: "There was an error while executing this command!",
-					flags: [MessageFlags.Ephemeral],
-				});
-			} else {
-				await interaction.reply({
-					content: "There was an error while executing this command!",
-					flags: [MessageFlags.Ephemeral],
-				});
-			}
+			await this.sendErrorResponse(interaction, "There was an error while executing this command!");
 		}
 	}
 }
