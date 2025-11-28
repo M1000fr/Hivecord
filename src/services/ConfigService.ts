@@ -2,11 +2,17 @@ import { prismaClient } from "./prismaService";
 import { ChannelType } from "../prisma/client/enums";
 
 export class ConfigService {
-	static async get(key: string): Promise<string | null> {
-		const config = await prismaClient.configuration.findUnique({
-			where: { key },
+	private static async ensureRoleExists(roleId: string): Promise<void> {
+		await prismaClient.role.upsert({
+			where: { id: roleId },
+			update: {},
+			create: { id: roleId },
 		});
-		return config ? config.value : null;
+	}
+
+	static async get(key: string): Promise<string | null> {
+		const config = await prismaClient.configuration.findUnique({ where: { key } });
+		return config?.value ?? null;
 	}
 
 	static async set(key: string, value: string): Promise<void> {
@@ -24,10 +30,8 @@ export class ConfigService {
 	}
 
 	static async getChannel(key: string): Promise<string | null> {
-		const config = await prismaClient.channelConfiguration.findUnique({
-			where: { key },
-		});
-		return config ? config.channelId : null;
+		const config = await prismaClient.channelConfiguration.findUnique({ where: { key } });
+		return config?.channelId ?? null;
 	}
 
 	static async setChannel(
@@ -49,24 +53,15 @@ export class ConfigService {
 	}
 
 	static async getRole(key: string): Promise<string | null> {
-		const config = await prismaClient.roleConfiguration.findFirst({
-			where: { key },
-		});
-		return config ? config.roleId : null;
+		const config = await prismaClient.roleConfiguration.findFirst({ where: { key } });
+		return config?.roleId ?? null;
 	}
 
 	static async setRole(key: string, roleId: string): Promise<void> {
-		await prismaClient.role.upsert({
-			where: { id: roleId },
-			update: {},
-			create: { id: roleId },
-		});
-
+		await this.ensureRoleExists(roleId);
 		await prismaClient.$transaction([
 			prismaClient.roleConfiguration.deleteMany({ where: { key } }),
-			prismaClient.roleConfiguration.create({
-				data: { key, roleId },
-			}),
+			prismaClient.roleConfiguration.create({ data: { key, roleId } }),
 		]);
 	}
 
@@ -77,33 +72,18 @@ export class ConfigService {
 		return configs.map((c) => c.roleId);
 	}
 
-	static async setRoles(
-		key: string,
-		roleIds: string[],
-	): Promise<void> {
+	static async setRoles(key: string, roleIds: string[]): Promise<void> {
 		await prismaClient.$transaction(async (tx) => {
 			await tx.roleConfiguration.deleteMany({ where: { key } });
-
 			for (const roleId of roleIds) {
-				await tx.role.upsert({
-					where: { id: roleId },
-					update: {},
-					create: { id: roleId },
-				});
-				await tx.roleConfiguration.create({
-					data: { key, roleId },
-				});
+				await this.ensureRoleExists(roleId);
+				await tx.roleConfiguration.create({ data: { key, roleId } });
 			}
 		});
 	}
 
 	static async addRole(key: string, roleId: string): Promise<void> {
-		await prismaClient.role.upsert({
-			where: { id: roleId },
-			update: {},
-			create: { id: roleId },
-		});
-
+		await this.ensureRoleExists(roleId);
 		await prismaClient.roleConfiguration.upsert({
 			where: { key_roleId: { key, roleId } },
 			update: {},
@@ -111,35 +91,25 @@ export class ConfigService {
 		});
 	}
 
-	static async removeRole(
-		key: string,
-		roleId: string,
-	): Promise<void> {
+	static async removeRole(key: string, roleId: string): Promise<void> {
 		try {
-			await prismaClient.roleConfiguration.delete({
-				where: { key_roleId: { key, roleId } },
-			});
-		} catch (e) {
+			await prismaClient.roleConfiguration.delete({ where: { key_roleId: { key, roleId } } });
+		} catch {
 			// Ignore if not found
 		}
 	}
 
 	static async getAll(): Promise<Record<string, string>> {
-		const configs = await prismaClient.configuration.findMany();
-		const channelConfigs =
-			await prismaClient.channelConfiguration.findMany();
-		const roleConfigs = await prismaClient.roleConfiguration.findMany();
+		const [configs, channelConfigs, roleConfigs] = await Promise.all([
+			prismaClient.configuration.findMany(),
+			prismaClient.channelConfiguration.findMany(),
+			prismaClient.roleConfiguration.findMany(),
+		]);
 
-		const result: Record<string, string> = {};
-		for (const config of configs) {
-			result[config.key] = config.value;
-		}
-		for (const config of channelConfigs) {
-			result[config.key] = config.channelId;
-		}
-		for (const config of roleConfigs) {
-			result[config.key] = config.roleId;
-		}
-		return result;
+		return {
+			...Object.fromEntries(configs.map(c => [c.key, c.value])),
+			...Object.fromEntries(channelConfigs.map(c => [c.key, c.channelId])),
+			...Object.fromEntries(roleConfigs.map(c => [c.key, c.roleId])),
+		};
 	}
 }
