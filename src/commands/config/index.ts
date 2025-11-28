@@ -77,11 +77,12 @@ export default class ConfigCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
-		const configs = await ConfigService.getAll();
-		const json = JSON.stringify(configs, null, 2);
-		const buffer = Buffer.from(json, "utf-8");
+		const backup = await ConfigService.getFullBackup();
+		const json = JSON.stringify(backup, null, 2);
+		const encrypted = ConfigService.encrypt(json);
+		const buffer = Buffer.from(encrypted, "utf-8");
 		const attachment = new AttachmentBuilder(buffer, {
-			name: "config.json",
+			name: "backup.enc",
 		});
 
 		await interaction.reply({
@@ -98,11 +99,11 @@ export default class ConfigCommand extends BaseCommand {
 		const file = interaction.options.getAttachment("file", true);
 
 		if (
-			!file.contentType?.includes("application/json") &&
+			!file.name.endsWith(".enc") &&
 			!file.name.endsWith(".json")
 		) {
 			await interaction.reply({
-				content: "Please upload a valid JSON file.",
+				content: "Please upload a valid backup file (.enc or .json).",
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -111,21 +112,37 @@ export default class ConfigCommand extends BaseCommand {
 		try {
 			const response = await fetch(file.url);
 			if (!response.ok) throw new Error("Failed to fetch file");
-			const json = await response.json();
+			
+			let json: any;
+			if (file.name.endsWith(".enc")) {
+				const text = await response.text();
+				const decrypted = ConfigService.decrypt(text);
+				json = JSON.parse(decrypted);
+			} else {
+				json = await response.json();
+			}
 
 			if (typeof json !== "object" || json === null) {
 				throw new Error("Invalid JSON format");
 			}
 
-			await ConfigService.import(json as Record<string, string>);
-			await interaction.reply({
-				content: "Configuration imported successfully.",
-				flags: [MessageFlags.Ephemeral],
-			});
+			if ('configuration' in json && Array.isArray((json as any).configuration)) {
+				await ConfigService.restoreFullBackup(json);
+				await interaction.reply({
+					content: "Full backup imported successfully.",
+					flags: [MessageFlags.Ephemeral],
+				});
+			} else {
+				await ConfigService.import(json as Record<string, string>);
+				await interaction.reply({
+					content: "Configuration imported successfully.",
+					flags: [MessageFlags.Ephemeral],
+				});
+			}
 		} catch (error) {
 			console.error(error);
 			await interaction.reply({
-				content: "Failed to import configuration.",
+				content: "Failed to import configuration. Ensure the file is valid and the encryption key matches.",
 				flags: [MessageFlags.Ephemeral],
 			});
 		}
