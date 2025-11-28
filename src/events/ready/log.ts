@@ -21,8 +21,6 @@ export default class ReadyEvent extends BaseEvent<Events.ClientReady> {
 			const guild = await client.guilds.fetch(guildId);
 			if (guild) {
 				await SyncService.syncGuild(guild);
-				const me = await guild.members.fetch("1105347662196256838");
-				client.emit("guildMemberAdd", me);
 			}
 		}
 	}

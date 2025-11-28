@@ -21,150 +21,98 @@ export default class ConfigCommand extends BaseCommand {
 	}
 
 	@Subcommand({
-		group: "mute-role",
-		name: "set",
+		name: "show",
 		permission: EPermission.Config,
 	})
-	async setMuteRole(
-		client: Client,
-		interaction: ChatInputCommandInteraction,
-	) {
-		const role = interaction.options.getRole("role", true);
+	async showConfig(client: Client, interaction: ChatInputCommandInteraction) {
+		const muteRoleId = await ConfigService.get(EConfigKey.MuteRoleId);
+		const welcomeChannelId = await ConfigService.get(
+			EConfigKey.WelcomeChannelId,
+		);
+		const welcomeMessage = await ConfigService.get(
+			EConfigKey.WelcomeMessage,
+		);
 
-		await ConfigService.set(EConfigKey.MuteRoleId, role.id);
+		const muteRole = muteRoleId
+			? interaction.guild?.roles.cache.get(muteRoleId)
+			: null;
+		const welcomeChannel = welcomeChannelId
+			? interaction.guild?.channels.cache.get(welcomeChannelId)
+			: null;
+
+		let content = "**Current Configuration**\n\n";
+		content += `**Mute Role:** ${
+			muteRole
+				? muteRole
+				: muteRoleId
+				? muteRoleId + " (Not found)"
+				: "Not set"
+		}\n`;
+		content += `**Welcome Channel:** ${
+			welcomeChannel
+				? welcomeChannel
+				: welcomeChannelId
+				? welcomeChannelId + " (Not found)"
+				: "Not set"
+		}\n`;
+		content += `**Welcome Message:** ${
+			welcomeMessage ? welcomeMessage : "Not set"
+		}\n`;
 
 		await interaction.reply({
-			content: `Mute role has been set to ${role.name}`,
+			content,
 			flags: [MessageFlags.Ephemeral],
 		});
 	}
 
 	@Subcommand({
-		group: "mute-role",
-		name: "get",
+		name: "edit",
 		permission: EPermission.Config,
 	})
-	async getMuteRole(
-		client: Client,
-		interaction: ChatInputCommandInteraction,
-	) {
-		const roleId = await ConfigService.get(EConfigKey.MuteRoleId);
+	async editConfig(client: Client, interaction: ChatInputCommandInteraction) {
+		const role = interaction.options.getRole("mute_role");
+		const channelOption = interaction.options.getChannel("welcome_channel");
+		const message = interaction.options.getString("welcome_message");
 
-		if (!roleId) {
+		if (!role && !channelOption && !message) {
 			await interaction.reply({
-				content: "Mute role is not configured.",
+				content: "No changes provided.",
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
-		const role = interaction.guild?.roles.cache.get(roleId);
-		if (!role) {
-			await interaction.reply({
-				content: `Mute role ID is configured as ${roleId}, but the role was not found in this guild.`,
-				flags: [MessageFlags.Ephemeral],
-			});
-			return;
+		const updates: string[] = [];
+
+		if (role) {
+			await ConfigService.set(EConfigKey.MuteRoleId, role.id);
+			updates.push(`Mute role set to ${role}`);
+		}
+
+		if (channelOption) {
+			const channel = interaction.guild?.channels.cache.get(
+				channelOption.id,
+			);
+			if (!channel || !channel.isTextBased()) {
+				updates.push(
+					`Failed to set welcome channel: ${channelOption} is not a text channel.`,
+				);
+			} else {
+				await ConfigService.set(
+					EConfigKey.WelcomeChannelId,
+					channel.id,
+				);
+				updates.push(`Welcome channel set to ${channel}`);
+			}
+		}
+
+		if (message) {
+			await ConfigService.set(EConfigKey.WelcomeMessage, message);
+			updates.push(`Welcome message set to: ${message}`);
 		}
 
 		await interaction.reply({
-			content: `Current mute role is ${role.name} (${role.id})`,
-			flags: [MessageFlags.Ephemeral],
-		});
-	}
-
-	@Subcommand({
-		group: "welcome-channel",
-		name: "set",
-		permission: EPermission.Config,
-	})
-	async setWelcomeChannel(
-		client: Client,
-		interaction: ChatInputCommandInteraction,
-	) {
-		const optionChannel = interaction.options.getChannel("channel", true);
-        const channel = interaction.guild?.channels.cache.get(optionChannel.id);
-        
-        if (!channel || !channel.isTextBased()) {
-             await interaction.reply({
-                content: `Channel must be a text channel.`,
-                flags: [MessageFlags.Ephemeral],
-            });
-            return;
-        }
-
-		await ConfigService.set(EConfigKey.WelcomeChannelId, channel.id);
-
-		await interaction.reply({
-			content: `Welcome channel has been set to ${channel}`,
-			flags: [MessageFlags.Ephemeral],
-		});
-	}
-
-	@Subcommand({
-		group: "welcome-channel",
-		name: "get",
-		permission: EPermission.Config,
-	})
-	async getWelcomeChannel(
-		client: Client,
-		interaction: ChatInputCommandInteraction,
-	) {
-		const channelId = await ConfigService.get(EConfigKey.WelcomeChannelId);
-        if (!channelId) {
-            await interaction.reply({
-                content: `Welcome channel is not set.`,
-                flags: [MessageFlags.Ephemeral],
-            });
-            return;
-        }
-        
-        const channel = interaction.guild?.channels.cache.get(channelId);
-
-		await interaction.reply({
-			content: `Welcome channel is ${channel ? channel : channelId}`,
-			flags: [MessageFlags.Ephemeral],
-		});
-	}
-
-	@Subcommand({
-		group: "welcome-message",
-		name: "set",
-		permission: EPermission.Config,
-	})
-	async setWelcomeMessage(
-		client: Client,
-		interaction: ChatInputCommandInteraction,
-	) {
-		const text = interaction.options.getString("text", true);
-		await ConfigService.set(EConfigKey.WelcomeMessage, text);
-
-		await interaction.reply({
-			content: `Welcome message has been set to: ${text}`,
-			flags: [MessageFlags.Ephemeral],
-		});
-	}
-
-	@Subcommand({
-		group: "welcome-message",
-		name: "get",
-		permission: EPermission.Config,
-	})
-	async getWelcomeMessage(
-		client: Client,
-		interaction: ChatInputCommandInteraction,
-	) {
-		const text = await ConfigService.get(EConfigKey.WelcomeMessage);
-        if (!text) {
-            await interaction.reply({
-                content: `Welcome message is not set.`,
-                flags: [MessageFlags.Ephemeral],
-            });
-            return;
-        }
-
-		await interaction.reply({
-			content: `Welcome message is: ${text}`,
+			content: `Configuration updated:\n- ${updates.join("\n- ")}`,
 			flags: [MessageFlags.Ephemeral],
 		});
 	}
