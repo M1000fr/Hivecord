@@ -27,7 +27,7 @@ export class TempVoiceService {
 		if (!newState.channelId || !newState.guild || !newState.member) return;
 
 		const generatorId = await ConfigService.getChannel(
-			EChannelConfigKey.TempVoiceGenerator,
+			EChannelConfigKey.TempVoiceGeneratorChannelId,
 		);
 
 		if (newState.channelId !== generatorId) return;
