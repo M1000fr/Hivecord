@@ -5,9 +5,14 @@ import { ConfigService } from "./ConfigService";
 import { ApplicationCommandOptionType } from "discord.js";
 import type { LeBotClient } from "../class/LeBotClient";
 
+interface ConfigValue {
+	value: string | string[];
+	type: ApplicationCommandOptionType;
+}
+
 interface ModuleConfig {
 	moduleName: string;
-	configurations: Record<string, string | string[]>;
+	configurations: Record<string, ConfigValue>;
 }
 
 interface BackupData {
@@ -51,7 +56,7 @@ class CryptoHelper {
 class ConfigExtractor {
 	static async extractModuleConfig(moduleName: string, configClass: any): Promise<ModuleConfig> {
 		const configProperties = configClass?.configProperties || {};
-		const configurations: Record<string, string | string[]> = {};
+		const configurations: Record<string, ConfigValue> = {};
 
 		for (const [propertyKey, options] of Object.entries(configProperties)) {
 			const opt = options as any;
@@ -59,7 +64,7 @@ class ConfigExtractor {
 
 			const value = await this.getConfigValue(snakeCaseKey, opt.type);
 			if (value !== null) {
-				configurations[snakeCaseKey] = value;
+				configurations[snakeCaseKey] = { value, type: opt.type };
 			}
 		}
 
@@ -91,19 +96,25 @@ class ConfigExtractor {
 
 class ConfigRestorer {
 	static async restoreModuleConfig(moduleConfig: ModuleConfig): Promise<void> {
-		for (const [key, value] of Object.entries(moduleConfig.configurations)) {
-			if (Array.isArray(value)) {
-				if (value.length === 1 && value[0]) {
-					// Single role
-					await ConfigService.setRole(key, value[0]);
-				} else if (value.length > 1) {
-					// Multiple roles
-					await ConfigService.setRoles(key, value);
+		for (const [key, configValue] of Object.entries(moduleConfig.configurations)) {
+			const { value, type } = configValue;
+
+			if (type === ApplicationCommandOptionType.Role) {
+				if (Array.isArray(value)) {
+					if (value.length === 1 && value[0]) {
+						await ConfigService.setRole(key, value[0]);
+					} else if (value.length > 1) {
+						await ConfigService.setRoles(key, value);
+					}
+				}
+			} else if (type === ApplicationCommandOptionType.Channel) {
+				if (typeof value === 'string') {
+					await ConfigService.setChannel(key, value);
 				}
 			} else {
-				// Try to determine type from key pattern or use generic set
-				// For now, we'll use the generic set method
-				await ConfigService.set(key, value);
+				if (typeof value === 'string') {
+					await ConfigService.set(key, value);
+				}
 			}
 		}
 	}
