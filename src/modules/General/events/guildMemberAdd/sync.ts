@@ -8,7 +8,7 @@ import { Events, GuildMember } from "discord.js";
 @Event({
 	name: Events.GuildMemberAdd,
 })
-export default class RegisterNewMemberEvent extends BaseEvent<Events.GuildMemberAdd> {
+export default class GuildMemberRegisterEvent extends BaseEvent<Events.GuildMemberAdd> {
 	private logger = new Logger("RegisterNewMemberEvent");
 
 	async run(client: LeBotClient<true>, member: GuildMember) {
