@@ -1,2 +1,2 @@
-declare module 'gifencoder';
-declare module 'gif-frames';
+declare module "gifencoder";
+declare module "gif-frames";

@@ -28,7 +28,9 @@ export class SanctionScheduler {
 		const guild = await this.client.guilds.fetch(guildId).catch(() => null);
 		if (!guild) return;
 
-		const muteRoleId = await ConfigService.getRole(ERoleConfigKey.MuteRoleId);
+		const muteRoleId = await ConfigService.getRole(
+			ERoleConfigKey.MuteRoleId,
+		);
 		if (!muteRoleId) return;
 
 		const muteRole = guild.roles.cache.get(muteRoleId);

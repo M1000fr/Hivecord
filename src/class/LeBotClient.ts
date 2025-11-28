@@ -13,8 +13,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export class LeBotClient<ready = false> extends Client {
-	public commands = new Collection<string, { instance: BaseCommand; options: CommandOptions }>();
-	private logger = new Logger('LeBotClient');
+	public commands = new Collection<
+		string,
+		{ instance: BaseCommand; options: CommandOptions }
+	>();
+	private logger = new Logger("LeBotClient");
 	private scheduler: SanctionScheduler;
 
 	constructor() {
@@ -54,7 +57,9 @@ export class LeBotClient<ready = false> extends Client {
 
 		const guildId = process.env.DISCORD_GUILD_ID;
 		if (!guildId) {
-			this.logger.error("DISCORD_GUILD_ID is missing in environment variables.");
+			this.logger.error(
+				"DISCORD_GUILD_ID is missing in environment variables.",
+			);
 			return;
 		}
 
@@ -64,17 +69,20 @@ export class LeBotClient<ready = false> extends Client {
 
 		try {
 			this.logger.log(
-				`Started refreshing ${commandsData.length} application (/) commands for guild ${guildId}.`
+				`Started refreshing ${commandsData.length} application (/) commands for guild ${guildId}.`,
 			);
 
 			await PermissionService.registerPermissions(permissions);
 
-			await rest.put(Routes.applicationGuildCommands(this.user.id, guildId), {
-				body: commandsData,
-			});
+			await rest.put(
+				Routes.applicationGuildCommands(this.user.id, guildId),
+				{
+					body: commandsData,
+				},
+			);
 
 			this.logger.log(
-				`Successfully reloaded ${commandsData.length} application (/) commands.`
+				`Successfully reloaded ${commandsData.length} application (/) commands.`,
 			);
 		} catch (error) {
 			this.logger.error(error);
@@ -96,9 +104,13 @@ export class LeBotClient<ready = false> extends Client {
 				const instance = new EventClass();
 
 				if (options.once) {
-					this.once(options.name, (...args) => instance.run(this, ...args));
+					this.once(options.name, (...args) =>
+						instance.run(this, ...args),
+					);
 				} else {
-					this.on(options.name, (...args) => instance.run(this, ...args));
+					this.on(options.name, (...args) =>
+						instance.run(this, ...args),
+					);
 				}
 			}
 		}
@@ -115,7 +127,8 @@ export class LeBotClient<ready = false> extends Client {
 			const CommandClass = commandModule.default;
 
 			if (CommandClass && (CommandClass as any).commandOptions) {
-				const options = (CommandClass as any).commandOptions as CommandOptions;
+				const options = (CommandClass as any)
+					.commandOptions as CommandOptions;
 				const instance = new CommandClass() as BaseCommand;
 				this.commands.set(options.name, { instance, options });
 			}

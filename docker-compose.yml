@@ -1,34 +1,34 @@
 name: LeBot Production
 services:
-  mariadb:
-    image: mariadb:latest
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-lebot_db}
-      MYSQL_USER: ${MYSQL_USER:-lebot_user}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-lebot_password}
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      start_period: 10s
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    volumes:
-      - mariadb_data:/var/lib/mysql
+    mariadb:
+        image: mariadb:latest
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+            MYSQL_DATABASE: ${MYSQL_DATABASE:-lebot_db}
+            MYSQL_USER: ${MYSQL_USER:-lebot_user}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD:-lebot_password}
+        healthcheck:
+            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+            start_period: 10s
+            interval: 10s
+            timeout: 5s
+            retries: 3
+        volumes:
+            - mariadb_data:/var/lib/mysql
 
-  bot:
-    build: .
-    restart: always
-    image: reg.m1000.fr/leserveur/lebot:latest
-    depends_on:
-      mariadb:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: mysql://${MYSQL_USER:-lebot_user}:${MYSQL_PASSWORD:-lebot_password}@mariadb:3306/${MYSQL_DATABASE:-lebot_db}
-      DISCORD_TOKEN: ${DISCORD_TOKEN}
-      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID}
-      DISCORD_OWNER_ID: ${DISCORD_OWNER_ID}
+    bot:
+        build: .
+        restart: always
+        image: reg.m1000.fr/leserveur/lebot:latest
+        depends_on:
+            mariadb:
+                condition: service_healthy
+        environment:
+            DATABASE_URL: mysql://${MYSQL_USER:-lebot_user}:${MYSQL_PASSWORD:-lebot_password}@mariadb:3306/${MYSQL_DATABASE:-lebot_db}
+            DISCORD_TOKEN: ${DISCORD_TOKEN}
+            DISCORD_GUILD_ID: ${DISCORD_GUILD_ID}
+            DISCORD_OWNER_ID: ${DISCORD_OWNER_ID}
 
 volumes:
-  mariadb_data:
+    mariadb_data:
