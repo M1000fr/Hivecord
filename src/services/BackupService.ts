@@ -1,296 +1,190 @@
 import { prismaClient } from "./prismaService";
-import {
-	createCipheriv,
-	createDecipheriv,
-	randomBytes,
-	scryptSync,
-} from "crypto";
+import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "crypto";
 import { Logger } from "../utils/Logger";
+import { ConfigService } from "./ConfigService";
+import { ApplicationCommandOptionType } from "discord.js";
+import type { LeBotClient } from "../class/LeBotClient";
 
-export class BackupService {
-	private static logger = new Logger("BackupService");
+interface ModuleConfig {
+	moduleName: string;
+	configurations: Record<string, string | string[]>;
+}
 
-	private static getAlgorithm() {
-		return "aes-256-cbc";
-	}
+interface BackupData {
+	timestamp: string;
+	version: number;
+	modules: ModuleConfig[];
+}
 
-	private static getKey() {
-		const secret =
-			process.env.BACKUP_SECRET || "default-secret-key-change-me";
-		return scryptSync(secret, "salt", 32);
+class CryptoHelper {
+	private static readonly ALGORITHM = "aes-256-cbc";
+	private static readonly SALT = "salt";
+	private static readonly KEY_LENGTH = 32;
+	private static readonly IV_LENGTH = 16;
+
+	private static getKey(): Buffer {
+		const secret = process.env.BACKUP_SECRET || "default-secret-key-change-me";
+		return scryptSync(secret, this.SALT, this.KEY_LENGTH);
 	}
 
 	static encrypt(text: string): string {
-		const iv = randomBytes(16);
-		const cipher = createCipheriv(
-			BackupService.getAlgorithm(),
-			BackupService.getKey(),
-			iv,
-		);
-		let encrypted = cipher.update(text);
-		encrypted = Buffer.concat([encrypted, cipher.final()]);
-		return iv.toString("hex") + ":" + encrypted.toString("hex");
+		const iv = randomBytes(this.IV_LENGTH);
+		const cipher = createCipheriv(this.ALGORITHM, this.getKey(), iv);
+		const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
+		return `${iv.toString("hex")}:${encrypted.toString("hex")}`;
 	}
 
 	static decrypt(text: string): string {
-		const textParts = text.split(":");
-		const iv = Buffer.from(textParts.shift()!, "hex");
-		const encryptedText = Buffer.from(textParts.join(":"), "hex");
-		const decipher = createDecipheriv(
-			BackupService.getAlgorithm(),
-			BackupService.getKey(),
-			iv,
-		);
-		let decrypted = decipher.update(encryptedText);
-		decrypted = Buffer.concat([decrypted, decipher.final()]);
+		const parts = text.split(":");
+		if (parts.length < 2) throw new Error("Invalid encrypted text format");
+		
+		const ivHex = parts[0]!;
+		const encryptedParts = parts.slice(1);
+		const iv = Buffer.from(ivHex, "hex");
+		const encryptedText = Buffer.from(encryptedParts.join(":"), "hex");
+		const decipher = createDecipheriv(this.ALGORITHM, this.getKey(), iv);
+		const decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
 		return decrypted.toString();
 	}
+}
 
-	static async createBackup(): Promise<Buffer> {
-		this.logger.log("Creating full backup...");
+class ConfigExtractor {
+	static async extractModuleConfig(moduleName: string, configClass: any): Promise<ModuleConfig> {
+		const configProperties = configClass?.configProperties || {};
+		const configurations: Record<string, string | string[]> = {};
 
-		const users = await prismaClient.user.findMany();
-		const channels = await prismaClient.channel.findMany();
-		const roles = await prismaClient.role.findMany();
-		const permissions = await prismaClient.permission.findMany();
-		const groups = await prismaClient.group.findMany();
-		const groupPermissions = await prismaClient.groupPermission.findMany();
-		const userGroups = await prismaClient.userGroup.findMany();
-		const sanctions = await prismaClient.sanction.findMany();
-		const configurations = await prismaClient.configuration.findMany();
-		const channelConfigurations = await prismaClient.channelConfiguration.findMany();
-		const roleConfigurations = await prismaClient.roleConfiguration.findMany();
-		const userConfigurations = await prismaClient.userConfiguration.findMany();
-		const tempVoiceChannels = await prismaClient.tempVoiceChannel.findMany();
-		const tempVoiceAllowedUsers = await prismaClient.tempVoiceAllowedUser.findMany();
-		const tempVoiceBlockedUsers = await prismaClient.tempVoiceBlockedUser.findMany();
+		for (const [propertyKey, options] of Object.entries(configProperties)) {
+			const opt = options as any;
+			const snakeCaseKey = this.toSnakeCase(propertyKey);
 
-		const backupData = {
+			const value = await this.getConfigValue(snakeCaseKey, opt.type);
+			if (value !== null) {
+				configurations[snakeCaseKey] = value;
+			}
+		}
+
+		return { moduleName, configurations };
+	}
+
+	private static async getConfigValue(
+		key: string,
+		type: ApplicationCommandOptionType
+	): Promise<string | string[] | null> {
+		if (type === ApplicationCommandOptionType.Role) {
+			// Check if it's a multi-role configuration
+			const roles = await ConfigService.getRoles(key);
+			if (roles.length > 0) return roles;
+			
+			const role = await ConfigService.getRole(key);
+			return role ? [role] : null;
+		}
+		if (type === ApplicationCommandOptionType.Channel) {
+			return await ConfigService.getChannel(key);
+		}
+		return await ConfigService.get(key);
+	}
+
+	private static toSnakeCase(str: string): string {
+		return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+	}
+}
+
+class ConfigRestorer {
+	static async restoreModuleConfig(moduleConfig: ModuleConfig): Promise<void> {
+		for (const [key, value] of Object.entries(moduleConfig.configurations)) {
+			if (Array.isArray(value)) {
+				if (value.length === 1 && value[0]) {
+					// Single role
+					await ConfigService.setRole(key, value[0]);
+				} else if (value.length > 1) {
+					// Multiple roles
+					await ConfigService.setRoles(key, value);
+				}
+			} else {
+				// Try to determine type from key pattern or use generic set
+				// For now, we'll use the generic set method
+				await ConfigService.set(key, value);
+			}
+		}
+	}
+}
+
+export class BackupService {
+	private static logger = new Logger("BackupService");
+	private static readonly BACKUP_VERSION = 3;
+
+	static async createBackup(client: LeBotClient<true>): Promise<Buffer> {
+		this.logger.log("Creating modular configuration backup...");
+
+		const modules: ModuleConfig[] = [];
+
+		for (const [moduleName, moduleData] of client.modules) {
+			const configClass = moduleData.options.config;
+			if (configClass && (configClass as any).configProperties) {
+				const moduleConfig = await ConfigExtractor.extractModuleConfig(
+					moduleName,
+					configClass
+				);
+				
+				if (Object.keys(moduleConfig.configurations).length > 0) {
+					modules.push(moduleConfig);
+					this.logger.log(`Backed up ${Object.keys(moduleConfig.configurations).length} configs for ${moduleName}`);
+				}
+			}
+		}
+
+		const backupData: BackupData = {
 			timestamp: new Date().toISOString(),
-			version: 2,
-			data: {
-				users,
-				channels,
-				roles,
-				permissions,
-				groups,
-				groupPermissions,
-				userGroups,
-				sanctions,
-				configurations,
-				channelConfigurations,
-				roleConfigurations,
-				userConfigurations,
-				tempVoiceChannels,
-				tempVoiceAllowedUsers,
-				tempVoiceBlockedUsers,
-			},
+			version: this.BACKUP_VERSION,
+			modules,
 		};
 
-		const json = JSON.stringify(backupData);
-		const encrypted = this.encrypt(json);
+		const json = JSON.stringify(backupData, null, 2);
+		const encrypted = CryptoHelper.encrypt(json);
+		this.logger.log(`Backup created with ${modules.length} modules`);
 		return Buffer.from(encrypted, "utf-8");
 	}
 
 	static async restoreBackup(buffer: Buffer): Promise<void> {
-		this.logger.log("Restoring full backup (merge/overwrite)...");
+		this.logger.log("Restoring modular configuration backup...");
 
 		try {
 			const encrypted = buffer.toString("utf-8");
-			const json = this.decrypt(encrypted);
-			const backup = JSON.parse(json);
-			const { data } = backup;
+			const json = CryptoHelper.decrypt(encrypted);
+			const backup: BackupData = JSON.parse(json);
 
-			await prismaClient.$transaction(async (tx) => {
-				// 1. Restore Base Entities (Users, Channels, Roles, Permissions)
-				if (data.users) {
-					for (const user of data.users) {
-						await tx.user.upsert({
-							where: { id: user.id },
-							update: { leftAt: user.leftAt },
-							create: { id: user.id, leftAt: user.leftAt },
-						});
-					}
-				}
+			if (backup.version !== this.BACKUP_VERSION) {
+				this.logger.warn(
+					`Backup version mismatch: expected ${this.BACKUP_VERSION}, got ${backup.version}`
+				);
+			}
 
-				if (data.channels) {
-					for (const channel of data.channels) {
-						await tx.channel.upsert({
-							where: { id: channel.id },
-							update: { type: channel.type },
-							create: { id: channel.id, type: channel.type },
-						});
-					}
-				}
+			this.logger.log(`Restoring ${backup.modules.length} modules from ${backup.timestamp}`);
 
-				if (data.roles) {
-					for (const role of data.roles) {
-						await tx.role.upsert({
-							where: { id: role.id },
-							update: { deletedAt: role.deletedAt },
-							create: { id: role.id, deletedAt: role.deletedAt },
-						});
-					}
-				}
-
-				if (data.permissions) {
-					for (const perm of data.permissions) {
-						await tx.permission.upsert({
-							where: { id: perm.id },
-							update: { name: perm.name },
-							create: { id: perm.id, name: perm.name },
-						});
-					}
-				}
-
-				// 2. Restore Configurations
-				if (data.configurations) {
-					for (const config of data.configurations) {
-						await tx.configuration.upsert({
-							where: { key: config.key },
-							update: { value: config.value },
-							create: { key: config.key, value: config.value },
-						});
-					}
-				}
-
-				if (data.channelConfigurations) {
-					for (const config of data.channelConfigurations) {
-						await tx.channelConfiguration.upsert({
-							where: { key: config.key },
-							update: { channelId: config.channelId },
-							create: { key: config.key, channelId: config.channelId },
-						});
-					}
-				}
-
-				if (data.roleConfigurations) {
-					for (const config of data.roleConfigurations) {
-						await tx.roleConfiguration.upsert({
-							where: { key_roleId: { key: config.key, roleId: config.roleId } },
-							update: {},
-							create: { key: config.key, roleId: config.roleId },
-						});
-					}
-				}
-
-				if (data.userConfigurations) {
-					for (const config of data.userConfigurations) {
-						await tx.userConfiguration.upsert({
-							where: { key: config.key },
-							update: { userId: config.userId },
-							create: { key: config.key, userId: config.userId },
-						});
-					}
-				}
-
-				// 3. Restore Groups & Relations
-				if (data.groups) {
-					for (const group of data.groups) {
-						await tx.group.upsert({
-							where: { id: group.id },
-							update: { name: group.name, roleId: group.roleId },
-							create: { id: group.id, name: group.name, roleId: group.roleId },
-						});
-					}
-				}
-
-				if (data.groupPermissions) {
-					for (const gp of data.groupPermissions) {
-						await tx.groupPermission.upsert({
-							where: { id: gp.id },
-							update: { groupId: gp.groupId, permissionId: gp.permissionId },
-							create: { id: gp.id, groupId: gp.groupId, permissionId: gp.permissionId },
-						});
-					}
-				}
-
-				if (data.userGroups) {
-					for (const ug of data.userGroups) {
-						await tx.userGroup.upsert({
-							where: { id: ug.id },
-							update: { userId: ug.userId, groupId: ug.groupId },
-							create: { id: ug.id, userId: ug.userId, groupId: ug.groupId },
-						});
-					}
-				}
-
-				// 4. Restore Sanctions
-				if (data.sanctions) {
-					for (const sanction of data.sanctions) {
-						await tx.sanction.upsert({
-							where: { id: sanction.id },
-							update: {
-								userId: sanction.userId,
-								moderatorId: sanction.moderatorId,
-								type: sanction.type,
-								reason: sanction.reason,
-								createdAt: sanction.createdAt,
-								expiresAt: sanction.expiresAt,
-								active: sanction.active,
-							},
-							create: {
-								id: sanction.id,
-								userId: sanction.userId,
-								moderatorId: sanction.moderatorId,
-								type: sanction.type,
-								reason: sanction.reason,
-								createdAt: sanction.createdAt,
-								expiresAt: sanction.expiresAt,
-								active: sanction.active,
-							},
-						});
-					}
-				}
-
-				// 5. Restore TempVoice
-				if (data.tempVoiceChannels) {
-					for (const tv of data.tempVoiceChannels) {
-						await tx.tempVoiceChannel.upsert({
-							where: { id: tv.id },
-							update: {
-								ownerId: tv.ownerId,
-								createdAt: tv.createdAt,
-								isLocked: tv.isLocked,
-							},
-							create: {
-								id: tv.id,
-								ownerId: tv.ownerId,
-								createdAt: tv.createdAt,
-								isLocked: tv.isLocked,
-							},
-						});
-					}
-				}
-
-				if (data.tempVoiceAllowedUsers) {
-					for (const tva of data.tempVoiceAllowedUsers) {
-						await tx.tempVoiceAllowedUser.upsert({
-							where: { id: tva.id },
-							update: { tempVoiceId: tva.tempVoiceId, userId: tva.userId },
-							create: { id: tva.id, tempVoiceId: tva.tempVoiceId, userId: tva.userId },
-						});
-					}
-				}
-
-				if (data.tempVoiceBlockedUsers) {
-					for (const tvb of data.tempVoiceBlockedUsers) {
-						await tx.tempVoiceBlockedUser.upsert({
-							where: { id: tvb.id },
-							update: { tempVoiceId: tvb.tempVoiceId, userId: tvb.userId },
-							create: { id: tvb.id, tempVoiceId: tvb.tempVoiceId, userId: tvb.userId },
-						});
-					}
-				}
-			});
+			for (const moduleConfig of backup.modules) {
+				this.logger.log(`Restoring ${moduleConfig.moduleName}...`);
+				await ConfigRestorer.restoreModuleConfig(moduleConfig);
+				this.logger.log(
+					`Restored ${Object.keys(moduleConfig.configurations).length} configs for ${moduleConfig.moduleName}`
+				);
+			}
 
 			this.logger.log("Backup restored successfully.");
 		} catch (error) {
 			this.logger.error(
 				"Failed to restore backup",
-				(error as Error)?.stack || String(error),
+				(error as Error)?.stack || String(error)
 			);
 			throw error;
 		}
+	}
+
+	// Legacy methods for backward compatibility
+	static encrypt(text: string): string {
+		return CryptoHelper.encrypt(text);
+	}
+
+	static decrypt(text: string): string {
+		return CryptoHelper.decrypt(text);
 	}
 }
