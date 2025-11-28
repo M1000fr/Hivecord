@@ -28,8 +28,9 @@ model User {
 }
 
 model Channel {
-    id   String      @id
-    type ChannelType
+    id        String    @id
+    type      ChannelType
+    deletedAt DateTime?
 
     ChannelConfigurations ChannelConfiguration[]
 }

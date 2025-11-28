@@ -64,9 +64,10 @@ export default class PurgeCommand extends BaseCommand {
 						data: { channelId: newChannel.id },
 					});
 
-					// Delete old channel record
-					await tx.channel.delete({
+					// Soft delete old channel record
+					await tx.channel.update({
 						where: { id: oldId },
+						data: { deletedAt: new Date() },
 					});
 				}
 			});

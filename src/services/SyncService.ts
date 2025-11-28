@@ -66,7 +66,7 @@ export class SyncService {
 
 			await prismaClient.channel.upsert({
 				where: { id },
-				update: { type },
+				update: { type, deletedAt: null },
 				create: { id, type },
 			});
 		}
