@@ -15,7 +15,6 @@ import { EPermission } from "../../../../enums/EPermission";
 import { modulesOptions } from "./modulesOptions";
 import { LeBotClient } from "../../../../class/LeBotClient";
 import { ConfigService } from "../../../../services/ConfigService";
-import { EConfigKey, EChannelConfigKey, ERoleConfigKey } from "../../../../enums/EConfigKey";
 
 @Command(modulesOptions)
 export default class ModulesCommand extends BaseCommand {
@@ -81,36 +80,21 @@ export default class ModulesCommand extends BaseCommand {
 				const snakeCaseKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 				
 				if (opt.type === ApplicationCommandOptionType.Role) {
-					const enumKey = Object.keys(ERoleConfigKey).find(
-						k => ERoleConfigKey[k as keyof typeof ERoleConfigKey] === snakeCaseKey
-					);
-					if (enumKey) {
-						const roleId = await ConfigService.getRole(ERoleConfigKey[enumKey as keyof typeof ERoleConfigKey]);
-						if (roleId) currentValue = `<@&${roleId}>`;
-					}
+					const roleId = await ConfigService.getRole(snakeCaseKey);
+					if (roleId) currentValue = `<@&${roleId}>`;
 				} else if (opt.type === ApplicationCommandOptionType.Channel) {
-					const enumKey = Object.keys(EChannelConfigKey).find(
-						k => EChannelConfigKey[k as keyof typeof EChannelConfigKey] === snakeCaseKey
-					);
-					if (enumKey) {
-						const channelId = await ConfigService.getChannel(EChannelConfigKey[enumKey as keyof typeof EChannelConfigKey]);
-						if (channelId) currentValue = `<#${channelId}>`;
-					}
+					const channelId = await ConfigService.getChannel(snakeCaseKey);
+					if (channelId) currentValue = `<#${channelId}>`;
 				} else {
-					const enumKey = Object.keys(EConfigKey).find(
-						k => EConfigKey[k as keyof typeof EConfigKey] === snakeCaseKey
-					);
-					if (enumKey) {
-						const value = await ConfigService.get(EConfigKey[enumKey as keyof typeof EConfigKey]);
-						if (value) currentValue = value.length > 100 ? value.substring(0, 97) + "..." : value;
-					}
+					const value = await ConfigService.get(snakeCaseKey);
+					if (value) currentValue = value.length > 100 ? value.substring(0, 97) + "..." : value;
 				}
 			} catch (error) {
 				// Ignore errors, keep "Not set"
 			}
 			
 			embed.addFields({
-				name: `${index}. ${key}`,
+				name: `${index}. ${opt.displayName || key}`,
 				value: `${opt.description}\nType: \`${typeName}\`\nCurrent: ${currentValue}`,
 				inline: false,
 			});
@@ -125,7 +109,7 @@ export default class ModulesCommand extends BaseCommand {
 				Object.entries(configProperties).map(([key, options], idx) => {
 					const opt = options as any;
 					return new StringSelectMenuOptionBuilder()
-						.setLabel(`${idx + 1}. ${key}`)
+						.setLabel(`${idx + 1}. ${opt.displayName || key}`)
 						.setDescription(
 							opt.description.substring(0, 100),
 						)

@@ -2,8 +2,8 @@ import { Client } from "discord.js";
 import { prismaClient } from "../services/prismaService";
 import { SanctionType } from "../prisma/client/enums";
 import { ConfigService } from "../services/ConfigService";
-import { EConfigKey, ERoleConfigKey } from "../enums/EConfigKey";
 import { Logger } from "../utils/Logger";
+import { ModerationConfigKeys } from "../modules/Moderation/ModerationConfig";
 
 export class SanctionScheduler {
 	private client: Client;
@@ -29,7 +29,7 @@ export class SanctionScheduler {
 		if (!guild) return;
 
 		const muteRoleId = await ConfigService.getRole(
-			ERoleConfigKey.MuteRoleId,
+			ModerationConfigKeys.muteRoleId,
 		);
 		if (!muteRoleId) return;
 
@@ -101,7 +101,7 @@ export class SanctionScheduler {
 
 				if (sanction.type === SanctionType.MUTE) {
 					const muteRoleId = await ConfigService.getRole(
-						ERoleConfigKey.MuteRoleId,
+						ModerationConfigKeys.muteRoleId,
 					);
 					if (muteRoleId) {
 						const member = await guild.members

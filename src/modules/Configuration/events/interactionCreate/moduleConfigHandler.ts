@@ -18,11 +18,6 @@ import { BaseEvent } from "../../../../class/BaseEvent";
 import { Event } from "../../../../decorators/Event";
 import { LeBotClient } from "../../../../class/LeBotClient";
 import { ConfigService } from "../../../../services/ConfigService";
-import {
-	EConfigKey,
-	EChannelConfigKey,
-	ERoleConfigKey,
-} from "../../../../enums/EConfigKey";
 
 @Event({
 	name: Events.InteractionCreate,
@@ -39,47 +34,17 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			);
 
 			if (type === ApplicationCommandOptionType.Role) {
-				const enumKey = Object.keys(ERoleConfigKey).find(
-					(k) =>
-						ERoleConfigKey[k as keyof typeof ERoleConfigKey] ===
-						snakeCaseKey,
-				);
-				if (enumKey) {
-					const roleId = await ConfigService.getRole(
-						ERoleConfigKey[enumKey as keyof typeof ERoleConfigKey],
-					);
-					if (roleId) return `<@&${roleId}>`;
-				}
+				const roleId = await ConfigService.getRole(snakeCaseKey);
+				if (roleId) return `<@&${roleId}>`;
 			} else if (type === ApplicationCommandOptionType.Channel) {
-				const enumKey = Object.keys(EChannelConfigKey).find(
-					(k) =>
-						EChannelConfigKey[
-							k as keyof typeof EChannelConfigKey
-						] === snakeCaseKey,
-				);
-				if (enumKey) {
-					const channelId = await ConfigService.getChannel(
-						EChannelConfigKey[
-							enumKey as keyof typeof EChannelConfigKey
-						],
-					);
-					if (channelId) return `<#${channelId}>`;
-				}
+				const channelId = await ConfigService.getChannel(snakeCaseKey);
+				if (channelId) return `<#${channelId}>`;
 			} else {
-				const enumKey = Object.keys(EConfigKey).find(
-					(k) =>
-						EConfigKey[k as keyof typeof EConfigKey] ===
-						snakeCaseKey,
-				);
-				if (enumKey) {
-					const value = await ConfigService.get(
-						EConfigKey[enumKey as keyof typeof EConfigKey],
-					);
-					if (value)
-						return value.length > 100
-							? value.substring(0, 97) + "..."
-							: value;
-				}
+				const value = await ConfigService.get(snakeCaseKey);
+				if (value)
+					return value.length > 100
+						? value.substring(0, 97) + "..."
+						: value;
 			}
 		} catch (error) {
 			// Ignore errors
@@ -120,7 +85,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			const currentValue = await this.getCurrentValue(key, opt.type);
 
 			embed.addFields({
-				name: `${index}. ${key}`,
+				name: `${index}. ${opt.displayName || key}`,
 				value: `${opt.description}\nType: \`${typeNames[opt.type] || "Unknown"}\`\nCurrent: ${currentValue}`,
 				inline: false,
 			});
@@ -134,7 +99,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 				Object.entries(configProperties).map(([key, options], idx) => {
 					const opt = options as any;
 					return new StringSelectMenuOptionBuilder()
-						.setLabel(`${idx + 1}. ${key}`)
+						.setLabel(`${idx + 1}. ${opt.displayName || key}`)
 						.setDescription(opt.description.substring(0, 100))
 						.setValue(key);
 				}),
@@ -164,49 +129,16 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 
 		try {
 			if (type === ApplicationCommandOptionType.Role) {
-				const enumKey = Object.keys(ERoleConfigKey).find(
-					(k) =>
-						ERoleConfigKey[k as keyof typeof ERoleConfigKey] ===
-						snakeCaseKey,
-				);
-				if (enumKey) {
-					await ConfigService.setRole(
-						ERoleConfigKey[enumKey as keyof typeof ERoleConfigKey],
-						value,
-					);
-					saved = true;
-					displayValue = `<@&${value}>`;
-				}
+				await ConfigService.setRole(snakeCaseKey, value);
+				saved = true;
+				displayValue = `<@&${value}>`;
 			} else if (type === ApplicationCommandOptionType.Channel) {
-				const enumKey = Object.keys(EChannelConfigKey).find(
-					(k) =>
-						EChannelConfigKey[
-							k as keyof typeof EChannelConfigKey
-						] === snakeCaseKey,
-				);
-				if (enumKey) {
-					await ConfigService.setChannel(
-						EChannelConfigKey[
-							enumKey as keyof typeof EChannelConfigKey
-						],
-						value,
-					);
-					saved = true;
-					displayValue = `<#${value}>`;
-				}
+				await ConfigService.setChannel(snakeCaseKey, value);
+				saved = true;
+				displayValue = `<#${value}>`;
 			} else {
-				const enumKey = Object.keys(EConfigKey).find(
-					(k) =>
-						EConfigKey[k as keyof typeof EConfigKey] ===
-						snakeCaseKey,
-				);
-				if (enumKey) {
-					await ConfigService.set(
-						EConfigKey[enumKey as keyof typeof EConfigKey],
-						value,
-					);
-					saved = true;
-				}
+				await ConfigService.set(snakeCaseKey, value);
+				saved = true;
 			}
 
 			if (saved) {
@@ -253,20 +185,6 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 							components: [config.row],
 						});
 					}
-				}
-			} else {
-				const errorContent = `⚠️ Configuration key not found in enums for property: **${propertyKey}**\nExpected enum value: \`${snakeCaseKey}\``;
-				if (interaction.isModalSubmit()) {
-					await interaction.reply({
-						content: errorContent,
-						flags: [MessageFlags.Ephemeral],
-					});
-				} else {
-					await interaction.update({
-						content: errorContent,
-						embeds: [],
-						components: [],
-					});
 				}
 			}
 		} catch (error) {
@@ -401,7 +319,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			);
 
 			const embed = new EmbedBuilder()
-				.setTitle(`⚙️ Configure: ${selectedProperty}`)
+				.setTitle(`⚙️ Configure: ${propertyOptions.displayName || selectedProperty}`)
 				.setDescription(
 					`${propertyOptions.description}\n\n**Current value:** ${currentValue}`,
 				)
@@ -439,15 +357,8 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 				(letter: string) => `_${letter.toLowerCase()}`,
 			);
 			let rawValue = "";
-			const enumKey = Object.keys(EConfigKey).find(
-				(k) => EConfigKey[k as keyof typeof EConfigKey] === snakeCaseKey,
-			);
-			if (enumKey) {
-				const val = await ConfigService.get(
-					EConfigKey[enumKey as keyof typeof EConfigKey],
-				);
-				if (val) rawValue = val;
-			}
+			const val = await ConfigService.get(snakeCaseKey);
+			if (val) rawValue = val;
 
 			const labelText =
 				propertyOptions.description.length > 45
@@ -472,7 +383,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 
 			const modal = new ModalBuilder({
 				customId: `module_config_modal:${moduleName}:${selectedProperty}`,
-				title: `Configure: ${selectedProperty}`,
+				title: `Configure: ${propertyOptions.displayName || selectedProperty}`,
 				components: [row.toJSON()],
 			});
 

@@ -18,7 +18,7 @@ import {
 	type ModalSubmitInteraction,
 } from "discord.js";
 import { Button, Modal } from "../decorators/Interaction";
-import { EChannelConfigKey } from "../enums/EConfigKey";
+import { VoiceConfigKeys } from "../modules/Voice/VoiceConfig";
 import { ConfigService } from "./ConfigService";
 import { prismaClient } from "./prismaService";
 
@@ -27,7 +27,7 @@ export class TempVoiceService {
 		if (!newState.channelId || !newState.guild || !newState.member) return;
 
 		const generatorId = await ConfigService.getChannel(
-			EChannelConfigKey.TempVoiceGeneratorChannelId,
+			VoiceConfigKeys.tempVoiceGeneratorChannelId,
 		);
 
 		if (newState.channelId !== generatorId) return;

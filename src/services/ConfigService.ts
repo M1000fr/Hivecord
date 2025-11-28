@@ -1,20 +1,15 @@
 import { prismaClient } from "./prismaService";
-import {
-	EConfigKey,
-	EChannelConfigKey,
-	ERoleConfigKey,
-} from "../enums/EConfigKey";
 import { ChannelType } from "../prisma/client/enums";
 
 export class ConfigService {
-	static async get(key: EConfigKey): Promise<string | null> {
+	static async get(key: string): Promise<string | null> {
 		const config = await prismaClient.configuration.findUnique({
 			where: { key },
 		});
 		return config ? config.value : null;
 	}
 
-	static async set(key: EConfigKey, value: string): Promise<void> {
+	static async set(key: string, value: string): Promise<void> {
 		await prismaClient.configuration.upsert({
 			where: { key },
 			update: { value },
@@ -22,13 +17,13 @@ export class ConfigService {
 		});
 	}
 
-	static async delete(key: EConfigKey): Promise<void> {
+	static async delete(key: string): Promise<void> {
 		await prismaClient.configuration.delete({
 			where: { key },
 		});
 	}
 
-	static async getChannel(key: EChannelConfigKey): Promise<string | null> {
+	static async getChannel(key: string): Promise<string | null> {
 		const config = await prismaClient.channelConfiguration.findUnique({
 			where: { key },
 		});
@@ -36,7 +31,7 @@ export class ConfigService {
 	}
 
 	static async setChannel(
-		key: EChannelConfigKey,
+		key: string,
 		channelId: string,
 		channelType: ChannelType = ChannelType.TEXT,
 	): Promise<void> {
@@ -53,14 +48,14 @@ export class ConfigService {
 		});
 	}
 
-	static async getRole(key: ERoleConfigKey): Promise<string | null> {
+	static async getRole(key: string): Promise<string | null> {
 		const config = await prismaClient.roleConfiguration.findFirst({
 			where: { key },
 		});
 		return config ? config.roleId : null;
 	}
 
-	static async setRole(key: ERoleConfigKey, roleId: string): Promise<void> {
+	static async setRole(key: string, roleId: string): Promise<void> {
 		await prismaClient.role.upsert({
 			where: { id: roleId },
 			update: {},
@@ -75,7 +70,7 @@ export class ConfigService {
 		]);
 	}
 
-	static async getRoles(key: ERoleConfigKey): Promise<string[]> {
+	static async getRoles(key: string): Promise<string[]> {
 		const configs = await prismaClient.roleConfiguration.findMany({
 			where: { key },
 		});
@@ -83,7 +78,7 @@ export class ConfigService {
 	}
 
 	static async setRoles(
-		key: ERoleConfigKey,
+		key: string,
 		roleIds: string[],
 	): Promise<void> {
 		await prismaClient.$transaction(async (tx) => {
@@ -102,7 +97,7 @@ export class ConfigService {
 		});
 	}
 
-	static async addRole(key: ERoleConfigKey, roleId: string): Promise<void> {
+	static async addRole(key: string, roleId: string): Promise<void> {
 		await prismaClient.role.upsert({
 			where: { id: roleId },
 			update: {},
@@ -117,7 +112,7 @@ export class ConfigService {
 	}
 
 	static async removeRole(
-		key: ERoleConfigKey,
+		key: string,
 		roleId: string,
 	): Promise<void> {
 		try {

@@ -10,7 +10,6 @@ import { BaseEvent } from "../../../../class/BaseEvent";
 import { Event } from "../../../../decorators/Event";
 import { LeBotClient } from "../../../../class/LeBotClient";
 import { ConfigService } from "../../../../services/ConfigService";
-import { EConfigKey, EChannelConfigKey } from "../../../../enums/EConfigKey";
 import { Logger } from "../../../../utils/Logger";
 import { Canvas, loadImage, Image, GlobalFonts } from "@napi-rs/canvas";
 import GIFEncoder from "gifencoder";
@@ -18,6 +17,7 @@ import gifFrames from "gif-frames";
 import { Stream } from "stream";
 import path from "path";
 import { MessageTemplate } from "../../../../class/MessageTemplate";
+import { GeneralConfigKeys } from "../../GeneralConfig";
 
 @Event({
 	name: Events.GuildMemberAdd,
@@ -28,7 +28,7 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 	async run(client: LeBotClient<true>, member: GuildMember) {
 		try {
 			const welcomeChannelId = await ConfigService.getChannel(
-				EChannelConfigKey.WelcomeChannelId,
+				GeneralConfigKeys.welcomeChannelId,
 			);
 			if (!welcomeChannelId) {
 				this.logger.warn(
@@ -61,7 +61,7 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 			const isAnimated = dynamicAvatarUrl.includes(".gif");
 
 			const welcomeMessageImageConfig = await ConfigService.get(
-				EConfigKey.WelcomeMessageImage,
+				GeneralConfigKeys.welcomeMessageImage,
 			);
 
 			const welcomeMessageImageTemplate = new MessageTemplate(
@@ -176,7 +176,7 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 			}
 
 			const welcomeMessageConfig = await ConfigService.get(
-				EConfigKey.WelcomeMessage,
+				GeneralConfigKeys.welcomeMessage,
 			);
 
 			const welcomeMessageTemplate = new MessageTemplate(
