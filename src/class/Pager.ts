@@ -8,11 +8,13 @@ import {
 	StringSelectMenuInteraction,
 	type RepliableInteraction,
 } from "discord.js";
+import { RedisService } from "../services/RedisService";
+import { PagerRegistry } from "../services/PagerRegistry";
 
 export interface PagerOptions<T> {
 	items: T[];
 	itemsPerPage: number;
-	renderPage: (
+	renderPage?: (
 		items: T[],
 		pageIndex: number,
 		totalPages: number,
@@ -23,6 +25,8 @@ export interface PagerOptions<T> {
 		interaction: StringSelectMenuInteraction | ButtonInteraction,
 		collector: InteractionCollector<any>,
 	) => Promise<void>;
+	type?: string; // Unique identifier for the pager type (required for persistence)
+	userId?: string; // User ID allowed to interact (for persistence)
 }
 
 export class Pager<T> {
@@ -40,14 +44,26 @@ export class Pager<T> {
 		interaction: StringSelectMenuInteraction | ButtonInteraction,
 		collector: InteractionCollector<any>,
 	) => Promise<void>;
+	private type?: string;
+	private userId?: string;
 
 	constructor(options: PagerOptions<T>) {
 		this.items = options.items;
 		this.itemsPerPage = options.itemsPerPage;
-		this.renderPage = options.renderPage;
+		this.renderPage = options.renderPage!;
 		this.filter = options.filter || (() => true);
 		this.time = options.time || 300000; // 5 minutes default
 		this.onComponent = options.onComponent;
+		this.type = options.type;
+		this.userId = options.userId;
+
+		if (this.type && !this.renderPage) {
+			const definition = PagerRegistry.get(this.type);
+			if (definition) {
+				this.renderPage = definition.renderPage;
+				// onComponent is handled differently for persistent pagers
+			}
+		}
 	}
 
 	public async start(interaction: RepliableInteraction) {
@@ -95,6 +111,23 @@ export class Pager<T> {
 			message = await interaction.fetchReply();
 		}
 
+		// If persistent, save state and return (don't start collector)
+		if (this.type) {
+			const redis = RedisService.getInstance();
+			const state = {
+				items: this.items,
+				itemsPerPage: this.itemsPerPage,
+				currentPage: this.currentPage,
+				type: this.type,
+				userId: this.userId,
+				totalPages: totalPages,
+			};
+			await redis.set(`pager:${message.id}`, JSON.stringify(state));
+			// Set expiry if needed, e.g. 1 day
+			await redis.expire(`pager:${message.id}`, 86400);
+			return;
+		}
+
 		const collector = message.createMessageComponentCollector({
 			filter: this.filter,
 			time: this.time,
@@ -115,10 +148,6 @@ export class Pager<T> {
 						i as StringSelectMenuInteraction | ButtonInteraction,
 						collector,
 					);
-					// After custom component action, we might want to refresh the page
-					// But the onComponent handler should decide if it updates or not.
-					// If onComponent updates the message, we are good.
-					// If onComponent opens a modal, it shouldn't update the message immediately.
 				}
 			}
 		});
@@ -128,5 +157,116 @@ export class Pager<T> {
 		});
 
 		return collector;
+	}
+
+	static async handleInteraction(interaction: ButtonInteraction | StringSelectMenuInteraction) {
+		const redis = RedisService.getInstance();
+		const key = `pager:${interaction.message.id}`;
+		const data = await redis.get(key);
+
+		if (!data) return false; // Not a pager interaction
+
+		const state = JSON.parse(data);
+		
+		// Check ownership
+		if (state.userId && interaction.user.id !== state.userId) {
+			await interaction.reply({
+				content: "You are not allowed to interact with this pager.",
+				flags: 64 // Ephemeral
+			});
+			return true;
+		}
+
+		const definition = PagerRegistry.get(state.type);
+		if (!definition) {
+			console.error(`Pager type ${state.type} not found in registry`);
+			return false;
+		}
+
+		const totalPages = Math.ceil(state.items.length / state.itemsPerPage);
+
+		if (interaction.customId === "pager_prev") {
+			if (state.currentPage > 0) {
+				state.currentPage--;
+				await redis.set(key, JSON.stringify(state));
+				await redis.expire(key, 86400);
+				
+				const start = state.currentPage * state.itemsPerPage;
+				const end = start + state.itemsPerPage;
+				const pageItems = state.items.slice(start, end);
+
+				const { embeds, components } = await definition.renderPage(
+					pageItems,
+					state.currentPage,
+					totalPages
+				);
+
+				const navigationRow = new ActionRowBuilder<ButtonBuilder>();
+				if (totalPages > 1) {
+					navigationRow.addComponents(
+						new ButtonBuilder()
+							.setCustomId("pager_prev")
+							.setLabel("Previous")
+							.setStyle(ButtonStyle.Secondary)
+							.setDisabled(state.currentPage === 0),
+						new ButtonBuilder()
+							.setCustomId("pager_next")
+							.setLabel("Next")
+							.setStyle(ButtonStyle.Secondary)
+							.setDisabled(state.currentPage === totalPages - 1),
+					);
+					components.push(navigationRow);
+				}
+
+				await interaction.update({ embeds, components });
+			} else {
+				await interaction.deferUpdate();
+			}
+			return true;
+		} else if (interaction.customId === "pager_next") {
+			if (state.currentPage < totalPages - 1) {
+				state.currentPage++;
+				await redis.set(key, JSON.stringify(state));
+				await redis.expire(key, 86400);
+
+				const start = state.currentPage * state.itemsPerPage;
+				const end = start + state.itemsPerPage;
+				const pageItems = state.items.slice(start, end);
+
+				const { embeds, components } = await definition.renderPage(
+					pageItems,
+					state.currentPage,
+					totalPages
+				);
+
+				const navigationRow = new ActionRowBuilder<ButtonBuilder>();
+				if (totalPages > 1) {
+					navigationRow.addComponents(
+						new ButtonBuilder()
+							.setCustomId("pager_prev")
+							.setLabel("Previous")
+							.setStyle(ButtonStyle.Secondary)
+							.setDisabled(state.currentPage === 0),
+						new ButtonBuilder()
+							.setCustomId("pager_next")
+							.setLabel("Next")
+							.setStyle(ButtonStyle.Secondary)
+							.setDisabled(state.currentPage === totalPages - 1),
+					);
+					components.push(navigationRow);
+				}
+
+				await interaction.update({ embeds, components });
+			} else {
+				await interaction.deferUpdate();
+			}
+			return true;
+		} else {
+			// Custom component
+			if (definition.onComponent) {
+				await definition.onComponent(interaction, state.items, state.currentPage);
+			}
+			return true;
+		}
 	}
 }
