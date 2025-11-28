@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, MessageFlags } from "discord.js";
-import { PermissionService } from "../services/PermissionService";
+import { PermissionService } from '@services/PermissionService';
 
 export abstract class BaseCommand {
 	async execute(

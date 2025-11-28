@@ -1,5 +1,5 @@
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import { PrismaClient } from "../prisma/client/client";
+import { PrismaClient } from '@prisma/client/client';
 
 function extractDatabaseLoginFromEnv(): {
 	username: string;

@@ -4,13 +4,13 @@ import {
 	MessageFlags,
 	PermissionsBitField,
 } from "discord.js";
-import { BaseCommand } from "../../../../class/BaseCommand";
-import { Command } from "../../../../decorators/Command";
-import { DefaultCommand } from "../../../../decorators/DefaultCommand";
-import { EPermission } from "../../../../enums/EPermission";
+import { BaseCommand } from '@class/BaseCommand';
+import { Command } from '@decorators/Command';
+import { DefaultCommand } from '@decorators/DefaultCommand';
+import { EPermission } from '@enums/EPermission';
 import { banOptions } from "./banOptions";
-import { BotPermission } from "../../../../decorators/BotPermission";
-import { SanctionService } from "../../../../services/SanctionService";
+import { BotPermission } from '@decorators/BotPermission';
+import { SanctionService } from '@services/SanctionService';
 
 @Command(banOptions)
 export default class BanCommand extends BaseCommand {

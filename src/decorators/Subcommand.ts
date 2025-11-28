@@ -1,4 +1,4 @@
-import { EPermission } from "../enums/EPermission";
+import { EPermission } from '@enums/EPermission';
 
 export interface SubcommandOptions {
 	name: string;

@@ -1,8 +1,8 @@
 import { Guild, User, GuildMember } from "discord.js";
 import { prismaClient } from "./prismaService";
-import { SanctionType } from "../prisma/client/enums";
+import { SanctionType } from '@prisma/client/enums';
 import { ConfigService } from "./ConfigService";
-import { ModerationConfigKeys } from "../modules/Moderation/ModerationConfig";
+import { ModerationConfigKeys } from '@modules/Moderation/ModerationConfig';
 
 export class SanctionService {
 	private static async fetchMember(guild: Guild, userId: string): Promise<GuildMember | null> {

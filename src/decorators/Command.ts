@@ -1,4 +1,4 @@
-import type { CommandOptions } from "../interfaces/CommandOptions";
+import type { CommandOptions } from '@interfaces/CommandOptions';
 
 export function Command(options: CommandOptions) {
 	return function (target: Function) {

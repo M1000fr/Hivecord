@@ -4,13 +4,13 @@ import {
 	EmbedBuilder,
 	MessageFlags,
 } from "discord.js";
-import { BaseCommand } from "../../../../class/BaseCommand";
-import { Command } from "../../../../decorators/Command";
-import { DefaultCommand } from "../../../../decorators/DefaultCommand";
-import { EPermission } from "../../../../enums/EPermission";
+import { BaseCommand } from '@class/BaseCommand';
+import { Command } from '@decorators/Command';
+import { DefaultCommand } from '@decorators/DefaultCommand';
+import { EPermission } from '@enums/EPermission';
 import { sanctionsOptions } from "./sanctionsOptions";
-import { prismaClient } from "../../../../services/prismaService";
-import { Pager } from "../../../../class/Pager";
+import { prismaClient } from '@services/prismaService';
+import { Pager } from '@class/Pager';
 
 @Command(sanctionsOptions)
 export default class SanctionsCommand extends BaseCommand {

@@ -1,5 +1,5 @@
 import { prismaClient } from "./prismaService";
-import { Logger } from "../utils/Logger";
+import { Logger } from '@utils/Logger';
 
 export class PermissionService {
 	private static logger = new Logger("PermissionService");

@@ -1,4 +1,4 @@
-import { Module } from "../../decorators/Module";
+import { Module } from '@decorators/Module';
 import { VoiceConfig } from "./VoiceConfig";
 import TempVoiceEvent from "./events/voiceStateUpdate/TempVoiceEvent";
 

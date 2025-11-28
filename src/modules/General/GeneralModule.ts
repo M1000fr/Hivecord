@@ -1,4 +1,4 @@
-import { Module } from "../../decorators/Module";
+import { Module } from '@decorators/Module';
 import { GeneralConfig } from "./GeneralConfig";
 import PingCommand from "./commands/ping/index";
 import ReadyEvent from "./events/ready/log";

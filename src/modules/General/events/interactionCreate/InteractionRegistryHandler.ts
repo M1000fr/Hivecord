@@ -1,8 +1,8 @@
 import { Events, type Interaction } from "discord.js";
-import { BaseEvent } from "../../../../class/BaseEvent";
-import { Event } from "../../../../decorators/Event";
-import { LeBotClient } from "../../../../class/LeBotClient";
-import { InteractionRegistry } from "../../../../services/InteractionRegistry";
+import { BaseEvent } from '@class/BaseEvent';
+import { Event } from '@decorators/Event';
+import { LeBotClient } from '@class/LeBotClient';
+import { InteractionRegistry } from '@services/InteractionRegistry';
 
 @Event({
 	name: Events.InteractionCreate,

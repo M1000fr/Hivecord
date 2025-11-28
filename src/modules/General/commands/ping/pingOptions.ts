@@ -1,4 +1,4 @@
-import type { CommandOptions } from "../../../../interfaces/CommandOptions";
+import type { CommandOptions } from '@interfaces/CommandOptions';
 
 export const pingOptions: CommandOptions = {
 	name: "ping",

@@ -17,8 +17,8 @@ import {
 	type Message,
 	type ModalSubmitInteraction,
 } from "discord.js";
-import { Button, Modal } from "../decorators/Interaction";
-import { VoiceConfigKeys } from "../modules/Voice/VoiceConfig";
+import { Button, Modal } from '@decorators/Interaction';
+import { VoiceConfigKeys } from '@modules/Voice/VoiceConfig';
 import { ConfigService } from "./ConfigService";
 import { prismaClient } from "./prismaService";
 

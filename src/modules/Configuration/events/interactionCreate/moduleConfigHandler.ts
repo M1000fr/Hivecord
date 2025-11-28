@@ -14,11 +14,11 @@ import {
 	ChannelSelectMenuBuilder,
 	type Message,
 } from "discord.js";
-import { BaseEvent } from "../../../../class/BaseEvent";
-import { Event } from "../../../../decorators/Event";
-import { LeBotClient } from "../../../../class/LeBotClient";
-import { ConfigService } from "../../../../services/ConfigService";
-import { InteractionHelper } from "../../../../utils/InteractionHelper";
+import { BaseEvent } from '@class/BaseEvent';
+import { Event } from '@decorators/Event';
+import { LeBotClient } from '@class/LeBotClient';
+import { ConfigService } from '@services/ConfigService';
+import { InteractionHelper } from '@utils/InteractionHelper';
 
 const TYPE_NAMES: Record<ApplicationCommandOptionType, string> = {
 	[ApplicationCommandOptionType.String]: "Text",

@@ -14,6 +14,21 @@
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 		"noEmit": true,
+		// Path aliases
+		"baseUrl": ".",
+		"ignoreDeprecations": "6.0",
+		"paths": {
+			"@src/*": ["src/*"],
+			"@class/*": ["src/class/*"],
+			"@decorators/*": ["src/decorators/*"],
+			"@enums/*": ["src/enums/*"],
+			"@interfaces/*": ["src/interfaces/*"],
+			"@modules/*": ["src/modules/*"],
+			"@services/*": ["src/services/*"],
+			"@types/*": ["src/types/*"],
+			"@utils/*": ["src/utils/*"],
+			"@prisma/*": ["src/prisma/*"]
+		},
 		// Best practices
 		"strict": true,
 		"skipLibCheck": true,

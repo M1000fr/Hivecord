@@ -1,5 +1,5 @@
 import { prismaClient } from "./prismaService";
-import { ChannelType } from "../prisma/client/enums";
+import { ChannelType } from '@prisma/client/enums';
 
 export class ConfigService {
 	private static async ensureRoleExists(roleId: string): Promise<void> {

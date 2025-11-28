@@ -4,14 +4,14 @@ import {
 	MessageFlags,
 	PermissionsBitField,
 } from "discord.js";
-import { BaseCommand } from "../../../../class/BaseCommand";
-import { Command } from "../../../../decorators/Command";
-import { DefaultCommand } from "../../../../decorators/DefaultCommand";
-import { EPermission } from "../../../../enums/EPermission";
+import { BaseCommand } from '@class/BaseCommand';
+import { Command } from '@decorators/Command';
+import { DefaultCommand } from '@decorators/DefaultCommand';
+import { EPermission } from '@enums/EPermission';
 import { tempMuteOptions } from "./tempMuteOptions";
-import { DurationParser } from "../../../../utils/DurationParser";
-import { BotPermission } from "../../../../decorators/BotPermission";
-import { SanctionService } from "../../../../services/SanctionService";
+import { DurationParser } from '@utils/DurationParser';
+import { BotPermission } from '@decorators/BotPermission';
+import { SanctionService } from '@services/SanctionService';
 
 @Command(tempMuteOptions)
 export default class TempMuteCommand extends BaseCommand {

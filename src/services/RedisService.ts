@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import { Logger } from "../utils/Logger";
+import { Logger } from '@utils/Logger';
 
 export class RedisService {
 	private static instance: Redis;

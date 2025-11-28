@@ -1,9 +1,9 @@
 import { Events, MessageFlags, type Interaction } from "discord.js";
-import { BaseEvent } from "../../../../class/BaseEvent";
-import { Event } from "../../../../decorators/Event";
-import { LeBotClient } from "../../../../class/LeBotClient";
-import { PermissionService } from "../../../../services/PermissionService";
-import { Logger } from "../../../../utils/Logger";
+import { BaseEvent } from '@class/BaseEvent';
+import { Event } from '@decorators/Event';
+import { LeBotClient } from '@class/LeBotClient';
+import { PermissionService } from '@services/PermissionService';
+import { Logger } from '@utils/Logger';
 
 @Event({
 	name: Events.InteractionCreate,

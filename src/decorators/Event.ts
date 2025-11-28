@@ -1,4 +1,4 @@
-import type { EventOptions } from "../interfaces/EventOptions";
+import type { EventOptions } from '@interfaces/EventOptions';
 import type { ClientEvents } from "discord.js";
 
 export function Event<K extends keyof ClientEvents>(options: EventOptions<K>) {

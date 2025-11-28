@@ -1,9 +1,9 @@
 import { prismaClient } from "./prismaService";
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "crypto";
-import { Logger } from "../utils/Logger";
+import { Logger } from '@utils/Logger';
 import { ConfigService } from "./ConfigService";
 import { ApplicationCommandOptionType } from "discord.js";
-import type { LeBotClient } from "../class/LeBotClient";
+import type { LeBotClient } from '@class/LeBotClient';
 
 interface ConfigValue {
 	value: string | string[];

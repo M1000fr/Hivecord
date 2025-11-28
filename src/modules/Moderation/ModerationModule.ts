@@ -1,4 +1,4 @@
-import { Module } from "../../decorators/Module";
+import { Module } from '@decorators/Module';
 import { ModerationConfig } from "./ModerationConfig";
 import BanCommand from "./commands/ban/index";
 import UnbanCommand from "./commands/unban/index";

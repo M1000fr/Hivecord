@@ -6,17 +6,17 @@ import {
 	EmbedBuilder,
 	Colors,
 } from "discord.js";
-import { BaseEvent } from "../../../../class/BaseEvent";
-import { Event } from "../../../../decorators/Event";
-import { LeBotClient } from "../../../../class/LeBotClient";
-import { ConfigService } from "../../../../services/ConfigService";
-import { Logger } from "../../../../utils/Logger";
+import { BaseEvent } from '@class/BaseEvent';
+import { Event } from '@decorators/Event';
+import { LeBotClient } from '@class/LeBotClient';
+import { ConfigService } from '@services/ConfigService';
+import { Logger } from '@utils/Logger';
 import { Canvas, loadImage, Image, GlobalFonts } from "@napi-rs/canvas";
 import GIFEncoder from "gifencoder";
 import gifFrames from "gif-frames";
 import { Stream } from "stream";
 import path from "path";
-import { MessageTemplate } from "../../../../class/MessageTemplate";
+import { MessageTemplate } from '@class/MessageTemplate';
 import { GeneralConfigKeys } from "../../GeneralConfig";
 
 @Event({

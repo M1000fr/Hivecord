@@ -1,4 +1,4 @@
-import type { CommandOptions } from "../../../../interfaces/CommandOptions";
+import type { CommandOptions } from '@interfaces/CommandOptions';
 import { ApplicationCommandOptionType } from "discord.js";
 
 export const modulesOptions: CommandOptions = {

@@ -4,14 +4,14 @@ import {
 	AttachmentBuilder,
 	MessageFlags,
 } from "discord.js";
-import { BaseCommand } from "../../../../class/BaseCommand";
-import { Command } from "../../../../decorators/Command";
-import { Subcommand } from "../../../../decorators/Subcommand";
-import { EPermission } from "../../../../enums/EPermission";
+import { BaseCommand } from '@class/BaseCommand';
+import { Command } from '@decorators/Command';
+import { Subcommand } from '@decorators/Subcommand';
+import { EPermission } from '@enums/EPermission';
 import { configOptions } from "./configOptions";
-import { LeBotClient } from "../../../../class/LeBotClient";
-import { BackupService } from "../../../../services/BackupService";
-import { InteractionHelper } from "../../../../utils/InteractionHelper";
+import { LeBotClient } from '@class/LeBotClient';
+import { BackupService } from '@services/BackupService';
+import { InteractionHelper } from '@utils/InteractionHelper';
 
 @Command(configOptions)
 export default class ConfigCommand extends BaseCommand {

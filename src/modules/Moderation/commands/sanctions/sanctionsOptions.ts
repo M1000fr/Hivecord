@@ -2,7 +2,7 @@ import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
 } from "discord.js";
-import type { CommandOptions } from "../../../../interfaces/CommandOptions";
+import type { CommandOptions } from '@interfaces/CommandOptions';
 
 export const sanctionsOptions: CommandOptions = {
 	name: "sanctions",

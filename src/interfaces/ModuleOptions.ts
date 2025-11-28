@@ -1,5 +1,5 @@
-import { BaseCommand } from "../class/BaseCommand";
-import { BaseEvent } from "../class/BaseEvent";
+import { BaseCommand } from '@class/BaseCommand';
+import { BaseEvent } from '@class/BaseEvent';
 
 export interface ModuleOptions {
     name: string;

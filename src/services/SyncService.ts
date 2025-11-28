@@ -1,7 +1,7 @@
 import { Guild, ChannelType as DiscordChannelType } from "discord.js";
 import { prismaClient } from "./prismaService";
-import { Logger } from "../utils/Logger";
-import { ChannelType } from "../prisma/client/enums";
+import { Logger } from '@utils/Logger';
+import { ChannelType } from '@prisma/client/enums';
 
 export class SyncService {
 	private static logger = new Logger("SyncService");

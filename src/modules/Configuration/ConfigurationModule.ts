@@ -1,4 +1,4 @@
-import { Module } from "../../decorators/Module";
+import { Module } from '@decorators/Module';
 import ModulesCommand from "./commands/modules/index";
 import ConfigCommand from "./commands/config/index";
 import ModuleConfigInteractionHandler from "./events/interactionCreate/moduleConfigHandler";

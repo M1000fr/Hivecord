@@ -1,4 +1,4 @@
-import { LeBotClient } from "./class/LeBotClient";
+import { LeBotClient } from "@class/LeBotClient";
 
 const leBotInstance = new LeBotClient();
 

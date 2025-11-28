@@ -8,13 +8,13 @@ import {
 	ApplicationCommandOptionType,
 	MessageFlags,
 } from "discord.js";
-import { BaseCommand } from "../../../../class/BaseCommand";
-import { Command } from "../../../../decorators/Command";
-import { DefaultCommand } from "../../../../decorators/DefaultCommand";
-import { EPermission } from "../../../../enums/EPermission";
+import { BaseCommand } from '@class/BaseCommand';
+import { Command } from '@decorators/Command';
+import { DefaultCommand } from '@decorators/DefaultCommand';
+import { EPermission } from '@enums/EPermission';
 import { modulesOptions } from "./modulesOptions";
-import { LeBotClient } from "../../../../class/LeBotClient";
-import { ConfigService } from "../../../../services/ConfigService";
+import { LeBotClient } from '@class/LeBotClient';
+import { ConfigService } from '@services/ConfigService';
 
 @Command(modulesOptions)
 export default class ModulesCommand extends BaseCommand {
