@@ -11,9 +11,48 @@ export class SanctionScheduler {
     }
 
     public start() {
-        // Check every 60 seconds
+        // Check every 10 seconds
         setInterval(() => this.checkExpiredSanctions(), 10 * 1000);
+        // Check every 60 seconds
+        setInterval(() => this.checkMuteConsistency(), 60 * 1000);
         console.log("SanctionScheduler started.");
+    }
+
+    private async checkMuteConsistency() {
+        const guildId = process.env.DISCORD_GUILD_ID;
+        if (!guildId) return;
+
+        const guild = await this.client.guilds.fetch(guildId).catch(() => null);
+        if (!guild) return;
+
+        const muteRoleId = await ConfigService.get("mute_role_id");
+        if (!muteRoleId) return;
+
+        const muteRole = guild.roles.cache.get(muteRoleId);
+        if (!muteRole) return;
+
+        // Fetch active mutes
+        const activeMutes = await prismaClient.sanction.findMany({
+            where: {
+                type: SanctionType.MUTE,
+                active: true
+            },
+            select: {
+                userId: true
+            }
+        });
+
+        const activeMuteUserIds = new Set(activeMutes.map(s => s.userId));
+
+        for (const [memberId, member] of muteRole.members) {
+            if (!activeMuteUserIds.has(memberId)) {
+                try {
+                    await member.roles.remove(muteRole, "Sanction consistency check: No active mute found");
+                } catch (error) {
+                    console.error(`Error removing mute role from ${memberId} during consistency check:`, error);
+                }
+            }
+        }
     }
 
     private async checkExpiredSanctions() {
