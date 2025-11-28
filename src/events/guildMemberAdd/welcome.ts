@@ -16,6 +16,7 @@ import GIFEncoder from "gifencoder";
 import gifFrames from "gif-frames";
 import { Stream } from "stream";
 import path from "path";
+import { MessageTemplate } from "../../class/MessageTemplate";
 
 @Event({
 	name: Events.GuildMemberAdd,
@@ -29,7 +30,9 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 				EConfigKey.WelcomeChannelId,
 			);
 			if (!welcomeChannelId) {
-				// Silent return if not configured, or log debug
+				this.logger.warn(
+					`No welcome channel configured for guild ${member.guild.id}.`,
+				);
 				return;
 			}
 
@@ -56,15 +59,18 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 			});
 			const isAnimated = dynamicAvatarUrl.includes(".gif");
 
-			const welcomeMessageTemplate = await ConfigService.get(
-				EConfigKey.WelcomeMessage,
+			const welcomeMessageImageConfig = await ConfigService.get(
+				EConfigKey.WelcomeMessageImage,
 			);
-			const welcomeMessage = welcomeMessageTemplate
-				? welcomeMessageTemplate.replace(
-						/{user}/g,
-						member.user.displayName,
-					)
-				: `Welcome ${member.user.displayName}!`;
+
+			const welcomeMessageImageTemplate = new MessageTemplate(
+				welcomeMessageImageConfig || "Welcome {user.displayName}!",
+			);
+			welcomeMessageImageTemplate.addContext("user", member.user);
+			welcomeMessageImageTemplate.addContext("guild", member.guild);
+			welcomeMessageImageTemplate.addContext("member", member);
+
+			const welcomeMessageImage = welcomeMessageImageTemplate.resolve();
 
 			// Canvas dimensions
 			const width = 700;
@@ -114,8 +120,8 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 				ctx.textAlign = "center";
 				ctx.strokeStyle = "black";
 				ctx.lineWidth = 3;
-				ctx.strokeText(welcomeMessage, width / 2, height - 20);
-				ctx.fillText(welcomeMessage, width / 2, height - 20);
+				ctx.strokeText(welcomeMessageImage, width / 2, height - 20);
+				ctx.fillText(welcomeMessageImage, width / 2, height - 20);
 			};
 
 			if (isAnimated) {
@@ -168,16 +174,26 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 				);
 			}
 
+			const welcomeMessageConfig = await ConfigService.get(
+				EConfigKey.WelcomeMessage,
+			);
+
+			const welcomeMessageTemplate = new MessageTemplate(
+				welcomeMessageConfig || "Welcome {user.displayName}!",
+			);
+			welcomeMessageTemplate.addContext("user", member.user);
+			welcomeMessageTemplate.addContext("guild", member.guild);
+			welcomeMessageTemplate.addContext("member", member);
+
+			const welcomeMessage = welcomeMessageTemplate.resolve();
+
 			encoder.finish();
 			const buffer = await finishPromise;
-
 			const attachment = new AttachmentBuilder(buffer, {
 				name: "welcome.gif",
 			});
 			await channel.send({
-				content: welcomeMessageTemplate
-					? welcomeMessageTemplate.replace(/{user}/g, `${member}`)
-					: `Welcome ${member} !`,
+				content: welcomeMessage,
 				files: [attachment],
 			});
 		} catch (error) {

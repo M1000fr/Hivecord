@@ -30,7 +30,7 @@ export default class ConfigCommand extends BaseCommand {
 			EConfigKey.WelcomeChannelId,
 		);
 		const welcomeMessage = await ConfigService.get(
-			EConfigKey.WelcomeMessage,
+			EConfigKey.WelcomeMessageImage,
 		);
 
 		const muteRole = muteRoleId
@@ -107,7 +107,7 @@ export default class ConfigCommand extends BaseCommand {
 		}
 
 		if (message) {
-			await ConfigService.set(EConfigKey.WelcomeMessage, message);
+			await ConfigService.set(EConfigKey.WelcomeMessageImage, message);
 			updates.push(`Welcome message set to: ${message}`);
 		}
 
