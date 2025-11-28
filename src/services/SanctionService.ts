@@ -5,6 +5,18 @@ import { ConfigService } from "./ConfigService";
 
 export class SanctionService {
     static async mute(guild: Guild, targetUser: User, moderator: User, duration: number, durationString: string, reason: string): Promise<void> {
+        const activeMute = await prismaClient.sanction.findFirst({
+            where: {
+                userId: targetUser.id,
+                type: SanctionType.MUTE,
+                active: true,
+            },
+        });
+
+        if (activeMute) {
+            throw new Error("User is already muted.");
+        }
+
         let member = guild.members.cache.get(targetUser.id);
         if (!member) {
             try {
@@ -40,6 +52,18 @@ export class SanctionService {
     }
 
     static async ban(guild: Guild, targetUser: User, moderator: User, reason: string, deleteMessageSeconds: number): Promise<void> {
+        const activeBan = await prismaClient.sanction.findFirst({
+            where: {
+                userId: targetUser.id,
+                type: SanctionType.BAN,
+                active: true,
+            },
+        });
+
+        if (activeBan) {
+            throw new Error("User is already banned.");
+        }
+
         let member = guild.members.cache.get(targetUser.id);
         if (!member) {
             try {
