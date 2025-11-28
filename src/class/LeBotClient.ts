@@ -26,6 +26,9 @@ export class LeBotClient<ready = false> extends Client {
 				IntentsBitField.Flags.Guilds,
 				IntentsBitField.Flags.GuildMembers,
 				IntentsBitField.Flags.GuildMessageReactions,
+				IntentsBitField.Flags.GuildVoiceStates,
+				IntentsBitField.Flags.GuildPresences,
+				IntentsBitField.Flags.GuildMessages,
 			],
 		});
 		this.scheduler = new SanctionScheduler(this);

@@ -21,6 +21,10 @@ model User {
     SanctionsReceived  Sanction[]          @relation("UserSanctions")
     SanctionsApplied   Sanction[]          @relation("ModeratorSanctions")
     UserConfigurations UserConfiguration[]
+
+    TempVoiceChannels TempVoiceChannel[]
+    TempVoiceAllowed  TempVoiceAllowedUser[]
+    TempVoiceBlocked  TempVoiceBlockedUser[]
 }
 
 model Channel {
@@ -118,4 +122,33 @@ model UserConfiguration {
     key    String @id
     userId String
     User   User   @relation(fields: [userId], references: [id])
+}
+
+model TempVoiceChannel {
+    id        String   @id
+    ownerId   String
+    createdAt DateTime @default(now())
+    isLocked  Boolean  @default(false)
+
+    Owner        User                   @relation(fields: [ownerId], references: [id])
+    AllowedUsers TempVoiceAllowedUser[]
+    BlockedUsers TempVoiceBlockedUser[]
+}
+
+model TempVoiceAllowedUser {
+    id          Int    @id @default(autoincrement())
+    tempVoiceId String
+    userId      String
+
+    TempVoiceChannel TempVoiceChannel @relation(fields: [tempVoiceId], references: [id], onDelete: Cascade)
+    User             User             @relation(fields: [userId], references: [id])
+}
+
+model TempVoiceBlockedUser {
+    id          Int    @id @default(autoincrement())
+    tempVoiceId String
+    userId      String
+
+    TempVoiceChannel TempVoiceChannel @relation(fields: [tempVoiceId], references: [id], onDelete: Cascade)
+    User             User             @relation(fields: [userId], references: [id])
 }

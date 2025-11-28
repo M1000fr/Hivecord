@@ -6,6 +6,7 @@ export enum EConfigKey {
 
 export enum EChannelConfigKey {
 	WelcomeChannelId = "welcome_channel_id",
+	TempVoiceGenerator = "temp_voice_generator",
 }
 
 export enum ERoleConfigKey {

@@ -29,6 +29,7 @@ import {
 import { EPermission } from "../../enums/EPermission";
 import { ConfigService } from "../../services/ConfigService";
 import { configOptions } from "./configOptions";
+import { ChannelType as PrismaChannelType } from "../../prisma/client/enums";
 
 type ConfigType = "string" | "channel" | "role" | "roles";
 
@@ -38,6 +39,7 @@ interface ConfigDefinition {
 	label: string;
 	description: string;
 	enumType: any;
+	channelTypes?: DiscordChannelType[];
 }
 
 const CONFIG_DEFINITIONS: ConfigDefinition[] = [
@@ -61,6 +63,10 @@ const CONFIG_DEFINITIONS: ConfigDefinition[] = [
 		label: "Welcome Channel",
 		description: "Channel for welcome messages",
 		enumType: EChannelConfigKey,
+		channelTypes: [
+			DiscordChannelType.GuildText,
+			DiscordChannelType.GuildAnnouncement,
+		],
 	},
 	{
 		key: ERoleConfigKey.MuteRoleId,
@@ -75,6 +81,14 @@ const CONFIG_DEFINITIONS: ConfigDefinition[] = [
 		label: "New Member Roles",
 		description: "Roles given to new members",
 		enumType: ERoleConfigKey,
+	},
+	{
+		key: EChannelConfigKey.TempVoiceGenerator,
+		type: "channel",
+		label: "Temp Voice Generator",
+		description: "Channel that creates temp voice channels",
+		enumType: EChannelConfigKey,
+		channelTypes: [DiscordChannelType.GuildVoice],
 	},
 ];
 
@@ -229,8 +243,10 @@ export default class ConfigCommand extends BaseCommand {
 				.setCustomId(`config_channel_${selectedKey}`)
 				.setPlaceholder(`Select ${configDef.label}`)
 				.setChannelTypes(
-					DiscordChannelType.GuildText,
-					DiscordChannelType.GuildAnnouncement,
+					configDef.channelTypes || [
+						DiscordChannelType.GuildText,
+						DiscordChannelType.GuildAnnouncement,
+					],
 				);
 
 			const row =
@@ -253,10 +269,29 @@ export default class ConfigCommand extends BaseCommand {
 				});
 
 				const channelId = selection.values[0];
+
 				if (channelId) {
+					const selectedChannel = selection.channels.get(channelId);
+					let prismaType: PrismaChannelType = PrismaChannelType.TEXT;
+
+					if (selectedChannel) {
+						if (
+							selectedChannel.type ===
+							DiscordChannelType.GuildVoice
+						) {
+							prismaType = PrismaChannelType.VOICE;
+						} else if (
+							selectedChannel.type ===
+							DiscordChannelType.GuildCategory
+						) {
+							prismaType = PrismaChannelType.CATEGORY;
+						}
+					}
+
 					await ConfigService.setChannel(
 						configDef.key as EChannelConfigKey,
 						channelId,
+						prismaType,
 					);
 					await selection.update({
 						content: `Updated ${configDef.label} to <#${channelId}>.`,
