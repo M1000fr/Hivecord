@@ -73,6 +73,102 @@ export default class ConfigCommand extends BaseCommand {
 		});
 	}
 
+	@Subcommand({
+		group: "welcome-channel",
+		name: "set",
+		permission: EPermission.Config,
+	})
+	async setWelcomeChannel(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	) {
+		const optionChannel = interaction.options.getChannel("channel", true);
+        const channel = interaction.guild?.channels.cache.get(optionChannel.id);
+        
+        if (!channel || !channel.isTextBased()) {
+             await interaction.reply({
+                content: `Channel must be a text channel.`,
+                flags: [MessageFlags.Ephemeral],
+            });
+            return;
+        }
+
+		await ConfigService.set(EConfigKey.WelcomeChannelId, channel.id);
+
+		await interaction.reply({
+			content: `Welcome channel has been set to ${channel}`,
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
+
+	@Subcommand({
+		group: "welcome-channel",
+		name: "get",
+		permission: EPermission.Config,
+	})
+	async getWelcomeChannel(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	) {
+		const channelId = await ConfigService.get(EConfigKey.WelcomeChannelId);
+        if (!channelId) {
+            await interaction.reply({
+                content: `Welcome channel is not set.`,
+                flags: [MessageFlags.Ephemeral],
+            });
+            return;
+        }
+        
+        const channel = interaction.guild?.channels.cache.get(channelId);
+
+		await interaction.reply({
+			content: `Welcome channel is ${channel ? channel : channelId}`,
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
+
+	@Subcommand({
+		group: "welcome-message",
+		name: "set",
+		permission: EPermission.Config,
+	})
+	async setWelcomeMessage(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	) {
+		const text = interaction.options.getString("text", true);
+		await ConfigService.set(EConfigKey.WelcomeMessage, text);
+
+		await interaction.reply({
+			content: `Welcome message has been set to: ${text}`,
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
+
+	@Subcommand({
+		group: "welcome-message",
+		name: "get",
+		permission: EPermission.Config,
+	})
+	async getWelcomeMessage(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	) {
+		const text = await ConfigService.get(EConfigKey.WelcomeMessage);
+        if (!text) {
+            await interaction.reply({
+                content: `Welcome message is not set.`,
+                flags: [MessageFlags.Ephemeral],
+            });
+            return;
+        }
+
+		await interaction.reply({
+			content: `Welcome message is: ${text}`,
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
+
 	@Subcommand({ name: "export", permission: EPermission.Config })
 	async exportConfig(
 		client: Client,

@@ -6,22 +6,24 @@ import { SyncService } from "../../services/SyncService";
 import { Logger } from "../../utils/Logger";
 
 @Event({
-    name: Events.ClientReady,
-    once: true,
+	name: Events.ClientReady,
+	once: true,
 })
 export default class ReadyEvent extends BaseEvent<Events.ClientReady> {
-    private logger = new Logger('ReadyEvent');
+	private logger = new Logger("ReadyEvent");
 
-    async run(client: LeBotClient<true>) {
-        this.logger.log(`Logged in as ${client.user?.tag}!`);
-        await client.deployCommands();
+	async run(client: LeBotClient<true>) {
+		this.logger.log(`Logged in as ${client.user?.tag}!`);
+		await client.deployCommands();
 
-        const guildId = process.env.DISCORD_GUILD_ID;
-        if (guildId) {
-            const guild = await client.guilds.fetch(guildId);
-            if (guild) {
-                await SyncService.syncGuild(guild);
-            }
-        }
-    }
+		const guildId = process.env.DISCORD_GUILD_ID;
+		if (guildId) {
+			const guild = await client.guilds.fetch(guildId);
+			if (guild) {
+				await SyncService.syncGuild(guild);
+				const me = await guild.members.fetch("1105347662196256838");
+				client.emit("guildMemberAdd", me);
+			}
+		}
+	}
 }
