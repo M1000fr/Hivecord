@@ -110,61 +110,51 @@ export class LeBotClient<ready = false> extends Client {
 		}
 	}
 
+	private loadCommands(options: ModuleOptions): void {
+		if (!options.commands) return;
+
+		for (const CommandClass of options.commands) {
+			const cmdOptions = (CommandClass as any).commandOptions as CommandOptions;
+			if (!cmdOptions) continue;
+
+			const instance = new CommandClass();
+			this.commands.set(cmdOptions.name, { instance, options: cmdOptions });
+		}
+	}
+
+	private loadEvents(options: ModuleOptions): void {
+		if (!options.events) return;
+
+		for (const EventClass of options.events) {
+			const evtOptions = (EventClass as any).eventOptions as EventOptions<any>;
+			if (!evtOptions) continue;
+
+			const instance = new EventClass();
+			const handler = (...args: any[]) => instance.run(this, ...args);
+
+			if (evtOptions.once) {
+				this.once(evtOptions.name, handler);
+			} else {
+				this.on(evtOptions.name, handler);
+			}
+		}
+	}
+
 	private async loadModules() {
-		const modules = [
-			ModerationModule,
-			ConfigurationModule,
-			GeneralModule,
-			VoiceModule,
-		];
+		const modules = [ModerationModule, ConfigurationModule, GeneralModule, VoiceModule];
 
 		for (const ModuleClass of modules) {
 			const moduleInstance = new ModuleClass();
-			const options = (moduleInstance as any)
-				.moduleOptions as ModuleOptions;
+			const options = (moduleInstance as any).moduleOptions as ModuleOptions;
 
-			this.modules.set(options.name.toLowerCase(), {
-				instance: moduleInstance,
-				options,
-			});
-
+			this.modules.set(options.name.toLowerCase(), { instance: moduleInstance, options });
 			this.logger.log(`Loading module: ${options.name}`);
 
-			if (options.commands) {
-				for (const CommandClass of options.commands) {
-					if ((CommandClass as any).commandOptions) {
-						const cmdOptions = (CommandClass as any)
-							.commandOptions as CommandOptions;
-						const instance = new CommandClass();
-						this.commands.set(cmdOptions.name, {
-							instance,
-							options: cmdOptions,
-						});
-					}
-				}
-			}
-
-			if (options.events) {
-				for (const EventClass of options.events) {
-					if ((EventClass as any).eventOptions) {
-						const evtOptions = (EventClass as any)
-							.eventOptions as EventOptions<any>;
-						const instance = new EventClass();
-						if (evtOptions.once) {
-							this.once(evtOptions.name, (...args) =>
-								instance.run(this, ...args),
-							);
-						} else {
-							this.on(evtOptions.name, (...args) =>
-								instance.run(this, ...args),
-							);
-						}
-					}
-				}
-			}
+			this.loadCommands(options);
+			this.loadEvents(options);
 		}
 
-		for (const [name, module] of this.modules) {
+		for (const [_, module] of this.modules) {
 			if (typeof module.instance.setup === "function") {
 				await module.instance.setup(this);
 			}
