@@ -4,8 +4,8 @@ FROM oven/bun:slim
 # Set the working directory
 WORKDIR /app
 
-# Install OpenSSL
-RUN apt-get update -y && apt-get install -y openssl
+# Install OpenSSL and fonts
+RUN apt-get update -y && apt-get install -y openssl fonts-dejavu-core fontconfig
 
 # Copy package.json and bun.lock
 COPY package.json bun.lock ./
