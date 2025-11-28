@@ -1,13 +1,18 @@
-import { Client, IntentsBitField, Collection, REST, Routes } from "discord.js";
+import { Client, IntentsBitField, Collection, REST, Routes, ApplicationCommandOptionType } from "discord.js";
 import path from "path";
-import fs from "fs";
-import { fileURLToPath, pathToFileURL } from "url";
+import { fileURLToPath } from "url";
 import { BaseCommand } from "./BaseCommand";
 import type { CommandOptions } from "../interfaces/CommandOptions";
 import { PermissionService } from "../services/PermissionService";
 import { EPermission } from "../enums/EPermission";
 import { Logger } from "../utils/Logger";
 import { SanctionScheduler } from "./SanctionScheduler";
+import { ModerationModule } from "../modules/Moderation/ModerationModule";
+import { ConfigurationModule } from "../modules/Configuration/ConfigurationModule.js";
+import { GeneralModule } from "../modules/General/GeneralModule";
+import { VoiceModule } from "../modules/Voice/VoiceModule";
+import type { ModuleOptions } from "../interfaces/ModuleOptions";
+import type { EventOptions } from "../interfaces/EventOptions";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,6 +21,10 @@ export class LeBotClient<ready = false> extends Client {
 	public commands = new Collection<
 		string,
 		{ instance: BaseCommand; options: CommandOptions }
+	>();
+	public modules = new Collection<
+		string,
+		{ instance: any; options: ModuleOptions }
 	>();
 	private logger = new Logger("LeBotClient");
 	private scheduler: SanctionScheduler;
@@ -46,10 +55,18 @@ export class LeBotClient<ready = false> extends Client {
 	}
 
 	public async start(token: string): Promise<string> {
-		await this.loadEvents();
-		await this.loadCommands();
+		await this.loadModules();
 		this.scheduler.start();
-		return this.login(token);
+		try {
+			return await this.login(token);
+		} catch (error: any) {
+			if (error.code === "DisallowedIntents") {
+				this.logger.error(
+					"Privileged intent provided is not enabled or whitelisted in the Discord Developer Portal.",
+				);
+			}
+			throw error;
+		}
 	}
 
 	public async deployCommands() {
@@ -67,6 +84,7 @@ export class LeBotClient<ready = false> extends Client {
 		}
 
 		const rest = new REST().setToken(this.token);
+		
 		const commandsData = this.commands.map((c) => c.options);
 		const permissions = Object.values(EPermission);
 
@@ -92,66 +110,64 @@ export class LeBotClient<ready = false> extends Client {
 		}
 	}
 
-	private async loadEvents() {
-		const eventsPath = path.join(__dirname, "../events");
-		if (!fs.existsSync(eventsPath)) return;
+	private async loadModules() {
+		const modules = [
+			ModerationModule,
+			ConfigurationModule,
+			GeneralModule,
+			VoiceModule,
+		];
 
-		const files = this.getFiles(eventsPath);
+		for (const ModuleClass of modules) {
+			const moduleInstance = new ModuleClass();
+			const options = (moduleInstance as any)
+				.moduleOptions as ModuleOptions;
 
-		for (const file of files) {
-			const eventModule = await import(pathToFileURL(file).toString());
-			const EventClass = eventModule.default;
+			this.modules.set(options.name.toLowerCase(), {
+				instance: moduleInstance,
+				options,
+			});
 
-			if (EventClass && (EventClass as any).eventOptions) {
-				const options = (EventClass as any).eventOptions;
-				const instance = new EventClass();
+			this.logger.log(`Loading module: ${options.name}`);
 
-				if (options.once) {
-					this.once(options.name, (...args) =>
-						instance.run(this, ...args),
-					);
-				} else {
-					this.on(options.name, (...args) =>
-						instance.run(this, ...args),
-					);
+			if (options.commands) {
+				for (const CommandClass of options.commands) {
+					if ((CommandClass as any).commandOptions) {
+						const cmdOptions = (CommandClass as any)
+							.commandOptions as CommandOptions;
+						const instance = new CommandClass();
+						this.commands.set(cmdOptions.name, {
+							instance,
+							options: cmdOptions,
+						});
+					}
+				}
+			}
+
+			if (options.events) {
+				for (const EventClass of options.events) {
+					if ((EventClass as any).eventOptions) {
+						const evtOptions = (EventClass as any)
+							.eventOptions as EventOptions<any>;
+						const instance = new EventClass();
+						if (evtOptions.once) {
+							this.once(evtOptions.name, (...args) =>
+								instance.run(this, ...args),
+							);
+						} else {
+							this.on(evtOptions.name, (...args) =>
+								instance.run(this, ...args),
+							);
+						}
+					}
 				}
 			}
 		}
-	}
 
-	private async loadCommands() {
-		const commandsPath = path.join(__dirname, "../commands");
-		if (!fs.existsSync(commandsPath)) return;
-
-		const files = this.getFiles(commandsPath);
-
-		for (const file of files) {
-			const commandModule = await import(pathToFileURL(file).toString());
-			const CommandClass = commandModule.default;
-
-			if (CommandClass && (CommandClass as any).commandOptions) {
-				const options = (CommandClass as any)
-					.commandOptions as CommandOptions;
-				const instance = new CommandClass() as BaseCommand;
-				this.commands.set(options.name, { instance, options });
+		for (const [name, module] of this.modules) {
+			if (typeof module.instance.setup === "function") {
+				await module.instance.setup(this);
 			}
 		}
-	}
-
-	private getFiles(dir: string): string[] {
-		const files: string[] = [];
-		const items = fs.readdirSync(dir, { withFileTypes: true });
-
-		for (const item of items) {
-			if (item.isDirectory()) {
-				files.push(...this.getFiles(path.join(dir, item.name)));
-			} else if (
-				item.isFile() &&
-				(item.name.endsWith(".ts") || item.name.endsWith(".js"))
-			) {
-				files.push(path.join(dir, item.name));
-			}
-		}
-		return files;
 	}
 }

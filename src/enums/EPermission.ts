@@ -15,4 +15,5 @@ export enum EPermission {
 	SyncRestore = "commands.sync.restore",
 	SanctionsList = "commands.sanctions.list",
 	ChannelPurge = "commands.purge",
+	ConfigureModules = "commands.modules",
 }
