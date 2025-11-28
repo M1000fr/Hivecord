@@ -18,6 +18,7 @@ import { BaseEvent } from "../../../../class/BaseEvent";
 import { Event } from "../../../../decorators/Event";
 import { LeBotClient } from "../../../../class/LeBotClient";
 import { ConfigService } from "../../../../services/ConfigService";
+import { InteractionHelper } from "../../../../utils/InteractionHelper";
 
 const TYPE_NAMES: Record<ApplicationCommandOptionType, string> = {
 	[ApplicationCommandOptionType.String]: "Text",
@@ -127,13 +128,10 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 	}
 
 	private async respondToInteraction(interaction: any, content: string, isError = false) {
-		const payload = { content, flags: [MessageFlags.Ephemeral] };
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp(payload);
-		} else if (interaction.isModalSubmit()) {
-			await interaction.reply(payload);
+		if (isError) {
+			await InteractionHelper.respondError(interaction, content);
 		} else {
-			await interaction.update({ ...payload, embeds: [], components: [] });
+			await InteractionHelper.respond(interaction, content);
 		}
 	}
 
@@ -158,9 +156,9 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			await ConfigHelper.saveValue(propertyKey, value, type);
 			const displayValue = ConfigHelper.formatValue(value, type);
 
-			await this.respondToInteraction(
+			await InteractionHelper.respondSuccess(
 				interaction, 
-				`✅ Successfully updated **${propertyKey}** to ${displayValue}`
+				`Successfully updated **${propertyKey}** to ${displayValue}`
 			);
 
 			const mainMessage = await this.getMainMessage(interaction);
@@ -172,11 +170,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			}
 		} catch (error) {
 			console.error(error);
-			await this.respondToInteraction(
-				interaction, 
-				"An error occurred while saving the configuration.", 
-				true
-			);
+			await InteractionHelper.respondError(interaction, "An error occurred while saving the configuration.");
 		}
 	}
 
@@ -257,7 +251,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 	private async handlePropertySelection(client: LeBotClient<true>, interaction: any, moduleName: string) {
 		const module = client.modules.get(moduleName.toLowerCase());
 		if (!module?.options.config) {
-			await this.respondToInteraction(interaction, "Module not found.");
+			await InteractionHelper.respondError(interaction, "Module not found.");
 			return;
 		}
 
@@ -266,7 +260,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		const propertyOptions = configProperties[selectedProperty];
 
 		if (!propertyOptions) {
-			await this.respondToInteraction(interaction, "Property not found.");
+			await InteractionHelper.respondError(interaction, "Property not found.");
 			return;
 		}
 
