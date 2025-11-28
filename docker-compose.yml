@@ -38,6 +38,7 @@ services:
             DISCORD_TOKEN: ${DISCORD_TOKEN}
             DISCORD_GUILD_ID: ${DISCORD_GUILD_ID}
             DISCORD_OWNER_ID: ${DISCORD_OWNER_ID}
+            BACKUP_SECRET: ${BACKUP_SECRET}
 
 volumes:
     mariadb_data:
