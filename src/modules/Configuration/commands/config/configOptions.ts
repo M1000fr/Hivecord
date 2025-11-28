@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, PermissionFlagsBits } from "discord.js";
+import { ApplicationCommandOptionType } from "discord.js";
 import type { CommandOptions } from "../../../../interfaces/CommandOptions";
 
 export const configOptions: CommandOptions = {
@@ -24,6 +24,5 @@ export const configOptions: CommandOptions = {
 			],
 		},
 	],
-	defaultMemberPermissions: [PermissionFlagsBits.Administrator],
 	dmPermission: false,
 };
