@@ -11,4 +11,6 @@ export enum EPermission {
 	Unmute = "commands.unmute",
 	Unban = "commands.unban",
 	Config = "commands.config",
+	SyncBackup = "commands.sync.backup",
+	SyncRestore = "commands.sync.restore",
 }
