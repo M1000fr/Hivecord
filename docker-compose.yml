@@ -17,6 +17,12 @@ services:
         volumes:
             - mariadb_data:/var/lib/mysql
 
+    redis:
+        image: redis:alpine
+        restart: always
+        volumes:
+            - redis_data:/data
+
     bot:
         build: .
         restart: always
@@ -24,11 +30,15 @@ services:
         depends_on:
             mariadb:
                 condition: service_healthy
+            redis:
+                condition: service_started
         environment:
             DATABASE_URL: mysql://${MYSQL_USER:-lebot_user}:${MYSQL_PASSWORD:-lebot_password}@mariadb:3306/${MYSQL_DATABASE:-lebot_db}
+            REDIS_URL: redis://redis:6379
             DISCORD_TOKEN: ${DISCORD_TOKEN}
             DISCORD_GUILD_ID: ${DISCORD_GUILD_ID}
             DISCORD_OWNER_ID: ${DISCORD_OWNER_ID}
 
 volumes:
     mariadb_data:
+    redis_data:
