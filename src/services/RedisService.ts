@@ -1,7 +1,9 @@
 import Redis from "ioredis";
+import { Logger } from "../utils/Logger";
 
 export class RedisService {
 	private static instance: Redis;
+	static logger = new Logger("RedisService");
 
 	public static getInstance(): Redis {
 		if (!this.instance) {
@@ -9,11 +11,11 @@ export class RedisService {
 			this.instance = new Redis(redisUrl);
 
 			this.instance.on("error", (err) => {
-				console.error("Redis Error:", err);
+				this.logger.error("Redis Error:", err.stack, "RedisService");
 			});
 
 			this.instance.on("connect", () => {
-				console.log("Connected to Redis");
+				this.logger.log("Connected to Redis");
 			});
 		}
 		return this.instance;
