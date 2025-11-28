@@ -123,8 +123,8 @@ export class Pager<T> {
 				totalPages: totalPages,
 			};
 			await redis.set(`pager:${message.id}`, JSON.stringify(state));
-			// Set expiry if needed, e.g. 1 day
-			await redis.expire(`pager:${message.id}`, 86400);
+			// Set expiry if needed, e.g. 1 hour
+			await redis.expire(`pager:${message.id}`, 3600);
 			return;
 		}
 
@@ -189,7 +189,7 @@ export class Pager<T> {
 			if (state.currentPage > 0) {
 				state.currentPage--;
 				await redis.set(key, JSON.stringify(state));
-				await redis.expire(key, 86400);
+				await redis.expire(key, 3600);
 				
 				const start = state.currentPage * state.itemsPerPage;
 				const end = start + state.itemsPerPage;
@@ -227,7 +227,7 @@ export class Pager<T> {
 			if (state.currentPage < totalPages - 1) {
 				state.currentPage++;
 				await redis.set(key, JSON.stringify(state));
-				await redis.expire(key, 86400);
+				await redis.expire(key, 3600);
 
 				const start = state.currentPage * state.itemsPerPage;
 				const end = start + state.itemsPerPage;
