@@ -47,6 +47,11 @@ export class SanctionScheduler {
         for (const [memberId, member] of muteRole.members) {
             if (!activeMuteUserIds.has(memberId)) {
                 try {
+                    try {
+                        await member.send(`You have been unmuted in ${guild.name}.`);
+                    } catch (e) {
+                        // Could not send DM
+                    }
                     await member.roles.remove(muteRole, "Sanction consistency check: No active mute found");
                 } catch (error) {
                     console.error(`Error removing mute role from ${memberId} during consistency check:`, error);
@@ -88,6 +93,11 @@ export class SanctionScheduler {
                         if (member) {
                             const muteRole = guild.roles.cache.get(muteRoleId);
                             if (muteRole && member.roles.cache.has(muteRoleId)) {
+                                try {
+                                    await member.send(`Your mute in ${guild.name} has expired.`);
+                                } catch (e) {
+                                    // Could not send DM
+                                }
                                 await member.roles.remove(muteRole, "TempMute expired");
                             }
                         }

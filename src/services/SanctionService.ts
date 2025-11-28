@@ -91,6 +91,12 @@ export class SanctionService {
             throw new Error("User is not muted.");
         }
 
+        try {
+            await targetUser.send(`You have been unmuted in ${guild.name}. Reason: ${reason}`);
+        } catch (e) {
+            // Could not send DM
+        }
+
         await member.roles.remove(muteRole, reason);
 
         await prismaClient.sanction.updateMany({
