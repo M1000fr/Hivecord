@@ -22,7 +22,143 @@ import { VoiceConfigKeys } from "../modules/Voice/VoiceConfig";
 import { ConfigService } from "./ConfigService";
 import { prismaClient } from "./prismaService";
 
+type ListType = "whitelist" | "blacklist";
+
+interface UserToggleResult {
+	member: GuildMember;
+	action: "added" | "removed";
+	type: ListType;
+}
+
 export class TempVoiceService {
+	private static async fetchGuildMember(guild: any, userId: string): Promise<GuildMember | null> {
+		try {
+			return await guild.members.fetch(userId);
+		} catch {
+			return null;
+		}
+	}
+
+	private static async collectUserMentions(
+		interaction: ButtonInteraction,
+		channel: VoiceChannel,
+		listType: ListType,
+	): Promise<void> {
+		await interaction.reply({
+			content: `Please mention one or more users (@user1 @user2) in this channel to add/remove them from the ${listType}. (Expires in 15s)`,
+			flags: MessageFlags.Ephemeral,
+		});
+
+		const filter = (m: Message) => m.author.id === interaction.user.id;
+		const collector = channel.createMessageCollector({ filter, time: 15000, max: 1 });
+
+		collector.on("collect", async (message: Message) => {
+			try { await message.delete(); } catch {}
+
+			if (message.mentions.users.size === 0) {
+				await interaction.followUp({
+					content: "No users mentioned. Please use @mention to mention users.",
+					flags: MessageFlags.Ephemeral,
+				});
+				return;
+			}
+
+			const results: string[] = [];
+			for (const targetUser of message.mentions.users.values()) {
+				const member = await this.fetchGuildMember(interaction.guild!, targetUser.id);
+				if (!member) {
+					results.push(`❌ ${targetUser.username} - User not found`);
+					continue;
+				}
+
+				const result = await this.toggleUserInList(channel, member, listType);
+				results.push(this.formatToggleResult(result));
+			}
+
+			await interaction.followUp({ content: results.join("\n"), flags: MessageFlags.Ephemeral });
+			await this.updateControlPanel(channel);
+			collector.stop();
+		});
+	}
+
+	private static async toggleUserInList(
+		channel: VoiceChannel,
+		member: GuildMember,
+		listType: ListType,
+	): Promise<UserToggleResult> {
+		if (listType === "whitelist") {
+			return await this.toggleWhitelist(channel, member);
+		}
+		return await this.toggleBlacklist(channel, member);
+	}
+
+	private static async toggleWhitelist(channel: VoiceChannel, member: GuildMember): Promise<UserToggleResult> {
+		const existing = await prismaClient.tempVoiceAllowedUser.findFirst({
+			where: { tempVoiceId: channel.id, userId: member.id },
+		});
+
+		if (existing) {
+			await prismaClient.tempVoiceAllowedUser.delete({ where: { id: existing.id } });
+			await channel.permissionOverwrites.delete(member.id);
+			return { member, action: "removed", type: "whitelist" };
+		}
+
+		const blocked = await prismaClient.tempVoiceBlockedUser.findFirst({
+			where: { tempVoiceId: channel.id, userId: member.id },
+		});
+		if (blocked) {
+			await prismaClient.tempVoiceBlockedUser.delete({ where: { id: blocked.id } });
+		}
+
+		await prismaClient.tempVoiceAllowedUser.create({
+			data: { tempVoiceId: channel.id, userId: member.id },
+		});
+		await channel.permissionOverwrites.edit(member.id, { Connect: true, MoveMembers: true });
+		return { member, action: "added", type: "whitelist" };
+	}
+
+	private static async toggleBlacklist(channel: VoiceChannel, member: GuildMember): Promise<UserToggleResult> {
+		const existing = await prismaClient.tempVoiceBlockedUser.findFirst({
+			where: { tempVoiceId: channel.id, userId: member.id },
+		});
+
+		if (existing) {
+			await prismaClient.tempVoiceBlockedUser.delete({ where: { id: existing.id } });
+			await channel.permissionOverwrites.delete(member.id);
+			return { member, action: "removed", type: "blacklist" };
+		}
+
+		const allowed = await prismaClient.tempVoiceAllowedUser.findFirst({
+			where: { tempVoiceId: channel.id, userId: member.id },
+		});
+		if (allowed) {
+			await prismaClient.tempVoiceAllowedUser.delete({ where: { id: allowed.id } });
+		}
+
+		await prismaClient.tempVoiceBlockedUser.create({
+			data: { tempVoiceId: channel.id, userId: member.id },
+		});
+		await channel.permissionOverwrites.edit(member.id, { Connect: false });
+
+		if (member.voice.channelId === channel.id) {
+			await member.voice.disconnect("Blacklisted from temp channel");
+		}
+
+		return { member, action: "added", type: "blacklist" };
+	}
+
+	private static formatToggleResult(result: UserToggleResult): string {
+		const emoji = result.type === "whitelist" 
+			? (result.action === "added" ? "✅" : "➖")
+			: (result.action === "added" ? "🔒" : "➖");
+		
+		const actionText = result.type === "whitelist"
+			? (result.action === "added" ? "added to the whitelist" : "removed from the whitelist")
+			: (result.action === "added" ? "banned from the channel" : "removed from the blacklist");
+
+		return `${emoji} ${result.member.displayName} has been ${actionText}`;
+	}
+
 	static async handleJoin(oldState: VoiceState, newState: VoiceState) {
 		if (!newState.channelId || !newState.guild || !newState.member) return;
 
@@ -311,237 +447,13 @@ export class TempVoiceService {
 	@Button("temp_voice_whitelist")
 	static async handleWhitelistButton(interaction: ButtonInteraction) {
 		if (!(await this.validateOwner(interaction))) return;
-		const channel = interaction.channel as VoiceChannel;
-
-		await interaction.reply({
-			content:
-				"Please mention one or more users (@user1 @user2) in this channel to add/remove them from the whitelist. (Expires in 15s)",
-			flags: MessageFlags.Ephemeral,
-		});
-
-		const filter = (m: Message) => m.author.id === interaction.user.id;
-		const collector = channel.createMessageCollector({
-			filter,
-			time: 15000,
-			max: 1,
-		});
-
-		collector.on("collect", async (message: Message) => {
-			const targetUsers = message.mentions.users;
-
-			// Delete user message to keep chat clean
-			try {
-				await message.delete();
-			} catch {}
-
-			if (targetUsers.size === 0) {
-				await interaction.followUp({
-					content:
-						"No users mentioned. Please use @mention to mention users.",
-					flags: MessageFlags.Ephemeral,
-				});
-				return;
-			}
-
-			const results: string[] = [];
-
-			for (const targetUser of targetUsers.values()) {
-				const targetUserId = targetUser.id;
-
-				let targetMember;
-				try {
-					targetMember =
-						await interaction.guild!.members.fetch(targetUserId);
-				} catch {
-					results.push(
-						`❌ ${targetUser.username} - User not found`,
-					);
-					continue;
-				}
-
-				// Check if already whitelisted
-				const existingAllowed =
-					await prismaClient.tempVoiceAllowedUser.findFirst({
-						where: {
-							tempVoiceId: channel.id,
-							userId: targetUserId,
-						},
-					});
-
-				if (existingAllowed) {
-					// Toggle OFF
-					await prismaClient.tempVoiceAllowedUser.delete({
-						where: { id: existingAllowed.id },
-					});
-					await channel.permissionOverwrites.delete(targetUserId);
-
-					results.push(
-						`➖ ${targetMember.displayName} has been removed from the whitelist`,
-					);
-				} else {
-					// Toggle ON
-
-					// Remove from blacklist if present
-					const blockedEntry =
-						await prismaClient.tempVoiceBlockedUser.findFirst({
-							where: {
-								tempVoiceId: channel.id,
-								userId: targetUserId,
-							},
-						});
-
-					if (blockedEntry) {
-						await prismaClient.tempVoiceBlockedUser.delete({
-							where: { id: blockedEntry.id },
-						});
-					}
-
-					await prismaClient.tempVoiceAllowedUser.create({
-						data: {
-							tempVoiceId: channel.id,
-							userId: targetUserId,
-						},
-					});
-
-					await channel.permissionOverwrites.edit(targetUserId, {
-						Connect: true,
-						MoveMembers: true, // Allows bypassing user limit
-					});
-
-					results.push(
-						`✅ ${targetMember.displayName} has been added to the whitelist`,
-					);
-				}
-			}
-
-			await interaction.followUp({
-				content: results.join("\n"),
-				flags: MessageFlags.Ephemeral,
-			});
-
-			await this.updateControlPanel(channel);
-			collector.stop();
-		});
+		await this.collectUserMentions(interaction, interaction.channel as VoiceChannel, "whitelist");
 	}
 
 	@Button("temp_voice_blacklist")
 	static async handleBlacklistButton(interaction: ButtonInteraction) {
 		if (!(await this.validateOwner(interaction))) return;
-		const channel = interaction.channel as VoiceChannel;
-
-		await interaction.reply({
-			content:
-				"Please mention one or more users (@user1 @user2) in this channel to add/remove them from the blacklist. (Expires in 15s)",
-			flags: MessageFlags.Ephemeral,
-		});
-
-		const filter = (m: Message) => m.author.id === interaction.user.id;
-		const collector = channel.createMessageCollector({
-			filter,
-			time: 15000,
-			max: 1,
-		});
-
-		collector.on("collect", async (message: Message) => {
-			const targetUsers = message.mentions.users;
-
-			// Delete user message to keep chat clean
-			try {
-				await message.delete();
-			} catch {}
-
-			if (targetUsers.size === 0) {
-				await interaction.followUp({
-					content:
-						"No users mentioned. Please use @mention to mention users.",
-					flags: MessageFlags.Ephemeral,
-				});
-				return;
-			}
-
-			const results: string[] = [];
-
-			for (const targetUser of targetUsers.values()) {
-				const targetUserId = targetUser.id;
-
-				let targetMember;
-				try {
-					targetMember =
-						await interaction.guild!.members.fetch(targetUserId);
-				} catch {
-					results.push(
-						`❌ ${targetUser.username} - User not found`,
-					);
-					continue;
-				}
-
-				// Check if already blacklisted
-				const existingBlocked =
-					await prismaClient.tempVoiceBlockedUser.findFirst({
-						where: {
-							tempVoiceId: channel.id,
-							userId: targetUserId,
-						},
-					});
-
-				if (existingBlocked) {
-					// Toggle OFF
-					await prismaClient.tempVoiceBlockedUser.delete({
-						where: { id: existingBlocked.id },
-					});
-					await channel.permissionOverwrites.delete(targetUserId);
-
-					results.push(
-						`➖ ${targetMember.displayName} has been removed from the blacklist`,
-					);
-				} else {
-					// Toggle ON
-
-					// Remove from whitelist if present
-					const allowedEntry =
-						await prismaClient.tempVoiceAllowedUser.findFirst({
-							where: {
-								tempVoiceId: channel.id,
-								userId: targetUserId,
-							},
-						});
-
-					if (allowedEntry) {
-						await prismaClient.tempVoiceAllowedUser.delete({
-							where: { id: allowedEntry.id },
-						});
-					}
-
-					await prismaClient.tempVoiceBlockedUser.create({
-						data: {
-							tempVoiceId: channel.id,
-							userId: targetUserId,
-						},
-					});
-
-					await channel.permissionOverwrites.edit(targetUserId, {
-						Connect: false,
-					});
-
-					if (targetMember.voice.channelId === channel.id) {
-						await targetMember.voice.disconnect(
-							"Blacklisted from temp channel",
-						);
-					}
-					results.push(
-						`🔒 ${targetMember.displayName} has been banned from the channel`,
-					);
-				}
-			}
-
-			await interaction.followUp({
-				content: results.join("\n"),
-				flags: MessageFlags.Ephemeral,
-			});
-
-			await this.updateControlPanel(channel);
-			collector.stop();
-		});
+		await this.collectUserMentions(interaction, interaction.channel as VoiceChannel, "blacklist");
 	}
 
 	@Modal("temp_voice_rename_modal")
