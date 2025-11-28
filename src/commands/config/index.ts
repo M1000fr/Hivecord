@@ -1,286 +1,345 @@
 import {
+	ActionRowBuilder,
+	ButtonInteraction,
+	ChannelSelectMenuBuilder,
 	ChatInputCommandInteraction,
 	Client,
-	MessageFlags,
-	AttachmentBuilder,
+	ComponentType,
+	ChannelType as DiscordChannelType,
 	EmbedBuilder,
+	InteractionCollector,
+	MessageFlags,
+	ModalBuilder,
+	RoleSelectMenuBuilder,
+	StringSelectMenuBuilder,
+	StringSelectMenuInteraction,
+	StringSelectMenuOptionBuilder,
+	TextInputBuilder,
+	TextInputStyle,
 } from "discord.js";
 import { BaseCommand } from "../../class/BaseCommand";
+import { Pager } from "../../class/Pager";
 import { Command } from "../../decorators/Command";
 import { DefaultCommand } from "../../decorators/DefaultCommand";
-import { Subcommand } from "../../decorators/Subcommand";
-import { EPermission } from "../../enums/EPermission";
-import { configOptions } from "./configOptions";
-import { ConfigService } from "../../services/ConfigService";
 import {
-	EConfigKey,
 	EChannelConfigKey,
+	EConfigKey,
 	ERoleConfigKey,
 } from "../../enums/EConfigKey";
-import { ChannelType } from "../../prisma/client/enums";
-import { ChannelType as DiscordChannelType } from "discord.js";
+import { EPermission } from "../../enums/EPermission";
+import { ConfigService } from "../../services/ConfigService";
+import { configOptions } from "./configOptions";
+
+type ConfigType = "string" | "channel" | "role" | "roles";
+
+interface ConfigDefinition {
+	key: string;
+	type: ConfigType;
+	label: string;
+	description: string;
+	enumType: any;
+}
+
+const CONFIG_DEFINITIONS: ConfigDefinition[] = [
+	{
+		key: EConfigKey.WelcomeMessage,
+		type: "string",
+		label: "Welcome Message",
+		description: "Message sent when a user joins",
+		enumType: EConfigKey,
+	},
+	{
+		key: EConfigKey.WelcomeMessageImage,
+		type: "string",
+		label: "Welcome Image",
+		description: "Image URL for welcome message",
+		enumType: EConfigKey,
+	},
+	{
+		key: EConfigKey.WelcomeBackgroundUrl,
+		type: "string",
+		label: "Welcome Background",
+		description: "Background URL for welcome card",
+		enumType: EConfigKey,
+	},
+	{
+		key: EChannelConfigKey.WelcomeChannelId,
+		type: "channel",
+		label: "Welcome Channel",
+		description: "Channel for welcome messages",
+		enumType: EChannelConfigKey,
+	},
+	{
+		key: ERoleConfigKey.MuteRoleId,
+		type: "role",
+		label: "Mute Role",
+		description: "Role given to muted users",
+		enumType: ERoleConfigKey,
+	},
+	{
+		key: ERoleConfigKey.NewMemberRoles,
+		type: "roles",
+		label: "New Member Roles",
+		description: "Roles given to new members",
+		enumType: ERoleConfigKey,
+	},
+];
 
 @Command(configOptions)
 export default class ConfigCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Config)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
-		// This method is required by BaseCommand but won't be called directly if subcommands are used properly
+		const pager = new Pager<ConfigDefinition>({
+			items: CONFIG_DEFINITIONS,
+			itemsPerPage: 5,
+			renderPage: this.renderPage.bind(this),
+			onComponent: this.handleComponent.bind(this),
+			filter: (i) => i.user.id === interaction.user.id,
+		});
+
+		await pager.start(interaction);
 	}
 
-	@Subcommand({
-		name: "show",
-		permission: EPermission.Config,
-	})
-	async showConfig(client: Client, interaction: ChatInputCommandInteraction) {
-		const muteRoleId = await ConfigService.getRole(
-			ERoleConfigKey.MuteRoleId,
-		);
-		const welcomeChannelId = await ConfigService.getChannel(
-			EChannelConfigKey.WelcomeChannelId,
-		);
-		const welcomeMessage = await ConfigService.get(
-			EConfigKey.WelcomeMessage,
-		);
-		const welcomeMessageImage = await ConfigService.get(
-			EConfigKey.WelcomeMessageImage,
-		);
-
-		const muteRole = muteRoleId
-			? interaction.guild?.roles.cache.get(muteRoleId)
-			: null;
-		const welcomeChannel = welcomeChannelId
-			? interaction.guild?.channels.cache.get(welcomeChannelId)
-			: null;
-
+	async renderPage(
+		items: ConfigDefinition[],
+		pageIndex: number,
+		totalPages: number,
+	) {
 		const embed = new EmbedBuilder()
-			.setTitle("Current Configuration")
-			.setColor("Blue")
-			.addFields(
-				{
-					name: "Mute Role",
-					value: muteRole
-						? muteRole.toString()
-						: muteRoleId
-							? `${muteRoleId} (Not found)`
-							: "Not set",
-					inline: true,
-				},
-				{
-					name: "Welcome Channel",
-					value: welcomeChannel
-						? welcomeChannel.toString()
-						: welcomeChannelId
-							? `${welcomeChannelId} (Not found)`
-							: "Not set",
-					inline: true,
-				},
-				{
-					name: "Welcome Message Image",
-					value: welcomeMessageImage || "Not set",
-					inline: false,
-				},
-				{
-					name: "Welcome Message",
-					value: welcomeMessage || "Not set",
-					inline: false,
-				},
+			.setTitle(`Configuration - Page ${pageIndex + 1}/${totalPages}`)
+			.setColor("#0099ff");
+
+		const options: StringSelectMenuOptionBuilder[] = [];
+
+		for (const item of items) {
+			let value = "Not Set";
+			if (item.enumType === EConfigKey) {
+				value =
+					(await ConfigService.get(item.key as EConfigKey)) ||
+					"Not Set";
+				if (value.length > 50) value = value.substring(0, 47) + "...";
+			} else if (item.enumType === EChannelConfigKey) {
+				const channelId = await ConfigService.getChannel(
+					item.key as EChannelConfigKey,
+				);
+				value = channelId ? `<#${channelId}>` : "Not Set";
+			} else if (item.enumType === ERoleConfigKey) {
+				if (item.type === "roles") {
+					const roleIds = await ConfigService.getRoles(
+						item.key as ERoleConfigKey,
+					);
+					value =
+						roleIds.length > 0
+							? roleIds.map((id) => `<@&${id}>`).join(", ")
+							: "Not Set";
+				} else {
+					const roleId = await ConfigService.getRole(
+						item.key as ERoleConfigKey,
+					);
+					value = roleId ? `<@&${roleId}>` : "Not Set";
+				}
+			}
+
+			embed.addFields({ name: item.label, value: value, inline: false });
+
+			options.push(
+				new StringSelectMenuOptionBuilder()
+					.setLabel(item.label)
+					.setDescription(item.description.substring(0, 100))
+					.setValue(item.key),
+			);
+		}
+
+		const selectMenu = new StringSelectMenuBuilder()
+			.setCustomId("config_select")
+			.setPlaceholder("Select a setting to edit")
+			.addOptions(options);
+
+		const row =
+			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+				selectMenu,
 			);
 
-		await interaction.reply({
-			embeds: [embed],
-			flags: [MessageFlags.Ephemeral],
-		});
+		return { embeds: [embed], components: [row] };
 	}
 
-	@Subcommand({
-		name: "edit",
-		permission: EPermission.Config,
-	})
-	async editConfig(client: Client, interaction: ChatInputCommandInteraction) {
-		const role = interaction.options.getRole("mute_role");
-		const channelOption = interaction.options.getChannel("welcome_channel");
-		const message = interaction.options.getString("welcome_message");
+	async handleComponent(
+		interaction: StringSelectMenuInteraction | ButtonInteraction,
+		collector: InteractionCollector<any>,
+	) {
+		if (!interaction.isStringSelectMenu()) return;
+		if (interaction.customId !== "config_select") return;
 
-		if (!role && !channelOption && !message) {
+		const selectedKey = interaction.values[0];
+		const configDef = CONFIG_DEFINITIONS.find((c) => c.key === selectedKey);
+
+		if (!configDef) {
 			await interaction.reply({
-				content: "No changes provided.",
+				content: "Configuration not found.",
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
-		const updates: string[] = [];
+		if (configDef.type === "string") {
+			const modal = new ModalBuilder()
+				.setCustomId(`config_modal_${selectedKey}`)
+				.setTitle(`Edit ${configDef.label}`);
 
-		if (role) {
-			await ConfigService.setRole(ERoleConfigKey.MuteRoleId, role.id);
-			updates.push(`Mute role set to ${role}`);
-		}
+			const currentValue =
+				(await ConfigService.get(configDef.key as EConfigKey)) || "";
 
-		if (channelOption) {
-			const channel = interaction.guild?.channels.cache.get(
-				channelOption.id,
+			const input = new TextInputBuilder()
+				.setCustomId("value")
+				.setLabel("Value")
+				.setStyle(TextInputStyle.Paragraph)
+				.setValue(currentValue)
+				.setRequired(false);
+
+			const row = new ActionRowBuilder<TextInputBuilder>().addComponents(
+				input,
 			);
-			if (!channel || !channel.isTextBased()) {
-				updates.push(
-					`Failed to set welcome channel: ${channelOption} is not a text channel.`,
-				);
-			} else {
-				await ConfigService.setChannel(
-					EChannelConfigKey.WelcomeChannelId,
-					channel.id,
-					ChannelType.TEXT,
-				);
-				updates.push(`Welcome channel set to ${channel}`);
+			modal.addComponents(row);
+
+			await interaction.showModal(modal);
+
+			try {
+				const submitted = await interaction.awaitModalSubmit({
+					time: 60000,
+					filter: (i) =>
+						i.customId === `config_modal_${selectedKey}` &&
+						i.user.id === interaction.user.id,
+				});
+
+				const newValue = submitted.fields.getTextInputValue("value");
+				if (newValue) {
+					await ConfigService.set(
+						configDef.key as EConfigKey,
+						newValue,
+					);
+					await submitted.reply({
+						content: `Updated ${configDef.label}.`,
+						flags: [MessageFlags.Ephemeral],
+					});
+				} else {
+					await ConfigService.delete(configDef.key as EConfigKey);
+					await submitted.reply({
+						content: `Cleared ${configDef.label}.`,
+						flags: [MessageFlags.Ephemeral],
+					});
+				}
+			} catch (e) {
+				// Timeout or error
 			}
-		}
+		} else if (configDef.type === "channel") {
+			const select = new ChannelSelectMenuBuilder()
+				.setCustomId(`config_channel_${selectedKey}`)
+				.setPlaceholder(`Select ${configDef.label}`)
+				.setChannelTypes(
+					DiscordChannelType.GuildText,
+					DiscordChannelType.GuildAnnouncement,
+				);
 
-		if (message) {
-			await ConfigService.set(EConfigKey.WelcomeMessageImage, message);
-			updates.push(`Welcome message set to: ${message}`);
-		}
+			const row =
+				new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+					select,
+				);
 
-		await interaction.reply({
-			content: `Configuration updated:\n- ${updates.join("\n- ")}`,
-			flags: [MessageFlags.Ephemeral],
-		});
-	}
-
-	@Subcommand({ name: "export", permission: EPermission.Config })
-	async exportConfig(
-		client: Client,
-		interaction: ChatInputCommandInteraction,
-	) {
-		const backup = await ConfigService.getFullBackup();
-		const json = JSON.stringify(backup, null, 2);
-		const encrypted = ConfigService.encrypt(json);
-		const buffer = Buffer.from(encrypted, "utf-8");
-		const attachment = new AttachmentBuilder(buffer, {
-			name: "backup.enc",
-		});
-
-		await interaction.reply({
-			files: [attachment],
-			flags: [MessageFlags.Ephemeral],
-		});
-	}
-
-	@Subcommand({ name: "import", permission: EPermission.Config })
-	async importConfig(
-		client: Client,
-		interaction: ChatInputCommandInteraction,
-	) {
-		const file = interaction.options.getAttachment("file", true);
-
-		if (!file.name.endsWith(".enc") && !file.name.endsWith(".json")) {
 			await interaction.reply({
-				content: "Please upload a valid backup file (.enc or .json).",
+				content: `Select channel for ${configDef.label}`,
+				components: [row],
 				flags: [MessageFlags.Ephemeral],
 			});
-			return;
-		}
+			const msg = await interaction.fetchReply();
 
-		try {
-			const response = await fetch(file.url);
-			if (!response.ok) throw new Error("Failed to fetch file");
-
-			let json: any;
-			if (file.name.endsWith(".enc")) {
-				const text = await response.text();
-				const decrypted = ConfigService.decrypt(text);
-				json = JSON.parse(decrypted);
-			} else {
-				json = await response.json();
-			}
-
-			if (typeof json !== "object" || json === null) {
-				throw new Error("Invalid JSON format");
-			}
-
-			if (
-				"configuration" in json &&
-				Array.isArray((json as any).configuration)
-			) {
-				await ConfigService.restoreFullBackup(json);
-				await interaction.reply({
-					content: "Full backup imported successfully.",
-					flags: [MessageFlags.Ephemeral],
+			try {
+				const selection = await msg.awaitMessageComponent({
+					componentType: ComponentType.ChannelSelect,
+					time: 60000,
+					filter: (i) => i.user.id === interaction.user.id,
 				});
-			} else {
-				await ConfigService.import(json as Record<string, string>);
-				await interaction.reply({
-					content: "Configuration imported successfully.",
-					flags: [MessageFlags.Ephemeral],
+
+				const channelId = selection.values[0];
+				if (channelId) {
+					await ConfigService.setChannel(
+						configDef.key as EChannelConfigKey,
+						channelId,
+					);
+					await selection.update({
+						content: `Updated ${configDef.label} to <#${channelId}>.`,
+						components: [],
+					});
+				} else {
+					await selection.update({
+						content: `No channel selected.`,
+						components: [],
+					});
+				}
+			} catch (e) {
+				await interaction.editReply({
+					content: "Selection timed out.",
+					components: [],
 				});
 			}
-		} catch (error) {
-			console.error(error);
+		} else if (configDef.type === "role" || configDef.type === "roles") {
+			const select = new RoleSelectMenuBuilder()
+				.setCustomId(`config_role_${selectedKey}`)
+				.setPlaceholder(`Select ${configDef.label}`)
+				.setMinValues(0)
+				.setMaxValues(configDef.type === "roles" ? 25 : 1);
+
+			const row =
+				new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
+					select,
+				);
+
 			await interaction.reply({
-				content:
-					"Failed to import configuration. Ensure the file is valid and the encryption key matches.",
+				content: `Select role(s) for ${configDef.label}`,
+				components: [row],
 				flags: [MessageFlags.Ephemeral],
 			});
+			const msg = await interaction.fetchReply();
+
+			try {
+				const selection = await msg.awaitMessageComponent({
+					componentType: ComponentType.RoleSelect,
+					time: 60000,
+					filter: (i) => i.user.id === interaction.user.id,
+				});
+
+				const roleIds = selection.values;
+				if (configDef.type === "roles") {
+					await ConfigService.setRoles(
+						configDef.key as ERoleConfigKey,
+						roleIds,
+					);
+					await selection.update({
+						content: `Updated ${configDef.label} with ${roleIds.length} roles.`,
+						components: [],
+					});
+				} else {
+					if (roleIds.length > 0 && roleIds[0]) {
+						await ConfigService.setRole(
+							configDef.key as ERoleConfigKey,
+							roleIds[0],
+						);
+						await selection.update({
+							content: `Updated ${configDef.label} to <@&${roleIds[0]}>.`,
+							components: [],
+						});
+					} else {
+						await selection.update({
+							content: `No role selected.`,
+							components: [],
+						});
+					}
+				}
+			} catch (e) {
+				await interaction.editReply({
+					content: "Selection timed out.",
+					components: [],
+				});
+			}
 		}
-	}
-
-	@Subcommand({
-		name: "add",
-		group: "auto_role",
-		permission: EPermission.Config,
-	})
-	async addAutoRole(client: Client, interaction: ChatInputCommandInteraction) {
-		const role = interaction.options.getRole("role", true);
-		await ConfigService.addRole(ERoleConfigKey.NewMemberRoles, role.id);
-		
-		await interaction.reply({
-			content: `Role ${role.toString()} added to auto-assigned roles.`,
-			flags: [MessageFlags.Ephemeral],
-		});
-	}
-
-	@Subcommand({
-		name: "remove",
-		group: "auto_role",
-		permission: EPermission.Config,
-	})
-	async removeAutoRole(client: Client, interaction: ChatInputCommandInteraction) {
-		const role = interaction.options.getRole("role", true);
-		await ConfigService.removeRole(ERoleConfigKey.NewMemberRoles, role.id);
-		
-		await interaction.reply({
-			content: `Role ${role.toString()} removed from auto-assigned roles.`,
-			flags: [MessageFlags.Ephemeral],
-		});
-	}
-
-	@Subcommand({
-		name: "list",
-		group: "auto_role",
-		permission: EPermission.Config,
-	})
-	async listAutoRoles(client: Client, interaction: ChatInputCommandInteraction) {
-		const roleIds = await ConfigService.getRoles(ERoleConfigKey.NewMemberRoles);
-		
-		if (roleIds.length === 0) {
-			await interaction.reply({
-				content: "No auto-assigned roles configured.",
-				flags: [MessageFlags.Ephemeral],
-			});
-			return;
-		}
-
-		const roles = roleIds.map(id => {
-			const role = interaction.guild?.roles.cache.get(id);
-			return role ? role.toString() : `${id} (Not found)`;
-		});
-
-		const embed = new EmbedBuilder()
-			.setTitle("Auto-assigned Roles")
-			.setColor("Blue")
-			.setDescription(roles.join("\n"));
-
-		await interaction.reply({
-			embeds: [embed],
-			flags: [MessageFlags.Ephemeral],
-		});
 	}
 }

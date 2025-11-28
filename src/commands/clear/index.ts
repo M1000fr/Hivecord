@@ -21,7 +21,7 @@ export default class ClearCommand extends BaseCommand {
 		if (isNaN(Number(amount)) || Number(amount) <= 0) {
 			await interaction.reply({
 				content: "Please provide a valid number of messages to clear.",
-				ephemeral: true,
+				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
