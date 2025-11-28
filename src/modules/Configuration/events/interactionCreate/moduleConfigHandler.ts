@@ -105,6 +105,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			.setColor("#5865F2")
 			.setTimestamp();
 
+		let index = 1;
 		for (const [key, options] of Object.entries(configProperties)) {
 			const opt = options as any;
 			const typeNames: { [key: number]: string } = {
@@ -119,20 +120,21 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			const currentValue = await this.getCurrentValue(key, opt.type);
 
 			embed.addFields({
-				name: key,
+				name: `${index}. ${key}`,
 				value: `${opt.description}\nType: \`${typeNames[opt.type] || "Unknown"}\`\nCurrent: ${currentValue}`,
 				inline: false,
 			});
+			index++;
 		}
 
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(`module_config:${moduleName.toLowerCase()}`)
 			.setPlaceholder("Select a property to configure")
 			.addOptions(
-				Object.entries(configProperties).map(([key, options]) => {
+				Object.entries(configProperties).map(([key, options], idx) => {
 					const opt = options as any;
 					return new StringSelectMenuOptionBuilder()
-						.setLabel(key)
+						.setLabel(`${idx + 1}. ${key}`)
 						.setDescription(opt.description.substring(0, 100))
 						.setValue(key);
 				}),

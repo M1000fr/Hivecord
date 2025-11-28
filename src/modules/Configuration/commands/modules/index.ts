@@ -62,6 +62,7 @@ export default class ModulesCommand extends BaseCommand {
 			.setTimestamp();
 
 		// Add fields for each config property with current values
+		let index = 1;
 		for (const [key, options] of Object.entries(configProperties)) {
 			const opt = options as any;
 			const typeNames: { [key: number]: string } = {
@@ -109,10 +110,11 @@ export default class ModulesCommand extends BaseCommand {
 			}
 			
 			embed.addFields({
-				name: key,
+				name: `${index}. ${key}`,
 				value: `${opt.description}\nType: \`${typeName}\`\nCurrent: ${currentValue}`,
 				inline: false,
 			});
+			index++;
 		}
 
 		// Create select menu
@@ -120,10 +122,10 @@ export default class ModulesCommand extends BaseCommand {
 			.setCustomId(`module_config:${moduleName.toLowerCase()}`)
 			.setPlaceholder("Select a property to configure")
 			.addOptions(
-				Object.entries(configProperties).map(([key, options]) => {
+				Object.entries(configProperties).map(([key, options], idx) => {
 					const opt = options as any;
 					return new StringSelectMenuOptionBuilder()
-						.setLabel(key)
+						.setLabel(`${idx + 1}. ${key}`)
 						.setDescription(
 							opt.description.substring(0, 100),
 						)
