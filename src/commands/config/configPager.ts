@@ -71,13 +71,6 @@ export const CONFIG_DEFINITIONS: ConfigDefinition[] = [
 		enumType: ERoleConfigKey,
 	},
 	{
-		key: ERoleConfigKey.NewMemberRoles,
-		type: "roles",
-		label: "New Member Roles",
-		description: "Roles given to new members",
-		enumType: ERoleConfigKey,
-	},
-	{
 		key: EChannelConfigKey.TempVoiceGenerator,
 		type: "channel",
 		label: "Temp Voice Generator",

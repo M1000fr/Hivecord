@@ -11,5 +11,4 @@ export enum EChannelConfigKey {
 
 export enum ERoleConfigKey {
 	MuteRoleId = "mute_role_id",
-	NewMemberRoles = "new_member_roles",
 }
