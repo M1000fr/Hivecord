@@ -11,6 +11,7 @@ import { Subcommand } from "../../decorators/Subcommand";
 import { EPermission } from "../../enums/EPermission";
 import { configOptions } from "./configOptions";
 import { ConfigService } from "../../services/ConfigService";
+import { EConfigKey } from "../../enums/EConfigKey";
 
 @Command(configOptions)
 export default class ConfigCommand extends BaseCommand {
@@ -30,7 +31,7 @@ export default class ConfigCommand extends BaseCommand {
 	) {
 		const role = interaction.options.getRole("role", true);
 
-		await ConfigService.set("mute_role_id", role.id);
+		await ConfigService.set(EConfigKey.MuteRoleId, role.id);
 
 		await interaction.reply({
 			content: `Mute role has been set to ${role.name}`,
@@ -47,7 +48,7 @@ export default class ConfigCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
-		const roleId = await ConfigService.get("mute_role_id");
+		const roleId = await ConfigService.get(EConfigKey.MuteRoleId);
 
 		if (!roleId) {
 			await interaction.reply({

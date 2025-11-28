@@ -1,5 +1,6 @@
 import { prismaClient } from "./prismaService";
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto';
+import { EConfigKey } from "../enums/EConfigKey";
 
 export class ConfigService {
     private static getAlgorithm() {
@@ -29,14 +30,14 @@ export class ConfigService {
         return decrypted.toString();
     }
 
-    static async get(key: string): Promise<string | null> {
+    static async get(key: EConfigKey): Promise<string | null> {
         const config = await prismaClient.configuration.findUnique({
             where: { key },
         });
         return config ? config.value : null;
     }
 
-    static async set(key: string, value: string): Promise<void> {
+    static async set(key: EConfigKey, value: string): Promise<void> {
         await prismaClient.configuration.upsert({
             where: { key },
             update: { value },
@@ -44,7 +45,7 @@ export class ConfigService {
         });
     }
 
-    static async delete(key: string): Promise<void> {
+    static async delete(key: EConfigKey): Promise<void> {
         await prismaClient.configuration.delete({
             where: { key },
         });
@@ -97,7 +98,7 @@ export class ConfigService {
 
     static async import(configs: Record<string, string>): Promise<void> {
         for (const [key, value] of Object.entries(configs)) {
-            await this.set(key, value);
+            await this.set(key as EConfigKey, value);
         }
     }
 
