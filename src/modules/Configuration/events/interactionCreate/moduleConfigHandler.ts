@@ -418,6 +418,21 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 				flags: [MessageFlags.Ephemeral],
 			});
 		} else {
+			const snakeCaseKey = selectedProperty.replace(
+				/[A-Z]/g,
+				(letter: string) => `_${letter.toLowerCase()}`,
+			);
+			let rawValue = "";
+			const enumKey = Object.keys(EConfigKey).find(
+				(k) => EConfigKey[k as keyof typeof EConfigKey] === snakeCaseKey,
+			);
+			if (enumKey) {
+				const val = await ConfigService.get(
+					EConfigKey[enumKey as keyof typeof EConfigKey],
+				);
+				if (val) rawValue = val;
+			}
+
 			const labelText =
 				propertyOptions.description.length > 45
 					? propertyOptions.description.substring(0, 42) + "..."
@@ -426,10 +441,14 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			const input = new TextInputBuilder({
 				customId: "value",
 				label: labelText,
-				style: TextInputStyle.Short,
+				style: TextInputStyle.Paragraph,
 				required: propertyOptions.required ?? false,
 				placeholder: "Enter text value",
 			});
+
+			if (rawValue) {
+				input.setValue(rawValue);
+			}
 
 			const row = new ActionRowBuilder<TextInputBuilder>().addComponents(
 				input,
