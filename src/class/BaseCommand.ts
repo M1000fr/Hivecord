@@ -8,6 +8,7 @@ export abstract class BaseCommand {
 	): Promise<void> {
 		const subcommand = interaction.options.getSubcommand(false);
 		const subcommandGroup = interaction.options.getSubcommandGroup(false);
+		let executed = false;
 
 		if (subcommand) {
 			const key = subcommandGroup
@@ -45,8 +46,11 @@ export abstract class BaseCommand {
 				}
 
 				await (this as any)[method](client, interaction);
+				executed = true;
 			}
-		} else {
+		}
+
+		if (!executed) {
 			const defaultCommand = (this.constructor as any).defaultCommand;
 			if (defaultCommand) {
 				const permission = (this.constructor as any)

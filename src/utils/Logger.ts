@@ -40,14 +40,19 @@ export class Logger {
 		const green = "\x1b[32m";
 		const yellow = "\x1b[33m";
 
-		const formattedMessage =
-			typeof message === "object"
-				? JSON.stringify(message, null, 2)
-				: message;
+		let formattedMessage = message;
+		if (message instanceof Error) {
+			formattedMessage = `${message.message}\n${message.stack}`;
+		} else if (typeof message === "object") {
+			formattedMessage = JSON.stringify(message, null, 2);
+		}
 
 		const output = `${green}[LeBot] ${pid}  -${reset} ${timestamp}   ${color}${level.toUpperCase()}${reset} ${yellow}[${ctx}]${reset} ${color}${formattedMessage}${reset}`;
 
 		console.log(output);
+		if (trace) {
+			console.log(trace);
+		}
 		if (trace) {
 			console.error(trace);
 		}
