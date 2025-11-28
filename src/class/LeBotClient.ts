@@ -7,6 +7,7 @@ import type { CommandOptions } from "../interfaces/CommandOptions";
 import { PermissionService } from "../services/PermissionService";
 import { EPermission } from "../enums/EPermission";
 import { Logger } from "../utils/Logger";
+import { SanctionScheduler } from "./SanctionScheduler";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,6 +15,7 @@ const __dirname = path.dirname(__filename);
 export class LeBotClient<ready = false> extends Client {
 	public commands = new Collection<string, { instance: BaseCommand; options: CommandOptions }>();
 	private logger = new Logger('LeBotClient');
+	private scheduler: SanctionScheduler;
 
 	constructor() {
 		super({
@@ -23,6 +25,7 @@ export class LeBotClient<ready = false> extends Client {
 				IntentsBitField.Flags.GuildMessageReactions,
 			],
 		});
+		this.scheduler = new SanctionScheduler(this);
 		this.handleProcessEvents();
 	}
 
@@ -39,6 +42,7 @@ export class LeBotClient<ready = false> extends Client {
 	public async start(token: string): Promise<string> {
 		await this.loadEvents();
 		await this.loadCommands();
+		this.scheduler.start();
 		return this.login(token);
 	}
 

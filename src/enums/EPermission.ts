@@ -8,5 +8,7 @@ export enum EPermission {
 	GroupsList = "commands.groups.list",
 	TempMute = "commands.tempmute",
 	Ban = "commands.ban",
+	Unmute = "commands.unmute",
+	Unban = "commands.unban",
 	Config = "commands.config",
 }

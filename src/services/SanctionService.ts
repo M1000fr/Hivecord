@@ -67,6 +67,65 @@ export class SanctionService {
         await this.logSanction(targetUser, moderator, SanctionType.BAN, reason);
     }
 
+    static async unmute(guild: Guild, targetUser: User, reason: string): Promise<void> {
+        let member = guild.members.cache.get(targetUser.id);
+        if (!member) {
+            try {
+                member = await guild.members.fetch(targetUser.id);
+            } catch (e) {
+                throw new Error("User not found in this guild.");
+            }
+        }
+
+        const muteRoleId = await ConfigService.get("mute_role_id");
+        if (!muteRoleId) {
+            throw new Error("Mute role is not configured.");
+        }
+
+        const muteRole = guild.roles.cache.get(muteRoleId);
+        if (!muteRole) {
+            throw new Error("Configured mute role not found in this guild.");
+        }
+
+        if (!member.roles.cache.has(muteRoleId)) {
+            throw new Error("User is not muted.");
+        }
+
+        await member.roles.remove(muteRole, reason);
+
+        await prismaClient.sanction.updateMany({
+            where: {
+                userId: targetUser.id,
+                type: SanctionType.MUTE,
+                active: true
+            },
+            data: {
+                active: false
+            }
+        });
+    }
+
+    static async unban(guild: Guild, targetUser: User, reason: string): Promise<void> {
+        try {
+            await guild.bans.fetch(targetUser.id);
+        } catch (e) {
+            throw new Error("User is not banned.");
+        }
+
+        await guild.members.unban(targetUser, reason);
+
+        await prismaClient.sanction.updateMany({
+            where: {
+                userId: targetUser.id,
+                type: SanctionType.BAN,
+                active: true
+            },
+            data: {
+                active: false
+            }
+        });
+    }
+
     private static async logSanction(user: User, moderator: User, type: SanctionType, reason: string, expiresAt?: Date) {
         // Ensure user exists in DB
         await prismaClient.user.upsert({
@@ -89,6 +148,7 @@ export class SanctionService {
                 type: type,
                 reason: reason,
                 expiresAt: expiresAt,
+                active: true,
             },
         });
     }
