@@ -5,7 +5,7 @@ export class DurationParser {
 
         if (!match) return null;
 
-        const value = parseInt(match[1]);
+        const value = parseInt(match[1]!);
         const unit = match[2];
 
         switch (unit) {
