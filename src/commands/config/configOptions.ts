@@ -53,5 +53,43 @@ export const configOptions: CommandOptions = {
 				},
 			],
 		},
+		{
+			name: "auto_role",
+			description: "Manage auto-assigned roles",
+			type: ApplicationCommandOptionType.SubcommandGroup,
+			options: [
+				{
+					name: "add",
+					description: "Add a role to be assigned to new members",
+					type: ApplicationCommandOptionType.Subcommand,
+					options: [
+						{
+							name: "role",
+							description: "The role to add",
+							type: ApplicationCommandOptionType.Role,
+							required: true,
+						},
+					],
+				},
+				{
+					name: "remove",
+					description: "Remove a role from being assigned to new members",
+					type: ApplicationCommandOptionType.Subcommand,
+					options: [
+						{
+							name: "role",
+							description: "The role to remove",
+							type: ApplicationCommandOptionType.Role,
+							required: true,
+						},
+					],
+				},
+				{
+					name: "list",
+					description: "List all auto-assigned roles",
+					type: ApplicationCommandOptionType.Subcommand,
+				},
+			],
+		},
 	],
 };

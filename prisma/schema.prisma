@@ -107,9 +107,11 @@ model ChannelConfiguration {
 }
 
 model RoleConfiguration {
-    key    String @id
+    key    String
     roleId String
     Role   Role   @relation(fields: [roleId], references: [id])
+
+    @@id([key, roleId])
 }
 
 model UserConfiguration {

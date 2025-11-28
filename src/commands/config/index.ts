@@ -221,4 +221,66 @@ export default class ConfigCommand extends BaseCommand {
 			});
 		}
 	}
+
+	@Subcommand({
+		name: "add",
+		group: "auto_role",
+		permission: EPermission.Config,
+	})
+	async addAutoRole(client: Client, interaction: ChatInputCommandInteraction) {
+		const role = interaction.options.getRole("role", true);
+		await ConfigService.addRole(ERoleConfigKey.NewMemberRoles, role.id);
+		
+		await interaction.reply({
+			content: `Role ${role.toString()} added to auto-assigned roles.`,
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
+
+	@Subcommand({
+		name: "remove",
+		group: "auto_role",
+		permission: EPermission.Config,
+	})
+	async removeAutoRole(client: Client, interaction: ChatInputCommandInteraction) {
+		const role = interaction.options.getRole("role", true);
+		await ConfigService.removeRole(ERoleConfigKey.NewMemberRoles, role.id);
+		
+		await interaction.reply({
+			content: `Role ${role.toString()} removed from auto-assigned roles.`,
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
+
+	@Subcommand({
+		name: "list",
+		group: "auto_role",
+		permission: EPermission.Config,
+	})
+	async listAutoRoles(client: Client, interaction: ChatInputCommandInteraction) {
+		const roleIds = await ConfigService.getRoles(ERoleConfigKey.NewMemberRoles);
+		
+		if (roleIds.length === 0) {
+			await interaction.reply({
+				content: "No auto-assigned roles configured.",
+				flags: [MessageFlags.Ephemeral],
+			});
+			return;
+		}
+
+		const roles = roleIds.map(id => {
+			const role = interaction.guild?.roles.cache.get(id);
+			return role ? role.toString() : `${id} (Not found)`;
+		});
+
+		const embed = new EmbedBuilder()
+			.setTitle("Auto-assigned Roles")
+			.setColor("Blue")
+			.setDescription(roles.join("\n"));
+
+		await interaction.reply({
+			embeds: [embed],
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
 }

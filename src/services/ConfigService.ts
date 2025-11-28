@@ -74,7 +74,7 @@ export class ConfigService {
     }
 
     static async getRole(key: ERoleConfigKey): Promise<string | null> {
-        const config = await prismaClient.roleConfiguration.findUnique({
+        const config = await prismaClient.roleConfiguration.findFirst({
             where: { key },
         });
         return config ? config.roleId : null;
@@ -87,11 +87,43 @@ export class ConfigService {
             create: { id: roleId },
         });
 
-        await prismaClient.roleConfiguration.upsert({
+        await prismaClient.$transaction([
+            prismaClient.roleConfiguration.deleteMany({ where: { key } }),
+            prismaClient.roleConfiguration.create({
+                data: { key, roleId }
+            })
+        ]);
+    }
+
+    static async getRoles(key: ERoleConfigKey): Promise<string[]> {
+        const configs = await prismaClient.roleConfiguration.findMany({
             where: { key },
-            update: { roleId },
+        });
+        return configs.map(c => c.roleId);
+    }
+
+    static async addRole(key: ERoleConfigKey, roleId: string): Promise<void> {
+        await prismaClient.role.upsert({
+            where: { id: roleId },
+            update: {},
+            create: { id: roleId },
+        });
+
+        await prismaClient.roleConfiguration.upsert({
+            where: { key_roleId: { key, roleId } },
+            update: {},
             create: { key, roleId },
         });
+    }
+
+    static async removeRole(key: ERoleConfigKey, roleId: string): Promise<void> {
+        try {
+            await prismaClient.roleConfiguration.delete({
+                where: { key_roleId: { key, roleId } },
+            });
+        } catch (e) {
+            // Ignore if not found
+        }
     }
 
     static async getAll(): Promise<Record<string, string>> {
