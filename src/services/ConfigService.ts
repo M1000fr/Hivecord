@@ -21,4 +21,19 @@ export class ConfigService {
             where: { key },
         });
     }
+
+    static async getAll(): Promise<Record<string, string>> {
+        const configs = await prismaClient.configuration.findMany();
+        const result: Record<string, string> = {};
+        for (const config of configs) {
+            result[config.key] = config.value;
+        }
+        return result;
+    }
+
+    static async import(configs: Record<string, string>): Promise<void> {
+        for (const [key, value] of Object.entries(configs)) {
+            await this.set(key, value);
+        }
+    }
 }

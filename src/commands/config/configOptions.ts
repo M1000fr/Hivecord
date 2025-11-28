@@ -30,5 +30,23 @@ export const configOptions: CommandOptions = {
                 },
             ],
         },
+        {
+            name: "export",
+            description: "Export configuration to a JSON file",
+            type: ApplicationCommandOptionType.Subcommand,
+        },
+        {
+            name: "import",
+            description: "Import configuration from a JSON file",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [
+                {
+                    name: "file",
+                    description: "The JSON configuration file",
+                    type: ApplicationCommandOptionType.Attachment,
+                    required: true,
+                }
+            ]
+        }
     ],
 };
