@@ -363,6 +363,20 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		}
 
 		const selectedProperty = interaction.values[0];
+
+		// Reset the select menu to allow re-selection of the same property
+		try {
+			const config = await this.buildModuleConfigEmbed(client, moduleName);
+			if (config && interaction.message) {
+				await interaction.message.edit({
+					embeds: [config.embed],
+					components: [config.row],
+				});
+			}
+		} catch (error) {
+			console.error("Failed to reset select menu:", error);
+		}
+
 		const configProperties =
 			(module.options.config as any).configProperties || {};
 		const propertyOptions = configProperties[selectedProperty];
