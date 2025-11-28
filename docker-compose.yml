@@ -20,6 +20,7 @@ services:
   bot:
     build: .
     restart: always
+    image: reg.m1000.fr/leserveur/lebot:latest
     depends_on:
       mariadb:
         condition: service_healthy
