@@ -3,11 +3,11 @@ import { Colors } from "discord.js";
 
 export class SpacerService {
 	/**
-	 * Génère une image de barre de séparation avec un dégradé
-	 * @param color La couleur de base (numéro ou clé de Colors)
-	 * @param width Largeur de l'image (défaut: 500)
-	 * @param height Hauteur de l'image (défaut: 10)
-	 * @returns Buffer de l'image PNG
+	 * Generates a spacer bar image with a gradient
+	 * @param color The base color (number or Colors key)
+	 * @param width Image width (default: 500)
+	 * @param height Image height (default: 10)
+	 * @returns PNG image buffer
 	 */
 	static async generateSpacer(
 		color: number | keyof typeof Colors = Colors.Blurple,
@@ -17,7 +17,7 @@ export class SpacerService {
 		const canvas = new Canvas(width, height);
 		const ctx = canvas.getContext("2d");
 
-		// Résolution de la couleur
+		// Color resolution
 		let colorValue: number;
 		if (typeof color === "string") {
 			if (color in Colors) {
@@ -31,14 +31,14 @@ export class SpacerService {
 
 		const hexColor = "#" + colorValue.toString(16).padStart(6, "0");
 
-		// Création du dégradé (Dark -> Light)
+		// Gradient creation (Dark -> Light)
 		const gradient = ctx.createLinearGradient(0, 0, width, 0);
-		gradient.addColorStop(0, this.adjustBrightness(hexColor, -40)); // Plus sombre au début
-		gradient.addColorStop(1, this.adjustBrightness(hexColor, 20)); // Plus clair à la fin
+		gradient.addColorStop(0, this.adjustBrightness(hexColor, -40)); // Darker at the beginning
+		gradient.addColorStop(1, this.adjustBrightness(hexColor, 20)); // Lighter at the end
 
 		ctx.fillStyle = gradient;
 
-		// Dessin du rectangle arrondi
+		// Drawing the rounded rectangle
 		const radius = height / 2;
 		ctx.beginPath();
 		ctx.moveTo(radius, 0);

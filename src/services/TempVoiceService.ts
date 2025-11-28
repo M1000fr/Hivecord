@@ -76,13 +76,14 @@ export class TempVoiceService {
 		const guild = member.guild;
 		const parent = generator.parent;
 
-		const channelName = `Salon de ${member.displayName}`;
+		const channelName = `${member.displayName}'s Channel`;
 
 		try {
 			const voiceChannel = await guild.channels.create({
 				name: channelName,
 				type: ChannelType.GuildVoice,
 				parent: parent?.id,
+                userLimit: 1,
 				permissionOverwrites: [
 					// Copy permissions from category (Discord does this by default if parent is set, but we want to be explicit about the owner)
 					...(parent?.permissionOverwrites.cache.values() || []),
@@ -133,26 +134,26 @@ export class TempVoiceService {
 				? tempChannel.AllowedUsers.map((u) => `<@${u.userId}>`).join(
 						", ",
 					)
-				: "Aucun";
+				: "None";
 
 		const blockedUsers =
 			tempChannel.BlockedUsers.length > 0
 				? tempChannel.BlockedUsers.map((u) => `<@${u.userId}>`).join(
 						", ",
 					)
-				: "Aucun";
+				: "None";
 
 		return new EmbedBuilder()
-			.setTitle("Interface de gestion du salon")
+			.setTitle("Channel Management Interface")
 			.setDescription(
-				`Bienvenue dans votre salon temporaire <@${tempChannel.ownerId}>.\nUtilisez les boutons ci-dessous pour configurer votre salon.`,
+				`Welcome to your temporary channel <@${tempChannel.ownerId}>.\nUse the buttons below to configure your channel.`,
 			)
 			.setColor("#0099ff")
 			.addFields(
 				{
-					name: "Informations",
-					value: `📝 Nom : ${channel.name}\n👥 Limite : ${
-						channel.userLimit === 0 ? "Illimité" : channel.userLimit
+					name: "Information",
+					value: `📝 Name : ${channel.name}\n👥 Limit : ${
+						channel.userLimit === 0 ? "Unlimited" : channel.userLimit
 					}`,
 					inline: false,
 				},
@@ -199,7 +200,7 @@ export class TempVoiceService {
 		const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder()
 				.setCustomId("temp_voice_rename")
-				.setLabel("Renommer")
+				.setLabel("Rename")
 				.setEmoji("📝")
 				.setStyle(ButtonStyle.Primary),
 			new ButtonBuilder()
@@ -247,7 +248,7 @@ export class TempVoiceService {
 		if (tempChannel.ownerId !== interaction.user.id) {
 			if (interaction.isRepliable()) {
 				await interaction.reply({
-					content: "Vous n'avez pas la permission de gérer ce salon.",
+					content: "You do not have permission to manage this channel.",
 					flags: MessageFlags.Ephemeral,
 				});
 			}
@@ -262,7 +263,7 @@ export class TempVoiceService {
 
 		const nameInput = new TextInputBuilder({
 			customId: "new_name",
-			label: "Nouveau nom",
+			label: "New name",
 			style: TextInputStyle.Short,
 			required: true,
 			maxLength: 100,
@@ -270,7 +271,7 @@ export class TempVoiceService {
 
 		const modal = new ModalBuilder({
 			customId: "temp_voice_rename_modal",
-			title: "Renommer le salon",
+			title: "Rename channel",
 			components: [
 				new ActionRowBuilder<TextInputBuilder>().addComponents(
 					nameInput,
@@ -314,7 +315,7 @@ export class TempVoiceService {
 
 		await interaction.reply({
 			content:
-				"Veuillez mentionner un ou plusieurs utilisateurs (@user1 @user2) dans ce salon pour les ajouter/retirer de la whitelist. (Expire dans 15s)",
+				"Please mention one or more users (@user1 @user2) in this channel to add/remove them from the whitelist. (Expires in 15s)",
 			flags: MessageFlags.Ephemeral,
 		});
 
@@ -336,7 +337,7 @@ export class TempVoiceService {
 			if (targetUsers.size === 0) {
 				await interaction.followUp({
 					content:
-						"Aucun utilisateur mentionné. Veuillez utiliser @mention pour mentionner des utilisateurs.",
+						"No users mentioned. Please use @mention to mention users.",
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -353,7 +354,7 @@ export class TempVoiceService {
 						await interaction.guild!.members.fetch(targetUserId);
 				} catch {
 					results.push(
-						`❌ ${targetUser.username} - Utilisateur introuvable`,
+						`❌ ${targetUser.username} - User not found`,
 					);
 					continue;
 				}
@@ -375,7 +376,7 @@ export class TempVoiceService {
 					await channel.permissionOverwrites.delete(targetUserId);
 
 					results.push(
-						`➖ ${targetMember.displayName} a été retiré de la whitelist`,
+						`➖ ${targetMember.displayName} has been removed from the whitelist`,
 					);
 				} else {
 					// Toggle ON
@@ -408,7 +409,7 @@ export class TempVoiceService {
 					});
 
 					results.push(
-						`✅ ${targetMember.displayName} a été ajouté à la whitelist`,
+						`✅ ${targetMember.displayName} has been added to the whitelist`,
 					);
 				}
 			}
@@ -430,7 +431,7 @@ export class TempVoiceService {
 
 		await interaction.reply({
 			content:
-				"Veuillez mentionner un ou plusieurs utilisateurs (@user1 @user2) dans ce salon pour les ajouter/retirer de la blacklist. (Expire dans 15s)",
+				"Please mention one or more users (@user1 @user2) in this channel to add/remove them from the blacklist. (Expires in 15s)",
 			flags: MessageFlags.Ephemeral,
 		});
 
@@ -452,7 +453,7 @@ export class TempVoiceService {
 			if (targetUsers.size === 0) {
 				await interaction.followUp({
 					content:
-						"Aucun utilisateur mentionné. Veuillez utiliser @mention pour mentionner des utilisateurs.",
+						"No users mentioned. Please use @mention to mention users.",
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -469,7 +470,7 @@ export class TempVoiceService {
 						await interaction.guild!.members.fetch(targetUserId);
 				} catch {
 					results.push(
-						`❌ ${targetUser.username} - Utilisateur introuvable`,
+						`❌ ${targetUser.username} - User not found`,
 					);
 					continue;
 				}
@@ -491,7 +492,7 @@ export class TempVoiceService {
 					await channel.permissionOverwrites.delete(targetUserId);
 
 					results.push(
-						`➖ ${targetMember.displayName} a été retiré de la blacklist`,
+						`➖ ${targetMember.displayName} has been removed from the blacklist`,
 					);
 				} else {
 					// Toggle ON
@@ -528,7 +529,7 @@ export class TempVoiceService {
 						);
 					}
 					results.push(
-						`🔒 ${targetMember.displayName} a été banni du salon`,
+						`🔒 ${targetMember.displayName} has been banned from the channel`,
 					);
 				}
 			}
@@ -551,7 +552,7 @@ export class TempVoiceService {
 		const newName = interaction.fields.getTextInputValue("new_name");
 		await channel.setName(newName);
 		await interaction.reply({
-			content: `Salon renommé en ${newName}`,
+			content: `Channel renamed to ${newName}`,
 			flags: MessageFlags.Ephemeral,
 		});
 		await this.updateControlPanel(channel);
