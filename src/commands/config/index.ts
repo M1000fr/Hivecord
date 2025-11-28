@@ -56,13 +56,6 @@ const CONFIG_DEFINITIONS: ConfigDefinition[] = [
 		enumType: EConfigKey,
 	},
 	{
-		key: EConfigKey.WelcomeBackgroundUrl,
-		type: "string",
-		label: "Welcome Background",
-		description: "Background URL for welcome card",
-		enumType: EConfigKey,
-	},
-	{
 		key: EChannelConfigKey.WelcomeChannelId,
 		type: "channel",
 		label: "Welcome Channel",
