@@ -1,5 +1,8 @@
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "@prisma/client/client";
+import { Logger } from "@src/utils/Logger";
+
+const logger = new Logger("PrismaService");
 
 function extractDatabaseLoginFromEnv(): {
 	username: string;
@@ -39,7 +42,7 @@ async function checkDatabaseConnection() {
 	try {
 		await prismaClient.$connect();
 		await prismaClient.$queryRaw`SELECT 1`;
-		console.log("✅ Connected to Database");
+		logger.log("✅ Database connection established successfully.");
 	} catch (error) {
 		console.error("❌ Database connection failed:", error);
 		process.exit(1);
