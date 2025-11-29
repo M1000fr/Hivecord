@@ -9,6 +9,8 @@ import PurgeCommand from "./commands/purge/index";
 import ClearCommand from "./commands/clear/index";
 import WarnCommand from "./commands/warn/index";
 import UnwarnCommand from "./commands/unwarn/index";
+import LockCommand from "./commands/lock/index";
+import UnlockCommand from "./commands/unlock/index";
 
 @Module({
     name: "Moderation",
@@ -21,7 +23,9 @@ import UnwarnCommand from "./commands/unwarn/index";
         PurgeCommand,
         ClearCommand,
         WarnCommand,
-        UnwarnCommand
+        UnwarnCommand,
+        LockCommand,
+        UnlockCommand
     ],
     events: [],
     config: ModerationConfig
