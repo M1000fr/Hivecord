@@ -57,6 +57,28 @@ export class HeatpointService {
         return result as number;
     }
 
+    static async getHeat(id: string): Promise<number> {
+        const redis = RedisService.getInstance();
+        const decayRateStr = await ConfigService.get(SecurityConfigKeys.heatpointDecayRate);
+        const decayRate = parseInt(decayRateStr || "1", 10);
+        const now = Math.floor(Date.now() / 1000);
+
+        const key_value = `heat:${id}`;
+        const key_time = `heat:${id}:last_update`;
+
+        const currentVal = parseInt(await redis.get(key_value) || "0", 10);
+        const lastTime = parseInt(await redis.get(key_time) || String(now), 10);
+
+        const timeDiff = now - lastTime;
+        let decay = timeDiff * decayRate;
+        if (decay < 0) decay = 0;
+
+        let newVal = currentVal - decay;
+        if (newVal < 0) newVal = 0;
+
+        return newVal;
+    }
+
     static async processAction(guild: Guild, channel: GuildChannel | null, user: User, actionType: string): Promise<void> {
         let points = 0;
 
@@ -79,6 +101,8 @@ export class HeatpointService {
         }
 
         if (points === 0) return;
+
+        this.logger.debug(`Processing heatpoint action '${actionType}' for user ${user.tag} (+${points} points)`);
 
         // User Heat
         const userHeat = await this.addHeat(`user:${user.id}`, points);

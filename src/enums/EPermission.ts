@@ -22,4 +22,5 @@ export enum EPermission {
 	Unlock = "commands.unlock",
 	Unwarn = "commands.unwarn",
 	ReasonManage = "commands.reason.manage",
+	SecurityHeatpoint = "commands.security.heatpoint",
 }
