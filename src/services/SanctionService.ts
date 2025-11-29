@@ -1,12 +1,15 @@
 import { Guild, User, GuildMember } from "discord.js";
 import { prismaClient } from "@services/prismaService";
-import { SanctionType } from '@prisma/client/enums';
+import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
-import { ModerationConfigKeys } from '@modules/Moderation/ModerationConfig';
+import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
 import { LogService } from "@services/LogService";
 
 export class SanctionService {
-	private static async fetchMember(guild: Guild, userId: string): Promise<GuildMember | null> {
+	private static async fetchMember(
+		guild: Guild,
+		userId: string,
+	): Promise<GuildMember | null> {
 		const cached = guild.members.cache.get(userId);
 		if (cached) return cached;
 		try {
@@ -25,10 +28,12 @@ export class SanctionService {
 	}
 
 	private static async getMuteRole(guild: Guild) {
-		const muteRoleId = await ConfigService.getRole(ModerationConfigKeys.muteRoleId);
+		const muteRoleId = await ConfigService.getRole(
+			ModerationConfigKeys.muteRoleId,
+		);
 		if (!muteRoleId) {
 			throw new Error(
-				"Mute role is not configured. Please ask an administrator to configure it using `/config mute-role set`.",
+				"Mute role is not configured. Please ask an administrator to configure it using `/modules module:Moderation`.",
 			);
 		}
 
@@ -47,10 +52,26 @@ export class SanctionService {
 		});
 	}
 
-	private static async deactivateSanction(userId: string, type: SanctionType): Promise<void> {
+	private static async deactivateSanction(
+		userId: string,
+		type: SanctionType,
+	): Promise<void> {
 		await prismaClient.sanction.updateMany({
 			where: { userId, type, active: true },
 			data: { active: false },
+		});
+	}
+
+	private static async deleteSanctionById(id: number): Promise<void> {
+		await prismaClient.sanction.delete({
+			where: { id },
+		});
+	}
+
+	static async getActiveWarns(userId: string) {
+		return await prismaClient.sanction.findMany({
+			where: { userId, type: SanctionType.WARN, active: true },
+			orderBy: { createdAt: "desc" },
 		});
 	}
 	static async mute(
@@ -62,7 +83,11 @@ export class SanctionService {
 		reason: string,
 	): Promise<void> {
 		const activeMute = await prismaClient.sanction.findFirst({
-			where: { userId: targetUser.id, type: SanctionType.MUTE, active: true },
+			where: {
+				userId: targetUser.id,
+				type: SanctionType.MUTE,
+				active: true,
+			},
 		});
 
 		if (activeMute) throw new Error("User is already muted.");
@@ -75,7 +100,7 @@ export class SanctionService {
 
 		await this.sendDM(
 			targetUser,
-			`You have been temporarily muted in ${guild.name} for ${durationString}. Reason: ${reason}`,
+			`You have been temporarily \`muted\` in \`${guild.name}\` for \`${durationString}\`.\nReason: \`${reason}\``,
 		);
 
 		await member.roles.add(muteRole);
@@ -86,7 +111,14 @@ export class SanctionService {
 			reason,
 			new Date(Date.now() + duration),
 		);
-		await LogService.logSanction(guild, targetUser, moderator, "Mute", reason, durationString);
+		await LogService.logSanction(
+			guild,
+			targetUser,
+			moderator,
+			"Mute",
+			reason,
+			durationString,
+		);
 	}
 
 	static async ban(
@@ -97,18 +129,88 @@ export class SanctionService {
 		deleteMessageSeconds: number,
 	): Promise<void> {
 		const activeBan = await prismaClient.sanction.findFirst({
-			where: { userId: targetUser.id, type: SanctionType.BAN, active: true },
+			where: {
+				userId: targetUser.id,
+				type: SanctionType.BAN,
+				active: true,
+			},
 		});
 
 		if (activeBan) throw new Error("User is already banned.");
 
 		const member = await this.fetchMember(guild, targetUser.id);
-		if (member && !member.bannable) throw new Error("I cannot ban this user.");
+		if (member && !member.bannable)
+			throw new Error("I cannot ban this user.");
 
-		await this.sendDM(targetUser, `You have been banned from ${guild.name}. Reason: ${reason}`);
+		await this.sendDM(
+			targetUser,
+			`You have been banned from \`${guild.name}\`.\nReason: \`${reason}\``,
+		);
 		await guild.members.ban(targetUser, { reason, deleteMessageSeconds });
 		await this.logSanction(targetUser, moderator, SanctionType.BAN, reason);
-		await LogService.logSanction(guild, targetUser, moderator, "Ban", reason);
+		await LogService.logSanction(
+			guild,
+			targetUser,
+			moderator,
+			"Ban",
+			reason,
+		);
+	}
+
+	static async warn(
+		guild: Guild,
+		targetUser: User,
+		moderator: User,
+		reason: string,
+	): Promise<void> {
+		await this.sendDM(
+			targetUser,
+			`You have been \`warned\` in \`${guild.name}\`.\nReason: \`${reason}\``,
+		);
+		await this.logSanction(
+			targetUser,
+			moderator,
+			SanctionType.WARN,
+			reason,
+		);
+		await LogService.logSanction(
+			guild,
+			targetUser,
+			moderator,
+			"Warn",
+			reason,
+		);
+	}
+
+	static async unwarn(
+		guild: Guild,
+		targetUser: User,
+		moderator: User,
+		warnId: number,
+	): Promise<void> {
+		const sanction = await prismaClient.sanction.findUnique({
+			where: { id: warnId },
+		});
+		if (
+			!sanction ||
+			sanction.userId !== targetUser.id ||
+			sanction.type !== SanctionType.WARN
+		) {
+			throw new Error("Invalid warning ID.");
+		}
+
+		await this.deleteSanctionById(warnId);
+		await this.sendDM(
+			targetUser,
+			`Your warning \`#${warnId}\` has been removed in \`${guild.name}\`.\nWarn reason: \`${sanction.reason}\``,
+		);
+		await LogService.logSanction(
+			guild,
+			targetUser,
+			moderator,
+			"Unwarn",
+			`Removed warning #${warnId}`,
+		);
 	}
 
 	static async unmute(
@@ -120,9 +222,13 @@ export class SanctionService {
 		if (!member) throw new Error("User not found in this guild.");
 
 		const muteRole = await this.getMuteRole(guild);
-		if (!member.roles.cache.has(muteRole.id)) throw new Error("User is not muted.");
+		if (!member.roles.cache.has(muteRole.id))
+			throw new Error("User is not muted.");
 
-		await this.sendDM(targetUser, `You have been unmuted in ${guild.name}. Reason: ${reason}`);
+		await this.sendDM(
+			targetUser,
+			`You have been \`unmuted\` in \`${guild.name}\`.\nReason: \`${reason}\``,
+		);
 		await member.roles.remove(muteRole, reason);
 		await this.deactivateSanction(targetUser.id, SanctionType.MUTE);
 	}
