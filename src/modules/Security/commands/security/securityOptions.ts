@@ -22,6 +22,30 @@ export const securityOptions: CommandOptions = {
                             required: true
                         }
                     ]
+                },
+                {
+                    name: "reset",
+                    description: "Reset heatpoints",
+                    type: ApplicationCommandOptionType.Subcommand,
+                    options: [
+                        {
+                            name: "target",
+                            description: "What to reset",
+                            type: ApplicationCommandOptionType.String,
+                            required: true,
+                            choices: [
+                                { name: "All Users", value: "all_users" },
+                                { name: "Channel", value: "channel" },
+                                { name: "Server", value: "server" }
+                            ]
+                        },
+                        {
+                            name: "channel",
+                            description: "The channel to reset (if target is channel)",
+                            type: ApplicationCommandOptionType.Channel,
+                            required: false
+                        }
+                    ]
                 }
             ]
         }

@@ -79,6 +79,25 @@ export class HeatpointService {
         return newVal;
     }
 
+    static async resetHeat(id: string): Promise<void> {
+        const redis = RedisService.getInstance();
+        await redis.del(`heat:${id}`);
+        await redis.del(`heat:${id}:last_update`);
+    }
+
+    static async resetAllUserHeat(): Promise<void> {
+        const redis = RedisService.getInstance();
+        let cursor = "0";
+        do {
+            const result = await redis.scan(cursor, "MATCH", "heat:user:*", "COUNT", "100");
+            cursor = result[0];
+            const keys = result[1];
+            if (keys.length > 0) {
+                await redis.del(...keys);
+            }
+        } while (cursor !== "0");
+    }
+
     static async processAction(guild: Guild, channel: GuildChannel | null, user: User, actionType: string): Promise<void> {
         let points = 0;
 

@@ -27,8 +27,42 @@ export default class SecurityCommand extends BaseCommand {
 
 				await interaction.reply({
 					content: `🔥 **Heatpoints for ${user.tag}**: ${Math.round(heat)}`,
-					flags: [MessageFlags.Ephemeral],
+					ephemeral: true,
 				});
+			} else if (subcommand === "reset") {
+				const target = interaction.options.getString("target", true);
+				const guild = interaction.guild;
+				if (!guild) return;
+
+				if (target === "all_users") {
+					await HeatpointService.resetAllUserHeat();
+					await interaction.reply({
+						content: "✅ Reset heatpoints for all users.",
+						ephemeral: true,
+					});
+				} else if (target === "channel") {
+					const channel =
+						interaction.options.getChannel("channel") ||
+						interaction.channel;
+					if (channel) {
+						await HeatpointService.resetHeat(`channel:${channel.id}`);
+						await interaction.reply({
+							content: `✅ Reset heatpoints for channel ${channel.toString()}.`,
+							ephemeral: true,
+						});
+					} else {
+						await interaction.reply({
+							content: "❌ Channel not found.",
+							ephemeral: true,
+						});
+					}
+				} else if (target === "server") {
+					await HeatpointService.resetHeat(`global:${guild.id}`);
+					await interaction.reply({
+						content: "✅ Reset global server heatpoints.",
+						ephemeral: true,
+					});
+				}
 			}
 		}
 	}
