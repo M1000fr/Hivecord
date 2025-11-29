@@ -1,7 +1,7 @@
-import { prismaClient } from "./prismaService";
+import { prismaClient } from "@services/prismaService";
 import { Logger } from '@utils/Logger';
-import type { GroupModel, PermissionModel, RoleModel } from "@prisma/client/models";
-import { RedisService } from "./RedisService";
+import type { GroupModel, RoleModel, PermissionModel } from "@prisma/client/models";
+import { RedisService } from "@services/RedisService";
 
 export class GroupService {
     private static logger = new Logger("GroupService");
