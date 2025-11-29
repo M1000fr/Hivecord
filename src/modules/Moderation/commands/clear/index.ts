@@ -31,16 +31,22 @@ export default class ClearCommand extends BaseCommand {
 		});
 
 		if (fetchedMessages) {
+			const twoWeeksAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
+			const validMessages = fetchedMessages.filter(
+				(msg) => msg.createdTimestamp > twoWeeksAgo,
+			);
+
 			let messagesToDelete;
 			if (user) {
-				messagesToDelete = fetchedMessages
+				messagesToDelete = validMessages
 					.filter((msg) => msg.author.id === user.id)
 					.first(Number(amount));
 			} else {
-				messagesToDelete = fetchedMessages.first(Number(amount));
+				messagesToDelete = validMessages.first(Number(amount));
 			}
 			if (
 				messagesToDelete &&
+				messagesToDelete.length > 0 &&
 				interaction.channel &&
 				"bulkDelete" in interaction.channel
 			) {
