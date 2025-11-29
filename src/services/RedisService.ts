@@ -27,7 +27,8 @@ export class RedisService {
 			await redis.ping();
 			this.logger.log("✅ Connected to Redis");
 		} catch (error) {
-			this.logger.error("❌ Redis connection failed:", error, "RedisService");
+			const trace = error instanceof Error ? error.stack : String(error);
+			this.logger.error("❌ Redis connection failed:", trace, "RedisService");
 			process.exit(1);
 		}
 	}
