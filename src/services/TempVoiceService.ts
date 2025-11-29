@@ -19,9 +19,9 @@ import {
 } from "discord.js";
 import { Button, Modal } from '@decorators/Interaction';
 import { VoiceConfigKeys } from '@modules/Voice/VoiceConfig';
-import { ConfigService } from "./ConfigService";
-import { prismaClient } from "./prismaService";
-import { LogService } from "./LogService";
+import { ConfigService } from "@services/ConfigService";
+import { prismaClient } from "@services/prismaService";
+import { LogService } from "@services/LogService";
 
 type ListType = "whitelist" | "blacklist";
 

@@ -32,6 +32,11 @@ services:
                 condition: service_healthy
             redis:
                 condition: service_started
+        healthcheck:
+            test: ["CMD", "bun", "src/healthcheck.ts"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
         environment:
             DATABASE_URL: mysql://${MYSQL_USER:-lebot_user}:${MYSQL_PASSWORD:-lebot_password}@mariadb:3306/${MYSQL_DATABASE:-lebot_db}
             REDIS_URL: redis://redis:6379

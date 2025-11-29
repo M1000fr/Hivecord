@@ -1,5 +1,5 @@
 import { EmbedBuilder, Guild, User, GuildMember, type PartialGuildMember, VoiceState, Colors, TextChannel, type ColorResolvable } from "discord.js";
-import { ConfigService } from "./ConfigService";
+import { ConfigService } from "@services/ConfigService";
 import { LogConfigKeys } from "@modules/Log/LogConfig";
 
 export class LogService {

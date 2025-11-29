@@ -1,5 +1,5 @@
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import { PrismaClient } from '@prisma/client/client';
+import { PrismaClient } from "@prisma/client/client";
 
 function extractDatabaseLoginFromEnv(): {
 	username: string;
@@ -35,4 +35,15 @@ const adapter = new PrismaMariaDb({
 
 const prismaClient = new PrismaClient({ adapter });
 
-export { prismaClient };
+async function checkDatabaseConnection() {
+	try {
+		await prismaClient.$connect();
+		await prismaClient.$queryRaw`SELECT 1`;
+		console.log("✅ Connected to Database");
+	} catch (error) {
+		console.error("❌ Database connection failed:", error);
+		process.exit(1);
+	}
+}
+
+export { prismaClient, checkDatabaseConnection };
