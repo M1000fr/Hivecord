@@ -3,6 +3,7 @@ import { prismaClient } from "./prismaService";
 import { SanctionType } from '@prisma/client/enums';
 import { ConfigService } from "./ConfigService";
 import { ModerationConfigKeys } from '@modules/Moderation/ModerationConfig';
+import { LogService } from "./LogService";
 
 export class SanctionService {
 	private static async fetchMember(guild: Guild, userId: string): Promise<GuildMember | null> {
@@ -85,6 +86,7 @@ export class SanctionService {
 			reason,
 			new Date(Date.now() + duration),
 		);
+		await LogService.logSanction(guild, targetUser, moderator, "Mute", reason, durationString);
 	}
 
 	static async ban(
@@ -106,6 +108,7 @@ export class SanctionService {
 		await this.sendDM(targetUser, `You have been banned from ${guild.name}. Reason: ${reason}`);
 		await guild.members.ban(targetUser, { reason, deleteMessageSeconds });
 		await this.logSanction(targetUser, moderator, SanctionType.BAN, reason);
+		await LogService.logSanction(guild, targetUser, moderator, "Ban", reason);
 	}
 
 	static async unmute(
