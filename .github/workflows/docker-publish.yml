@@ -25,7 +25,9 @@ jobs:
 
       - name: Generate Prisma Client
         run: bunx prisma generate
-
+        env:
+          DATABASE_URL: "mysql://root:password@localhost:3306/lebot"
+          
       - name: Typecheck
         run: bun run typecheck
 
