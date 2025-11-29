@@ -1,11 +1,6 @@
 import {
 	ChatInputCommandInteraction,
 	Client,
-	EmbedBuilder,
-	ActionRowBuilder,
-	StringSelectMenuBuilder,
-	StringSelectMenuOptionBuilder,
-	ApplicationCommandOptionType,
 	MessageFlags,
 } from "discord.js";
 import { BaseCommand } from '@class/BaseCommand';
@@ -14,13 +9,13 @@ import { DefaultCommand } from '@decorators/DefaultCommand';
 import { EPermission } from '@enums/EPermission';
 import { modulesOptions } from "./modulesOptions";
 import { LeBotClient } from '@class/LeBotClient';
-import { ConfigService } from '@services/ConfigService';
+import { ConfigHelper } from '@utils/ConfigHelper';
 
 @Command(modulesOptions)
 export default class ModulesCommand extends BaseCommand {
 	@DefaultCommand(EPermission.ConfigureModules)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
-		const lebot = client as LeBotClient;
+		const lebot = client as LeBotClient<true>;
 		const moduleName = interaction.options.getString("module", true);
 
 		const module = lebot.modules.get(moduleName.toLowerCase());
@@ -41,89 +36,19 @@ export default class ModulesCommand extends BaseCommand {
 			return;
 		}
 
-		const configClass = module.options.config;
-		const configProperties = (configClass as any).configProperties || {};
+		const config = await ConfigHelper.buildModuleConfigEmbed(lebot, moduleName);
 
-		if (Object.keys(configProperties).length === 0) {
+		if (!config) {
 			await interaction.reply({
-				content: `Module **${module.options.name}** has no configuration properties.`,
+				content: `Failed to build configuration for module **${module.options.name}**.`,
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
-		const embed = new EmbedBuilder()
-			.setTitle(`⚙️ Configuration: ${module.options.name}`)
-			.setDescription(
-				`Select a property to configure for the **${module.options.name}** module.`,
-			)
-			.setColor("#5865F2")
-			.setTimestamp();
-
-		// Add fields for each config property with current values
-		let index = 1;
-		for (const [key, options] of Object.entries(configProperties)) {
-			const opt = options as any;
-			const typeNames: { [key: number]: string } = {
-				[ApplicationCommandOptionType.String]: "Text",
-				[ApplicationCommandOptionType.Role]: "Role",
-				[ApplicationCommandOptionType.Channel]: "Channel",
-				[ApplicationCommandOptionType.User]: "User",
-				[ApplicationCommandOptionType.Integer]: "Number",
-				[ApplicationCommandOptionType.Boolean]: "Boolean",
-			};
-			const typeName = typeNames[opt.type] || "Unknown";
-			
-			// Get current value
-			let currentValue = "*Not set*";
-			try {
-				const snakeCaseKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-				
-				if (opt.type === ApplicationCommandOptionType.Role) {
-					const roleId = await ConfigService.getRole(snakeCaseKey);
-					if (roleId) currentValue = `<@&${roleId}>`;
-				} else if (opt.type === ApplicationCommandOptionType.Channel) {
-					const channelId = await ConfigService.getChannel(snakeCaseKey);
-					if (channelId) currentValue = `<#${channelId}>`;
-				} else {
-					const value = await ConfigService.get(snakeCaseKey);
-					if (value) currentValue = value.length > 100 ? value.substring(0, 97) + "..." : value;
-				}
-			} catch (error) {
-				// Ignore errors, keep "Not set"
-			}
-			
-			embed.addFields({
-				name: `${index}. ${opt.displayName || key}`,
-				value: `${opt.description}\nType: \`${typeName}\`\nCurrent: ${currentValue}`,
-				inline: false,
-			});
-			index++;
-		}
-
-		// Create select menu
-		const selectMenu = new StringSelectMenuBuilder()
-			.setCustomId(`module_config:${moduleName.toLowerCase()}`)
-			.setPlaceholder("Select a property to configure")
-			.addOptions(
-				Object.entries(configProperties).map(([key, options], idx) => {
-					const opt = options as any;
-					return new StringSelectMenuOptionBuilder()
-						.setLabel(`${idx + 1}. ${opt.displayName || key}`)
-						.setDescription(
-							opt.description.substring(0, 100),
-						)
-						.setValue(key);
-				}),
-			);
-
-		const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-			selectMenu,
-		);
-
 		await interaction.reply({
-			embeds: [embed],
-			components: [row],
+			embeds: [config.embed],
+			components: [config.row],
 		});
 	}
 }
