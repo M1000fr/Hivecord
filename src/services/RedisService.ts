@@ -20,4 +20,15 @@ export class RedisService {
 		}
 		return this.instance;
 	}
+
+	public static async checkConnection(): Promise<void> {
+		const redis = this.getInstance();
+		try {
+			await redis.ping();
+			this.logger.log("✅ Connected to Redis");
+		} catch (error) {
+			this.logger.error("❌ Redis connection failed:", error, "RedisService");
+			process.exit(1);
+		}
+	}
 }
