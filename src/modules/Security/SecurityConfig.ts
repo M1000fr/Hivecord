@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from "discord.js";
-import { ConfigProperty } from "@decorators/ConfigProperty";
+import { ConfigProperty, toConfigKey } from "@decorators/ConfigProperty";
 
 export class SecurityConfig {
 	@ConfigProperty({
@@ -124,19 +124,19 @@ export class SecurityConfig {
 }
 
 export const SecurityConfigKeys = {
-	heatpointJoinVoice: "security_heatpoint_join_voice",
-	heatpointSwitchVoice: "security_heatpoint_switch_voice",
-	heatpointStream: "security_heatpoint_stream",
-	heatpointReaction: "security_heatpoint_reaction",
-	heatpointMessage: "security_heatpoint_message",
-	heatpointDecayRate: "security_heatpoint_decay_rate",
-	heatpointChannelThreshold: "security_heatpoint_channel_threshold",
-	heatpointGlobalThreshold: "security_heatpoint_global_threshold",
-	heatpointLockDuration: "security_heatpoint_lock_duration",
-	alertChannelId: "security_alert_channel_id",
-	heatpointUserWarnThreshold: "security_heatpoint_user_warn_threshold",
-	heatpointUserMuteThreshold: "security_heatpoint_user_mute_threshold",
-	heatpointMuteDuration: "security_heatpoint_mute_duration",
-	bypassRoleId: "security_bypass_role_id",
-	heatpointDeleteMessagesLimit: "security_heatpoint_delete_messages_limit",
-};
+	get heatpointJoinVoice() { return toConfigKey("securityHeatpointJoinVoice"); },
+	get heatpointSwitchVoice() { return toConfigKey("securityHeatpointSwitchVoice"); },
+	get heatpointStream() { return toConfigKey("securityHeatpointStream"); },
+	get heatpointReaction() { return toConfigKey("securityHeatpointReaction"); },
+	get heatpointMessage() { return toConfigKey("securityHeatpointMessage"); },
+	get heatpointDecayRate() { return toConfigKey("securityHeatpointDecayRate"); },
+	get heatpointChannelThreshold() { return toConfigKey("securityHeatpointChannelThreshold"); },
+	get heatpointGlobalThreshold() { return toConfigKey("securityHeatpointGlobalThreshold"); },
+	get heatpointLockDuration() { return toConfigKey("securityHeatpointLockDuration"); },
+	get alertChannelId() { return toConfigKey("securityAlertChannelId"); },
+	get heatpointUserWarnThreshold() { return toConfigKey("securityHeatpointUserWarnThreshold"); },
+	get heatpointUserMuteThreshold() { return toConfigKey("securityHeatpointUserMuteThreshold"); },
+	get heatpointMuteDuration() { return toConfigKey("securityHeatpointMuteDuration"); },
+	get bypassRoleId() { return toConfigKey("securityBypassRoleId"); },
+	get heatpointDeleteMessagesLimit() { return toConfigKey("securityHeatpointDeleteMessagesLimit"); },
+} as const;
