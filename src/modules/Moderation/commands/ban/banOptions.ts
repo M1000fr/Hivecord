@@ -16,6 +16,7 @@ export const banOptions: CommandOptions = {
 			description: "Reason for the ban",
 			type: ApplicationCommandOptionType.String,
 			required: false,
+			autocomplete: true,
 		},
 		{
 			name: "delete_messages",

@@ -38,28 +38,26 @@ export default class TempMuteCommand extends BaseCommand {
 	@BotPermission(PermissionsBitField.Flags.ManageRoles)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const user = interaction.options.getUser("user", true);
-		const durationString = interaction.options.getString("duration");
-		const reason =
-			interaction.options.getString("reason") || "No reason provided";
+		const reason = interaction.options.getString("reason", true);
 
-        let finalDurationString = durationString;
+		let finalDurationString: string | undefined;
 
-        if (!finalDurationString) {
-            const reasons = await SanctionReasonService.getByType(SanctionType.MUTE);
-            const reasonObj = reasons.find(r => r.text === reason);
-            if (reasonObj && reasonObj.duration) {
-                finalDurationString = reasonObj.duration;
-            }
-        }
+		const reasons = await SanctionReasonService.getByType(
+			SanctionType.MUTE,
+		);
+		const reasonObj = reasons.find((r) => r.text === reason);
+		if (reasonObj && reasonObj.duration) {
+			finalDurationString = reasonObj.duration;
+		}
 
-        if (!finalDurationString) {
+		if (!finalDurationString) {
 			await interaction.reply({
 				content:
-					"You must provide a duration or select a reason with a default duration.",
+					"You must select a predefined reason with a duration.",
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
-        }
+		}
 
 		const duration = DurationParser.parse(finalDurationString);
 		if (!duration) {
