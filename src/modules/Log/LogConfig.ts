@@ -15,7 +15,7 @@ export class LogConfig {
         type: ApplicationCommandOptionType.Boolean,
         defaultValue: false,
     })
-    enableSanctionLogs: boolean = false;
+    logEnableSanctionLogs: boolean = false;
 
     @ConfigProperty({
         displayName: "Enable Voice Logs",
@@ -23,7 +23,7 @@ export class LogConfig {
         type: ApplicationCommandOptionType.Boolean,
         defaultValue: false,
     })
-    enableVoiceLogs: boolean = false;
+    logEnableVoiceLogs: boolean = false;
 
     @ConfigProperty({
         displayName: "Enable Member Logs",
@@ -31,7 +31,7 @@ export class LogConfig {
         type: ApplicationCommandOptionType.Boolean,
         defaultValue: false,
     })
-    enableMemberLogs: boolean = false;
+    logEnableMemberLogs: boolean = false;
 
     @ConfigProperty({
         displayName: "Enable Voice Connection Logs",
@@ -39,13 +39,13 @@ export class LogConfig {
         type: ApplicationCommandOptionType.Boolean,
         defaultValue: false,
     })
-    enableVoiceConnectionLogs: boolean = false;
+    logEnableVoiceConnectionLogs: boolean = false;
 }
 
 export const LogConfigKeys = {
     get logChannelId() { return toConfigKey('logChannelId'); },
-    get enableSanctionLogs() { return toConfigKey('enableSanctionLogs'); },
-    get enableVoiceLogs() { return toConfigKey('enableVoiceLogs'); },
-    get enableMemberLogs() { return toConfigKey('enableMemberLogs'); },
-    get enableVoiceConnectionLogs() { return toConfigKey('enableVoiceConnectionLogs'); },
+    get enableSanctionLogs() { return toConfigKey('logEnableSanctionLogs'); },
+    get enableVoiceLogs() { return toConfigKey('logEnableVoiceLogs'); },
+    get enableMemberLogs() { return toConfigKey('logEnableMemberLogs'); },
+    get enableVoiceConnectionLogs() { return toConfigKey('logEnableVoiceConnectionLogs'); },
 } as const;

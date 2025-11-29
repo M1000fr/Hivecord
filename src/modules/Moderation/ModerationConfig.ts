@@ -7,9 +7,9 @@ export class ModerationConfig {
         description: "The role to give to muted users",
         type: ApplicationCommandOptionType.Role,
     })
-    muteRoleId: string = "";
+    moderationMuteRoleId: string = "";
 }
 
 export const ModerationConfigKeys = {
-    get muteRoleId() { return toConfigKey('muteRoleId'); },
+    get muteRoleId() { return toConfigKey('moderationMuteRoleId'); },
 } as const;

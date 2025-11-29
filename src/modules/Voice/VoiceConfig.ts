@@ -7,9 +7,9 @@ export class VoiceConfig {
         description: "The channel ID for the temporary voice channel generator",
         type: ApplicationCommandOptionType.Channel,
     })
-    tempVoiceGeneratorChannelId: string = "";
+    voiceTempVoiceGeneratorChannelId: string = "";
 }
 
 export const VoiceConfigKeys = {
-    get tempVoiceGeneratorChannelId() { return toConfigKey('tempVoiceGeneratorChannelId'); },
+    get tempVoiceGeneratorChannelId() { return toConfigKey('voiceTempVoiceGeneratorChannelId'); },
 } as const;
