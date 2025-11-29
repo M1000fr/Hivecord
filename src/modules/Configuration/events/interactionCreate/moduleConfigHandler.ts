@@ -13,6 +13,8 @@ import {
 	RoleSelectMenuBuilder,
 	ChannelSelectMenuBuilder,
 	type Message,
+	ButtonBuilder,
+	ButtonStyle,
 } from "discord.js";
 import { BaseEvent } from '@class/BaseEvent';
 import { Event } from '@decorators/Event';
@@ -187,6 +189,10 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			await this.updateConfig(client, interaction, moduleName, propertyKey, interaction.values[0], ApplicationCommandOptionType.Channel);
 		} else if (interaction.isModalSubmit() && action === "module_config_modal" && moduleName && propertyKey) {
 			await this.updateConfig(client, interaction, moduleName, propertyKey, interaction.fields.getTextInputValue("value"), ApplicationCommandOptionType.String);
+		} else if (interaction.isButton() && action === "module_config_bool" && moduleName && propertyKey) {
+			const value = ConfigHelper.parseCustomId(interaction.customId)[3];
+			if (!value) return;
+			await this.updateConfig(client, interaction, moduleName, propertyKey, value, ApplicationCommandOptionType.Boolean);
 		}
 	}
 
@@ -248,6 +254,28 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		await interaction.showModal(modal);
 	}
 
+	private async handleBooleanProperty(interaction: any, propertyOptions: any, selectedProperty: string, moduleName: string) {
+		const currentValue = await this.getCurrentValue(selectedProperty, propertyOptions.type);
+		const embed = this.buildPropertyEmbed(propertyOptions, selectedProperty, currentValue);
+
+		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder()
+				.setCustomId(ConfigHelper.buildCustomId(["module_config_bool", moduleName, selectedProperty, "true"]))
+				.setLabel("Enable")
+				.setStyle(ButtonStyle.Success),
+			new ButtonBuilder()
+				.setCustomId(ConfigHelper.buildCustomId(["module_config_bool", moduleName, selectedProperty, "false"]))
+				.setLabel("Disable")
+				.setStyle(ButtonStyle.Danger),
+		);
+
+		await interaction.reply({
+			embeds: [embed],
+			components: [row],
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
+
 	private async handlePropertySelection(client: LeBotClient<true>, interaction: any, moduleName: string) {
 		const module = client.modules.get(moduleName.toLowerCase());
 		if (!module?.options.config) {
@@ -277,6 +305,8 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		
 		if (isRoleOrChannel) {
 			await this.handleRoleOrChannelProperty(interaction, propertyOptions, selectedProperty, moduleName);
+		} else if (propertyOptions.type === ApplicationCommandOptionType.Boolean) {
+			await this.handleBooleanProperty(interaction, propertyOptions, selectedProperty, moduleName);
 		} else {
 			await this.handleTextProperty(interaction, propertyOptions, selectedProperty, moduleName);
 		}
