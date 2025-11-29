@@ -81,7 +81,7 @@ export class HeatpointService {
 
         // User Heat
         const userHeat = await this.addHeat(`user:${user.id}`, points);
-        await this.handleUserSanction(guild, user, userHeat);
+        await this.handleUserSanction(guild, user, userHeat, channel);
 
         // Channel Heat
         if (channel) {
@@ -102,51 +102,107 @@ export class HeatpointService {
         }
     }
 
-    private static async handleUserSanction(guild: Guild, user: User, heat: number): Promise<void> {
-        const warnThreshold = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointUserWarnThreshold) || "50", 10);
-        const muteThreshold = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointUserMuteThreshold) || "80", 10);
-        const configMuteDuration = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointMuteDuration) || "3600", 10);
+    private static async handleUserSanction(
+		guild: Guild,
+		user: User,
+		heat: number,
+		channel: GuildChannel | null,
+	): Promise<void> {
+		const warnThreshold = parseInt(
+			(await ConfigService.get(
+				SecurityConfigKeys.heatpointUserWarnThreshold,
+			)) || "50",
+			10,
+		);
+		const muteThreshold = parseInt(
+			(await ConfigService.get(
+				SecurityConfigKeys.heatpointUserMuteThreshold,
+			)) || "80",
+			10,
+		);
+		const configMuteDuration = parseInt(
+			(await ConfigService.get(
+				SecurityConfigKeys.heatpointMuteDuration,
+			)) || "3600",
+			10,
+		);
+		const deleteMessagesLimit = parseInt(
+			(await ConfigService.get(
+				SecurityConfigKeys.heatpointDeleteMessagesLimit,
+			)) || "50",
+			10,
+		);
 
-        const redis = RedisService.getInstance();
-        const warnedKey = `warned:${guild.id}:${user.id}`;
-        const processingKey = `processing:sanction:${guild.id}:${user.id}`;
+		const redis = RedisService.getInstance();
+		const warnedKey = `warned:${guild.id}:${user.id}`;
+		const processingKey = `processing:sanction:${guild.id}:${user.id}`;
 
-        // Prevent spamming actions by checking a short-lived lock
-        if (await redis.get(processingKey)) return;
+		// Prevent spamming actions by checking a short-lived lock
+		if (await redis.get(processingKey)) return;
 
-        if (heat >= muteThreshold) {
-            // Set processing lock
-            await redis.set(processingKey, "true", "EX", 10);
+		if (heat >= muteThreshold) {
+			// Set processing lock
+			await redis.set(processingKey, "true", "EX", 10);
 
-            try {
-                const moderator = guild.client.user;
-                if (moderator) {
-                    const reasonObj = await SanctionReasonService.getOrCreateSystemReason(
-                        "HEATPOINT_MUTE",
-                        "Excessive activity (Heatpoint threshold exceeded)",
-                        SanctionType.MUTE,
-                        "1h"
-                    );
+			try {
+				const moderator = guild.client.user;
+				if (moderator) {
+					const reasonObj =
+						await SanctionReasonService.getOrCreateSystemReason(
+							"HEATPOINT_MUTE",
+							"Excessive activity (Heatpoint threshold exceeded)",
+							SanctionType.MUTE,
+							"1h",
+						);
 
-                    const durationStr = reasonObj.duration || "1h";
-                    const durationMs = DurationParser.parse(durationStr) || (configMuteDuration * 1000);
+					const durationStr = reasonObj.duration || "1h";
+					const durationMs =
+						DurationParser.parse(durationStr) ||
+						configMuteDuration * 1000;
 
-                    await SanctionService.mute(
-                        guild,
-                        user,
-                        moderator,
-                        durationMs,
-                        durationStr,
-                        reasonObj.text
-                    );
-                    this.logger.log(`Muted user ${user.tag} for excessive heat.`);
-                }
-            } catch (error: any) {
-                if (error.message !== "User is already muted.") {
-                    this.logger.error(`Failed to mute user ${user.tag}: ${error.message}`);
-                }
-            }
-        } else if (heat >= warnThreshold) {
+					await SanctionService.mute(
+						guild,
+						user,
+						moderator,
+						durationMs,
+						durationStr,
+						reasonObj.text,
+					);
+					this.logger.log(
+						`Muted user ${user.tag} for excessive heat.`,
+					);
+
+					// Delete recent messages if channel is text-based
+					if (channel && channel.isTextBased()) {
+						try {
+							const textChannel = channel as TextChannel; // or other text based channels
+							const messages = await textChannel.messages.fetch({
+								limit: deleteMessagesLimit,
+							});
+							const userMessages = messages.filter(
+								(m) => m.author.id === user.id,
+							);
+							if (userMessages.size > 0) {
+								await textChannel.bulkDelete(userMessages);
+								this.logger.log(
+									`Deleted ${userMessages.size} messages from ${user.tag} in ${channel.name}.`,
+								);
+							}
+						} catch (delError: any) {
+							this.logger.error(
+								`Failed to delete messages for ${user.tag}: ${delError.message}`,
+							);
+						}
+					}
+				}
+			} catch (error: any) {
+				if (error.message !== "User is already muted.") {
+					this.logger.error(
+						`Failed to mute user ${user.tag}: ${error.message}`,
+					);
+				}
+			}
+		} else if (heat >= warnThreshold) {
             const alreadyWarned = await redis.get(warnedKey);
             if (!alreadyWarned) {
                 // Set processing lock

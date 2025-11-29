@@ -113,6 +113,14 @@ export class SecurityConfig {
 		required: false,
 	})
 	bypassRoleId: string | null = null;
+
+	@ConfigProperty({
+		description: "Number of messages to check for deletion when sanctioning",
+		displayName: "Delete Messages Limit",
+		type: ApplicationCommandOptionType.Integer,
+		defaultValue: 50,
+	})
+	heatpointDeleteMessagesLimit: number = 50;
 }
 
 export const SecurityConfigKeys = {
@@ -130,4 +138,5 @@ export const SecurityConfigKeys = {
 	heatpointUserMuteThreshold: "security_heatpoint_user_mute_threshold",
 	heatpointMuteDuration: "security_heatpoint_mute_duration",
 	bypassRoleId: "security_bypass_role_id",
+	heatpointDeleteMessagesLimit: "security_heatpoint_delete_messages_limit",
 };
