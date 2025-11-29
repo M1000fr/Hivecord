@@ -91,7 +91,14 @@ export class HeatpointService {
             const channelHeat = await this.addHeat(`channel:${channel.id}`, points);
             const channelThreshold = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointChannelThreshold) || "100", 10);
 
-            if (channelHeat > channelThreshold) {
+            // Track unique users in channel
+            const redis = RedisService.getInstance();
+            const channelUsersKey = `channel_users:${channel.id}`;
+            await redis.sadd(channelUsersKey, user.id);
+            await redis.expire(channelUsersKey, 60); // Expire after 60 seconds (sliding window)
+            const uniqueUsers = await redis.scard(channelUsersKey);
+
+            if (channelHeat > channelThreshold && uniqueUsers >= 3) {
                 await this.lockChannel(channel);
             }
         }
