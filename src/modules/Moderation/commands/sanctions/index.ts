@@ -130,7 +130,7 @@ export default class SanctionsCommand extends BaseCommand {
 
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            await interaction.reply({ content: "Failed to add reason. It might already exist.", ephemeral: true });
+            await interaction.reply({ content: "Failed to add reason. It might already exist.", flags: [MessageFlags.Ephemeral] });
         }
     }
 
@@ -141,19 +141,19 @@ export default class SanctionsCommand extends BaseCommand {
         const duration = interaction.options.getString("duration");
 
         if (!text && !duration) {
-            await interaction.reply({ content: "You must provide at least one field to update.", ephemeral: true });
+            await interaction.reply({ content: "You must provide at least one field to update.", flags: [MessageFlags.Ephemeral] });
             return;
         }
 
         try {
             const reason = await SanctionReasonService.getById(id);
             if (!reason) {
-                await interaction.reply({ content: `Reason with ID ${id} not found.`, ephemeral: true });
+                await interaction.reply({ content: `Reason with ID ${id} not found.`, flags: [MessageFlags.Ephemeral] });
                 return;
             }
 
             if (reason.isSystem) {
-                await interaction.reply({ content: "Cannot edit system reasons.", ephemeral: true });
+                await interaction.reply({ content: "Cannot edit system reasons.", flags: [MessageFlags.Ephemeral] });
                 return;
             }
 
@@ -162,9 +162,9 @@ export default class SanctionsCommand extends BaseCommand {
                 duration: duration || undefined,
             });
 
-            await interaction.reply({ content: `Reason with ID ${id} updated.`, ephemeral: true });
+            await interaction.reply({ content: `Reason with ID ${id} updated.`, flags: [MessageFlags.Ephemeral] });
         } catch (error) {
-            await interaction.reply({ content: `Failed to update reason with ID ${id}.`, ephemeral: true });
+            await interaction.reply({ content: `Failed to update reason with ID ${id}.`, flags: [MessageFlags.Ephemeral] });
         }
     }
 
@@ -174,9 +174,9 @@ export default class SanctionsCommand extends BaseCommand {
 
         try {
             await SanctionReasonService.delete(id);
-            await interaction.reply({ content: `Reason with ID ${id} removed.`, ephemeral: true });
+            await interaction.reply({ content: `Reason with ID ${id} removed.`, flags: [MessageFlags.Ephemeral] });
         } catch (error) {
-            await interaction.reply({ content: `Failed to remove reason with ID ${id}.`, ephemeral: true });
+            await interaction.reply({ content: `Failed to remove reason with ID ${id}.`, flags: [MessageFlags.Ephemeral] });
         }
     }
 
@@ -190,7 +190,7 @@ export default class SanctionsCommand extends BaseCommand {
             : await SanctionReasonService.getAll();
 
         if (reasons.length === 0) {
-            await interaction.reply({ content: "No reasons found.", ephemeral: true });
+            await interaction.reply({ content: "No reasons found.", flags: [MessageFlags.Ephemeral] });
             return;
         }
 

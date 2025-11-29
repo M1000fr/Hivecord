@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, PermissionsBitField, TextChannel, GuildChannel } from "discord.js";
+import { ChatInputCommandInteraction, Client, PermissionsBitField, TextChannel, GuildChannel, MessageFlags } from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
@@ -20,7 +20,7 @@ export default class UnlockCommand extends BaseCommand {
         if (target === "channel") {
             const channel = interaction.channel;
             if (!channel || !('permissionOverwrites' in channel)) {
-                return interaction.reply({ content: "This channel cannot be unlocked.", ephemeral: true });
+                return interaction.reply({ content: "This channel cannot be unlocked.", flags: [MessageFlags.Ephemeral] });
             }
 
             await (channel as TextChannel).permissionOverwrites.edit(guild.roles.everyone, {
@@ -30,7 +30,7 @@ export default class UnlockCommand extends BaseCommand {
             await interaction.reply({ content: `🔓 Channel unlocked. Reason: ${reason}` });
         } else if (target === "server") {
             if (!interaction.memberPermissions?.has(PermissionsBitField.Flags.Administrator)) {
-                 return interaction.reply({ content: "You need Administrator permission to unlock the server.", ephemeral: true });
+                 return interaction.reply({ content: "You need Administrator permission to unlock the server.", flags: [MessageFlags.Ephemeral] });
             }
 
             const everyoneRole = guild.roles.everyone;
