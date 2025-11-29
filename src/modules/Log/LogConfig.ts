@@ -13,29 +13,33 @@ export class LogConfig {
         displayName: "Enable Sanction Logs",
         description: "Enable logs for sanctions (ban, mute, etc.)",
         type: ApplicationCommandOptionType.Boolean,
+        defaultValue: false,
     })
-    enableSanctionLogs: boolean = true;
+    enableSanctionLogs: boolean = false;
 
     @ConfigProperty({
         displayName: "Enable Voice Logs",
         description: "Enable logs for private voice channels (create, whitelist, blacklist)",
         type: ApplicationCommandOptionType.Boolean,
+        defaultValue: false,
     })
-    enableVoiceLogs: boolean = true;
+    enableVoiceLogs: boolean = false;
 
     @ConfigProperty({
         displayName: "Enable Member Logs",
         description: "Enable logs for member join/leave",
         type: ApplicationCommandOptionType.Boolean,
+        defaultValue: false,
     })
-    enableMemberLogs: boolean = true;
+    enableMemberLogs: boolean = false;
 
     @ConfigProperty({
         displayName: "Enable Voice Connection Logs",
         description: "Enable logs for voice connection/disconnection/stream",
         type: ApplicationCommandOptionType.Boolean,
+        defaultValue: false,
     })
-    enableVoiceConnectionLogs: boolean = true;
+    enableVoiceConnectionLogs: boolean = false;
 }
 
 export const LogConfigKeys = {

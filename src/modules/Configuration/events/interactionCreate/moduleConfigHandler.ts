@@ -20,6 +20,8 @@ import { LeBotClient } from '@class/LeBotClient';
 import { InteractionHelper } from '@utils/InteractionHelper';
 import { ConfigHelper } from '@utils/ConfigHelper';
 
+import { ConfigService } from "@services/ConfigService";
+
 @Event({
 	name: Events.InteractionCreate,
 })
@@ -52,6 +54,23 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		try {
 			await ConfigHelper.saveValue(propertyKey, value, type);
 			const displayValue = ConfigHelper.formatValue(value, type);
+
+			// Special logic for Log module
+			if (moduleName.toLowerCase() === "log" && propertyKey === "logChannelId") {
+				const logKeys = [
+					"enable_sanction_logs",
+					"enable_voice_logs",
+					"enable_member_logs",
+					"enable_voice_connection_logs",
+				];
+
+				for (const key of logKeys) {
+					const currentValue = await ConfigService.get(key);
+					if (currentValue === null) {
+						await ConfigService.set(key, "true");
+					}
+				}
+			}
 
 			await InteractionHelper.respondSuccess(
 				interaction, 
