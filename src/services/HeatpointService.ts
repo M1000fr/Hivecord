@@ -57,6 +57,47 @@ export class HeatpointService {
         return result as number;
     }
 
+    static async getHeat(id: string): Promise<number> {
+        const redis = RedisService.getInstance();
+        const decayRateStr = await ConfigService.get(SecurityConfigKeys.heatpointDecayRate);
+        const decayRate = parseInt(decayRateStr || "1", 10);
+        const now = Math.floor(Date.now() / 1000);
+
+        const key_value = `heat:${id}`;
+        const key_time = `heat:${id}:last_update`;
+
+        const currentVal = parseInt(await redis.get(key_value) || "0", 10);
+        const lastTime = parseInt(await redis.get(key_time) || String(now), 10);
+
+        const timeDiff = now - lastTime;
+        let decay = timeDiff * decayRate;
+        if (decay < 0) decay = 0;
+
+        let newVal = currentVal - decay;
+        if (newVal < 0) newVal = 0;
+
+        return newVal;
+    }
+
+    static async resetHeat(id: string): Promise<void> {
+        const redis = RedisService.getInstance();
+        await redis.del(`heat:${id}`);
+        await redis.del(`heat:${id}:last_update`);
+    }
+
+    static async resetAllUserHeat(): Promise<void> {
+        const redis = RedisService.getInstance();
+        let cursor = "0";
+        do {
+            const result = await redis.scan(cursor, "MATCH", "heat:user:*", "COUNT", "100");
+            cursor = result[0];
+            const keys = result[1];
+            if (keys.length > 0) {
+                await redis.del(...keys);
+            }
+        } while (cursor !== "0");
+    }
+
     static async processAction(guild: Guild, channel: GuildChannel | null, user: User, actionType: string): Promise<void> {
         let points = 0;
 
@@ -80,11 +121,17 @@ export class HeatpointService {
 
         if (points === 0) return;
 
+        this.logger.debug(`Processing heatpoint action '${actionType}' for user ${user.tag} (+${points} points)`);
+
         // User Heat
         const userHeat = await this.addHeat(`user:${user.id}`, points);
+        this.logger.debug(`User ${user.tag} heat: ${userHeat}`);
         const userSanctioned = await this.handleUserSanction(guild, user, userHeat, channel);
 
-        if (userSanctioned) return;
+        if (userSanctioned) {
+            this.logger.debug(`User ${user.tag} sanctioned, stopping propagation.`);
+            return;
+        }
 
         // Channel Heat
         if (channel) {
@@ -98,6 +145,8 @@ export class HeatpointService {
             await redis.expire(channelUsersKey, 60); // Expire after 60 seconds (sliding window)
             const uniqueUsers = await redis.scard(channelUsersKey);
 
+            this.logger.debug(`Channel ${channel.name} heat: ${channelHeat}/${channelThreshold} (Unique users: ${uniqueUsers})`);
+
             if (channelHeat > channelThreshold && uniqueUsers >= 3) {
                 await this.lockChannel(channel);
             }
@@ -106,6 +155,8 @@ export class HeatpointService {
         // Global Heat
         const globalHeat = await this.addHeat(`global:${guild.id}`, points);
         const globalThreshold = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointGlobalThreshold) || "500", 10);
+
+        this.logger.debug(`Global heat: ${globalHeat}/${globalThreshold}`);
 
         if (globalHeat > globalThreshold) {
             await this.lockServer(guild);

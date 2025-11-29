@@ -83,6 +83,16 @@ export class SanctionService {
 		durationString: string,
 		reason: string,
 	): Promise<void> {
+		const member = await this.fetchMember(guild, targetUser.id);
+		if (!member) throw new Error("User not found in this guild.");
+		if (!member.moderatable) throw new Error("I cannot mute this user.");
+
+		const muteRole = await this.getMuteRole(guild);
+
+		if (member.roles.cache.has(muteRole.id)) {
+			throw new Error("User is already muted.");
+		}
+
 		const activeMute = await prismaClient.sanction.findFirst({
 			where: {
 				userId: targetUser.id,
@@ -91,13 +101,10 @@ export class SanctionService {
 			},
 		});
 
-		if (activeMute) throw new Error("User is already muted.");
-
-		const member = await this.fetchMember(guild, targetUser.id);
-		if (!member) throw new Error("User not found in this guild.");
-		if (!member.moderatable) throw new Error("I cannot mute this user.");
-
-		const muteRole = await this.getMuteRole(guild);
+		if (activeMute) {
+			// Stale record (User has no role but DB says active). Deactivate it.
+			await this.deactivateSanction(targetUser.id, SanctionType.MUTE);
+		}
 
 		await this.sendDM(
 			targetUser,
