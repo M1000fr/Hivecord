@@ -217,7 +217,6 @@ export class SanctionService {
 	static async unmute(
 		guild: Guild,
 		targetUser: User,
-		reason: string,
 	): Promise<void> {
 		const member = await this.fetchMember(guild, targetUser.id);
 		if (!member) throw new Error("User not found in this guild.");
@@ -228,9 +227,9 @@ export class SanctionService {
 
 		await this.sendDM(
 			targetUser,
-			`You have been \`unmuted\` in \`${guild.name}\`.\nReason: \`${reason}\``,
+			`You have been \`unmuted\` in \`${guild.name}\`.`,
 		);
-		await member.roles.remove(muteRole, reason);
+		await member.roles.remove(muteRole);
 		await this.deactivateSanction(targetUser.id, SanctionType.MUTE);
 	}
 
