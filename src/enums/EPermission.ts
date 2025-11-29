@@ -17,4 +17,7 @@ export enum EPermission {
 	ChannelPurge = "commands.purge",
 	ConfigureModules = "commands.modules",
 	Debug = "commands.debug",
+	Warn = "commands.warn",
+	Unwarn = "commands.unwarn",
+	ReasonManage = "commands.reason.manage",
 }

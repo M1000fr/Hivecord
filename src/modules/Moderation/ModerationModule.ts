@@ -7,6 +7,8 @@ import UnmuteCommand from "./commands/unmute/index";
 import SanctionsCommand from "./commands/sanctions/index";
 import PurgeCommand from "./commands/purge/index";
 import ClearCommand from "./commands/clear/index";
+import WarnCommand from "./commands/warn/index";
+import UnwarnCommand from "./commands/unwarn/index";
 
 @Module({
     name: "Moderation",
@@ -17,8 +19,11 @@ import ClearCommand from "./commands/clear/index";
         UnmuteCommand,
         SanctionsCommand,
         PurgeCommand,
-        ClearCommand
+        ClearCommand,
+        WarnCommand,
+        UnwarnCommand
     ],
+    events: [],
     config: ModerationConfig
 })
 export class ModerationModule {}

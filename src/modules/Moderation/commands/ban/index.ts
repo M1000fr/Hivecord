@@ -3,17 +3,42 @@ import {
 	Client,
 	MessageFlags,
 	PermissionsBitField,
+	AutocompleteInteraction,
 } from "discord.js";
-import { BaseCommand } from '@class/BaseCommand';
-import { Command } from '@decorators/Command';
-import { DefaultCommand } from '@decorators/DefaultCommand';
-import { EPermission } from '@enums/EPermission';
+import { BaseCommand } from "@class/BaseCommand";
+import { Command } from "@decorators/Command";
+import { DefaultCommand } from "@decorators/DefaultCommand";
+import { Autocomplete } from "@decorators/Autocomplete";
+import { EPermission } from "@enums/EPermission";
 import { banOptions } from "./banOptions";
-import { BotPermission } from '@decorators/BotPermission';
-import { SanctionService } from '@services/SanctionService';
+import { BotPermission } from "@decorators/BotPermission";
+import { SanctionService } from "@services/SanctionService";
+import { SanctionReasonService } from "@services/SanctionReasonService";
+import { SanctionType } from "@prisma/client/client";
 
 @Command(banOptions)
 export default class BanCommand extends BaseCommand {
+	@Autocomplete({ optionName: "reason" })
+	async autocompleteReason(
+		client: Client,
+		interaction: AutocompleteInteraction,
+	) {
+		const focusedOption = interaction.options.getFocused(true);
+		const reasons = await SanctionReasonService.getByType(
+			SanctionType.BAN,
+			false,
+		);
+		const filtered = reasons
+			.filter((r) =>
+				r.text
+					.toLowerCase()
+					.includes(focusedOption.value.toLowerCase()),
+			)
+			.map((r) => ({ name: r.text, value: r.text }))
+			.slice(0, 25);
+		await interaction.respond(filtered);
+	}
+
 	@DefaultCommand(EPermission.Ban)
 	@BotPermission(PermissionsBitField.Flags.BanMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {

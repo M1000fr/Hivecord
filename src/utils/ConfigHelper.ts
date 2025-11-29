@@ -89,7 +89,7 @@ export class ConfigHelper {
             embed.addFields({
                 name: `${idx + 1}. ${opt.displayName || key}`,
                 value: `${opt.description}\nType: \`${TYPE_NAMES[opt.type as ApplicationCommandOptionType] || "Unknown"}\`\nCurrent: ${currentValue}`,
-                inline: false,
+                inline: true,
             });
         }
 

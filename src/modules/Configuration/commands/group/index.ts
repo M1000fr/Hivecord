@@ -1,7 +1,8 @@
-import { ChatInputCommandInteraction, Client, EmbedBuilder, Colors } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder, Colors, AutocompleteInteraction } from "discord.js";
 import { BaseCommand } from '@class/BaseCommand';
 import { Command } from '@decorators/Command';
 import { Subcommand } from '@decorators/Subcommand';
+import { Autocomplete } from '@decorators/Autocomplete';
 import { EPermission } from '@enums/EPermission';
 import { groupOptions } from "./groupOptions";
 import { GroupService } from '@services/GroupService';
@@ -10,6 +11,66 @@ import { Pager } from '@class/Pager';
 
 @Command(groupOptions)
 export default class GroupCommand extends BaseCommand {
+    @Autocomplete({ optionName: "name" })
+    @Autocomplete({ optionName: "group" })
+    async autocompleteGroup(client: Client, interaction: AutocompleteInteraction) {
+        const focusedValue = interaction.options.getFocused().toLowerCase();
+        const groups = await GroupService.listGroups();
+        
+        const filtered = groups
+            .filter(g => g.name.toLowerCase().includes(focusedValue))
+            .map(g => ({
+                name: g.name,
+                value: g.name
+            }))
+            .slice(0, 25);
+            
+        await interaction.respond(filtered);
+    }
+
+    @Autocomplete({ optionName: "permission" })
+    async autocompletePermission(client: Client, interaction: AutocompleteInteraction) {
+        const focusedValue = interaction.options.getFocused().toLowerCase();
+        const subcommandGroup = interaction.options.getSubcommandGroup();
+        const subcommand = interaction.options.getSubcommand();
+        const groupName = interaction.options.getString("group");
+
+        let permissions: string[] = [];
+
+        if (subcommandGroup === "permissions") {
+            if (groupName) {
+                const group = await GroupService.getGroup(groupName);
+                if (group) {
+                    const groupPermissions = group.Permissions.map(
+                        (p) => p.Permissions.name,
+                    );
+
+                    if (subcommand === "add") {
+                        permissions = Object.values(EPermission).filter(
+                            (p) => !groupPermissions.includes(p),
+                        );
+                    } else if (subcommand === "remove") {
+                        permissions = groupPermissions;
+                    }
+                } else if (subcommand === "add") {
+                    permissions = Object.values(EPermission);
+                }
+            } else if (subcommand === "add") {
+                permissions = Object.values(EPermission);
+            }
+        }
+
+        const filtered = permissions
+            .filter((p) => p.toLowerCase().includes(focusedValue))
+            .map((p) => ({
+                name: p,
+                value: p,
+            }))
+            .slice(0, 25);
+
+        await interaction.respond(filtered);
+    }
+
     private async sendGroupEmbed(interaction: ChatInputCommandInteraction, groupName: string, title: string) {
         const group = await GroupService.getGroup(groupName);
         if (!group) return;

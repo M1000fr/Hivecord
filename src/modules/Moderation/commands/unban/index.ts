@@ -18,15 +18,13 @@ export default class UnbanCommand extends BaseCommand {
 	@BotPermission(PermissionsBitField.Flags.BanMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const user = interaction.options.getUser("user", true);
-		const reason =
-			interaction.options.getString("reason") || "No reason provided";
 
 		if (!interaction.guild) return;
 
 		try {
-			await SanctionService.unban(interaction.guild, user, reason);
+			await SanctionService.unban(interaction.guild, user);
 			await interaction.reply(
-				`User ${user.tag} has been unbanned. Reason: ${reason}`,
+				`User ${user.tag} has been unbanned.`,
 			);
 		} catch (error: any) {
 			await interaction.reply({
