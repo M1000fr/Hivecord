@@ -60,6 +60,9 @@ describe("SanctionService", () => {
             moderatable: true,
             roles: {
                 add: mock(),
+                cache: {
+                    has: mock().mockReturnValue(false),
+                }
             }
         };
         const mockGuild = {
@@ -94,13 +97,36 @@ describe("SanctionService", () => {
         expect(mockPrisma.sanction.create).toHaveBeenCalled();
     });
 
-    test("mute throws if user already muted", async () => {
-        mockPrisma.sanction.findFirst.mockResolvedValue({ id: 1 });
-
+    test("mute throws if user already muted (has role)", async () => {
+        mockConfigService.getRole.mockResolvedValue("mute_role_id");
+        
+        const mockMuteRole = { id: "mute_role_id" };
+        const mockMember = {
+            moderatable: true,
+            roles: {
+                cache: {
+                    has: mock().mockReturnValue(true), // User has the role
+                }
+            }
+        };
+        const mockGuild = {
+            name: "Test Guild",
+            members: {
+                cache: {
+                    get: mock().mockReturnValue(mockMember),
+                },
+                fetch: mock().mockResolvedValue(mockMember),
+            },
+            roles: {
+                cache: {
+                    get: mock().mockReturnValue(mockMuteRole),
+                }
+            }
+        };
         const mockTarget = { id: "target_id" };
 
         expect(SanctionService.mute(
-            {} as any,
+            mockGuild as any,
             mockTarget as any,
             {} as any,
             60000,
