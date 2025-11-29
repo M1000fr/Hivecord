@@ -55,10 +55,11 @@ export class SanctionService {
 	private static async deactivateSanction(
 		userId: string,
 		type: SanctionType,
+		expiresAt?: Date,
 	): Promise<void> {
 		await prismaClient.sanction.updateMany({
 			where: { userId, type, active: true },
-			data: { active: false },
+			data: { active: false, expiresAt },
 		});
 	}
 
@@ -236,7 +237,6 @@ export class SanctionService {
 	static async unban(
 		guild: Guild,
 		targetUser: User,
-		reason: string,
 	): Promise<void> {
 		try {
 			await guild.bans.fetch(targetUser.id);
@@ -244,8 +244,12 @@ export class SanctionService {
 			throw new Error("User is not banned.");
 		}
 
-		await guild.members.unban(targetUser, reason);
-		await this.deactivateSanction(targetUser.id, SanctionType.BAN);
+		await guild.members.unban(targetUser);
+		await this.deactivateSanction(
+			targetUser.id,
+			SanctionType.BAN,
+			new Date(),
+		);
 	}
 
 	private static async logSanction(

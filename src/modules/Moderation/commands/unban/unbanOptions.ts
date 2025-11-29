@@ -11,11 +11,5 @@ export const unbanOptions: CommandOptions = {
 			type: ApplicationCommandOptionType.User,
 			required: true,
 		},
-		{
-			name: "reason",
-			description: "Reason for the unban",
-			type: ApplicationCommandOptionType.String,
-			required: false,
-		},
 	],
 };
