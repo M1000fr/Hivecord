@@ -1,5 +1,8 @@
 import { prismaClient } from "./prismaService";
 import { Logger } from '@utils/Logger';
+import { RedisService } from "./RedisService";
+
+const CACHE_TTL = 60; // 60 seconds
 
 export class PermissionService {
 	private static logger = new Logger("PermissionService");
@@ -16,26 +19,42 @@ export class PermissionService {
 			return true;
 		}
 
-		const groups = await prismaClient.group.findMany({
-			where: {
-				roleId: {
-					in: userRoleIds,
-				},
-			},
-			include: {
-				Permissions: {
+		const redis = RedisService.getInstance();
+
+		for (const roleId of userRoleIds) {
+			const cacheKey = `permissions:role:${roleId}`;
+			let permissions: string[] = [];
+
+			const cached = await redis.get(cacheKey);
+			if (cached) {
+				permissions = JSON.parse(cached);
+			} else {
+				const groups = await prismaClient.group.findMany({
+					where: { roleId },
 					include: {
-						Permissions: true,
+						Permissions: {
+							include: {
+								Permissions: true,
+							},
+						},
 					},
-				},
-			},
-		});
+				});
 
-		const permissions = groups.flatMap((g) =>
-			g.Permissions.map((gp) => gp.Permissions.name),
-		);
+				permissions = groups.flatMap((g) =>
+					g.Permissions.map((gp) => gp.Permissions.name),
+				);
+				// Remove duplicates
+				permissions = [...new Set(permissions)];
 
-		return this.checkPermission(permissions, requiredPermission);
+				await redis.set(cacheKey, JSON.stringify(permissions), "EX", CACHE_TTL);
+			}
+
+			if (this.checkPermission(permissions, requiredPermission)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private static checkPermission(

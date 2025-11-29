@@ -1,6 +1,7 @@
 import { prismaClient } from "./prismaService";
 import { Logger } from '@utils/Logger';
 import type { GroupModel, PermissionModel, RoleModel } from "@prisma/client/models";
+import { RedisService } from "./RedisService";
 
 export class GroupService {
     private static logger = new Logger("GroupService");
@@ -25,6 +26,10 @@ export class GroupService {
         if (!group) {
             throw new Error(`Group ${name} not found`);
         }
+        
+        const redis = RedisService.getInstance();
+        await redis.del(`permissions:role:${group.roleId}`);
+
         return prismaClient.group.delete({
             where: { id: group.id }
         });
@@ -56,6 +61,9 @@ export class GroupService {
                     permissionId: permission.id
                 }
             });
+            
+            const redis = RedisService.getInstance();
+            await redis.del(`permissions:role:${group.roleId}`);
         }
     }
 
@@ -81,6 +89,9 @@ export class GroupService {
             await prismaClient.groupPermission.delete({
                 where: { id: groupPermission.id }
             });
+            
+            const redis = RedisService.getInstance();
+            await redis.del(`permissions:role:${group.roleId}`);
         }
     }
 
