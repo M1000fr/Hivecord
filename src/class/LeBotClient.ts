@@ -11,6 +11,7 @@ import { ModerationModule } from "@modules/Moderation/ModerationModule";
 import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule.js";
 import { GeneralModule } from "@modules/General/GeneralModule";
 import { VoiceModule } from "@modules/Voice/VoiceModule";
+import { LogModule } from "@modules/Log/LogModule";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
 import type { EventOptions } from "@interfaces/EventOptions";
 
@@ -148,7 +149,7 @@ export class LeBotClient<ready = false> extends Client {
 	}
 
 	private async loadModules() {
-		const modules = [ModerationModule, ConfigurationModule, GeneralModule, VoiceModule];
+		const modules = [ModerationModule, ConfigurationModule, GeneralModule, VoiceModule, LogModule];
 
 		for (const ModuleClass of modules) {
 			const moduleInstance = new ModuleClass();
