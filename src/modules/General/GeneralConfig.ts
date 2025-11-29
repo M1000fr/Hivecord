@@ -6,15 +6,17 @@ export class GeneralConfig {
         displayName: "Welcome Image Text",
         description: "The text to display on the welcome image",
         type: ApplicationCommandOptionType.String,
+        defaultValue: "Welcome!",
     })
-    welcomeMessageImage: string = "";
+    welcomeMessageImage: string = "Welcome!";
 
     @ConfigProperty({
         displayName: "Welcome Message",
         description: "The welcome message text",
         type: ApplicationCommandOptionType.String,
+        defaultValue: "Welcome {user} to {guild}!",
     })
-    welcomeMessage: string = "";
+    welcomeMessage: string = "Welcome {user} to {guild}!";
 
     @ConfigProperty({
         displayName: "Welcome Channel",

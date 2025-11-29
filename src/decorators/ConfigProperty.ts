@@ -5,6 +5,7 @@ export interface ConfigPropertyOptions {
     description: string;
     type: ApplicationCommandOptionType;
     required?: boolean;
+    defaultValue?: any;
 }
 
 export function ConfigProperty(options: ConfigPropertyOptions) {

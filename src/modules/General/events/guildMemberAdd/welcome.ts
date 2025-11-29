@@ -65,7 +65,7 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 			);
 
 			const welcomeMessageImageTemplate = new MessageTemplate(
-				welcomeMessageImageConfig || "Welcome {user.displayName}!",
+				welcomeMessageImageConfig || "Welcome!",
 			);
 			welcomeMessageImageTemplate.addContext("user", member.user);
 			welcomeMessageImageTemplate.addContext("guild", member.guild);
@@ -180,7 +180,7 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 			);
 
 			const welcomeMessageTemplate = new MessageTemplate(
-				welcomeMessageConfig || "Welcome {user.displayName}!",
+				welcomeMessageConfig || "Welcome {user} to {guild}!",
 			);
 			welcomeMessageTemplate.addContext("user", member.user);
 			welcomeMessageTemplate.addContext("guild", member.guild);

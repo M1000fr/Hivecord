@@ -32,11 +32,18 @@ export class ConfigHelper {
         return this.truncate(value, 100);
     }
 
-    static async fetchValue(key: string, type: ApplicationCommandOptionType): Promise<string | null> {
+    static async fetchValue(key: string, type: ApplicationCommandOptionType, defaultValue?: any): Promise<string | null> {
         const snakeKey = this.toSnakeCase(key);
-        if (type === ApplicationCommandOptionType.Role) return ConfigService.getRole(snakeKey);
-        if (type === ApplicationCommandOptionType.Channel) return ConfigService.getChannel(snakeKey);
-        return ConfigService.get(snakeKey);
+        let value: string | null = null;
+
+        if (type === ApplicationCommandOptionType.Role) value = await ConfigService.getRole(snakeKey);
+        else if (type === ApplicationCommandOptionType.Channel) value = await ConfigService.getChannel(snakeKey);
+        else value = await ConfigService.get(snakeKey);
+
+        if (value === null && defaultValue !== undefined) {
+            return String(defaultValue);
+        }
+        return value;
     }
 
     static async saveValue(key: string, value: string, type: ApplicationCommandOptionType): Promise<void> {
@@ -54,9 +61,9 @@ export class ConfigHelper {
         return customId.split(":");
     }
 
-    static async getCurrentValue(key: string, type: ApplicationCommandOptionType): Promise<string> {
+    static async getCurrentValue(key: string, type: ApplicationCommandOptionType, defaultValue?: any): Promise<string> {
         try {
-            const value = await this.fetchValue(key, type);
+            const value = await this.fetchValue(key, type, defaultValue);
             return value ? this.formatValue(value, type) : "*Not set*";
         } catch {
             return "*Not set*";
@@ -77,7 +84,7 @@ export class ConfigHelper {
 
         for (const [idx, [key, options]] of Object.entries(configProperties).entries()) {
             const opt = options as any;
-            const currentValue = await this.getCurrentValue(key, opt.type);
+            const currentValue = await this.getCurrentValue(key, opt.type, opt.defaultValue);
 
             embed.addFields({
                 name: `${idx + 1}. ${opt.displayName || key}`,

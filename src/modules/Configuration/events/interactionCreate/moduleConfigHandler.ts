@@ -115,7 +115,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 	}
 
 	private async handleRoleOrChannelProperty(interaction: any, propertyOptions: any, selectedProperty: string, moduleName: string) {
-		const currentValue = await ConfigHelper.getCurrentValue(selectedProperty, propertyOptions.type);
+		const currentValue = await ConfigHelper.getCurrentValue(selectedProperty, propertyOptions.type, propertyOptions.defaultValue);
 		const embed = this.buildPropertyEmbed(propertyOptions, selectedProperty, currentValue);
 		const component = this.buildSelectComponent(propertyOptions.type, moduleName, selectedProperty);
 
@@ -127,7 +127,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 	}
 
 	private async handleTextProperty(interaction: any, propertyOptions: any, selectedProperty: string, moduleName: string) {
-		const rawValue = await ConfigHelper.fetchValue(selectedProperty, ApplicationCommandOptionType.String) || "";
+		const rawValue = await ConfigHelper.fetchValue(selectedProperty, ApplicationCommandOptionType.String, propertyOptions.defaultValue) || "";
 		const labelText = ConfigHelper.truncate(propertyOptions.description, 45);
 
 		const input = new TextInputBuilder({
@@ -150,7 +150,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 	}
 
 	private async handleBooleanProperty(interaction: any, propertyOptions: any, selectedProperty: string, moduleName: string) {
-		const currentValue = await ConfigHelper.getCurrentValue(selectedProperty, propertyOptions.type);
+		const currentValue = await ConfigHelper.getCurrentValue(selectedProperty, propertyOptions.type, propertyOptions.defaultValue);
 		const embed = this.buildPropertyEmbed(propertyOptions, selectedProperty, currentValue);
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
