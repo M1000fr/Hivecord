@@ -9,7 +9,7 @@ import PurgeCommand from "./commands/purge/index";
 import ClearCommand from "./commands/clear/index";
 import WarnCommand from "./commands/warn/index";
 import UnwarnCommand from "./commands/unwarn/index";
-import ModerationAutocompleteHandler from "./events/interactionCreate/autocompleteHandler";
+import ReasonCommand from "./commands/reason/index";
 
 @Module({
     name: "Moderation",
@@ -22,11 +22,10 @@ import ModerationAutocompleteHandler from "./events/interactionCreate/autocomple
         PurgeCommand,
         ClearCommand,
         WarnCommand,
-        UnwarnCommand
+        UnwarnCommand,
+        ReasonCommand
     ],
-    events: [
-        ModerationAutocompleteHandler
-    ],
+    events: [],
     config: ModerationConfig
 })
 export class ModerationModule {}

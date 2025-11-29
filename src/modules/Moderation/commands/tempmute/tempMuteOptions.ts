@@ -15,13 +15,14 @@ export const tempMuteOptions: CommandOptions = {
 			name: "duration",
 			description: "Duration of the mute (e.g. 10m, 1h, 1d)",
 			type: ApplicationCommandOptionType.String,
-			required: true,
+			required: false,
 		},
 		{
 			name: "reason",
 			description: "Reason for the mute",
 			type: ApplicationCommandOptionType.String,
 			required: false,
+			autocomplete: true,
 		},
 	],
 };

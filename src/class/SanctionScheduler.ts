@@ -54,7 +54,7 @@ export class SanctionScheduler {
 				try {
 					try {
 						await member.send(
-							`You have been unmuted in ${guild.name}.`,
+							`You have been \`unmuted\` in \`${guild.name}\`.`,
 						);
 					} catch (e) {
 						// Could not send DM

@@ -4,6 +4,9 @@ import { SecurityConfigKeys } from "@modules/Security/SecurityConfig";
 import { Guild, GuildChannel, User, PermissionsBitField, TextChannel, ChannelType, CategoryChannel, VoiceChannel } from "discord.js";
 import { Logger } from "@utils/Logger";
 import { SanctionService } from "@services/SanctionService";
+import { SanctionReasonService } from "@services/SanctionReasonService";
+import { SanctionType } from "@prisma/client/client";
+import { DurationParser } from "@utils/DurationParser";
 
 export class HeatpointService {
     private static logger = new Logger("HeatpointService");
@@ -102,7 +105,7 @@ export class HeatpointService {
     private static async handleUserSanction(guild: Guild, user: User, heat: number): Promise<void> {
         const warnThreshold = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointUserWarnThreshold) || "50", 10);
         const muteThreshold = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointUserMuteThreshold) || "80", 10);
-        const muteDuration = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointMuteDuration) || "3600", 10);
+        const configMuteDuration = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointMuteDuration) || "3600", 10);
 
         const redis = RedisService.getInstance();
         const warnedKey = `warned:${guild.id}:${user.id}`;
@@ -118,13 +121,23 @@ export class HeatpointService {
             try {
                 const moderator = guild.client.user;
                 if (moderator) {
+                    const reasonObj = await SanctionReasonService.getOrCreateSystemReason(
+                        "HEATPOINT_MUTE",
+                        "Excessive activity (Heatpoint threshold exceeded)",
+                        SanctionType.MUTE,
+                        "1h"
+                    );
+
+                    const durationStr = reasonObj.duration || "1h";
+                    const durationMs = DurationParser.parse(durationStr) || (configMuteDuration * 1000);
+
                     await SanctionService.mute(
                         guild,
                         user,
                         moderator,
-                        muteDuration * 1000,
-                        "1h",
-                        "Excessive activity (Heatpoint threshold exceeded)"
+                        durationMs,
+                        durationStr,
+                        reasonObj.text
                     );
                     this.logger.log(`Muted user ${user.tag} for excessive heat.`);
                 }
@@ -142,11 +155,17 @@ export class HeatpointService {
                 try {
                     const moderator = guild.client.user;
                     if (moderator) {
+                        const reasonObj = await SanctionReasonService.getOrCreateSystemReason(
+                            "HEATPOINT_WARN",
+                            "You are generating too much activity. Please slow down or you will be muted.",
+                            SanctionType.WARN
+                        );
+
                         await SanctionService.warn(
                             guild,
                             user,
                             moderator,
-                            "You are generating too much activity. Please slow down or you will be muted."
+                            reasonObj.text
                         );
                         await redis.set(warnedKey, "true", "EX", 300); // 5 minutes cooldown for warning
                         this.logger.log(`Warned user ${user.tag} for high heat.`);

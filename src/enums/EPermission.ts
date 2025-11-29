@@ -19,4 +19,5 @@ export enum EPermission {
 	Debug = "commands.debug",
 	Warn = "commands.warn",
 	Unwarn = "commands.unwarn",
+	ReasonManage = "commands.reason.manage",
 }

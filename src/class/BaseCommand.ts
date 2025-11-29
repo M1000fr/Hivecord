@@ -1,7 +1,17 @@
-import { ChatInputCommandInteraction, Client, MessageFlags } from "discord.js";
+import { ChatInputCommandInteraction, Client, MessageFlags, AutocompleteInteraction } from "discord.js";
 import { PermissionService } from '@services/PermissionService';
 
 export abstract class BaseCommand {
+    async handleAutocomplete(client: Client, interaction: AutocompleteInteraction): Promise<void> {
+        const focusedOption = interaction.options.getFocused(true);
+        const autocompletes = (this.constructor as any).autocompletes;
+
+        if (autocompletes && autocompletes.has(focusedOption.name)) {
+            const method = autocompletes.get(focusedOption.name);
+            await (this as any)[method](client, interaction);
+        }
+    }
+
 	async execute(
 		client: Client,
 		interaction: ChatInputCommandInteraction,

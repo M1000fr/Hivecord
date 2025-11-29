@@ -21,6 +21,18 @@ export default class InteractionCreateEvent extends BaseEvent<Events.Interaction
 	}
 
 	async run(client: LeBotClient<true>, interaction: Interaction) {
+        if (interaction.isAutocomplete()) {
+            const command = client.commands.get(interaction.commandName);
+            if (!command) return;
+
+            try {
+                await command.instance.handleAutocomplete(client, interaction);
+            } catch (error: any) {
+                this.logger.error(`Error handling autocomplete for ${interaction.commandName}:`, error.message);
+            }
+            return;
+        }
+
 		if (!interaction.isChatInputCommand()) return;
 
 		const command = client.commands.get(interaction.commandName);

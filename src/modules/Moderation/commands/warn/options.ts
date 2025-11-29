@@ -12,5 +12,6 @@ export const warnOptions: ApplicationCommandOptionData[] = [
         description: "The reason for the warning",
         type: ApplicationCommandOptionType.String,
         required: true,
+        autocomplete: true,
     },
 ];
