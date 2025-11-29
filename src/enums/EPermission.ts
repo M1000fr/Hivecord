@@ -16,4 +16,5 @@ export enum EPermission {
 	SanctionsList = "commands.sanctions.list",
 	ChannelPurge = "commands.purge",
 	ConfigureModules = "commands.modules",
+	Debug = "commands.debug",
 }
