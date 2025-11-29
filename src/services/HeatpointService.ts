@@ -78,13 +78,13 @@ export class HeatpointService {
                 break;
         }
 
-        this.logger.debug(`Processing heatpoint action '${actionType}' for user ${user.tag} in guild ${guild.name}, points: ${points}`);
-
         if (points === 0) return;
 
         // User Heat
         const userHeat = await this.addHeat(`user:${user.id}`, points);
-        await this.handleUserSanction(guild, user, userHeat, channel);
+        const userSanctioned = await this.handleUserSanction(guild, user, userHeat, channel);
+
+        if (userSanctioned) return;
 
         // Channel Heat
         if (channel) {
@@ -110,7 +110,7 @@ export class HeatpointService {
 		user: User,
 		heat: number,
 		channel: GuildChannel | null,
-	): Promise<void> {
+	): Promise<boolean> {
 		const warnThreshold = parseInt(
 			(await ConfigService.get(
 				SecurityConfigKeys.heatpointUserWarnThreshold,
@@ -141,7 +141,7 @@ export class HeatpointService {
 		const processingKey = `processing:sanction:${guild.id}:${user.id}`;
 
 		// Prevent spamming actions by checking a short-lived lock
-		if (await redis.get(processingKey)) return;
+		if (await redis.get(processingKey)) return true;
 
 		if (heat >= muteThreshold) {
 			// Set processing lock
@@ -197,6 +197,7 @@ export class HeatpointService {
 							);
 						}
 					}
+                    return true;
 				}
 			} catch (error: any) {
 				if (error.message !== "User is already muted.") {
@@ -204,6 +205,8 @@ export class HeatpointService {
 						`Failed to mute user ${user.tag}: ${error.message}`,
 					);
 				}
+                // Even if mute failed (e.g. already muted), we consider it handled
+                return true;
 			}
 		} else if (heat >= warnThreshold) {
             const alreadyWarned = await redis.get(warnedKey);
@@ -234,6 +237,7 @@ export class HeatpointService {
                 }
             }
         }
+        return false;
     }
 
     static async isLocked(id: string): Promise<boolean> {
