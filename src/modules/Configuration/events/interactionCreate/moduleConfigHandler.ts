@@ -48,6 +48,7 @@ class ConfigHelper {
 	static formatValue(value: string, type: ApplicationCommandOptionType): string {
 		if (type === ApplicationCommandOptionType.Role) return `<@&${value}>`;
 		if (type === ApplicationCommandOptionType.Channel) return `<#${value}>`;
+		if (type === ApplicationCommandOptionType.Boolean) return value === "true" ? "`✅`" : "`❌`";
 		return this.truncate(value, 100);
 	}
 
