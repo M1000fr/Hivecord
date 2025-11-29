@@ -18,6 +18,8 @@ export enum EPermission {
 	ConfigureModules = "commands.modules",
 	Debug = "commands.debug",
 	Warn = "commands.warn",
+	Lock = "commands.lock",
+	Unlock = "commands.unlock",
 	Unwarn = "commands.unwarn",
 	ReasonManage = "commands.reason.manage",
 }

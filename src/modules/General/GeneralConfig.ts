@@ -8,7 +8,7 @@ export class GeneralConfig {
         type: ApplicationCommandOptionType.String,
         defaultValue: "Welcome!",
     })
-    welcomeMessageImage: string = "Welcome!";
+    generalWelcomeMessageImage: string = "Welcome!";
 
     @ConfigProperty({
         displayName: "Welcome Message",
@@ -16,18 +16,18 @@ export class GeneralConfig {
         type: ApplicationCommandOptionType.String,
         defaultValue: "Welcome {user} to {guild}!",
     })
-    welcomeMessage: string = "Welcome {user} to {guild}!";
+    generalWelcomeMessage: string = "Welcome {user} to {guild}!";
 
     @ConfigProperty({
         displayName: "Welcome Channel",
         description: "The channel to send welcome messages to",
         type: ApplicationCommandOptionType.Channel,
     })
-    welcomeChannelId: string = "";
+    generalWelcomeChannelId: string = "";
 }
 
 export const GeneralConfigKeys = {
-    get welcomeMessageImage() { return toConfigKey('welcomeMessageImage'); },
-    get welcomeMessage() { return toConfigKey('welcomeMessage'); },
-    get welcomeChannelId() { return toConfigKey('welcomeChannelId'); },
+    get welcomeMessageImage() { return toConfigKey('generalWelcomeMessageImage'); },
+    get welcomeMessage() { return toConfigKey('generalWelcomeMessage'); },
+    get welcomeChannelId() { return toConfigKey('generalWelcomeChannelId'); },
 } as const;

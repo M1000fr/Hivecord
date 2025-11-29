@@ -18,15 +18,13 @@ export default class UnmuteCommand extends BaseCommand {
 	@BotPermission(PermissionsBitField.Flags.ManageRoles)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const user = interaction.options.getUser("user", true);
-		const reason =
-			interaction.options.getString("reason") || "No reason provided";
 
 		if (!interaction.guild) return;
 
 		try {
-			await SanctionService.unmute(interaction.guild, user, reason);
+			await SanctionService.unmute(interaction.guild, user);
 			await interaction.reply(
-				`User ${user.tag} has been unmuted. Reason: ${reason}`,
+				`User ${user.tag} has been unmuted.`,
 			);
 		} catch (error: any) {
 			await interaction.reply({

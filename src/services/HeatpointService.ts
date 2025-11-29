@@ -59,6 +59,7 @@ export class HeatpointService {
 
     static async processAction(guild: Guild, channel: GuildChannel | null, user: User, actionType: string): Promise<void> {
         let points = 0;
+
         switch (actionType) {
             case 'join_voice':
                 points = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointJoinVoice) || "10", 10);
@@ -81,14 +82,23 @@ export class HeatpointService {
 
         // User Heat
         const userHeat = await this.addHeat(`user:${user.id}`, points);
-        await this.handleUserSanction(guild, user, userHeat, channel);
+        const userSanctioned = await this.handleUserSanction(guild, user, userHeat, channel);
+
+        if (userSanctioned) return;
 
         // Channel Heat
         if (channel) {
             const channelHeat = await this.addHeat(`channel:${channel.id}`, points);
             const channelThreshold = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointChannelThreshold) || "100", 10);
 
-            if (channelHeat > channelThreshold) {
+            // Track unique users in channel
+            const redis = RedisService.getInstance();
+            const channelUsersKey = `channel_users:${channel.id}`;
+            await redis.sadd(channelUsersKey, user.id);
+            await redis.expire(channelUsersKey, 60); // Expire after 60 seconds (sliding window)
+            const uniqueUsers = await redis.scard(channelUsersKey);
+
+            if (channelHeat > channelThreshold && uniqueUsers >= 3) {
                 await this.lockChannel(channel);
             }
         }
@@ -107,7 +117,7 @@ export class HeatpointService {
 		user: User,
 		heat: number,
 		channel: GuildChannel | null,
-	): Promise<void> {
+	): Promise<boolean> {
 		const warnThreshold = parseInt(
 			(await ConfigService.get(
 				SecurityConfigKeys.heatpointUserWarnThreshold,
@@ -138,7 +148,7 @@ export class HeatpointService {
 		const processingKey = `processing:sanction:${guild.id}:${user.id}`;
 
 		// Prevent spamming actions by checking a short-lived lock
-		if (await redis.get(processingKey)) return;
+		if (await redis.get(processingKey)) return true;
 
 		if (heat >= muteThreshold) {
 			// Set processing lock
@@ -194,6 +204,7 @@ export class HeatpointService {
 							);
 						}
 					}
+                    return true;
 				}
 			} catch (error: any) {
 				if (error.message !== "User is already muted.") {
@@ -201,6 +212,8 @@ export class HeatpointService {
 						`Failed to mute user ${user.tag}: ${error.message}`,
 					);
 				}
+                // Even if mute failed (e.g. already muted), we consider it handled
+                return true;
 			}
 		} else if (heat >= warnThreshold) {
             const alreadyWarned = await redis.get(warnedKey);
@@ -231,6 +244,7 @@ export class HeatpointService {
                 }
             }
         }
+        return false;
     }
 
     static async isLocked(id: string): Promise<boolean> {

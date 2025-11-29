@@ -11,11 +11,5 @@ export const unmuteOptions: CommandOptions = {
 			type: ApplicationCommandOptionType.User,
 			required: true,
 		},
-		{
-			name: "reason",
-			description: "Reason for the unmute",
-			type: ApplicationCommandOptionType.String,
-			required: false,
-		},
 	],
 };
