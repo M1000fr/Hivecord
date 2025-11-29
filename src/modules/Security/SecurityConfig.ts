@@ -8,7 +8,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 10,
 	})
-	heatpointJoinVoice: number = 10;
+	securityHeatpointJoinVoice: number = 10;
 
 	@ConfigProperty({
 		description: "Points given for switching voice channels",
@@ -16,7 +16,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 5,
 	})
-	heatpointSwitchVoice: number = 5;
+	securityHeatpointSwitchVoice: number = 5;
 
 	@ConfigProperty({
 		description: "Points given for starting a stream",
@@ -24,7 +24,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 20,
 	})
-	heatpointStream: number = 20;
+	securityHeatpointStream: number = 20;
 
 	@ConfigProperty({
 		description: "Points given for adding a reaction",
@@ -32,7 +32,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 2,
 	})
-	heatpointReaction: number = 2;
+	securityHeatpointReaction: number = 2;
 
 	@ConfigProperty({
 		description: "Points given for sending a message",
@@ -40,7 +40,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 5,
 	})
-	heatpointMessage: number = 5;
+	securityHeatpointMessage: number = 5;
 
 	@ConfigProperty({
 		description: "Points lost per second (Decay rate)",
@@ -48,7 +48,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 1,
 	})
-	heatpointDecayRate: number = 1;
+	securityHeatpointDecayRate: number = 1;
 
 	@ConfigProperty({
 		description: "Threshold for channel lockdown",
@@ -56,7 +56,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 100,
 	})
-	heatpointChannelThreshold: number = 100;
+	securityHeatpointChannelThreshold: number = 100;
 
 	@ConfigProperty({
 		description: "Threshold for global server lockdown",
@@ -64,7 +64,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 500,
 	})
-	heatpointGlobalThreshold: number = 500;
+	securityHeatpointGlobalThreshold: number = 500;
 
 	@ConfigProperty({
 		description: "Duration of lockdown in seconds",
@@ -72,7 +72,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 60,
 	})
-	heatpointLockDuration: number = 60;
+	securityHeatpointLockDuration: number = 60;
 
 	@ConfigProperty({
 		description: "Channel ID for security alerts",
@@ -80,7 +80,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Channel,
 		required: false,
 	})
-	alertChannelId: string | null = null;
+	securityAlertChannelId: string | null = null;
 
 	@ConfigProperty({
 		description: "User heat threshold for warning",
@@ -88,7 +88,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 50,
 	})
-	heatpointUserWarnThreshold: number = 50;
+	securityHeatpointUserWarnThreshold: number = 50;
 
 	@ConfigProperty({
 		description: "User heat threshold for mute (1h)",
@@ -96,7 +96,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 80,
 	})
-	heatpointUserMuteThreshold: number = 80;
+	securityHeatpointUserMuteThreshold: number = 80;
 
 	@ConfigProperty({
 		description: "Duration of mute in seconds (default 1h)",
@@ -104,7 +104,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 3600,
 	})
-	heatpointMuteDuration: number = 3600;
+	securityHeatpointMuteDuration: number = 3600;
 
 	@ConfigProperty({
 		description: "Role ID that bypasses locks (but still gains heat)",
@@ -112,7 +112,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Role,
 		required: false,
 	})
-	bypassRoleId: string | null = null;
+	securityBypassRoleId: string | null = null;
 
 	@ConfigProperty({
 		description: "Number of messages to check for deletion when sanctioning",
@@ -120,7 +120,7 @@ export class SecurityConfig {
 		type: ApplicationCommandOptionType.Integer,
 		defaultValue: 50,
 	})
-	heatpointDeleteMessagesLimit: number = 50;
+	securityHeatpointDeleteMessagesLimit: number = 50;
 }
 
 export const SecurityConfigKeys = {

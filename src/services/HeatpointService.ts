@@ -59,6 +59,9 @@ export class HeatpointService {
 
     static async processAction(guild: Guild, channel: GuildChannel | null, user: User, actionType: string): Promise<void> {
         let points = 0;
+
+        console.log(await ConfigService.get(SecurityConfigKeys.heatpointMessage));
+
         switch (actionType) {
             case 'join_voice':
                 points = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointJoinVoice) || "10", 10);
@@ -76,6 +79,8 @@ export class HeatpointService {
                 points = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointReaction) || "2", 10);
                 break;
         }
+
+        this.logger.debug(`Processing heatpoint action '${actionType}' for user ${user.tag} in guild ${guild.name}, points: ${points}`);
 
         if (points === 0) return;
 
