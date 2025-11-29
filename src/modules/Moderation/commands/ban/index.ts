@@ -5,15 +5,15 @@ import {
 	PermissionsBitField,
 	AutocompleteInteraction,
 } from "discord.js";
-import { BaseCommand } from '@class/BaseCommand';
-import { Command } from '@decorators/Command';
-import { DefaultCommand } from '@decorators/DefaultCommand';
-import { Autocomplete } from '@decorators/Autocomplete';
-import { EPermission } from '@enums/EPermission';
+import { BaseCommand } from "@class/BaseCommand";
+import { Command } from "@decorators/Command";
+import { DefaultCommand } from "@decorators/DefaultCommand";
+import { Autocomplete } from "@decorators/Autocomplete";
+import { EPermission } from "@enums/EPermission";
 import { banOptions } from "./banOptions";
-import { BotPermission } from '@decorators/BotPermission';
-import { SanctionService } from '@services/SanctionService';
-import { SanctionReasonService } from '@services/SanctionReasonService';
+import { BotPermission } from "@decorators/BotPermission";
+import { SanctionService } from "@services/SanctionService";
+import { SanctionReasonService } from "@services/SanctionReasonService";
 import { SanctionType } from "@prisma/client/client";
 
 @Command(banOptions)
