@@ -21,6 +21,7 @@ import { Button, Modal } from '@decorators/Interaction';
 import { VoiceConfigKeys } from '@modules/Voice/VoiceConfig';
 import { ConfigService } from "./ConfigService";
 import { prismaClient } from "./prismaService";
+import { LogService } from "./LogService";
 
 type ListType = "whitelist" | "blacklist";
 
@@ -73,6 +74,17 @@ export class TempVoiceService {
 
 				const result = await this.toggleUserInList(channel, member, listType);
 				results.push(this.formatToggleResult(result));
+
+				const actionDesc = result.type === "whitelist" 
+                    ? (result.action === "added" ? "Added to whitelist" : "Removed from whitelist")
+                    : (result.action === "added" ? "Added to blacklist" : "Removed from blacklist");
+                
+                await LogService.logTempVoice(
+                    interaction.guild!, 
+                    interaction.user, 
+                    "Permission Change", 
+                    `${actionDesc}: <@${member.id}> in <#${channel.id}>`
+                );
 			}
 
 			await interaction.followUp({ content: results.join("\n"), flags: MessageFlags.Ephemeral });
@@ -248,6 +260,7 @@ export class TempVoiceService {
 			});
 
 			await this.sendControlPanel(voiceChannel, member);
+			await LogService.logTempVoice(guild, member.user, "Created", `Created temp voice channel <#${voiceChannel.id}>`);
 		} catch (error) {
 			console.error("Error creating temp voice channel:", error);
 		}
@@ -463,6 +476,7 @@ export class TempVoiceService {
 
 		const newName = interaction.fields.getTextInputValue("new_name");
 		await channel.setName(newName);
+		await LogService.logTempVoice(channel.guild, interaction.user, "Rename", `Renamed <#${channel.id}> to ${newName}`);
 		await interaction.reply({
 			content: `Channel renamed to ${newName}`,
 			flags: MessageFlags.Ephemeral,
