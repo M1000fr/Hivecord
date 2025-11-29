@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: reg.m1000.fr
-  IMAGE_NAME: lebot
+  IMAGE_NAME: leserveur/lebot
 
 jobs:
   build:
