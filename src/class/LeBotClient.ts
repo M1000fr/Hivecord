@@ -85,7 +85,14 @@ export class LeBotClient<ready = false> extends Client {
 
 		const rest = new REST().setToken(this.token);
 		
-		const commandsData = this.commands.map((c) => c.options);
+		const commandsData = this.commands.map((c) => {
+			const options = { ...c.options };
+			if (typeof options.defaultMemberPermissions === 'bigint') {
+				// @ts-ignore - JSON.stringify cannot serialize BigInt
+				options.defaultMemberPermissions = options.defaultMemberPermissions.toString();
+			}
+			return options;
+		});
 		const permissions = Object.values(EPermission);
 
 		try {

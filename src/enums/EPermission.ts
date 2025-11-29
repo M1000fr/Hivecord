@@ -2,7 +2,7 @@ export enum EPermission {
 	Ping = "commands.ping",
 	ReplaceRole = "commands.replaceRole",
 	ChannelClear = "commands.clear",
-	roupsCreate = "commands.groups.create",
+	GroupsCreate = "commands.groups.create",
 	GroupsUpdate = "commands.groups.update",
 	GroupsDelete = "commands.groups.delete",
 	GroupsList = "commands.groups.list",
