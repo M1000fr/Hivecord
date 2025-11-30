@@ -56,7 +56,7 @@ export class ConfigService {
 		const cached = await redis.get(cacheKey);
 		if (cached) return cached;
 
-		const config = await prismaClient.channelConfiguration.findUnique({ where: { key } });
+		const config = await prismaClient.channelConfiguration.findFirst({ where: { key } });
 		const value = config?.channelId ?? null;
 
 		if (value) await redis.set(cacheKey, value, "EX", CACHE_TTL);
@@ -71,7 +71,49 @@ export class ConfigService {
 	): Promise<void> {
 		const redis = RedisService.getInstance();
 		const cacheKey = `config:channel:${key}`;
+		const channelsCacheKey = `config:channels:${key}`;
 		await redis.del(cacheKey);
+		await redis.del(channelsCacheKey);
+
+		await prismaClient.channel.upsert({
+			where: { id: channelId },
+			update: { type: channelType },
+			create: { id: channelId, type: channelType },
+		});
+
+		await prismaClient.$transaction([
+			prismaClient.channelConfiguration.deleteMany({ where: { key } }),
+			prismaClient.channelConfiguration.create({ data: { key, channelId } }),
+		]);
+		await redis.set(cacheKey, channelId, "EX", CACHE_TTL);
+	}
+
+	static async getChannels(key: string): Promise<string[]> {
+		const redis = RedisService.getInstance();
+		const cacheKey = `config:channels:${key}`;
+		const cached = await redis.get(cacheKey);
+		if (cached) return JSON.parse(cached);
+
+		const configs = await prismaClient.channelConfiguration.findMany({
+			where: { key },
+		});
+		const values = configs.map((c) => c.channelId);
+
+		await redis.set(cacheKey, JSON.stringify(values), "EX", CACHE_TTL);
+
+		return values;
+	}
+
+	static async addChannel(
+		key: string,
+		channelId: string,
+		channelType: ChannelType = ChannelType.TEXT,
+	): Promise<void> {
+		const redis = RedisService.getInstance();
+		const cacheKey = `config:channels:${key}`;
+		const channelCacheKey = `config:channel:${key}`;
+		await redis.del(cacheKey);
+		await redis.del(channelCacheKey);
 
 		await prismaClient.channel.upsert({
 			where: { id: channelId },
@@ -80,11 +122,26 @@ export class ConfigService {
 		});
 
 		await prismaClient.channelConfiguration.upsert({
-			where: { key },
-			update: { channelId },
+			where: { key_channelId: { key, channelId } },
+			update: {},
 			create: { key, channelId },
 		});
-		await redis.set(cacheKey, channelId, "EX", CACHE_TTL);
+	}
+
+	static async removeChannel(key: string, channelId: string): Promise<void> {
+		const redis = RedisService.getInstance();
+		const cacheKey = `config:channels:${key}`;
+		const channelCacheKey = `config:channel:${key}`;
+		await redis.del(cacheKey);
+		await redis.del(channelCacheKey);
+
+		try {
+			await prismaClient.channelConfiguration.delete({
+				where: { key_channelId: { key, channelId } },
+			});
+		} catch {
+			// Ignore if not found
+		}
 	}
 
 	static async getRole(key: string): Promise<string | null> {
