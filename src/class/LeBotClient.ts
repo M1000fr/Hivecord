@@ -8,7 +8,7 @@ import { EPermission } from "@enums/EPermission";
 import { Logger } from "@utils/Logger";
 import { SanctionScheduler } from "@class/SanctionScheduler";
 import { ModerationModule } from "@modules/Moderation/ModerationModule";
-import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule.js";
+import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
 import { GeneralModule } from "@modules/General/GeneralModule";
 import { VoiceModule } from "@modules/Voice/VoiceModule";
 import { LogModule } from "@modules/Log/LogModule";
