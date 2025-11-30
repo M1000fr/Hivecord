@@ -7,7 +7,6 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	type APIEmbed,
-	type ModalActionRowComponentBuilder,
 	Colors,
 } from "discord.js";
 
@@ -82,6 +81,12 @@ export class EmbedEditorUtils {
 	static getFieldsSubMenu(fields: APIEmbed["fields"] = []) {
 		const options = [
 			{
+				label: "Back",
+				value: "back",
+				description: "Return to main menu",
+				emoji: "⬅️",
+			},
+			{
 				label: "Add Field",
 				value: "field_add",
 				description: "Add a new field",
@@ -120,8 +125,8 @@ export class EmbedEditorUtils {
 		switch (type) {
 			case "edit_title":
 				modal.setCustomId("modal_embed_title").setTitle("Edit Title");
-				modal.addComponents(
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+				modal.setComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("title")
 							.setLabel("Title")
@@ -129,7 +134,7 @@ export class EmbedEditorUtils {
 							.setRequired(false)
 							.setValue(currentData?.title || ""),
 					),
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("url")
 							.setLabel("URL")
@@ -144,8 +149,8 @@ export class EmbedEditorUtils {
 				modal
 					.setCustomId("modal_embed_description")
 					.setTitle("Edit Description");
-				modal.addComponents(
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+				modal.setComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("description")
 							.setLabel("Description")
@@ -158,8 +163,8 @@ export class EmbedEditorUtils {
 
 			case "edit_author":
 				modal.setCustomId("modal_embed_author").setTitle("Edit Author");
-				modal.addComponents(
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+				modal.setComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("name")
 							.setLabel("Name")
@@ -167,7 +172,7 @@ export class EmbedEditorUtils {
 							.setRequired(false)
 							.setValue(currentData?.author?.name || ""),
 					),
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("icon_url")
 							.setLabel("Icon URL")
@@ -180,8 +185,8 @@ export class EmbedEditorUtils {
 
 			case "edit_footer":
 				modal.setCustomId("modal_embed_footer").setTitle("Edit Footer");
-				modal.addComponents(
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+				modal.setComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("text")
 							.setLabel("Text")
@@ -189,7 +194,7 @@ export class EmbedEditorUtils {
 							.setRequired(false)
 							.setValue(currentData?.footer?.text || ""),
 					),
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("icon_url")
 							.setLabel("Icon URL")
@@ -202,8 +207,8 @@ export class EmbedEditorUtils {
 
 			case "edit_images":
 				modal.setCustomId("modal_embed_images").setTitle("Edit Images");
-				modal.addComponents(
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+				modal.setComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("image")
 							.setLabel("Main Image URL")
@@ -212,7 +217,7 @@ export class EmbedEditorUtils {
 							.setRequired(false)
 							.setValue(currentData?.image?.url || ""),
 					),
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("thumbnail")
 							.setLabel("Thumbnail URL")
@@ -225,8 +230,8 @@ export class EmbedEditorUtils {
 
 			case "edit_color":
 				modal.setCustomId("modal_embed_color").setTitle("Edit Color");
-				modal.addComponents(
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+				modal.setComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("color")
 							.setLabel("Color (Hex or Int)")
@@ -245,13 +250,9 @@ export class EmbedEditorUtils {
 			case "field_add":
 			case "field_edit":
 				modal.setCustomId("modal_embed_field").setTitle("Edit Field");
-				// Store the index in the customId if editing
-				if (typeof currentData?.index === "number") {
-					modal.setCustomId(`modal_embed_field_${currentData.index}`);
-				}
-
-				modal.addComponents(
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+				
+				modal.setComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("name")
 							.setLabel("Name")
@@ -259,7 +260,7 @@ export class EmbedEditorUtils {
 							.setRequired(true)
 							.setValue(currentData?.field?.name || ""),
 					),
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("value")
 							.setLabel("Value")
@@ -267,7 +268,7 @@ export class EmbedEditorUtils {
 							.setRequired(true)
 							.setValue(currentData?.field?.value || ""),
 					),
-					new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("inline")
 							.setLabel("Inline? (true/false)")
