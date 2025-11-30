@@ -70,7 +70,7 @@ export class ConfigHelper {
         }
     }
 
-    static async buildModuleConfigEmbed(client: LeBotClient<true>, moduleName: string) {
+    static async buildModuleConfigEmbed(client: LeBotClient<true>, moduleName: string, userId: string) {
         const module = client.modules.get(moduleName.toLowerCase());
         if (!module?.options.config) return null;
 
@@ -94,7 +94,7 @@ export class ConfigHelper {
         }
 
         const selectMenu = new StringSelectMenuBuilder()
-            .setCustomId(this.buildCustomId(["module_config", moduleName.toLowerCase()]))
+            .setCustomId(this.buildCustomId(["module_config", moduleName.toLowerCase(), userId]))
             .setPlaceholder("Select a property to configure")
             .addOptions(
                 Object.entries(configProperties).map(([key, options], idx) => {

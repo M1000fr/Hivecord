@@ -38,6 +38,7 @@ export default class SanctionsCommand extends BaseCommand {
 		const pager = new Pager({
 			items: sanctions,
 			itemsPerPage: 10,
+			userId: interaction.user.id,
 			renderPage: async (items, pageIndex, totalPages) => {
 				const embed = new EmbedBuilder()
 					.setTitle(`Sanctions for ${targetUser.tag}`)

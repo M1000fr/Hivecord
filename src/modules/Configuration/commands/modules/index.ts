@@ -56,7 +56,7 @@ export default class ModulesCommand extends BaseCommand {
 			return;
 		}
 
-		const config = await ConfigHelper.buildModuleConfigEmbed(lebot, moduleName);
+		const config = await ConfigHelper.buildModuleConfigEmbed(lebot, moduleName, interaction.user.id);
 
 		if (!config) {
 			await interaction.reply({

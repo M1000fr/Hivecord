@@ -8,8 +8,8 @@ import {
 	StringSelectMenuInteraction,
 	type RepliableInteraction,
 } from "discord.js";
-import { RedisService } from '@services/RedisService';
-import { PagerRegistry } from '@services/PagerRegistry';
+import { RedisService } from "@services/RedisService";
+import { PagerRegistry } from "@services/PagerRegistry";
 
 export interface PagerOptions<T> {
 	items: T[];
@@ -134,6 +134,15 @@ export class Pager<T> {
 		});
 
 		collector.on("collect", async (i) => {
+			if (this.userId && i.user.id !== this.userId) {
+				await i.reply({
+					content:
+						"❌ You are not allowed to interact with this pager.",
+					flags: [64],
+				});
+				return;
+			}
+
 			if (i.customId === "pager_prev") {
 				this.currentPage--;
 				const content = await getPageContent();
@@ -159,7 +168,9 @@ export class Pager<T> {
 		return collector;
 	}
 
-	static async handleInteraction(interaction: ButtonInteraction | StringSelectMenuInteraction) {
+	static async handleInteraction(
+		interaction: ButtonInteraction | StringSelectMenuInteraction,
+	) {
 		const redis = RedisService.getInstance();
 		const key = `pager:${interaction.message.id}`;
 		const data = await redis.get(key);
@@ -167,12 +178,12 @@ export class Pager<T> {
 		if (!data) return false; // Not a pager interaction
 
 		const state = JSON.parse(data);
-		
+
 		// Check ownership
 		if (state.userId && interaction.user.id !== state.userId) {
 			await interaction.reply({
-				content: "You are not allowed to interact with this pager.",
-				flags: 64 // Ephemeral
+				content: "❌ You are not allowed to interact with this pager.",
+				flags: [64], // Ephemeral
 			});
 			return true;
 		}
@@ -190,16 +201,17 @@ export class Pager<T> {
 				state.currentPage--;
 				await redis.set(key, JSON.stringify(state));
 				await redis.expire(key, 3600);
-				
+
 				const start = state.currentPage * state.itemsPerPage;
 				const end = start + state.itemsPerPage;
 				const pageItems = state.items.slice(start, end);
 
-				const { embeds, components, files } = await definition.renderPage(
-					pageItems,
-					state.currentPage,
-					totalPages
-				);
+				const { embeds, components, files } =
+					await definition.renderPage(
+						pageItems,
+						state.currentPage,
+						totalPages,
+					);
 
 				const navigationRow = new ActionRowBuilder<ButtonBuilder>();
 				if (totalPages > 1) {
@@ -218,7 +230,11 @@ export class Pager<T> {
 					components.push(navigationRow);
 				}
 
-				await interaction.update({ embeds, components, files: files || [] });
+				await interaction.update({
+					embeds,
+					components,
+					files: files || [],
+				});
 			} else {
 				await interaction.deferUpdate();
 			}
@@ -233,11 +249,12 @@ export class Pager<T> {
 				const end = start + state.itemsPerPage;
 				const pageItems = state.items.slice(start, end);
 
-				const { embeds, components, files } = await definition.renderPage(
-					pageItems,
-					state.currentPage,
-					totalPages
-				);
+				const { embeds, components, files } =
+					await definition.renderPage(
+						pageItems,
+						state.currentPage,
+						totalPages,
+					);
 
 				const navigationRow = new ActionRowBuilder<ButtonBuilder>();
 				if (totalPages > 1) {
@@ -256,7 +273,11 @@ export class Pager<T> {
 					components.push(navigationRow);
 				}
 
-				await interaction.update({ embeds, components, files: files || [] });
+				await interaction.update({
+					embeds,
+					components,
+					files: files || [],
+				});
 			} else {
 				await interaction.deferUpdate();
 			}
@@ -264,7 +285,11 @@ export class Pager<T> {
 		} else {
 			// Custom component
 			if (definition.onComponent) {
-				await definition.onComponent(interaction, state.items, state.currentPage);
+				await definition.onComponent(
+					interaction,
+					state.items,
+					state.currentPage,
+				);
 			}
 			return true;
 		}

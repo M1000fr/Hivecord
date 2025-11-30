@@ -13,6 +13,13 @@ export default class PagerHandlerEvent extends BaseEvent<Events.InteractionCreat
 
 		// Try to handle as pager interaction
 		// If it returns true, it was handled
-		await Pager.handleInteraction(interaction);
+		try {
+			await Pager.handleInteraction(interaction);
+		} catch (error) {
+			// Ignore unknown interaction errors, as they might happen if the interaction was already handled
+			if ((error as any).code !== 10062 && (error as any).code !== 40060) {
+				console.error("Error handling pager interaction:", error);
+			}
+		}
 	}
 }
