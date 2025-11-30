@@ -121,11 +121,9 @@ export class HeatpointService {
 
         if (points === 0) return;
 
-        this.logger.debug(`Processing heatpoint action '${actionType}' for user ${user.tag} (+${points} points)`);
-
         // User Heat
         const userHeat = await this.addHeat(`user:${user.id}`, points);
-        this.logger.debug(`User ${user.tag} heat: ${userHeat}`);
+
         const userSanctioned = await this.handleUserSanction(guild, user, userHeat, channel);
 
         if (userSanctioned) {
@@ -145,8 +143,6 @@ export class HeatpointService {
             await redis.expire(channelUsersKey, 60); // Expire after 60 seconds (sliding window)
             const uniqueUsers = await redis.scard(channelUsersKey);
 
-            this.logger.debug(`Channel ${channel.name} heat: ${channelHeat}/${channelThreshold} (Unique users: ${uniqueUsers})`);
-
             if (channelHeat > channelThreshold && uniqueUsers >= 3) {
                 await this.lockChannel(channel);
             }
@@ -155,8 +151,6 @@ export class HeatpointService {
         // Global Heat
         const globalHeat = await this.addHeat(`global:${guild.id}`, points);
         const globalThreshold = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointGlobalThreshold) || "500", 10);
-
-        this.logger.debug(`Global heat: ${globalHeat}/${globalThreshold}`);
 
         if (globalHeat > globalThreshold) {
             await this.lockServer(guild);
