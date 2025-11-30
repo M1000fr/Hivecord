@@ -3,6 +3,10 @@ import {
 	Client,
 	AttachmentBuilder,
 	EmbedBuilder,
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	MessageComponentInteraction,
 } from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
@@ -28,7 +32,7 @@ export default class StatsCommand extends BaseCommand {
 			await interaction.editReply("Cette sous-commande n'est disponible que dans un serveur.");
 			return;
 		}
-		const period = interaction.options.getString("period") || "24h";
+		const period = "24h"; // default initial period handled via buttons
 		const timeRange = this.getTimeRange(period);
 		try {
 			await this.handleServerStats(interaction, timeRange, period);
@@ -45,7 +49,7 @@ export default class StatsCommand extends BaseCommand {
 			await interaction.editReply("Cette sous-commande n'est disponible que dans un serveur.");
 			return;
 		}
-		const period = interaction.options.getString("period") || "24h";
+		const period = "24h"; // default period
 		const timeRange = this.getTimeRange(period);
 		try {
 			await this.handleUserStats(interaction, interaction.user.id, timeRange, interaction.user.username, period);
@@ -67,7 +71,7 @@ export default class StatsCommand extends BaseCommand {
 			await interaction.editReply("Utilisateur requis.");
 			return;
 		}
-		const period = interaction.options.getString("period") || "24h";
+		const period = "24h"; // default period
 		const timeRange = this.getTimeRange(period);
 		try {
 			await this.handleUserStats(interaction, target.id, timeRange, target.username, period);
@@ -191,6 +195,7 @@ export default class StatsCommand extends BaseCommand {
 		await interaction.editReply({
 			embeds: [embed],
 			files: [chartAttachment],
+			components: [this.buildPeriodButtons("user", userId, interaction.user.id, period)],
 		});
 	}
 
@@ -302,6 +307,50 @@ export default class StatsCommand extends BaseCommand {
 		await interaction.editReply({
 			embeds: [embed],
 			files: [statsAttachment],
+			components: [this.buildPeriodButtons("server", guildId, interaction.user.id, period)],
 		});
+	}
+
+	// Build the action row with period selection buttons
+	private buildPeriodButtons(scope: "server" | "user", targetId: string, invokerId: string, activePeriod: string) {
+		const periods: { value: string; label: string }[] = [
+			{ value: "24h", label: "24h" },
+			{ value: "7d", label: "7j" },
+			{ value: "30d", label: "30j" },
+		];
+		const row = new ActionRowBuilder<ButtonBuilder>();
+		for (const p of periods) {
+			row.addComponents(
+				new ButtonBuilder()
+					.setCustomId(`stats:period:${p.value}:${scope}:${targetId}:${invokerId}`)
+					.setLabel(p.label)
+					.setStyle(p.value === activePeriod ? ButtonStyle.Primary : ButtonStyle.Secondary),
+			);
+		}
+		return row;
+	}
+
+	// Expose a static method for the button handler to reuse logic without duplicating code
+	static getTimeRange(period: string): TimeRange {
+		const end = new Date();
+		const start = new Date();
+		switch (period) {
+			case "24h":
+				start.setHours(start.getHours() - 24); break;
+			case "7d":
+				start.setDate(start.getDate() - 7); break;
+			case "30d":
+				start.setDate(start.getDate() - 30); break;
+		}
+		return { start, end };
+	}
+
+	static getPeriodLabel(period: string): string {
+		switch (period) {
+			case "24h": return "dernières 24 heures";
+			case "7d": return "7 derniers jours";
+			case "30d": return "30 derniers jours";
+			default: return period;
+		}
 	}
 }

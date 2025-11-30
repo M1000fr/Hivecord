@@ -4,6 +4,7 @@ import MessageCreateEvent from "./events/messageCreate";
 import VoiceStateUpdateEvent from "./events/voiceStateUpdate";
 import GuildMemberAddEvent from "./events/guildMemberAdd";
 import GuildMemberRemoveEvent from "./events/guildMemberRemove";
+import StatsPeriodButtonEvent from "./events/statsPeriodButton.ts";
 
 @Module({
 	name: "Statistics",
@@ -13,6 +14,7 @@ import GuildMemberRemoveEvent from "./events/guildMemberRemove";
 		VoiceStateUpdateEvent,
 		GuildMemberAddEvent,
 		GuildMemberRemoveEvent,
+		StatsPeriodButtonEvent,
 	],
 })
 export class StatisticsModule {}
