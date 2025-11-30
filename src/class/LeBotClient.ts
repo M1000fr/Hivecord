@@ -1,4 +1,11 @@
-import { Client, IntentsBitField, Collection, REST, Routes, ApplicationCommandOptionType } from "discord.js";
+import {
+	Client,
+	IntentsBitField,
+	Collection,
+	REST,
+	Routes,
+	ApplicationCommandOptionType,
+} from "discord.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { BaseCommand } from "@class/BaseCommand";
@@ -41,6 +48,7 @@ export class LeBotClient<ready = false> extends Client {
 				IntentsBitField.Flags.GuildVoiceStates,
 				IntentsBitField.Flags.GuildPresences,
 				IntentsBitField.Flags.GuildMessages,
+				IntentsBitField.Flags.MessageContent,
 			],
 		});
 		this.scheduler = new SanctionScheduler(this);
@@ -87,12 +95,13 @@ export class LeBotClient<ready = false> extends Client {
 		}
 
 		const rest = new REST().setToken(this.token);
-		
+
 		const commandsData = this.commands.map((c) => {
 			const options = { ...c.options };
-			if (typeof options.defaultMemberPermissions === 'bigint') {
+			if (typeof options.defaultMemberPermissions === "bigint") {
 				// @ts-ignore - JSON.stringify cannot serialize BigInt
-				options.defaultMemberPermissions = options.defaultMemberPermissions.toString();
+				options.defaultMemberPermissions =
+					options.defaultMemberPermissions.toString();
 			}
 			return options;
 		});
@@ -124,11 +133,15 @@ export class LeBotClient<ready = false> extends Client {
 		if (!options.commands) return;
 
 		for (const CommandClass of options.commands) {
-			const cmdOptions = (CommandClass as any).commandOptions as CommandOptions;
+			const cmdOptions = (CommandClass as any)
+				.commandOptions as CommandOptions;
 			if (!cmdOptions) continue;
 
 			const instance = new CommandClass();
-			this.commands.set(cmdOptions.name, { instance, options: cmdOptions });
+			this.commands.set(cmdOptions.name, {
+				instance,
+				options: cmdOptions,
+			});
 		}
 	}
 
@@ -136,7 +149,8 @@ export class LeBotClient<ready = false> extends Client {
 		if (!options.events) return;
 
 		for (const EventClass of options.events) {
-			const evtOptions = (EventClass as any).eventOptions as EventOptions<any>;
+			const evtOptions = (EventClass as any)
+				.eventOptions as EventOptions<any>;
 			if (!evtOptions) continue;
 
 			const instance = new EventClass();
@@ -151,13 +165,25 @@ export class LeBotClient<ready = false> extends Client {
 	}
 
 	private async loadModules() {
-		const modules = [ModerationModule, ConfigurationModule, GeneralModule, VoiceModule, LogModule, DebugModule, SecurityModule];
+		const modules = [
+			ModerationModule,
+			ConfigurationModule,
+			GeneralModule,
+			VoiceModule,
+			LogModule,
+			DebugModule,
+			SecurityModule,
+		];
 
 		for (const ModuleClass of modules) {
 			const moduleInstance = new ModuleClass();
-			const options = (moduleInstance as any).moduleOptions as ModuleOptions;
+			const options = (moduleInstance as any)
+				.moduleOptions as ModuleOptions;
 
-			this.modules.set(options.name.toLowerCase(), { instance: moduleInstance, options });
+			this.modules.set(options.name.toLowerCase(), {
+				instance: moduleInstance,
+				options,
+			});
 			this.logger.log(`Loading module: ${options.name}`);
 
 			this.loadCommands(options);
