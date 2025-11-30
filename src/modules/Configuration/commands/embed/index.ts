@@ -18,14 +18,19 @@ import { embedOptions } from "./embedOptions";
 @Command(embedOptions)
 export default class EmbedCommand extends BaseCommand {
 	@Autocomplete({ optionName: "name" })
-	async autocompleteName(client: Client, interaction: AutocompleteInteraction) {
+	async autocompleteName(
+		client: Client,
+		interaction: AutocompleteInteraction,
+	) {
 		const focusedValue = interaction.options.getFocused();
 		const embeds = await EmbedService.list();
 		const filtered = embeds.filter((choice) =>
 			choice.toLowerCase().includes(focusedValue.toLowerCase()),
 		);
 		await interaction.respond(
-			filtered.slice(0, 25).map((choice) => ({ name: choice, value: choice })),
+			filtered
+				.slice(0, 25)
+				.map((choice) => ({ name: choice, value: choice })),
 		);
 	}
 
@@ -108,22 +113,9 @@ export default class EmbedCommand extends BaseCommand {
 	@Subcommand({ name: "preview", permission: EPermission.ConfigureModules })
 	async preview(client: Client, interaction: ChatInputCommandInteraction) {
 		const name = interaction.options.getString("name", true);
-		
+
 		// Dummy context
-		const context = {
-			user: {
-				username: interaction.user.username,
-				id: interaction.user.id,
-				mention: interaction.user.toString(),
-				tag: interaction.user.tag,
-				toString: () => interaction.user.toString(),
-			},
-			guild: {
-				name: interaction.guild?.name || "Guild",
-				memberCount: interaction.guild?.memberCount || 0,
-				toString: () => interaction.guild?.name || "Guild",
-			},
-		};
+		const context = {};
 
 		const embed = await EmbedService.render(name, context);
 		if (!embed) {
