@@ -21,6 +21,7 @@ import { VoiceModule } from "@modules/Voice/VoiceModule";
 import { LogModule } from "@modules/Log/LogModule";
 import { DebugModule } from "@modules/Debug/DebugModule";
 import { SecurityModule } from "@modules/Security/SecurityModule";
+import { StatisticsModule } from "@modules/Statistics/StatisticsModule";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
 import type { EventOptions } from "@interfaces/EventOptions";
 
@@ -173,6 +174,7 @@ export class LeBotClient<ready = false> extends Client {
 			LogModule,
 			DebugModule,
 			SecurityModule,
+			StatisticsModule,
 		];
 
 		for (const ModuleClass of modules) {
