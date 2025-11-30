@@ -14,11 +14,11 @@ import {
 	ButtonStyle,
 	MessageFlags,
 } from "discord.js";
-import { BaseEvent } from '@class/BaseEvent';
-import { Event } from '@decorators/Event';
-import { LeBotClient } from '@class/LeBotClient';
-import { InteractionHelper } from '@utils/InteractionHelper';
-import { ConfigHelper } from '@utils/ConfigHelper';
+import { BaseEvent } from "@class/BaseEvent";
+import { Event } from "@decorators/Event";
+import { LeBotClient } from "@class/LeBotClient";
+import { InteractionHelper } from "@utils/InteractionHelper";
+import { ConfigHelper } from "@utils/ConfigHelper";
 
 import { ConfigService } from "@services/ConfigService";
 
@@ -26,7 +26,11 @@ import { ConfigService } from "@services/ConfigService";
 	name: Events.InteractionCreate,
 })
 export default class ModuleConfigInteractionHandler extends BaseEvent<Events.InteractionCreate> {
-	private async respondToInteraction(interaction: any, content: string, isError = false) {
+	private async respondToInteraction(
+		interaction: any,
+		content: string,
+		isError = false,
+	) {
 		if (isError) {
 			await InteractionHelper.respondError(interaction, content);
 		} else {
@@ -36,11 +40,15 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 
 	private async getMainMessage(interaction: any): Promise<Message | null> {
 		if (interaction.isModalSubmit()) return interaction.message;
-		
+
 		const refId = interaction.message.reference?.messageId;
 		if (!refId) return null;
 
-		return await interaction.channel?.messages.fetch(refId).catch(() => null) || null;
+		return (
+			(await interaction.channel?.messages
+				.fetch(refId)
+				.catch(() => null)) || null
+		);
 	}
 
 	private async updateConfig(
@@ -56,7 +64,10 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			const displayValue = ConfigHelper.formatValue(value, type);
 
 			// Special logic for Log module
-			if (moduleName.toLowerCase() === "log" && propertyKey === "logChannelId") {
+			if (
+				moduleName.toLowerCase() === "log" &&
+				propertyKey === "logChannelId"
+			) {
 				const logKeys = [
 					"enable_sanction_logs",
 					"enable_voice_logs",
@@ -73,70 +84,202 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			}
 
 			await InteractionHelper.respondSuccess(
-				interaction, 
-				`Successfully updated **${propertyKey}** to ${displayValue}`
+				interaction,
+				`Successfully updated **${propertyKey}** to ${displayValue}`,
 			);
 
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
-				const config = await ConfigHelper.buildModuleConfigEmbed(client, moduleName);
+				const config = await ConfigHelper.buildModuleConfigEmbed(
+					client,
+					moduleName,
+					interaction.user.id,
+				);
 				if (config) {
-					await mainMessage.edit({ embeds: [config.embed], components: [config.row] });
+					await mainMessage.edit({
+						embeds: [config.embed],
+						components: [config.row],
+					});
 				}
 			}
 		} catch (error) {
 			console.error(error);
-			await InteractionHelper.respondError(interaction, "An error occurred while saving the configuration.");
+			await InteractionHelper.respondError(
+				interaction,
+				"An error occurred while saving the configuration.",
+			);
 		}
+	}
+
+	private async validateUser(
+		interaction: any,
+		userId: string,
+	): Promise<boolean> {
+		if (interaction.user.id !== userId) {
+			await interaction.reply({
+				content:
+					"❌ You are not allowed to interact with this component.",
+				flags: [MessageFlags.Ephemeral],
+			});
+			return false;
+		}
+		return true;
 	}
 
 	async run(client: LeBotClient<true>, interaction: Interaction) {
 		if (!("customId" in interaction)) return;
-		
-		const [action, moduleName, propertyKey] = ConfigHelper.parseCustomId(interaction.customId);
 
-		if (interaction.isStringSelectMenu() && action === "module_config" && moduleName) {
-			await this.handlePropertySelection(client, interaction, moduleName);
-		} else if (interaction.isRoleSelectMenu() && action === "module_config_role" && moduleName && propertyKey && interaction.values[0]) {
-			await this.updateConfig(client, interaction, moduleName, propertyKey, interaction.values[0], ApplicationCommandOptionType.Role);
-		} else if (interaction.isChannelSelectMenu() && action === "module_config_channel" && moduleName && propertyKey && interaction.values[0]) {
-			await this.updateConfig(client, interaction, moduleName, propertyKey, interaction.values[0], ApplicationCommandOptionType.Channel);
-		} else if (interaction.isModalSubmit() && action === "module_config_modal" && moduleName && propertyKey) {
-			await this.updateConfig(client, interaction, moduleName, propertyKey, interaction.fields.getTextInputValue("value"), ApplicationCommandOptionType.String);
-		} else if (interaction.isButton() && action === "module_config_bool" && moduleName && propertyKey) {
-			const value = ConfigHelper.parseCustomId(interaction.customId)[3];
-			if (!value) return;
-			await this.updateConfig(client, interaction, moduleName, propertyKey, value, ApplicationCommandOptionType.Boolean);
+		const parts = ConfigHelper.parseCustomId(interaction.customId);
+		const action = parts[0];
+
+		if (!action || !action.startsWith("module_config")) return;
+
+		const userId = parts[parts.length - 1];
+
+		if (!userId || !(await this.validateUser(interaction, userId))) return;
+
+		if (interaction.isStringSelectMenu() && action === "module_config") {
+			const moduleName = parts[1];
+			if (moduleName)
+				await this.handlePropertySelection(
+					client,
+					interaction,
+					moduleName,
+				);
+		} else if (
+			interaction.isRoleSelectMenu() &&
+			action === "module_config_role"
+		) {
+			const moduleName = parts[1];
+			const propertyKey = parts[2];
+			if (moduleName && propertyKey && interaction.values[0]) {
+				await this.updateConfig(
+					client,
+					interaction,
+					moduleName,
+					propertyKey,
+					interaction.values[0],
+					ApplicationCommandOptionType.Role,
+				);
+			}
+		} else if (
+			interaction.isChannelSelectMenu() &&
+			action === "module_config_channel"
+		) {
+			const moduleName = parts[1];
+			const propertyKey = parts[2];
+			if (moduleName && propertyKey && interaction.values[0]) {
+				await this.updateConfig(
+					client,
+					interaction,
+					moduleName,
+					propertyKey,
+					interaction.values[0],
+					ApplicationCommandOptionType.Channel,
+				);
+			}
+		} else if (
+			interaction.isModalSubmit() &&
+			action === "module_config_modal"
+		) {
+			const moduleName = parts[1];
+			const propertyKey = parts[2];
+			if (moduleName && propertyKey) {
+				await this.updateConfig(
+					client,
+					interaction,
+					moduleName,
+					propertyKey,
+					interaction.fields.getTextInputValue("value"),
+					ApplicationCommandOptionType.String,
+				);
+			}
+		} else if (interaction.isButton() && action === "module_config_bool") {
+			const moduleName = parts[1];
+			const propertyKey = parts[2];
+			const value = parts[3];
+			if (moduleName && propertyKey && value) {
+				await this.updateConfig(
+					client,
+					interaction,
+					moduleName,
+					propertyKey,
+					value,
+					ApplicationCommandOptionType.Boolean,
+				);
+			}
 		}
 	}
 
-	private buildPropertyEmbed(propertyOptions: any, selectedProperty: string, currentValue: string) {
+	private buildPropertyEmbed(
+		propertyOptions: any,
+		selectedProperty: string,
+		currentValue: string,
+	) {
 		return new EmbedBuilder()
-			.setTitle(`⚙️ Configure: ${propertyOptions.displayName || selectedProperty}`)
-			.setDescription(`${propertyOptions.description}\n\n**Current value:** ${currentValue}`)
+			.setTitle(
+				`⚙️ Configure: ${propertyOptions.displayName || selectedProperty}`,
+			)
+			.setDescription(
+				`${propertyOptions.description}\n\n**Current value:** ${currentValue}`,
+			)
 			.setColor("#5865F2")
 			.setTimestamp();
 	}
 
-	private buildSelectComponent(type: ApplicationCommandOptionType, moduleName: string, selectedProperty: string) {
+	private buildSelectComponent(
+		type: ApplicationCommandOptionType,
+		moduleName: string,
+		selectedProperty: string,
+		userId: string,
+	) {
 		const customId = ConfigHelper.buildCustomId([
-			type === ApplicationCommandOptionType.Role ? "module_config_role" : "module_config_channel",
+			type === ApplicationCommandOptionType.Role
+				? "module_config_role"
+				: "module_config_channel",
 			moduleName,
-			selectedProperty
+			selectedProperty,
+			userId,
 		]);
-		const placeholder = type === ApplicationCommandOptionType.Role ? "Select a role" : "Select a channel";
+		const placeholder =
+			type === ApplicationCommandOptionType.Role
+				? "Select a role"
+				: "Select a channel";
 
-		const component = type === ApplicationCommandOptionType.Role
-			? new RoleSelectMenuBuilder()
-			: new ChannelSelectMenuBuilder();
+		const component =
+			type === ApplicationCommandOptionType.Role
+				? new RoleSelectMenuBuilder()
+				: new ChannelSelectMenuBuilder();
 
-		return component.setCustomId(customId).setPlaceholder(placeholder).setMinValues(1).setMaxValues(1);
+		return component
+			.setCustomId(customId)
+			.setPlaceholder(placeholder)
+			.setMinValues(1)
+			.setMaxValues(1);
 	}
 
-	private async handleRoleOrChannelProperty(interaction: any, propertyOptions: any, selectedProperty: string, moduleName: string) {
-		const currentValue = await ConfigHelper.getCurrentValue(selectedProperty, propertyOptions.type, propertyOptions.defaultValue);
-		const embed = this.buildPropertyEmbed(propertyOptions, selectedProperty, currentValue);
-		const component = this.buildSelectComponent(propertyOptions.type, moduleName, selectedProperty);
+	private async handleRoleOrChannelProperty(
+		interaction: any,
+		propertyOptions: any,
+		selectedProperty: string,
+		moduleName: string,
+	) {
+		const currentValue = await ConfigHelper.getCurrentValue(
+			selectedProperty,
+			propertyOptions.type,
+			propertyOptions.defaultValue,
+		);
+		const embed = this.buildPropertyEmbed(
+			propertyOptions,
+			selectedProperty,
+			currentValue,
+		);
+		const component = this.buildSelectComponent(
+			propertyOptions.type,
+			moduleName,
+			selectedProperty,
+			interaction.user.id,
+		);
 
 		await interaction.reply({
 			embeds: [embed],
@@ -145,9 +288,22 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		});
 	}
 
-	private async handleTextProperty(interaction: any, propertyOptions: any, selectedProperty: string, moduleName: string) {
-		const rawValue = await ConfigHelper.fetchValue(selectedProperty, ApplicationCommandOptionType.String, propertyOptions.defaultValue) || "";
-		const labelText = ConfigHelper.truncate(propertyOptions.description, 45);
+	private async handleTextProperty(
+		interaction: any,
+		propertyOptions: any,
+		selectedProperty: string,
+		moduleName: string,
+	) {
+		const rawValue =
+			(await ConfigHelper.fetchValue(
+				selectedProperty,
+				ApplicationCommandOptionType.String,
+				propertyOptions.defaultValue,
+			)) || "";
+		const labelText = ConfigHelper.truncate(
+			propertyOptions.description,
+			45,
+		);
 
 		const input = new TextInputBuilder({
 			customId: "value",
@@ -160,25 +316,66 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		if (rawValue) input.setValue(rawValue);
 
 		const modal = new ModalBuilder({
-			customId: ConfigHelper.buildCustomId(["module_config_modal", moduleName, selectedProperty]),
-			title: ConfigHelper.truncate(`Configure: ${propertyOptions.displayName || selectedProperty}`, 45),
-			components: [new ActionRowBuilder<TextInputBuilder>().addComponents(input).toJSON()],
+			customId: ConfigHelper.buildCustomId([
+				"module_config_modal",
+				moduleName,
+				selectedProperty,
+				interaction.user.id,
+			]),
+			title: ConfigHelper.truncate(
+				`Configure: ${propertyOptions.displayName || selectedProperty}`,
+				45,
+			),
+			components: [
+				new ActionRowBuilder<TextInputBuilder>()
+					.addComponents(input)
+					.toJSON(),
+			],
 		});
 
 		await interaction.showModal(modal);
 	}
 
-	private async handleBooleanProperty(interaction: any, propertyOptions: any, selectedProperty: string, moduleName: string) {
-		const currentValue = await ConfigHelper.getCurrentValue(selectedProperty, propertyOptions.type, propertyOptions.defaultValue);
-		const embed = this.buildPropertyEmbed(propertyOptions, selectedProperty, currentValue);
+	private async handleBooleanProperty(
+		interaction: any,
+		propertyOptions: any,
+		selectedProperty: string,
+		moduleName: string,
+	) {
+		const currentValue = await ConfigHelper.getCurrentValue(
+			selectedProperty,
+			propertyOptions.type,
+			propertyOptions.defaultValue,
+		);
+		const embed = this.buildPropertyEmbed(
+			propertyOptions,
+			selectedProperty,
+			currentValue,
+		);
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder()
-				.setCustomId(ConfigHelper.buildCustomId(["module_config_bool", moduleName, selectedProperty, "true"]))
+				.setCustomId(
+					ConfigHelper.buildCustomId([
+						"module_config_bool",
+						moduleName,
+						selectedProperty,
+						"true",
+						interaction.user.id,
+					]),
+				)
 				.setLabel("Enable")
 				.setStyle(ButtonStyle.Success),
 			new ButtonBuilder()
-				.setCustomId(ConfigHelper.buildCustomId(["module_config_bool", moduleName, selectedProperty, "false"]))
+				.setCustomId(
+					ConfigHelper.buildCustomId([
+						"module_config_bool",
+						moduleName,
+						selectedProperty,
+						"false",
+						interaction.user.id,
+					]),
+				)
 				.setLabel("Disable")
 				.setStyle(ButtonStyle.Danger),
 		);
@@ -190,39 +387,77 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		});
 	}
 
-	private async handlePropertySelection(client: LeBotClient<true>, interaction: any, moduleName: string) {
+	private async handlePropertySelection(
+		client: LeBotClient<true>,
+		interaction: any,
+		moduleName: string,
+	) {
 		const module = client.modules.get(moduleName.toLowerCase());
 		if (!module?.options.config) {
-			await InteractionHelper.respondError(interaction, "Module not found.");
+			await InteractionHelper.respondError(
+				interaction,
+				"Module not found.",
+			);
 			return;
 		}
 
 		const selectedProperty = interaction.values[0];
-		const configProperties = (module.options.config as any).configProperties || {};
+		const configProperties =
+			(module.options.config as any).configProperties || {};
 		const propertyOptions = configProperties[selectedProperty];
 
 		if (!propertyOptions) {
-			await InteractionHelper.respondError(interaction, "Property not found.");
+			await InteractionHelper.respondError(
+				interaction,
+				"Property not found.",
+			);
 			return;
 		}
 
 		try {
-			const config = await ConfigHelper.buildModuleConfigEmbed(client, moduleName);
+			const config = await ConfigHelper.buildModuleConfigEmbed(
+				client,
+				moduleName,
+				interaction.user.id,
+			);
 			if (config && interaction.message) {
-				await interaction.message.edit({ embeds: [config.embed], components: [config.row] });
+				await interaction.message.edit({
+					embeds: [config.embed],
+					components: [config.row],
+				});
 			}
 		} catch (error) {
 			console.error("Failed to reset select menu:", error);
 		}
 
-		const isRoleOrChannel = [ApplicationCommandOptionType.Role, ApplicationCommandOptionType.Channel].includes(propertyOptions.type);
-		
+		const isRoleOrChannel = [
+			ApplicationCommandOptionType.Role,
+			ApplicationCommandOptionType.Channel,
+		].includes(propertyOptions.type);
+
 		if (isRoleOrChannel) {
-			await this.handleRoleOrChannelProperty(interaction, propertyOptions, selectedProperty, moduleName);
-		} else if (propertyOptions.type === ApplicationCommandOptionType.Boolean) {
-			await this.handleBooleanProperty(interaction, propertyOptions, selectedProperty, moduleName);
+			await this.handleRoleOrChannelProperty(
+				interaction,
+				propertyOptions,
+				selectedProperty,
+				moduleName,
+			);
+		} else if (
+			propertyOptions.type === ApplicationCommandOptionType.Boolean
+		) {
+			await this.handleBooleanProperty(
+				interaction,
+				propertyOptions,
+				selectedProperty,
+				moduleName,
+			);
 		} else {
-			await this.handleTextProperty(interaction, propertyOptions, selectedProperty, moduleName);
+			await this.handleTextProperty(
+				interaction,
+				propertyOptions,
+				selectedProperty,
+				moduleName,
+			);
 		}
 	}
 }

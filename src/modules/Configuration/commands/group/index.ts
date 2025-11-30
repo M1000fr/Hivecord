@@ -159,6 +159,7 @@ export default class GroupCommand extends BaseCommand {
             const pager = new Pager({
                 items: groups,
                 itemsPerPage: 1,
+                userId: interaction.user.id,
                 renderPage: async (items, pageIndex, totalPages) => {
                     const group = items[0];
                     if (!group) return { embeds: [], components: [] };
