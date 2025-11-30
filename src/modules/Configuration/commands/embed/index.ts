@@ -48,9 +48,6 @@ export default class EmbedCommand extends BaseCommand {
 			};
 		}
 
-		// Save to session
-		await EmbedService.setEditorSession(interaction.user.id, name, data);
-
 		const embed = new EmbedBuilder(data);
 		await interaction.reply({
 			content: `**Embed Editor**: Editing \`${name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
@@ -59,8 +56,11 @@ export default class EmbedCommand extends BaseCommand {
 				EmbedEditorUtils.getMainMenu(),
 				EmbedEditorUtils.getControlButtons(),
 			],
-			flags: MessageFlags.Ephemeral,
 		});
+		const response = await interaction.fetchReply();
+
+		// Save to session
+		await EmbedService.setEditorSession(response.id, name, data);
 	}
 
 	@Subcommand({ name: "edit", permission: EPermission.ConfigureModules })
@@ -76,9 +76,6 @@ export default class EmbedCommand extends BaseCommand {
 			return;
 		}
 
-		// Save to session
-		await EmbedService.setEditorSession(interaction.user.id, name, data);
-
 		const embed = new EmbedBuilder(data);
 		await interaction.reply({
 			content: `**Embed Editor**: Editing \`${name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
@@ -87,8 +84,11 @@ export default class EmbedCommand extends BaseCommand {
 				EmbedEditorUtils.getMainMenu(),
 				EmbedEditorUtils.getControlButtons(),
 			],
-			flags: MessageFlags.Ephemeral,
 		});
+		const response = await interaction.fetchReply();
+
+		// Save to session
+		await EmbedService.setEditorSession(response.id, name, data);
 	}
 
 	@Subcommand({ name: "delete", permission: EPermission.ConfigureModules })

@@ -72,32 +72,33 @@ export class EmbedService {
 	// --- Editor Session Management (Redis) ---
 
 	static async getEditorSession(
-		userId: string,
-	): Promise<{ name: string; data: APIEmbed } | null> {
+		sessionId: string,
+	): Promise<{ name: string; data: APIEmbed; meta?: any } | null> {
 		const redis = RedisService.getInstance();
-		const key = `embed:editor:${userId}`;
+		const key = `embed:editor:${sessionId}`;
 		const data = await redis.get(key);
 		return data ? JSON.parse(data) : null;
 	}
 
 	static async setEditorSession(
-		userId: string,
+		sessionId: string,
 		name: string,
 		data: APIEmbed,
+		meta?: any,
 	): Promise<void> {
 		const redis = RedisService.getInstance();
-		const key = `embed:editor:${userId}`;
+		const key = `embed:editor:${sessionId}`;
 		await redis.set(
 			key,
-			JSON.stringify({ name, data }),
+			JSON.stringify({ name, data, meta }),
 			"EX",
 			EDITOR_TTL,
 		);
 	}
 
-	static async clearEditorSession(userId: string): Promise<void> {
+	static async clearEditorSession(sessionId: string): Promise<void> {
 		const redis = RedisService.getInstance();
-		const key = `embed:editor:${userId}`;
+		const key = `embed:editor:${sessionId}`;
 		await redis.del(key);
 	}
 }
