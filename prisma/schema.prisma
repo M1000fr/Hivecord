@@ -17,10 +17,9 @@ model User {
     id     String    @id
     leftAt DateTime?
 
-    Groups             UserGroup[]
-    SanctionsReceived  Sanction[]          @relation("UserSanctions")
-    SanctionsApplied   Sanction[]          @relation("ModeratorSanctions")
-    UserConfigurations UserConfiguration[]
+    Groups            UserGroup[]
+    SanctionsReceived Sanction[]  @relation("UserSanctions")
+    SanctionsApplied  Sanction[]  @relation("ModeratorSanctions")
 
     TempVoiceChannels TempVoiceChannel[]
     TempVoiceAllowed  TempVoiceAllowedUser[]
@@ -28,7 +27,7 @@ model User {
 }
 
 model Channel {
-    id        String    @id
+    id        String      @id
     type      ChannelType
     deletedAt DateTime?
 
@@ -106,9 +105,11 @@ model Configuration {
 }
 
 model ChannelConfiguration {
-    key       String  @id
+    key       String
     channelId String
     Channel   Channel @relation(fields: [channelId], references: [id])
+
+    @@id([key, channelId])
 }
 
 model RoleConfiguration {
@@ -117,12 +118,6 @@ model RoleConfiguration {
     Role   Role   @relation(fields: [roleId], references: [id])
 
     @@id([key, roleId])
-}
-
-model UserConfiguration {
-    key    String @id
-    userId String
-    User   User   @relation(fields: [userId], references: [id])
 }
 
 model TempVoiceChannel {
@@ -161,4 +156,11 @@ model SanctionReason {
     type     SanctionType
     duration String?
     isSystem Boolean      @default(false)
+}
+
+model CustomEmbed {
+    name      String   @id
+    data      String   @db.Text // JSON content
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

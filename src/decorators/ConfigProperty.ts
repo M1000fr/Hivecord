@@ -1,9 +1,23 @@
 import { ApplicationCommandOptionType } from "discord.js";
 
+export enum EConfigType {
+	String = ApplicationCommandOptionType.String,
+	Integer = ApplicationCommandOptionType.Integer,
+	Boolean = ApplicationCommandOptionType.Boolean,
+	User = ApplicationCommandOptionType.User,
+	Channel = ApplicationCommandOptionType.Channel,
+	Role = ApplicationCommandOptionType.Role,
+	Mentionable = ApplicationCommandOptionType.Mentionable,
+	Number = ApplicationCommandOptionType.Number,
+	Attachment = ApplicationCommandOptionType.Attachment,
+	// Custom types
+	CustomEmbed = 100,
+}
+
 export interface ConfigPropertyOptions {
     displayName?: string;
     description: string;
-    type: ApplicationCommandOptionType;
+    type: ApplicationCommandOptionType | EConfigType;
     required?: boolean;
     defaultValue?: any;
 }

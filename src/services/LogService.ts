@@ -1,17 +1,19 @@
+import { LogConfigKeys } from "@modules/Log/LogConfig";
+import { ConfigService } from "@services/ConfigService";
 import {
+	type ColorResolvable,
+	Colors,
 	EmbedBuilder,
 	Guild,
-	User,
 	GuildMember,
+	Message,
 	type PartialGuildMember,
-	VoiceState,
-	Colors,
-	TextChannel,
-	type ColorResolvable,
+	type PartialMessage,
 	Role,
+	TextChannel,
+	User,
+	VoiceState,
 } from "discord.js";
-import { ConfigService } from "@services/ConfigService";
-import { LogConfigKeys } from "@modules/Log/LogConfig";
 
 export class LogService {
 	private static async getLogChannel(
@@ -314,6 +316,79 @@ export class LogService {
 				iconURL: member.user.displayAvatarURL(),
 			})
 			.setTimestamp();
+
+		await channel.send({ embeds: [embed] });
+	}
+
+	static async logMessageUpdate(
+		oldMessage: Message | PartialMessage,
+		newMessage: Message | PartialMessage,
+	) {
+		if (!(await this.isEnabled(LogConfigKeys.enableMessageLogs))) return;
+		if (newMessage.author?.bot) return;
+		if (oldMessage.content === newMessage.content) return;
+
+		const channel = await this.getLogChannel(newMessage.guild!);
+		if (!channel) return;
+
+		const embed = new EmbedBuilder()
+			.setTitle("Message Edited")
+			.setColor(Colors.Yellow)
+			.setAuthor({
+				name: newMessage.author?.tag ?? "Unknown User",
+				iconURL: newMessage.author?.displayAvatarURL(),
+			})
+			.setDescription(
+				`Message edited in <#${newMessage.channelId}> [Jump to message](${newMessage.url})`,
+			)
+			.addFields(
+				{
+					name: "Before",
+					value:
+						oldMessage.content?.substring(0, 1024) ||
+						"*No content*",
+					inline: true,
+				},
+				{
+					name: "After",
+					value:
+						newMessage.content?.substring(0, 1024) ||
+						"*No content*",
+					inline: true,
+				},
+			)
+			.setTimestamp();
+
+		await channel.send({ embeds: [embed] });
+	}
+
+	static async logMessageDelete(message: Message | PartialMessage) {
+		if (!(await this.isEnabled(LogConfigKeys.enableMessageLogs))) return;
+		if (message.author?.bot) return;
+
+		const channel = await this.getLogChannel(message.guild!);
+		if (!channel) return;
+
+		const embed = new EmbedBuilder()
+			.setTitle("Message Deleted")
+			.setColor(Colors.Red)
+			.setAuthor({
+				name: message.author?.tag ?? "Unknown User",
+				iconURL: message.author?.displayAvatarURL(),
+			})
+			.setDescription(`Message deleted in <#${message.channelId}>`)
+			.addFields({
+				name: "Content",
+				value: message.content?.substring(0, 1024) || "*No content*",
+			})
+			.setTimestamp();
+
+		if (message.attachments.size > 0) {
+			embed.addFields({
+				name: "Attachments",
+				value: `${message.attachments.size} attachment(s)`,
+			});
+		}
 
 		await channel.send({ embeds: [embed] });
 	}

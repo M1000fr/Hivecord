@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from "discord.js";
-import { ConfigProperty, toConfigKey } from '@decorators/ConfigProperty';
+import { ConfigProperty, toConfigKey, EConfigType } from '@decorators/ConfigProperty';
 
 export class GeneralConfig {
     @ConfigProperty({
@@ -24,10 +24,19 @@ export class GeneralConfig {
         type: ApplicationCommandOptionType.Channel,
     })
     generalWelcomeChannelId: string = "";
+
+    @ConfigProperty({
+        displayName: "Welcome Embed",
+        description: "The name of the custom embed to use for welcome messages",
+        type: EConfigType.CustomEmbed,
+        defaultValue: "",
+    })
+    generalWelcomeEmbedName: string = "";
 }
 
 export const GeneralConfigKeys = {
     get welcomeMessageImage() { return toConfigKey('generalWelcomeMessageImage'); },
     get welcomeMessage() { return toConfigKey('generalWelcomeMessage'); },
     get welcomeChannelId() { return toConfigKey('generalWelcomeChannelId'); },
+    get welcomeEmbedName() { return toConfigKey('generalWelcomeEmbedName'); },
 } as const;

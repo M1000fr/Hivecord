@@ -1,9 +1,12 @@
 import { Client } from "discord.js";
 import { prismaClient } from '@services/prismaService';
-import { SanctionType } from '@prisma/client/enums';
+import { SanctionType } from '@prisma/client/client';
 import { ConfigService } from '@services/ConfigService';
 import { Logger } from '@utils/Logger';
 import { ModerationConfigKeys } from '@modules/Moderation/ModerationConfig';
+
+const CHECK_EXPIRED_INTERVAL = 10 * 1000; // 10 seconds
+const CHECK_MUTE_CONSISTENCY_INTERVAL = 60 * 1000; // 60 seconds
 
 export class SanctionScheduler {
 	private client: Client;
@@ -14,10 +17,8 @@ export class SanctionScheduler {
 	}
 
 	public start() {
-		// Check every 10 seconds
-		setInterval(() => this.checkExpiredSanctions(), 10 * 1000);
-		// Check every 60 seconds
-		setInterval(() => this.checkMuteConsistency(), 60 * 1000);
+		setInterval(() => this.checkExpiredSanctions(), CHECK_EXPIRED_INTERVAL);
+		setInterval(() => this.checkMuteConsistency(), CHECK_MUTE_CONSISTENCY_INTERVAL);
 		this.logger.log("SanctionScheduler started.");
 	}
 
