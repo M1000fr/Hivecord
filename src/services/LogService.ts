@@ -8,6 +8,7 @@ import {
 	Colors,
 	TextChannel,
 	type ColorResolvable,
+	Role,
 } from "discord.js";
 import { ConfigService } from "@services/ConfigService";
 import { LogConfigKeys } from "@modules/Log/LogConfig";
@@ -131,6 +132,135 @@ export class LogService {
 					value: member.joinedTimestamp
 						? `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`
 						: "Unknown",
+				},
+			)
+			.setTimestamp();
+
+		await channel.send({ embeds: [embed] });
+	}
+
+	static async logMessageEdit(
+		guild: Guild,
+		user: User,
+		before: string,
+		after: string,
+	) {
+		if (!(await this.isEnabled(LogConfigKeys.enableMessageLogs))) return;
+		const channel = await this.getLogChannel(guild);
+		if (!channel) return;
+
+		const embed = new EmbedBuilder()
+			.setTitle("Message Edited")
+			.setColor(Colors.Yellow)
+			.setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
+			.addFields(
+				{ name: "Before", value: before || "*Empty Message*" },
+				{ name: "After", value: after || "*Empty Message*" },
+			)
+			.setTimestamp();
+
+		await channel.send({ embeds: [embed] });
+	}
+
+	static async logRoleCreate(guild: Guild, role: Role) {
+		if (!(await this.isEnabled(LogConfigKeys.enableRoleUpdateLogs))) return;
+		const channel = await this.getLogChannel(guild);
+		if (!channel) return;
+
+		const embed = new EmbedBuilder()
+			.setTitle("Role Created")
+			.setColor(Colors.Green)
+			.addFields(
+				{ name: "Role", value: `<@&${role.id}>` },
+				{
+					name: "Color",
+					value: `#${role.colors.primaryColor.toString(16).padStart(6, "0")}`,
+				},
+			)
+			.setTimestamp();
+
+		await channel.send({ embeds: [embed] });
+	}
+
+	static async logRoleUpdate(
+		guild: Guild,
+		roleBefore: Role,
+		roleAfter: Role,
+	) {
+		if (!(await this.isEnabled(LogConfigKeys.enableRoleUpdateLogs))) return;
+		const channel = await this.getLogChannel(guild);
+		if (!channel) return;
+		const changes: string[] = [];
+
+		const checkChange = (field: string, before: any, after: any) => {
+			if (before !== after) {
+				changes.push(`**${field}**: \`${before}\` ➔ \`${after}\``);
+			}
+		};
+
+		const permissions = roleBefore.permissions.toArray();
+		const newPermissions = roleAfter.permissions.toArray();
+
+		const addedPermissions = newPermissions.filter(
+			(perm) => !permissions.includes(perm),
+		);
+		const removedPermissions = permissions.filter(
+			(perm) => !newPermissions.includes(perm),
+		);
+
+		checkChange("Name", roleBefore.name, roleAfter.name);
+		checkChange(
+			"Color",
+			`#${roleBefore.colors.primaryColor.toString(16).padStart(6, "0")}`,
+			`#${roleAfter.colors.primaryColor.toString(16).padStart(6, "0")}`,
+		);
+		checkChange("Hoist", roleBefore.hoist, roleAfter.hoist);
+		checkChange("Position", roleBefore.position, roleAfter.position);
+		checkChange(
+			"Mentionable",
+			roleBefore.mentionable,
+			roleAfter.mentionable,
+		);
+
+		if (addedPermissions.length > 0) {
+			changes.push(
+				`**Added Permissions**: \`${addedPermissions.join(", ")}\``,
+			);
+		}
+
+		if (removedPermissions.length > 0) {
+			changes.push(
+				`**Removed Permissions**: \`${removedPermissions.join(", ")}\``,
+			);
+		}
+
+		if (changes.length === 0) return; // No changes detected
+
+		const embed = new EmbedBuilder()
+			.setTitle("Role Updated")
+			.setColor(Colors.Yellow)
+			.addFields(
+				{ name: "Role", value: `<@&${roleAfter.id}>` },
+				{ name: "Changes", value: changes.join("\n") },
+			)
+			.setTimestamp();
+
+		await channel.send({ embeds: [embed] });
+	}
+
+	static async logRoleDelete(guild: Guild, role: Role) {
+		if (!(await this.isEnabled(LogConfigKeys.enableRoleUpdateLogs))) return;
+		const channel = await this.getLogChannel(guild);
+		if (!channel) return;
+
+		const embed = new EmbedBuilder()
+			.setTitle("Role Created")
+			.setColor(Colors.Green)
+			.addFields(
+				{ name: "Role", value: `<@&${role.id}>` },
+				{
+					name: "Color",
+					value: `#${role.colors.primaryColor.toString(16).padStart(6, "0")}`,
 				},
 			)
 			.setTimestamp();
