@@ -157,3 +157,10 @@ model SanctionReason {
     duration String?
     isSystem Boolean      @default(false)
 }
+
+model CustomEmbed {
+    name      String   @id
+    data      String   @db.Text // JSON content
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
