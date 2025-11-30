@@ -5,7 +5,6 @@ import {
 	TextInputBuilder,
 	TextInputStyle,
 	ActionRowBuilder,
-	ApplicationCommandOptionType,
 	EmbedBuilder,
 	RoleSelectMenuBuilder,
 	ChannelSelectMenuBuilder,
@@ -19,6 +18,7 @@ import { Event } from "@decorators/Event";
 import { LeBotClient } from "@class/LeBotClient";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import { ConfigHelper } from "@utils/ConfigHelper";
+import { EConfigType } from "@decorators/ConfigProperty";
 
 import { ConfigService } from "@services/ConfigService";
 
@@ -57,7 +57,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		moduleName: string,
 		propertyKey: string,
 		value: string,
-		type: ApplicationCommandOptionType,
+		type: EConfigType,
 	) {
 		try {
 			await ConfigHelper.saveValue(propertyKey, value, type);
@@ -159,7 +159,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 					moduleName,
 					propertyKey,
 					interaction.values[0],
-					ApplicationCommandOptionType.Role,
+					EConfigType.Role,
 				);
 			}
 		} else if (
@@ -175,7 +175,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 					moduleName,
 					propertyKey,
 					interaction.values[0],
-					ApplicationCommandOptionType.Channel,
+					EConfigType.Channel,
 				);
 			}
 		} else if (
@@ -191,7 +191,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 					moduleName,
 					propertyKey,
 					interaction.fields.getTextInputValue("value"),
-					ApplicationCommandOptionType.String,
+					EConfigType.String,
 				);
 			}
 		} else if (interaction.isButton() && action === "module_config_bool") {
@@ -205,7 +205,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 					moduleName,
 					propertyKey,
 					value,
-					ApplicationCommandOptionType.Boolean,
+					EConfigType.Boolean,
 				);
 			}
 		}
@@ -228,13 +228,13 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 	}
 
 	private buildSelectComponent(
-		type: ApplicationCommandOptionType,
+		type: EConfigType,
 		moduleName: string,
 		selectedProperty: string,
 		userId: string,
 	) {
 		const customId = ConfigHelper.buildCustomId([
-			type === ApplicationCommandOptionType.Role
+			type === EConfigType.Role
 				? "module_config_role"
 				: "module_config_channel",
 			moduleName,
@@ -242,12 +242,12 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			userId,
 		]);
 		const placeholder =
-			type === ApplicationCommandOptionType.Role
+			type === EConfigType.Role
 				? "Select a role"
 				: "Select a channel";
 
 		const component =
-			type === ApplicationCommandOptionType.Role
+			type === EConfigType.Role
 				? new RoleSelectMenuBuilder()
 				: new ChannelSelectMenuBuilder();
 
@@ -297,7 +297,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		const rawValue =
 			(await ConfigHelper.fetchValue(
 				selectedProperty,
-				ApplicationCommandOptionType.String,
+				EConfigType.String,
 				propertyOptions.defaultValue,
 			)) || "";
 		const labelText = ConfigHelper.truncate(
@@ -431,8 +431,8 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 		}
 
 		const isRoleOrChannel = [
-			ApplicationCommandOptionType.Role,
-			ApplicationCommandOptionType.Channel,
+			EConfigType.Role,
+			EConfigType.Channel,
 		].includes(propertyOptions.type);
 
 		if (isRoleOrChannel) {
@@ -442,9 +442,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 				selectedProperty,
 				moduleName,
 			);
-		} else if (
-			propertyOptions.type === ApplicationCommandOptionType.Boolean
-		) {
+		} else if (propertyOptions.type === EConfigType.Boolean) {
 			await this.handleBooleanProperty(
 				interaction,
 				propertyOptions,

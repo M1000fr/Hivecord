@@ -2,12 +2,12 @@ import { prismaClient } from "./prismaService";
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "crypto";
 import { Logger } from '@utils/Logger';
 import { ConfigService } from "./ConfigService";
-import { ApplicationCommandOptionType } from "discord.js";
 import type { LeBotClient } from '@class/LeBotClient';
+import { EConfigType } from "@decorators/ConfigProperty";
 
 interface ConfigValue {
 	value: string | string[];
-	type: ApplicationCommandOptionType;
+	type: EConfigType;
 }
 
 interface ModuleConfig {
@@ -73,9 +73,9 @@ class ConfigExtractor {
 
 	private static async getConfigValue(
 		key: string,
-		type: ApplicationCommandOptionType
+		type: EConfigType
 	): Promise<string | string[] | null> {
-		if (type === ApplicationCommandOptionType.Role) {
+		if (type === EConfigType.Role) {
 			// Check if it's a multi-role configuration
 			const roles = await ConfigService.getRoles(key);
 			if (roles.length > 0) return roles;
@@ -83,7 +83,7 @@ class ConfigExtractor {
 			const role = await ConfigService.getRole(key);
 			return role ? [role] : null;
 		}
-		if (type === ApplicationCommandOptionType.Channel) {
+		if (type === EConfigType.Channel) {
 			return await ConfigService.getChannel(key);
 		}
 		return await ConfigService.get(key);
@@ -99,7 +99,7 @@ class ConfigRestorer {
 		for (const [key, configValue] of Object.entries(moduleConfig.configurations)) {
 			const { value, type } = configValue;
 
-			if (type === ApplicationCommandOptionType.Role) {
+			if (type === EConfigType.Role) {
 				if (Array.isArray(value)) {
 					if (value.length === 1 && value[0]) {
 						await ConfigService.setRole(key, value[0]);
@@ -107,7 +107,7 @@ class ConfigRestorer {
 						await ConfigService.setRoles(key, value);
 					}
 				}
-			} else if (type === ApplicationCommandOptionType.Channel) {
+			} else if (type === EConfigType.Channel) {
 				if (typeof value === 'string') {
 					await ConfigService.setChannel(key, value);
 				}

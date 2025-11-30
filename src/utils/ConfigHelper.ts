@@ -1,19 +1,19 @@
-import { ApplicationCommandOptionType, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } from "discord.js";
+import { EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } from "discord.js";
 import { ConfigService } from "@services/ConfigService";
 import { LeBotClient } from "@class/LeBotClient";
+import { EConfigType } from "@decorators/ConfigProperty";
 
-export const TYPE_NAMES: Record<ApplicationCommandOptionType, string> = {
-    [ApplicationCommandOptionType.String]: "Text",
-    [ApplicationCommandOptionType.Role]: "Role",
-    [ApplicationCommandOptionType.Channel]: "Channel",
-    [ApplicationCommandOptionType.User]: "User",
-    [ApplicationCommandOptionType.Integer]: "Number",
-    [ApplicationCommandOptionType.Boolean]: "Boolean",
-    [ApplicationCommandOptionType.Subcommand]: "Subcommand",
-    [ApplicationCommandOptionType.SubcommandGroup]: "SubcommandGroup",
-    [ApplicationCommandOptionType.Number]: "Number",
-    [ApplicationCommandOptionType.Mentionable]: "Mentionable",
-    [ApplicationCommandOptionType.Attachment]: "Attachment",
+export const TYPE_NAMES: Record<number, string> = {
+    [EConfigType.String]: "Text",
+    [EConfigType.Role]: "Role",
+    [EConfigType.Channel]: "Channel",
+    [EConfigType.User]: "User",
+    [EConfigType.Integer]: "Number",
+    [EConfigType.Boolean]: "Boolean",
+    [EConfigType.Number]: "Number",
+    [EConfigType.Mentionable]: "Mentionable",
+    [EConfigType.Attachment]: "Attachment",
+    [EConfigType.CustomEmbed]: "Custom Embed",
 };
 
 export class ConfigHelper {
@@ -25,19 +25,19 @@ export class ConfigHelper {
         return str.length > maxLength ? `${str.substring(0, maxLength - 3)}...` : str;
     }
 
-    static formatValue(value: string, type: ApplicationCommandOptionType): string {
-        if (type === ApplicationCommandOptionType.Role) return `<@&${value}>`;
-        if (type === ApplicationCommandOptionType.Channel) return `<#${value}>`;
-        if (type === ApplicationCommandOptionType.Boolean) return value === "true" ? "`✅`" : "`❌`";
+    static formatValue(value: string, type: EConfigType): string {
+        if (type === EConfigType.Role) return `<@&${value}>`;
+        if (type === EConfigType.Channel) return `<#${value}>`;
+        if (type === EConfigType.Boolean) return value === "true" ? "`✅`" : "`❌`";
         return this.truncate(value, 100);
     }
 
-    static async fetchValue(key: string, type: ApplicationCommandOptionType, defaultValue?: any): Promise<string | null> {
+    static async fetchValue(key: string, type: EConfigType, defaultValue?: any): Promise<string | null> {
         const snakeKey = this.toSnakeCase(key);
         let value: string | null = null;
 
-        if (type === ApplicationCommandOptionType.Role) value = await ConfigService.getRole(snakeKey);
-        else if (type === ApplicationCommandOptionType.Channel) value = await ConfigService.getChannel(snakeKey);
+        if (type === EConfigType.Role) value = await ConfigService.getRole(snakeKey);
+        else if (type === EConfigType.Channel) value = await ConfigService.getChannel(snakeKey);
         else value = await ConfigService.get(snakeKey);
 
         if (value === null && defaultValue !== undefined) {
@@ -46,10 +46,10 @@ export class ConfigHelper {
         return value;
     }
 
-    static async saveValue(key: string, value: string, type: ApplicationCommandOptionType): Promise<void> {
+    static async saveValue(key: string, value: string, type: EConfigType): Promise<void> {
         const snakeKey = this.toSnakeCase(key);
-        if (type === ApplicationCommandOptionType.Role) return ConfigService.setRole(snakeKey, value);
-        if (type === ApplicationCommandOptionType.Channel) return ConfigService.setChannel(snakeKey, value);
+        if (type === EConfigType.Role) return ConfigService.setRole(snakeKey, value);
+        if (type === EConfigType.Channel) return ConfigService.setChannel(snakeKey, value);
         return ConfigService.set(snakeKey, value);
     }
 
@@ -61,7 +61,7 @@ export class ConfigHelper {
         return customId.split(":");
     }
 
-    static async getCurrentValue(key: string, type: ApplicationCommandOptionType, defaultValue?: any): Promise<string> {
+    static async getCurrentValue(key: string, type: EConfigType, defaultValue?: any): Promise<string> {
         try {
             const value = await this.fetchValue(key, type, defaultValue);
             return value ? this.formatValue(value, type) : "*Not set*";
@@ -88,7 +88,7 @@ export class ConfigHelper {
 
             embed.addFields({
                 name: `${idx + 1}. ${opt.displayName || key}`,
-                value: `${opt.description}\nType: \`${TYPE_NAMES[opt.type as ApplicationCommandOptionType] || "Unknown"}\`\nCurrent: ${currentValue}`,
+                value: `${opt.description}\nType: \`${TYPE_NAMES[opt.type as EConfigType] || "Unknown"}\`\nCurrent: ${currentValue}`,
                 inline: true,
             });
         }

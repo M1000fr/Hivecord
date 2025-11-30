@@ -1,11 +1,10 @@
-import { ApplicationCommandOptionType } from "discord.js";
 import { ConfigProperty, toConfigKey, EConfigType } from '@decorators/ConfigProperty';
 
 export class GeneralConfig {
     @ConfigProperty({
         displayName: "Welcome Image Text",
         description: "The text to display on the welcome image",
-        type: ApplicationCommandOptionType.String,
+        type: EConfigType.String,
         defaultValue: "Welcome!",
     })
     generalWelcomeMessageImage: string = "Welcome!";
@@ -13,7 +12,7 @@ export class GeneralConfig {
     @ConfigProperty({
         displayName: "Welcome Message",
         description: "The welcome message text",
-        type: ApplicationCommandOptionType.String,
+        type: EConfigType.String,
         defaultValue: "Welcome {user} to {guild}!",
     })
     generalWelcomeMessage: string = "Welcome {user} to {guild}!";
@@ -21,7 +20,7 @@ export class GeneralConfig {
     @ConfigProperty({
         displayName: "Welcome Channel",
         description: "The channel to send welcome messages to",
-        type: ApplicationCommandOptionType.Channel,
+        type: EConfigType.Channel,
     })
     generalWelcomeChannelId: string = "";
 

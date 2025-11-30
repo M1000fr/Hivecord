@@ -17,7 +17,7 @@ export enum EConfigType {
 export interface ConfigPropertyOptions {
     displayName?: string;
     description: string;
-    type: ApplicationCommandOptionType | EConfigType;
+    type: EConfigType;
     required?: boolean;
     defaultValue?: any;
 }
