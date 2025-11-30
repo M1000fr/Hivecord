@@ -18,6 +18,7 @@ import { Stream } from "stream";
 import path from "path";
 import { MessageTemplate } from '@class/MessageTemplate';
 import { GeneralConfigKeys } from "../../GeneralConfig";
+import { EmbedService } from "@services/EmbedService";
 
 @Event({
 	name: Events.GuildMemberAdd,
@@ -46,6 +47,11 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 				);
 				return;
 			}
+
+			// Check for custom embed
+			const welcomeEmbedName = await ConfigService.get(
+				GeneralConfigKeys.welcomeEmbedName,
+			);
 
 			// Use local file for background
 			const backgroundPath = path.join(
@@ -193,6 +199,32 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 			const attachment = new AttachmentBuilder(buffer, {
 				name: "welcome.gif",
 			});
+
+			if (welcomeEmbedName) {
+				const context = {
+					user: member.user,
+					guild: member.guild,
+					member: member,
+				};
+
+				const customEmbed = await EmbedService.render(
+					welcomeEmbedName,
+					context,
+				);
+
+				if (customEmbed) {
+					await channel.send({
+						embeds: [customEmbed],
+						files: [attachment],
+					});
+					return;
+				} else {
+					this.logger.warn(
+						`Custom welcome embed '${welcomeEmbedName}' not found. Falling back to default.`,
+					);
+				}
+			}
+
 			const embed = new EmbedBuilder()
 				.setImage("attachment://welcome.gif")
 				.setColor(Colors.Green);
