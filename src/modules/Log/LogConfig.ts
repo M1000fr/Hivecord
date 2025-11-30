@@ -1,18 +1,17 @@
-import { ApplicationCommandOptionType } from "discord.js";
-import { ConfigProperty, toConfigKey } from "@decorators/ConfigProperty";
+import { ConfigProperty, toConfigKey, EConfigType } from "@decorators/ConfigProperty";
 
 export class LogConfig {
 	@ConfigProperty({
 		displayName: "Log Channel",
 		description: "The channel where logs will be sent",
-		type: ApplicationCommandOptionType.Channel,
+		type: EConfigType.Channel,
 	})
 	logChannelId: string = "";
 
 	@ConfigProperty({
 		displayName: "Enable Sanction Logs",
 		description: "Enable logs for sanctions (ban, mute, etc.)",
-		type: ApplicationCommandOptionType.Boolean,
+		type: EConfigType.Boolean,
 		defaultValue: false,
 	})
 	logEnableSanctionLogs: boolean = false;
@@ -21,7 +20,7 @@ export class LogConfig {
 		displayName: "Enable Voice Logs",
 		description:
 			"Enable logs for private voice channels (create, whitelist, blacklist)",
-		type: ApplicationCommandOptionType.Boolean,
+		type: EConfigType.Boolean,
 		defaultValue: false,
 	})
 	logEnableVoiceLogs: boolean = false;
@@ -29,7 +28,7 @@ export class LogConfig {
 	@ConfigProperty({
 		displayName: "Enable Member Logs",
 		description: "Enable logs for member join/leave",
-		type: ApplicationCommandOptionType.Boolean,
+		type: EConfigType.Boolean,
 		defaultValue: false,
 	})
 	logEnableMemberLogs: boolean = false;
@@ -37,7 +36,7 @@ export class LogConfig {
 	@ConfigProperty({
 		displayName: "Enable Voice Connection Logs",
 		description: "Enable logs for voice connection/disconnection/stream",
-		type: ApplicationCommandOptionType.Boolean,
+		type: EConfigType.Boolean,
 		defaultValue: false,
 	})
 	logEnableVoiceConnectionLogs: boolean = false;
@@ -45,7 +44,7 @@ export class LogConfig {
 	@ConfigProperty({
 		displayName: "Enable Message Edit/Delete Logs",
 		description: "Enable logs for message edits and deletions",
-		type: ApplicationCommandOptionType.Boolean,
+		type: EConfigType.Boolean,
 		defaultValue: false,
 	})
 	logEnableMessageLogs: boolean = false;
@@ -53,7 +52,7 @@ export class LogConfig {
 	@ConfigProperty({
 		displayName: "Enable Role Update Logs",
 		description: "Enable logs for role creations, deletions and updates",
-		type: ApplicationCommandOptionType.Boolean,
+		type: EConfigType.Boolean,
 		defaultValue: false,
 	})
 	logEnableRoleUpdateLogs: boolean = false;
