@@ -3,6 +3,7 @@ import { checkDatabaseConnection } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 import { InfluxService } from "@services/InfluxService";
 import { startStatsCleanupJob } from "./jobs/statsCleanup";
+import { startVoiceSessionTickJob } from "./jobs/voiceSessionTick";
 
 // Check connections before starting
 await checkDatabaseConnection();
@@ -13,6 +14,7 @@ const leBotInstance = new LeBotClient();
 
 // Start background jobs
 startStatsCleanupJob();
+startVoiceSessionTickJob();
 
 // Health check server
 Bun.serve({

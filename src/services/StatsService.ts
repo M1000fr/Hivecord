@@ -96,9 +96,15 @@ export class StatsService {
 		const sessionId = `${userId}-${channelId}-${Date.now()}`;
 		const sessionKey = `voice:session:${userId}:${channelId}`;
 		const startTime = Date.now();
+		const lastTickTime = startTime;
 
-		// Store session start in Redis
-		await redis.set(sessionKey, JSON.stringify({ sessionId, startTime }), "EX", 86400); // 24h
+		// Store session start in Redis (include lastTickTime & guildId for incremental ticks)
+		await redis.set(
+			sessionKey,
+			JSON.stringify({ sessionId, startTime, lastTickTime, guildId }),
+			"EX",
+			86400,
+		); // 24h
 
 		this.logger.log(`Voice session started: ${userId} in ${channelId}`);
 	}
@@ -113,25 +119,67 @@ export class StatsService {
 		const sessionData = await redis.get(sessionKey);
 
 		if (sessionData) {
-			const { sessionId, startTime } = JSON.parse(sessionData);
+			const { sessionId, lastTickTime } = JSON.parse(sessionData);
 			const endTime = Date.now();
-			const duration = Math.floor((endTime - startTime) / 1000); // seconds
-
-			// Write to InfluxDB
-			const point = new Point("voice_activity")
-				.tag("userId", userId)
-				.tag("channelId", channelId)
-				.tag("guildId", guildId)
-				.tag("sessionId", sessionId)
-				.intField("duration", duration)
-				.timestamp(new Date(startTime));
-
-			InfluxService.writePoint(point);
+			const remainingDuration = Math.floor((endTime - lastTickTime) / 1000); // seconds since last tick
+			if (remainingDuration > 0) {
+				const point = new Point("voice_activity")
+					.tag("userId", userId)
+					.tag("channelId", channelId)
+					.tag("guildId", guildId)
+					.tag("sessionId", sessionId)
+					.intField("duration", remainingDuration)
+					.timestamp(new Date(lastTickTime));
+				InfluxService.writePoint(point);
+			}
 			await redis.del(sessionKey);
-			// Defer cache invalidation until flush completes
 			this.pendingUserInvalidations.add(`${userId}|${guildId}`);
 			this.scheduleFlush();
-			this.logger.log(`Voice session ended: ${userId} in ${channelId} (${duration}s)`);
+			this.logger.log(`Voice session ended: ${userId} in ${channelId} (final +${remainingDuration}s)`);
+		}
+	}
+
+	// Incremental per-minute recording of ongoing voice sessions
+	static async tickActiveVoiceSessions(): Promise<void> {
+		const redis = RedisService.getInstance();
+		const pattern = "voice:session:*";
+		const keys = await redis.keys(pattern);
+		const now = Date.now();
+		let updated = 0;
+		for (const key of keys) {
+			const data = await redis.get(key);
+			if (!data) continue;
+			try {
+				const { sessionId, startTime, lastTickTime, guildId } = JSON.parse(data);
+				const parts = key.split(":");
+				const userId = parts[2];
+				const channelId = parts[3];
+				if (!userId || !channelId || !guildId) continue;
+				const elapsedSeconds = Math.floor((now - lastTickTime) / 1000);
+				if (elapsedSeconds < 60) continue; // only record if at least a minute elapsed
+				const point = new Point("voice_activity")
+					.tag("userId", userId)
+					.tag("channelId", channelId)
+					.tag("guildId", guildId)
+					.tag("sessionId", sessionId)
+					.intField("duration", elapsedSeconds)
+					.timestamp(new Date(lastTickTime));
+				InfluxService.writePoint(point);
+				await redis.set(
+					key,
+					JSON.stringify({ sessionId, startTime, lastTickTime: now, guildId }),
+					"EX",
+					86400,
+				);
+				this.pendingUserInvalidations.add(`${userId}|${guildId}`);
+				updated++;
+			} catch (err) {
+				this.logger.error(`Failed ticking session ${key}:`, err instanceof Error ? err.message : String(err));
+			}
+		}
+		if (updated > 0) {
+			this.scheduleFlush();
+			this.logger.log(`Ticked ${updated} voice sessions`);
 		}
 	}
 
