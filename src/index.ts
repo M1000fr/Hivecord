@@ -14,7 +14,7 @@ const leBotInstance = new LeBotClient();
 
 // Start background jobs
 startStatsCleanupJob();
-startVoiceSessionTickJob();
+startVoiceSessionTickJob(leBotInstance);
 
 // Health check server
 Bun.serve({

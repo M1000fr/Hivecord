@@ -2,6 +2,7 @@ import { RedisService } from "@services/RedisService";
 import { InfluxService } from "@services/InfluxService";
 import { Point } from "@influxdata/influxdb-client";
 import { Logger } from "@utils/Logger";
+import type { LeBotClient } from "@class/LeBotClient";
 
 const CACHE_TTL = 300; // 5 minutes cache for stats
 // Flush behavior tuning
@@ -140,7 +141,7 @@ export class StatsService {
 	}
 
 	// Incremental per-minute recording of ongoing voice sessions
-	static async tickActiveVoiceSessions(): Promise<void> {
+	static async tickActiveVoiceSessions(client: LeBotClient<boolean>): Promise<void> {
 		const redis = RedisService.getInstance();
 		const pattern = "voice:session:*";
 		const keys = await redis.keys(pattern);
@@ -155,6 +156,21 @@ export class StatsService {
 				const userId = parts[2];
 				const channelId = parts[3];
 				if (!userId || !channelId || !guildId) continue;
+
+				// Verify if the user is still in the voice channel
+				const guild = client.guilds.cache.get(guildId);
+				if (!guild) {
+					// Guild not found, cleanup session
+					await redis.del(key);
+					continue;
+				}
+				const voiceState = guild.voiceStates.cache.get(userId);
+				if (!voiceState || voiceState.channelId !== channelId) {
+					// User not in voice or in different channel - zombie session
+					await redis.del(key);
+					continue;
+				}
+
 				const elapsedSeconds = Math.floor((now - lastTickTime) / 1000);
 				if (elapsedSeconds < 60) continue; // only record if at least a minute elapsed
 				const point = new Point("voice_activity")
