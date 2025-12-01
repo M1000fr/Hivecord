@@ -24,4 +24,5 @@ export enum EPermission {
 	ReasonManage = "commands.reason.manage",
 	SecurityHeatpoint = "commands.security.heatpoint",
 	Stats = "commands.stats",
+	Invites = "commands.invites",
 }
