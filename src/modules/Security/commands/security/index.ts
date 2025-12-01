@@ -10,7 +10,7 @@ import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
 import { BotPermission } from "@decorators/BotPermission";
 import { securityOptions } from "./securityOptions";
-import { HeatpointService } from "@services/HeatpointService";
+import { HeatpointService } from "@modules/Security/services/HeatpointService";
 
 @Command(securityOptions)
 export default class SecurityCommand extends BaseCommand {

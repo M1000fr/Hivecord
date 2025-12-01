@@ -12,7 +12,7 @@ import { EPermission } from '@enums/EPermission';
 import { sanctionsOptions } from "./sanctionsOptions";
 import { prismaClient } from '@services/prismaService';
 import { Pager } from '@class/Pager';
-import { SanctionReasonService } from '@services/SanctionReasonService';
+import { SanctionReasonService } from '@modules/Moderation/services/SanctionReasonService';
 import { SanctionType } from "@prisma/client/client";
 
 @Command(sanctionsOptions)

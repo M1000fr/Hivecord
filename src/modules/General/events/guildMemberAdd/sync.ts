@@ -3,12 +3,13 @@ import { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
 import { prismaClient } from "@src/services/prismaService";
 import { Logger } from "@utils/Logger";
-import { Events, GuildMember } from "discord.js";
+import { GuildMember } from "discord.js";
+import { BotEvents } from "@enums/BotEvents";
 
 @Event({
-	name: Events.GuildMemberAdd,
+	name: BotEvents.GuildMemberAdd,
 })
-export default class GuildMemberRegisterEvent extends BaseEvent<Events.GuildMemberAdd> {
+export default class GuildMemberRegisterEvent extends BaseEvent<typeof BotEvents.GuildMemberAdd> {
 	private logger = new Logger("RegisterNewMemberEvent");
 
 	async run(client: LeBotClient<true>, member: GuildMember) {

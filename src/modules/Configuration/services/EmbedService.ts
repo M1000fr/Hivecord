@@ -1,7 +1,7 @@
-import { prismaClient } from "./prismaService";
+import { prismaClient } from "@services/prismaService";
 import { EmbedBuilder, type APIEmbed } from "discord.js";
 import { MessageTemplate } from "@class/MessageTemplate";
-import { RedisService } from "./RedisService";
+import { RedisService } from "@services/RedisService";
 
 const EDITOR_TTL = 3600; // 1 hour
 

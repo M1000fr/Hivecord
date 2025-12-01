@@ -10,7 +10,7 @@ import { DefaultCommand } from '@decorators/DefaultCommand';
 import { EPermission } from '@enums/EPermission';
 import { unbanOptions } from "./unbanOptions";
 import { BotPermission } from '@decorators/BotPermission';
-import { SanctionService } from '@services/SanctionService';
+import { SanctionService } from '@modules/Moderation/services/SanctionService';
 
 @Command(unbanOptions)
 export default class UnbanCommand extends BaseCommand {

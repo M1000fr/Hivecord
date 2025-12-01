@@ -10,7 +10,7 @@ import { Subcommand } from '@decorators/Subcommand';
 import { EPermission } from '@enums/EPermission';
 import { configOptions } from "./configOptions";
 import { LeBotClient } from '@class/LeBotClient';
-import { BackupService } from '@services/BackupService';
+import { BackupService } from '@modules/Configuration/services/BackupService';
 import { InteractionHelper } from '@utils/InteractionHelper';
 
 @Command(configOptions)

@@ -3,12 +3,13 @@ import { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
 import { prismaClient } from "@src/services/prismaService";
 import { Logger } from "@utils/Logger";
-import { Events, type Channel } from "discord.js";
+import { type Channel } from "discord.js";
+import { BotEvents } from "@enums/BotEvents";
 
 @Event({
-	name: Events.ChannelDelete,
+	name: BotEvents.ChannelDelete,
 })
-export default class ChannelDeleteEvent extends BaseEvent<Events.ChannelDelete> {
+export default class ChannelDeleteEvent extends BaseEvent<typeof BotEvents.ChannelDelete> {
 	private logger = new Logger("ChannelDeleteEvent");
 
 	async run(client: LeBotClient<true>, channel: Channel) {

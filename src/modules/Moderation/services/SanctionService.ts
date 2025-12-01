@@ -3,7 +3,7 @@ import { prismaClient } from "@services/prismaService";
 import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
 import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
-import { LogService } from "@services/LogService";
+import { LogService } from "@modules/Log/services/LogService";
 
 export class SanctionService {
 	private static async fetchMember(

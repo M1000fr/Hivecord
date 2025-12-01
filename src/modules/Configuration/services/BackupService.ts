@@ -1,7 +1,7 @@
-import { prismaClient } from "./prismaService";
+import { prismaClient } from "@services/prismaService";
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "crypto";
 import { Logger } from '@utils/Logger';
-import { ConfigService } from "./ConfigService";
+import { ConfigService } from "@services/ConfigService";
 import type { LeBotClient } from '@class/LeBotClient';
 import { EConfigType } from "@decorators/ConfigProperty";
 

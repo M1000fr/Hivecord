@@ -23,11 +23,11 @@ const mockLogService = {
     logTempVoice: mock(),
 };
 
-mock.module("@services/LogService", () => ({
+mock.module("@modules/Log/services/LogService", () => ({
     LogService: mockLogService
 }));
 
-import { TempVoiceService } from "../../src/services/TempVoiceService";
+import { TempVoiceService } from "../../src/modules/Voice/services/TempVoiceService";
 import { VoiceChannel } from "discord.js";
 
 describe("TempVoiceService", () => {

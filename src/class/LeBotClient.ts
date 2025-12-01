@@ -21,6 +21,8 @@ import { VoiceModule } from "@modules/Voice/VoiceModule";
 import { LogModule } from "@modules/Log/LogModule";
 import { DebugModule } from "@modules/Debug/DebugModule";
 import { SecurityModule } from "@modules/Security/SecurityModule";
+import { StatisticsModule } from "@modules/Statistics/StatisticsModule";
+import { InvitationModule } from "@modules/Invitation/InvitationModule";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
 import type { EventOptions } from "@interfaces/EventOptions";
 
@@ -49,6 +51,7 @@ export class LeBotClient<ready = false> extends Client {
 				IntentsBitField.Flags.GuildPresences,
 				IntentsBitField.Flags.GuildMessages,
 				IntentsBitField.Flags.MessageContent,
+				IntentsBitField.Flags.GuildInvites,
 			],
 		});
 		this.scheduler = new SanctionScheduler(this);
@@ -173,6 +176,8 @@ export class LeBotClient<ready = false> extends Client {
 			LogModule,
 			DebugModule,
 			SecurityModule,
+			StatisticsModule,
+			InvitationModule,
 		];
 
 		for (const ModuleClass of modules) {

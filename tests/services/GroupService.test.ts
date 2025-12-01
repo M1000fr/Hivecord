@@ -34,7 +34,7 @@ mock.module("@services/RedisService", () => ({
     }
 }));
 
-import { GroupService } from "../../src/services/GroupService";
+import { GroupService } from "../../src/modules/Configuration/services/GroupService";
 
 describe("GroupService", () => {
     beforeEach(() => {

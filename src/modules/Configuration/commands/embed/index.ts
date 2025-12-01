@@ -11,7 +11,7 @@ import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { Autocomplete } from "@decorators/Autocomplete";
 import { EPermission } from "@enums/EPermission";
-import { EmbedService } from "@services/EmbedService";
+import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { EmbedEditorUtils } from "./EmbedEditorUtils";
 import { embedOptions } from "./embedOptions";
 

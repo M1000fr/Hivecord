@@ -24,6 +24,25 @@ model User {
     TempVoiceChannels TempVoiceChannel[]
     TempVoiceAllowed  TempVoiceAllowedUser[]
     TempVoiceBlocked  TempVoiceBlockedUser[]
+
+    InvitedBy      Invitation[] @relation("InvitedBy")
+    InvitedMembers Invitation[] @relation("Inviter")
+}
+
+model Invitation {
+    id        Int      @id @default(autoincrement())
+    inviterId String
+    invitedId String
+    code      String
+    active    Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    Inviter User @relation("Inviter", fields: [inviterId], references: [id])
+    Invited User @relation("InvitedBy", fields: [invitedId], references: [id])
+
+    @@index([inviterId])
+    @@index([invitedId])
 }
 
 model Channel {

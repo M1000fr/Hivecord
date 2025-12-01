@@ -5,7 +5,7 @@ import {
 	type ButtonInteraction,
 } from "discord.js";
 import { Button, SelectMenu, Modal } from "@decorators/Interaction";
-import { EmbedService } from "@services/EmbedService";
+import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { EmbedEditorUtils } from "../commands/embed/EmbedEditorUtils";
 
 export class EmbedEditorInteractions {

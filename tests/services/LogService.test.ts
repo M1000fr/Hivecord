@@ -21,7 +21,7 @@ mock.module("@modules/Log/LogConfig", () => ({
     }
 }));
 
-import { LogService } from "../../src/services/LogService";
+import { LogService } from "../../src/modules/Log/services/LogService";
 
 describe("LogService", () => {
     beforeEach(() => {

@@ -3,13 +3,14 @@ import { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
 import { prismaClient } from "@src/services/prismaService";
 import { Logger } from "@utils/Logger";
-import { Events, ChannelType as DiscordChannelType, type DMChannel, type NonThreadGuildBasedChannel } from "discord.js";
+import { ChannelType as DiscordChannelType, type DMChannel, type NonThreadGuildBasedChannel } from "discord.js";
 import { $Enums } from "@src/prisma/client/client";
+import { BotEvents } from "@enums/BotEvents";
 
 @Event({
-	name: Events.ChannelUpdate,
+	name: BotEvents.ChannelUpdate,
 })
-export default class ChannelUpdateEvent extends BaseEvent<Events.ChannelUpdate> {
+export default class ChannelUpdateEvent extends BaseEvent<typeof BotEvents.ChannelUpdate> {
 	private logger = new Logger("ChannelUpdateEvent");
 
 	async run(client: LeBotClient<true>, oldChannel: NonThreadGuildBasedChannel | DMChannel, newChannel: NonThreadGuildBasedChannel | DMChannel) {

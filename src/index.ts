@@ -1,12 +1,20 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { checkDatabaseConnection } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
+import { InfluxService } from "@services/InfluxService";
+import { startStatsCleanupJob } from "./jobs/statsCleanup";
+import { startVoiceSessionTickJob } from "./jobs/voiceSessionTick";
 
 // Check connections before starting
 await checkDatabaseConnection();
 await RedisService.checkConnection();
+await InfluxService.checkConnection();
 
 const leBotInstance = new LeBotClient();
+
+// Start background jobs
+startStatsCleanupJob();
+startVoiceSessionTickJob(leBotInstance);
 
 // Health check server
 Bun.serve({
