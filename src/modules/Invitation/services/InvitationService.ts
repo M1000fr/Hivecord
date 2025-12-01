@@ -167,20 +167,28 @@ export class InvitationService {
 						: null;
 
 					if (inviterId) {
-                        let inviterUser = guild.client.users.cache.get(inviterId);
-                        if (!inviterUser) {
-                            try {
-                                inviterUser = await guild.client.users.fetch(inviterId);
-                            } catch (error) {
-                                this.logger.error(`Failed to fetch inviter ${inviterId}`, (error as Error).stack);
-                            }
-                        }
+						let inviterUser =
+							guild.client.users.cache.get(inviterId);
+						if (!inviterUser) {
+							try {
+								inviterUser =
+									await guild.client.users.fetch(inviterId);
+							} catch (error) {
+								this.logger.error(
+									`Failed to fetch inviter ${inviterId}`,
+									(error as Error).stack,
+								);
+							}
+						}
 
 						// Mock an Invite object
 						usedInvite = {
 							code,
 							guild,
-							inviter: inviterUser || { id: inviterId, tag: "Unknown User" },
+							inviter: inviterUser || {
+								id: inviterId,
+								tag: "Unknown User",
+							},
 							uses: 1,
 						} as unknown as Invite;
 					}
@@ -271,9 +279,11 @@ export class InvitationService {
 		}
 	}
 
-	public static async getInviteCounts(
-		userId: string,
-	): Promise<{ active: number; fake: number }> {
+	public static async getInviteCounts(userId: string): Promise<{
+		active: number;
+		fake: number;
+		total: number;
+	}> {
 		const allInvites = await prismaClient.invitation.findMany({
 			where: { inviterId: userId },
 			select: { invitedId: true, active: true },
@@ -300,6 +310,7 @@ export class InvitationService {
 		return {
 			active: activeSet.size,
 			fake: fakeCount,
+			total: allInvites.length,
 		};
 	}
 }
