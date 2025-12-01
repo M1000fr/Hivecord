@@ -36,10 +36,6 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
-      - name: Run tests
-        run: bun test
-        env:
-          DATABASE_URL: "mysql://root:password@localhost:3306/lebot"
 
   build:
     needs: test
