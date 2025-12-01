@@ -1,14 +1,15 @@
-import { Events, MessageFlags, type Interaction } from "discord.js";
+import { MessageFlags, type Interaction } from "discord.js";
 import { BaseEvent } from '@class/BaseEvent';
 import { Event } from '@decorators/Event';
 import { LeBotClient } from '@class/LeBotClient';
 import { PermissionService } from '@services/PermissionService';
 import { Logger } from '@utils/Logger';
+import { BotEvents } from "@enums/BotEvents";
 
 @Event({
-	name: Events.InteractionCreate,
+	name: BotEvents.InteractionCreate,
 })
-export default class InteractionCreateEvent extends BaseEvent<Events.InteractionCreate> {
+export default class InteractionCreateEvent extends BaseEvent<typeof BotEvents.InteractionCreate> {
 	private logger = new Logger("InteractionCreateEvent");
 
 	private async sendErrorResponse(interaction: any, message: string): Promise<void> {

@@ -21,11 +21,14 @@ import { ConfigHelper } from "@utils/ConfigHelper";
 import { EConfigType } from "@decorators/ConfigProperty";
 
 import { ConfigService } from "@services/ConfigService";
+import { BotEvents } from "@src/enums/BotEvents";
 
 @Event({
-	name: Events.InteractionCreate,
+	name: BotEvents.InteractionCreate,
 })
-export default class ModuleConfigInteractionHandler extends BaseEvent<Events.InteractionCreate> {
+export default class ModuleConfigInteractionHandler extends BaseEvent<
+	typeof BotEvents.InteractionCreate
+> {
 	private async respondToInteraction(
 		interaction: any,
 		content: string,
@@ -242,9 +245,7 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<Events.Int
 			userId,
 		]);
 		const placeholder =
-			type === EConfigType.Role
-				? "Select a role"
-				: "Select a channel";
+			type === EConfigType.Role ? "Select a role" : "Select a channel";
 
 		const component =
 			type === EConfigType.Role

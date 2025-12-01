@@ -6,14 +6,14 @@ import { prismaClient } from "@src/services/prismaService";
 import { Logger } from "@utils/Logger";
 import {
 	ChannelType as DiscordChannelType,
-	Events,
 	type Channel,
 } from "discord.js";
+import { BotEvents } from "@enums/BotEvents";
 
 @Event({
-	name: Events.ChannelCreate,
+	name: BotEvents.ChannelCreate,
 })
-export default class ChannelCreateEvent extends BaseEvent<Events.ChannelCreate> {
+export default class ChannelCreateEvent extends BaseEvent<typeof BotEvents.ChannelCreate> {
 	private logger = new Logger("ChannelCreateEvent");
 
 	async run(client: LeBotClient<true>, channel: Channel) {

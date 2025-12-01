@@ -3,9 +3,12 @@ import type { LeBotClient } from "@class/LeBotClient";
 import type { VoiceState } from "discord.js";
 import { StatsService } from "@modules/Statistics/services/StatsService";
 import { Event } from "@decorators/Event";
+import { BotEvents } from "@src/enums/BotEvents";
 
-@Event({ name: "voiceStateUpdate" })
-export default class VoiceStateUpdateEvent extends BaseEvent<"voiceStateUpdate"> {
+@Event({ name: BotEvents.VoiceStateUpdate })
+export default class VoiceStateUpdateEvent extends BaseEvent<
+	typeof BotEvents.VoiceStateUpdate
+> {
 	async run(
 		client: LeBotClient<true>,
 		oldState: VoiceState,

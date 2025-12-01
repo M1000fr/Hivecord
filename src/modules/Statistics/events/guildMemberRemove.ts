@@ -3,9 +3,12 @@ import type { LeBotClient } from "@class/LeBotClient";
 import type { GuildMember } from "discord.js";
 import { StatsService } from "@modules/Statistics/services/StatsService";
 import { Event } from "@decorators/Event";
+import { BotEvents } from "@src/enums/BotEvents";
 
-@Event({ name: "guildMemberRemove" })
-export default class GuildMemberRemoveEvent extends BaseEvent<"guildMemberRemove"> {
+@Event({ name: BotEvents.GuildMemberRemove })
+export default class GuildMemberRemoveEvent extends BaseEvent<
+	typeof BotEvents.GuildMemberRemove
+> {
 	async run(client: LeBotClient<true>, member: GuildMember): Promise<void> {
 		try {
 			await StatsService.recordLeave(member.id, member.guild.id);

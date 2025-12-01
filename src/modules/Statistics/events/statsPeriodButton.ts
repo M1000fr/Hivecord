@@ -1,4 +1,4 @@
-import { Events, AttachmentBuilder, EmbedBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { AttachmentBuilder, EmbedBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import type { Interaction } from "discord.js";
 import { BaseEvent } from "@class/BaseEvent";
 import { Event } from "@decorators/Event";
@@ -8,11 +8,12 @@ import { PermissionService } from "@services/PermissionService";
 import { EPermission } from "@enums/EPermission";
 import { ChartGenerator } from "@utils/ChartGenerator";
 import StatsCommand from "../commands/stats/index";
+import { BotEvents } from "@enums/BotEvents";
 
 @Event({
-    name: Events.InteractionCreate,
+    name: BotEvents.InteractionCreate,
 })
-export default class StatsPeriodButtonEvent extends BaseEvent<Events.InteractionCreate> {
+export default class StatsPeriodButtonEvent extends BaseEvent<typeof BotEvents.InteractionCreate> {
     async run(client: LeBotClient<true>, interaction: Interaction): Promise<void> {
         if (!interaction.isButton()) return;
         const customId = interaction.customId;

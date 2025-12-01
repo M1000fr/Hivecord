@@ -1,5 +1,4 @@
 import {
-	Events,
 	GuildMember,
 	AttachmentBuilder,
 	TextChannel,
@@ -19,14 +18,17 @@ import path from "path";
 import { MessageTemplate } from "@class/MessageTemplate";
 import { GeneralConfigKeys } from "../../GeneralConfig";
 import { EmbedService } from "@modules/Configuration/services/EmbedService";
+import { InvitationService } from "@modules/Invitation/services/InvitationService";
+import { Invite } from "discord.js";
+import { BotEvents } from "@enums/BotEvents";
 
 @Event({
-	name: Events.GuildMemberAdd,
+	name: BotEvents.MemberJoinProcessed,
 })
-export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
+export default class WelcomeEvent extends BaseEvent<typeof BotEvents.MemberJoinProcessed> {
 	private logger = new Logger("WelcomeEvent");
 
-	async run(client: LeBotClient<true>, member: GuildMember) {
+	async run(client: LeBotClient<true>, member: GuildMember, invite: Invite | null) {
 		try {
 			const welcomeChannelId = await ConfigService.getChannel(
 				GeneralConfigKeys.welcomeChannelId,
@@ -47,6 +49,13 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 				);
 				return;
 			}
+
+            const inviteContext = invite ? {
+                code: invite.code,
+                uses: invite.uses,
+                inviter: invite.inviter,
+                url: invite.url
+            } : null;
 
 			// Check for custom embed
 			const welcomeEmbedName = await ConfigService.get(
@@ -76,6 +85,10 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 			welcomeMessageImageTemplate.addContext("user", member.user);
 			welcomeMessageImageTemplate.addContext("guild", member.guild);
 			welcomeMessageImageTemplate.addContext("member", member);
+            if (inviteContext) {
+                welcomeMessageImageTemplate.addContext("invite", inviteContext);
+                welcomeMessageImageTemplate.addContext("inviter", inviteContext.inviter);
+            }
 
 			const welcomeMessageImage = welcomeMessageImageTemplate.resolve();
 
@@ -191,6 +204,10 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 			welcomeMessageTemplate.addContext("user", member.user);
 			welcomeMessageTemplate.addContext("guild", member.guild);
 			welcomeMessageTemplate.addContext("member", member);
+            if (inviteContext) {
+                welcomeMessageTemplate.addContext("invite", inviteContext);
+                welcomeMessageTemplate.addContext("inviter", inviteContext.inviter);
+            }
 
 			const welcomeMessage = welcomeMessageTemplate.resolve();
 
@@ -205,6 +222,8 @@ export default class WelcomeEvent extends BaseEvent<Events.GuildMemberAdd> {
 					user: member.user,
 					guild: member.guild,
 					member: member,
+                    invite: inviteContext,
+                    inviter: inviteContext?.inviter
 				};
 
 				const customEmbed = await EmbedService.render(

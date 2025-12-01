@@ -1,13 +1,14 @@
-import { Events, type Interaction } from "discord.js";
+import { type Interaction } from "discord.js";
 import { BaseEvent } from '@class/BaseEvent';
 import { Event } from '@decorators/Event';
 import { LeBotClient } from '@class/LeBotClient';
 import { InteractionRegistry } from '@services/InteractionRegistry';
+import { BotEvents } from "@enums/BotEvents";
 
 @Event({
-	name: Events.InteractionCreate,
+	name: BotEvents.InteractionCreate,
 })
-export default class InteractionRegistryHandler extends BaseEvent<Events.InteractionCreate> {
+export default class InteractionRegistryHandler extends BaseEvent<typeof BotEvents.InteractionCreate> {
 	async run(client: LeBotClient<true>, interaction: Interaction) {
 		if (interaction.isButton()) {
 			const handler = InteractionRegistry.buttons.get(
