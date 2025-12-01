@@ -28,7 +28,7 @@ mock.module("@services/RedisService", () => ({
     }
 }));
 
-import { ConfigService } from "../../src/services/ConfigService";
+import { ConfigService } from "@services/ConfigService";
 
 describe("ConfigService", () => {
     beforeEach(() => {
