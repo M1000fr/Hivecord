@@ -1,5 +1,6 @@
 import {
 	ApplicationCommandOptionType,
+	AutocompleteInteraction,
 	CommandInteraction,
 	Events,
 	GuildMember,
@@ -11,75 +12,67 @@ import { Command } from "@decorators/Command";
 import { LeBotClient } from "@class/LeBotClient";
 import { EPermission } from "@enums/EPermission";
 import { DefaultCommand } from "@decorators/DefaultCommand";
+import { Autocomplete } from "@decorators/Autocomplete";
+
+const DEBUG_ACTIONS = [
+	{ name: "Guild Member Add: Message", value: "guild_member_add_message" },
+	{ name: "Voice State Update: Join", value: "voice_state_update_join" },
+	{ name: "Voice State Update: Leave", value: "voice_state_update_leave" },
+	{ name: "Voice State Update: Move", value: "voice_state_update_move" },
+	{ name: "Voice State Update: Stream", value: "voice_state_update_stream" },
+];
 
 @Command({
 	name: "debug",
 	description: "Debug commands",
 	options: [
 		{
-			name: "guild_member_add",
-			description: "Debug GuildMemberAdd event",
-			type: ApplicationCommandOptionType.SubcommandGroup,
-			options: [
-				{
-					name: "message",
-					description: "Test welcome message",
-					type: ApplicationCommandOptionType.Subcommand,
-				},
-			],
-		},
-		{
-			name: "voice_state_update",
-			description: "Debug VoiceStateUpdate event",
-			type: ApplicationCommandOptionType.SubcommandGroup,
-			options: [
-				{
-					name: "join",
-					description: "Test voice join",
-					type: ApplicationCommandOptionType.Subcommand,
-				},
-				{
-					name: "leave",
-					description: "Test voice leave",
-					type: ApplicationCommandOptionType.Subcommand,
-				},
-				{
-					name: "move",
-					description: "Test voice move",
-					type: ApplicationCommandOptionType.Subcommand,
-				},
-				{
-					name: "stream",
-					description: "Test voice stream",
-					type: ApplicationCommandOptionType.Subcommand,
-				},
-			],
+			name: "action",
+			description: "The debug action to perform",
+			type: ApplicationCommandOptionType.String,
+			required: true,
+			autocomplete: true,
 		},
 	],
 	defaultMemberPermissions: "Administrator",
 })
 export default class DebugCommand extends BaseCommand {
+	@Autocomplete({ optionName: "action" })
+	async autocomplete(client: LeBotClient<true>, interaction: AutocompleteInteraction) {
+		const focusedValue = interaction.options.getFocused();
+		const filtered = DEBUG_ACTIONS.filter((choice) =>
+			choice.name.toLowerCase().includes(focusedValue.toLowerCase()),
+		);
+		await interaction.respond(filtered);
+	}
+
 	@DefaultCommand(EPermission.Debug)
 	async run(client: LeBotClient<true>, interaction: CommandInteraction) {
 		if (!interaction.isChatInputCommand()) return;
 
-		const subcommandGroup = interaction.options.getSubcommandGroup();
-		const subcommand = interaction.options.getSubcommand();
+		const action = interaction.options.getString("action", true);
 
-		if (subcommandGroup === "guild_member_add") {
-			if (subcommand === "message") {
+		switch (action) {
+			case "guild_member_add_message":
 				await this.debugGuildMemberAddMessage(client, interaction);
-			}
-		} else if (subcommandGroup === "voice_state_update") {
-			if (subcommand === "join") {
+				break;
+			case "voice_state_update_join":
 				await this.debugVoiceStateUpdateJoin(client, interaction);
-			} else if (subcommand === "leave") {
+				break;
+			case "voice_state_update_leave":
 				await this.debugVoiceStateUpdateLeave(client, interaction);
-			} else if (subcommand === "move") {
+				break;
+			case "voice_state_update_move":
 				await this.debugVoiceStateUpdateMove(client, interaction);
-			} else if (subcommand === "stream") {
+				break;
+			case "voice_state_update_stream":
 				await this.debugVoiceStateUpdateStream(client, interaction);
-			}
+				break;
+			default:
+				await interaction.reply({
+					content: "Unknown debug action.",
+					flags: [MessageFlags.Ephemeral],
+				});
 		}
 	}
 
