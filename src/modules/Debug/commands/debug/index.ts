@@ -4,6 +4,7 @@ import {
 	CommandInteraction,
 	Events,
 	GuildMember,
+	Invite,
 	MessageFlags,
 	VoiceState,
 } from "discord.js";
@@ -13,6 +14,7 @@ import { LeBotClient } from "@class/LeBotClient";
 import { EPermission } from "@enums/EPermission";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { Autocomplete } from "@decorators/Autocomplete";
+import { BotEvents } from "@src/enums/BotEvents";
 
 const DEBUG_ACTIONS = [
 	{ name: "Guild Member Add: Message", value: "guild_member_add_message" },
@@ -38,7 +40,10 @@ const DEBUG_ACTIONS = [
 })
 export default class DebugCommand extends BaseCommand {
 	@Autocomplete({ optionName: "action" })
-	async autocomplete(client: LeBotClient<true>, interaction: AutocompleteInteraction) {
+	async autocomplete(
+		client: LeBotClient<true>,
+		interaction: AutocompleteInteraction,
+	) {
 		const focusedValue = interaction.options.getFocused();
 		const filtered = DEBUG_ACTIONS.filter((choice) =>
 			choice.name.toLowerCase().includes(focusedValue.toLowerCase()),
@@ -94,7 +99,13 @@ export default class DebugCommand extends BaseCommand {
 			flags: [MessageFlags.Ephemeral],
 		});
 
-		client.emit(Events.GuildMemberAdd, member);
+		client.emit(BotEvents.MemberJoinProcessed, member, {
+			code: "DEBUG",
+			inviter: interaction.member?.user || null,
+			inviterid: interaction.member?.user.id || null,
+			guild: member.guild,
+			uses: 1,
+		});
 	}
 
 	private getMockVoiceState(
@@ -149,7 +160,7 @@ export default class DebugCommand extends BaseCommand {
 		});
 
 		client.emit(
-			Events.VoiceStateUpdate,
+			BotEvents.VoiceStateUpdate,
 			this.getMockVoiceState(guild, member, null),
 			this.getMockVoiceState(guild, member, channel.id),
 		);
@@ -185,7 +196,7 @@ export default class DebugCommand extends BaseCommand {
 		});
 
 		client.emit(
-			Events.VoiceStateUpdate,
+			BotEvents.VoiceStateUpdate,
 			this.getMockVoiceState(guild, member, channel.id),
 			this.getMockVoiceState(guild, member, null),
 		);
@@ -223,7 +234,7 @@ export default class DebugCommand extends BaseCommand {
 		});
 
 		client.emit(
-			Events.VoiceStateUpdate,
+			BotEvents.VoiceStateUpdate,
 			this.getMockVoiceState(guild, member, channel1.id),
 			this.getMockVoiceState(guild, member, channel2.id),
 		);
@@ -259,7 +270,7 @@ export default class DebugCommand extends BaseCommand {
 		});
 
 		client.emit(
-			Events.VoiceStateUpdate,
+			BotEvents.VoiceStateUpdate,
 			this.getMockVoiceState(guild, member, channel.id, false),
 			this.getMockVoiceState(guild, member, channel.id, true),
 		);
