@@ -28,8 +28,7 @@
 	"scripts": {
 		"dev": "bun .",
 		"start": "bunx prisma migrate deploy && bun .",
-		"typecheck": "bunx tsc -p tsconfig.json --noEmit",
-		"test": "bun test"
+		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
 	},
 	"trustedDependencies": [
 		"@napi-rs/canvas",
