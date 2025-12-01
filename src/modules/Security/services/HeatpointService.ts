@@ -3,8 +3,8 @@ import { ConfigService } from "@services/ConfigService";
 import { SecurityConfigKeys } from "@modules/Security/SecurityConfig";
 import { Guild, GuildChannel, User, PermissionsBitField, TextChannel, ChannelType, CategoryChannel, VoiceChannel } from "discord.js";
 import { Logger } from "@utils/Logger";
-import { SanctionService } from "@services/SanctionService";
-import { SanctionReasonService } from "@services/SanctionReasonService";
+import { SanctionService } from "@modules/Moderation/services/SanctionService";
+import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
 import { SanctionType } from "@prisma/client/client";
 import { DurationParser } from "@utils/DurationParser";
 

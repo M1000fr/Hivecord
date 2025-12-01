@@ -3,7 +3,7 @@ import type { Interaction } from "discord.js";
 import { BaseEvent } from "@class/BaseEvent";
 import { Event } from "@decorators/Event";
 import { LeBotClient } from "@class/LeBotClient";
-import { StatsService } from "@services/StatsService";
+import { StatsService } from "@modules/Statistics/services/StatsService";
 import { PermissionService } from "@services/PermissionService";
 import { EPermission } from "@enums/EPermission";
 import { ChartGenerator } from "@utils/ChartGenerator";

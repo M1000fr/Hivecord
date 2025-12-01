@@ -1,7 +1,7 @@
 import { Events, Message, type PartialMessage } from "discord.js";
 import { BaseEvent } from "@class/BaseEvent";
 import { Event } from "@decorators/Event";
-import { LogService } from "@services/LogService";
+import { LogService } from "@modules/Log/services/LogService";
 import { LeBotClient } from "@class/LeBotClient";
 
 @Event({

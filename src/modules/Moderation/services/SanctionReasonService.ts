@@ -1,4 +1,4 @@
-import { prismaClient as prisma } from "./prismaService";
+import { prismaClient as prisma } from "@services/prismaService";
 import { SanctionType, type SanctionReason } from "@prisma/client/client";
 
 export class SanctionReasonService {

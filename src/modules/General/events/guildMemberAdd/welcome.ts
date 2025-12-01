@@ -18,7 +18,7 @@ import { Stream } from "stream";
 import path from "path";
 import { MessageTemplate } from "@class/MessageTemplate";
 import { GeneralConfigKeys } from "../../GeneralConfig";
-import { EmbedService } from "@services/EmbedService";
+import { EmbedService } from "@modules/Configuration/services/EmbedService";
 
 @Event({
 	name: Events.GuildMemberAdd,

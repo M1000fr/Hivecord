@@ -1,4 +1,4 @@
-import { StatsService } from "@services/StatsService";
+import { StatsService } from "@modules/Statistics/services/StatsService";
 import { InfluxService } from "@services/InfluxService";
 import { Logger } from "@utils/Logger";
 

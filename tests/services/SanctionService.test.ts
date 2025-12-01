@@ -29,7 +29,7 @@ const mockLogService = {
     logSanction: mock(),
 };
 
-mock.module("@services/LogService", () => ({
+mock.module("@modules/Log/services/LogService", () => ({
     LogService: mockLogService
 }));
 
@@ -39,7 +39,7 @@ mock.module("@modules/Moderation/ModerationConfig", () => ({
     }
 }));
 
-import { SanctionService } from "../../src/services/SanctionService";
+import { SanctionService } from "../../src/modules/Moderation/services/SanctionService";
 
 describe("SanctionService", () => {
     beforeEach(() => {

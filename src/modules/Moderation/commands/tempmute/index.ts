@@ -13,8 +13,8 @@ import { EPermission } from '@enums/EPermission';
 import { tempMuteOptions } from "./tempMuteOptions";
 import { DurationParser } from '@utils/DurationParser';
 import { BotPermission } from '@decorators/BotPermission';
-import { SanctionService } from '@services/SanctionService';
-import { SanctionReasonService } from '@services/SanctionReasonService';
+import { SanctionService } from '@modules/Moderation/services/SanctionService';
+import { SanctionReasonService } from '@modules/Moderation/services/SanctionReasonService';
 import { SanctionType } from "@prisma/client/client";
 
 @Command(tempMuteOptions)

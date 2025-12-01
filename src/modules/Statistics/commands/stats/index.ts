@@ -14,8 +14,8 @@ import { DefaultCommand } from "@decorators/DefaultCommand";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { statsOptions } from "./statsOptions";
-import { StatsService } from "@services/StatsService";
-import type { TimeRange } from "@services/StatsService";
+import { StatsService } from "@modules/Statistics/services/StatsService";
+import type { TimeRange } from "@modules/Statistics/services/StatsService";
 import { ChartGenerator } from "@utils/ChartGenerator";
 
 @Command(statsOptions)

@@ -5,7 +5,7 @@ import { Subcommand } from '@decorators/Subcommand';
 import { Autocomplete } from '@decorators/Autocomplete';
 import { EPermission } from '@enums/EPermission';
 import { groupOptions } from "./groupOptions";
-import { GroupService } from '@services/GroupService';
+import { GroupService } from '@modules/Configuration/services/GroupService';
 import { InteractionHelper } from '@utils/InteractionHelper';
 import { Pager } from '@class/Pager';
 

@@ -1,4 +1,4 @@
-import { StatsService } from "@services/StatsService";
+import { StatsService } from "@modules/Statistics/services/StatsService";
 import { Logger } from "@utils/Logger";
 
 const logger = new Logger("VoiceSessionTickJob");

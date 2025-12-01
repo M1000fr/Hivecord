@@ -1,7 +1,7 @@
 import { BaseEvent } from "@class/BaseEvent";
 import type { LeBotClient } from "@class/LeBotClient";
 import type { Message } from "discord.js";
-import { StatsService } from "@services/StatsService";
+import { StatsService } from "@modules/Statistics/services/StatsService";
 import { Event } from "@decorators/Event";
 
 @Event({ name: "messageCreate" })

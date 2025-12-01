@@ -4,7 +4,7 @@ import { DefaultCommand } from "@decorators/DefaultCommand";
 import { Autocomplete } from "@decorators/Autocomplete";
 import { BaseCommand } from "@class/BaseCommand";
 import { EPermission } from "@enums/EPermission";
-import { SanctionService } from "@services/SanctionService";
+import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { LeBotClient } from "@class/LeBotClient";
 import { unwarnOptions } from "./options";
 

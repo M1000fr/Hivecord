@@ -21,7 +21,7 @@ import { Button, Modal } from '@decorators/Interaction';
 import { VoiceConfigKeys } from '@modules/Voice/VoiceConfig';
 import { ConfigService } from "@services/ConfigService";
 import { prismaClient } from "@services/prismaService";
-import { LogService } from "@services/LogService";
+import { LogService } from "@modules/Log/services/LogService";
 
 type ListType = "whitelist" | "blacklist";
 

@@ -2,7 +2,7 @@ import { Events } from "discord.js";
 import { BaseEvent } from '@class/BaseEvent';
 import { Event } from '@decorators/Event';
 import { LeBotClient } from '@class/LeBotClient';
-import { SyncService } from '@services/SyncService';
+import { SyncService } from '@modules/General/services/SyncService';
 import { Logger } from '@utils/Logger';
 
 @Event({
