@@ -14,6 +14,7 @@ import ReadyEvent from "./events/ready/log";
 import RoleCreateEvent from "./events/roleCreate/sync";
 import RoleDeleteEvent from "./events/roleDelete/sync";
 import RoleUpdateEvent from "./events/roleUpdate/sync";
+import { PingCommandInteractions } from "./interactions/PingCommandInteractions";
 
 @Module({
 	name: "General",
@@ -33,6 +34,7 @@ import RoleUpdateEvent from "./events/roleUpdate/sync";
 		ChannelDeleteEvent,
 		ChannelUpdateEvent,
 	],
+	interactions: [PingCommandInteractions],
 	config: GeneralConfig,
 })
 export class GeneralModule {}

@@ -125,7 +125,7 @@ export class EmbedEditorUtils {
 		switch (type) {
 			case "edit_title":
 				modal.setCustomId("modal_embed_title").setTitle("Edit Title");
-				modal.setComponents(
+				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("title")
@@ -149,7 +149,7 @@ export class EmbedEditorUtils {
 				modal
 					.setCustomId("modal_embed_description")
 					.setTitle("Edit Description");
-				modal.setComponents(
+				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("description")
@@ -163,7 +163,7 @@ export class EmbedEditorUtils {
 
 			case "edit_author":
 				modal.setCustomId("modal_embed_author").setTitle("Edit Author");
-				modal.setComponents(
+				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("name")
@@ -185,7 +185,7 @@ export class EmbedEditorUtils {
 
 			case "edit_footer":
 				modal.setCustomId("modal_embed_footer").setTitle("Edit Footer");
-				modal.setComponents(
+				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("text")
@@ -207,7 +207,7 @@ export class EmbedEditorUtils {
 
 			case "edit_images":
 				modal.setCustomId("modal_embed_images").setTitle("Edit Images");
-				modal.setComponents(
+				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("image")
@@ -230,7 +230,7 @@ export class EmbedEditorUtils {
 
 			case "edit_color":
 				modal.setCustomId("modal_embed_color").setTitle("Edit Color");
-				modal.setComponents(
+				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("color")
@@ -251,7 +251,7 @@ export class EmbedEditorUtils {
 			case "field_edit":
 				modal.setCustomId("modal_embed_field").setTitle("Edit Field");
 				
-				modal.setComponents(
+				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("name")

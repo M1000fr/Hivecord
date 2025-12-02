@@ -1,5 +1,4 @@
 import {
-	Events,
 	type Interaction,
 	ModalBuilder,
 	TextInputBuilder,
@@ -12,23 +11,20 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	MessageFlags,
+	type StringSelectMenuInteraction,
+	type RoleSelectMenuInteraction,
+	type ChannelSelectMenuInteraction,
+	type ModalSubmitInteraction,
+	type ButtonInteraction,
 } from "discord.js";
-import { BaseEvent } from "@class/BaseEvent";
-import { Event } from "@decorators/Event";
+import { ButtonPattern, SelectMenuPattern, ModalPattern } from "@decorators/Interaction";
 import { LeBotClient } from "@class/LeBotClient";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { EConfigType } from "@decorators/ConfigProperty";
-
 import { ConfigService } from "@services/ConfigService";
-import { BotEvents } from "@src/enums/BotEvents";
 
-@Event({
-	name: BotEvents.InteractionCreate,
-})
-export default class ModuleConfigInteractionHandler extends BaseEvent<
-	typeof BotEvents.InteractionCreate
-> {
+export class ModuleConfigInteractions {
 	private async respondToInteraction(
 		interaction: any,
 		content: string,
@@ -63,34 +59,21 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<
 		type: EConfigType,
 	) {
 		try {
-			await ConfigHelper.saveValue(propertyKey, value, type);
-			const displayValue = ConfigHelper.formatValue(value, type);
-
-			// Special logic for Log module
-			if (
-				moduleName.toLowerCase() === "log" &&
-				propertyKey === "logChannelId"
-			) {
-				const logKeys = [
-					"enable_sanction_logs",
-					"enable_voice_logs",
-					"enable_member_logs",
-					"enable_voice_connection_logs",
-				];
-
-				for (const key of logKeys) {
-					const currentValue = await ConfigService.get(key);
-					if (currentValue === null) {
-						await ConfigService.set(key, "true");
-					}
-				}
+			// Use appropriate ConfigService method based on type
+			switch (type) {
+				case EConfigType.String:
+				case EConfigType.Boolean:
+					await ConfigService.set(propertyKey, value);
+					break;
+				case EConfigType.Role:
+					await ConfigService.setRole(propertyKey, value);
+					break;
+				case EConfigType.Channel:
+					await ConfigService.setChannel(propertyKey, value);
+					break;
+				default:
+					await ConfigService.set(propertyKey, value);
 			}
-
-			await InteractionHelper.respondSuccess(
-				interaction,
-				`Successfully updated **${propertyKey}** to ${displayValue}`,
-			);
-
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
 				const config = await ConfigHelper.buildModuleConfigEmbed(
@@ -105,11 +88,13 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<
 					});
 				}
 			}
+			await this.respondToInteraction(interaction, "✅ Configuration updated.");
 		} catch (error) {
-			console.error(error);
-			await InteractionHelper.respondError(
+			console.error("Failed to update config:", error);
+			await this.respondToInteraction(
 				interaction,
-				"An error occurred while saving the configuration.",
+				"❌ Failed to update configuration.",
+				true,
 			);
 		}
 	}
@@ -129,105 +114,179 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<
 		return true;
 	}
 
-	async run(client: LeBotClient<true>, interaction: Interaction) {
-		if (!("customId" in interaction)) return;
-
+	@SelectMenuPattern("module_config:*")
+	async handlePropertySelection(interaction: StringSelectMenuInteraction) {
+		const client = interaction.client as LeBotClient<true>;
 		const parts = ConfigHelper.parseCustomId(interaction.customId);
-		const action = parts[0];
-
-		if (!action || !action.startsWith("module_config")) return;
-
+		const moduleName = parts[1];
 		const userId = parts[parts.length - 1];
 
 		if (!userId || !(await this.validateUser(interaction, userId))) return;
 
-		if (interaction.isStringSelectMenu() && action === "module_config") {
-			const moduleName = parts[1];
-			if (moduleName)
-				await this.handlePropertySelection(
-					client,
+		if (moduleName) {
+			const module = client.modules.get(moduleName.toLowerCase());
+			if (!module?.options.config) {
+				await InteractionHelper.respondError(
 					interaction,
-					moduleName,
+					"Module not found.",
 				);
-		} else if (
-			interaction.isRoleSelectMenu() &&
-			action === "module_config_role"
-		) {
-			const moduleName = parts[1];
-			const propertyKey = parts[2];
-			if (moduleName && propertyKey && interaction.values[0]) {
-				await this.updateConfig(
-					client,
-					interaction,
-					moduleName,
-					propertyKey,
-					interaction.values[0],
-					EConfigType.Role,
-				);
+				return;
 			}
-		} else if (
-			interaction.isChannelSelectMenu() &&
-			action === "module_config_channel"
-		) {
-			const moduleName = parts[1];
-			const propertyKey = parts[2];
-			if (moduleName && propertyKey && interaction.values[0]) {
-				await this.updateConfig(
-					client,
+
+			const selectedProperty = interaction.values[0];
+			if (!selectedProperty) {
+				await InteractionHelper.respondError(
 					interaction,
-					moduleName,
-					propertyKey,
-					interaction.values[0],
-					EConfigType.Channel,
+					"No property selected.",
 				);
+				return;
 			}
-		} else if (
-			interaction.isModalSubmit() &&
-			action === "module_config_modal"
-		) {
-			const moduleName = parts[1];
-			const propertyKey = parts[2];
-			if (moduleName && propertyKey) {
-				await this.updateConfig(
-					client,
+
+			const configProperties =
+				(module.options.config as any).configProperties || {};
+			const propertyOptions = configProperties[selectedProperty];
+
+			if (!propertyOptions) {
+				await InteractionHelper.respondError(
 					interaction,
-					moduleName,
-					propertyKey,
-					interaction.fields.getTextInputValue("value"),
-					EConfigType.String,
+					"Property not found.",
 				);
+				return;
 			}
-		} else if (interaction.isButton() && action === "module_config_bool") {
-			const moduleName = parts[1];
-			const propertyKey = parts[2];
-			const value = parts[3];
-			if (moduleName && propertyKey && value) {
-				await this.updateConfig(
+
+			try {
+				const config = await ConfigHelper.buildModuleConfigEmbed(
 					client,
-					interaction,
 					moduleName,
-					propertyKey,
-					value,
-					EConfigType.Boolean,
+					interaction.user.id,
+				);
+				if (config && interaction.message) {
+					await interaction.message.edit({
+						embeds: [config.embed],
+						components: [config.row],
+					});
+				}
+			} catch (error) {
+				console.error("Failed to reset select menu:", error);
+			}
+
+			const isRoleOrChannel = [
+				EConfigType.Role,
+				EConfigType.Channel,
+			].includes(propertyOptions.type);
+
+			if (isRoleOrChannel) {
+				await this.handleRoleOrChannelProperty(
+					interaction,
+					propertyOptions,
+					selectedProperty,
+					moduleName,
+				);
+			} else if (propertyOptions.type === EConfigType.Boolean) {
+				await this.handleBooleanProperty(
+					interaction,
+					propertyOptions,
+					selectedProperty,
+					moduleName,
+				);
+			} else {
+				await this.handleTextProperty(
+					interaction,
+					propertyOptions,
+					selectedProperty,
+					moduleName,
 				);
 			}
 		}
 	}
 
-	private buildPropertyEmbed(
-		propertyOptions: any,
-		selectedProperty: string,
-		currentValue: string,
-	) {
-		return new EmbedBuilder()
-			.setTitle(
-				`⚙️ Configure: ${propertyOptions.displayName || selectedProperty}`,
-			)
-			.setDescription(
-				`${propertyOptions.description}\n\n**Current value:** ${currentValue}`,
-			)
-			.setColor("#5865F2")
-			.setTimestamp();
+	@SelectMenuPattern("module_config_role:*")
+	async handleRoleSelection(interaction: RoleSelectMenuInteraction) {
+		const client = interaction.client as LeBotClient<true>;
+		const parts = ConfigHelper.parseCustomId(interaction.customId);
+		const moduleName = parts[1];
+		const propertyKey = parts[2];
+		const userId = parts[parts.length - 1];
+
+		if (!userId || !(await this.validateUser(interaction, userId))) return;
+
+		if (moduleName && propertyKey && interaction.values[0]) {
+			await this.updateConfig(
+				client,
+				interaction,
+				moduleName,
+				propertyKey,
+				interaction.values[0],
+				EConfigType.Role,
+			);
+		}
+	}
+
+	@SelectMenuPattern("module_config_channel:*")
+	async handleChannelSelection(interaction: ChannelSelectMenuInteraction) {
+		const client = interaction.client as LeBotClient<true>;
+		const parts = ConfigHelper.parseCustomId(interaction.customId);
+		const moduleName = parts[1];
+		const propertyKey = parts[2];
+		const userId = parts[parts.length - 1];
+
+		if (!userId || !(await this.validateUser(interaction, userId))) return;
+
+		if (moduleName && propertyKey && interaction.values[0]) {
+			await this.updateConfig(
+				client,
+				interaction,
+				moduleName,
+				propertyKey,
+				interaction.values[0],
+				EConfigType.Channel,
+			);
+		}
+	}
+
+	@ModalPattern("module_config_modal:*")
+	async handleTextModal(interaction: ModalSubmitInteraction) {
+		const client = interaction.client as LeBotClient<true>;
+		const parts = ConfigHelper.parseCustomId(interaction.customId);
+		const moduleName = parts[1];
+		const propertyKey = parts[2];
+		const userId = parts[parts.length - 1];
+
+		if (!userId || !(await this.validateUser(interaction, userId))) return;
+
+		if (moduleName && propertyKey) {
+			await this.updateConfig(
+				client,
+				interaction,
+				moduleName,
+				propertyKey,
+				interaction.fields.getTextInputValue("value"),
+				EConfigType.String,
+			);
+		}
+	}
+
+	@ButtonPattern("module_config_bool:*")
+	async handleBooleanButton(interaction: ButtonInteraction) {
+		const client = interaction.client as LeBotClient<true>;
+		const parts = ConfigHelper.parseCustomId(interaction.customId);
+		const moduleName = parts[1];
+		const propertyKey = parts[2];
+		const value = parts[3];
+		const userId = parts[parts.length - 1];
+
+		if (!userId || !(await this.validateUser(interaction, userId))) return;
+
+		if (moduleName && propertyKey && value) {
+			await this.updateConfig(
+				client,
+				interaction,
+				moduleName,
+				propertyKey,
+				value,
+				EConfigType.Boolean,
+			);
+		}
 	}
 
 	private buildSelectComponent(
@@ -388,75 +447,19 @@ export default class ModuleConfigInteractionHandler extends BaseEvent<
 		});
 	}
 
-	private async handlePropertySelection(
-		client: LeBotClient<true>,
-		interaction: any,
-		moduleName: string,
+	private buildPropertyEmbed(
+		propertyOptions: any,
+		selectedProperty: string,
+		currentValue: string,
 	) {
-		const module = client.modules.get(moduleName.toLowerCase());
-		if (!module?.options.config) {
-			await InteractionHelper.respondError(
-				interaction,
-				"Module not found.",
-			);
-			return;
-		}
-
-		const selectedProperty = interaction.values[0];
-		const configProperties =
-			(module.options.config as any).configProperties || {};
-		const propertyOptions = configProperties[selectedProperty];
-
-		if (!propertyOptions) {
-			await InteractionHelper.respondError(
-				interaction,
-				"Property not found.",
-			);
-			return;
-		}
-
-		try {
-			const config = await ConfigHelper.buildModuleConfigEmbed(
-				client,
-				moduleName,
-				interaction.user.id,
-			);
-			if (config && interaction.message) {
-				await interaction.message.edit({
-					embeds: [config.embed],
-					components: [config.row],
-				});
-			}
-		} catch (error) {
-			console.error("Failed to reset select menu:", error);
-		}
-
-		const isRoleOrChannel = [
-			EConfigType.Role,
-			EConfigType.Channel,
-		].includes(propertyOptions.type);
-
-		if (isRoleOrChannel) {
-			await this.handleRoleOrChannelProperty(
-				interaction,
-				propertyOptions,
-				selectedProperty,
-				moduleName,
-			);
-		} else if (propertyOptions.type === EConfigType.Boolean) {
-			await this.handleBooleanProperty(
-				interaction,
-				propertyOptions,
-				selectedProperty,
-				moduleName,
-			);
-		} else {
-			await this.handleTextProperty(
-				interaction,
-				propertyOptions,
-				selectedProperty,
-				moduleName,
-			);
-		}
+		return new EmbedBuilder()
+			.setTitle(
+				`⚙️ Configure: ${propertyOptions.displayName || selectedProperty}`,
+			)
+			.setDescription(
+				`${propertyOptions.description}\n\n**Current value:** ${currentValue}`,
+			)
+			.setColor("#5865F2")
+			.setTimestamp();
 	}
 }

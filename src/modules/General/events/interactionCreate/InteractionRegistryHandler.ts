@@ -11,17 +11,17 @@ import { BotEvents } from "@enums/BotEvents";
 export default class InteractionRegistryHandler extends BaseEvent<typeof BotEvents.InteractionCreate> {
 	async run(client: LeBotClient<true>, interaction: Interaction) {
 		if (interaction.isButton()) {
-			const handler = InteractionRegistry.buttons.get(
+			const handler = InteractionRegistry.getButtonHandler(
 				interaction.customId,
 			);
 			if (handler) await handler(interaction);
 		} else if (interaction.isAnySelectMenu()) {
-			const handler = InteractionRegistry.selectMenus.get(
+			const handler = InteractionRegistry.getSelectMenuHandler(
 				interaction.customId,
 			);
 			if (handler) await handler(interaction);
 		} else if (interaction.isModalSubmit()) {
-			const handler = InteractionRegistry.modals.get(
+			const handler = InteractionRegistry.getModalHandler(
 				interaction.customId,
 			);
 			if (handler) await handler(interaction);

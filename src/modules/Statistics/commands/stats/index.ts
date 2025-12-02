@@ -5,12 +5,10 @@ import {
 	EmbedBuilder,
 	ActionRowBuilder,
 	ButtonBuilder,
-	ButtonStyle,
-	MessageComponentInteraction,
+	ButtonStyle
 } from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
-import { DefaultCommand } from "@decorators/DefaultCommand";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { statsOptions } from "./statsOptions";
@@ -20,12 +18,7 @@ import { ChartGenerator } from "@utils/ChartGenerator";
 
 @Command(statsOptions)
 export default class StatsCommand extends BaseCommand {
-	@DefaultCommand(EPermission.Stats)
-	async run(client: Client, interaction: ChatInputCommandInteraction): Promise<void> {
-		await interaction.reply({ content: "Utilise une sous-commande: /stats server | /stats me | /stats user", ephemeral: true });
-	}
-
-	@Subcommand({ name: "server", permission: EPermission.Stats })
+	@Subcommand({ name: "server", permission: EPermission.StatsServer })
 	async server(client: Client, interaction: ChatInputCommandInteraction): Promise<void> {
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -42,7 +35,7 @@ export default class StatsCommand extends BaseCommand {
 		}
 	}
 
-	@Subcommand({ name: "me", permission: EPermission.Stats })
+	@Subcommand({ name: "me", permission: EPermission.StatsUser })
 	async me(client: Client, interaction: ChatInputCommandInteraction): Promise<void> {
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -59,7 +52,7 @@ export default class StatsCommand extends BaseCommand {
 		}
 	}
 
-	@Subcommand({ name: "user", permission: EPermission.Stats })
+	@Subcommand({ name: "user", permission: EPermission.StatsUser })
 	async user(client: Client, interaction: ChatInputCommandInteraction): Promise<void> {
 		await interaction.deferReply();
 		if (!interaction.guild) {

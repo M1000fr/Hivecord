@@ -1,14 +1,17 @@
 import { ChatInputCommandInteraction, Client, MessageFlags, AutocompleteInteraction } from "discord.js";
 import { PermissionService } from '@services/PermissionService';
+import type { ICommandClass } from '@interfaces/ICommandClass';
 
 export abstract class BaseCommand {
     async handleAutocomplete(client: Client, interaction: AutocompleteInteraction): Promise<void> {
         const focusedOption = interaction.options.getFocused(true);
-        const autocompletes = (this.constructor as any).autocompletes;
+        const autocompletes = (this.constructor as ICommandClass).autocompletes;
 
         if (autocompletes && autocompletes.has(focusedOption.name)) {
             const method = autocompletes.get(focusedOption.name);
-            await (this as any)[method](client, interaction);
+            if (method) {
+                await (this as any)[method](client, interaction);
+            }
         }
     }
 
@@ -24,74 +27,88 @@ export abstract class BaseCommand {
 			const key = subcommandGroup
 				? `${subcommandGroup}:${subcommand}`
 				: subcommand;
-			const subcommands = (this.constructor as any).subcommands;
+			const subcommands = (this.constructor as ICommandClass).subcommands;
 
 			if (subcommands && subcommands.has(key)) {
-				const { method, permission } = subcommands.get(key);
+				const subcommandInfo = subcommands.get(key);
+				if (subcommandInfo) {
+					const { method, permission } = subcommandInfo;
 
-				if (permission) {
-					let roleIds: string[] = [];
-					if (interaction.member) {
-						if (Array.isArray(interaction.member.roles)) {
-							roleIds = interaction.member.roles;
-						} else {
-							roleIds = interaction.member.roles.cache.map(
-								(r) => r.id,
-							);
-						}
-					}
-
-					const hasPermission = await PermissionService.hasPermission(
-						interaction.user.id,
-						roleIds,
-						permission,
-					);
-					if (!hasPermission) {
-						await interaction.reply({
-							content: `You need the permission \`${permission}\` to perform this action.`,
-							flags: [MessageFlags.Ephemeral],
-						});
+					if (permission && !(await this.checkPermission(interaction, permission))) {
 						return;
 					}
-				}
 
-				await (this as any)[method](client, interaction);
-				executed = true;
+					await (this as any)[method](client, interaction);
+					executed = true;
+				}
 			}
 		}
 
 		if (!executed) {
-			const defaultCommand = (this.constructor as any).defaultCommand;
-			if (defaultCommand) {
-				const permission = (this.constructor as any)
-					.defaultCommandPermission;
-				if (permission) {
-					let roleIds: string[] = [];
-					if (interaction.member) {
-						if (Array.isArray(interaction.member.roles)) {
-							roleIds = interaction.member.roles;
-						} else {
-							roleIds = interaction.member.roles.cache.map(
-								(r) => r.id,
-							);
+			const optionRoutes = (this.constructor as ICommandClass).optionRoutes;
+			if (optionRoutes) {
+				for (const [optionName, valueMap] of optionRoutes) {
+					const optionValue = interaction.options.get(optionName)?.value;
+					if (optionValue !== undefined && valueMap.has(optionValue)) {
+						const route = valueMap.get(optionValue);
+						if (route) {
+							const { method, permission } = route;
+
+							if (permission && !(await this.checkPermission(interaction, permission))) {
+								return;
+							}
+
+							await (this as any)[method](client, interaction);
+							executed = true;
+							break;
 						}
 					}
-
-					const hasPermission = await PermissionService.hasPermission(
-						interaction.user.id,
-						roleIds,
-						permission,
-					);
-					if (!hasPermission) {
-						await interaction.reply({
-							content: `You need the permission \`${permission}\` to perform this action.`,
-							flags: [MessageFlags.Ephemeral],
-						});
-						return;
-					}
 				}
+			}
+		}
+
+		if (!executed) {
+			const defaultCommand = (this.constructor as ICommandClass).defaultCommand;
+			if (defaultCommand) {
+				const permission = (this.constructor as ICommandClass)
+					.defaultCommandPermission;
+				
+				if (permission && !(await this.checkPermission(interaction, permission))) {
+					return;
+				}
+
 				await (this as any)[defaultCommand](client, interaction);
 			}
 		}
+	}
+
+	protected async checkPermission(
+		interaction: ChatInputCommandInteraction,
+		permission: string,
+	): Promise<boolean> {
+		let roleIds: string[] = [];
+		if (interaction.member) {
+			if (Array.isArray(interaction.member.roles)) {
+				roleIds = interaction.member.roles;
+			} else {
+				roleIds = interaction.member.roles.cache.map((r) => r.id);
+			}
+		}
+
+		const hasPermission = await PermissionService.hasPermission(
+			interaction.user.id,
+			roleIds,
+			permission,
+		);
+
+		if (!hasPermission) {
+			await interaction.reply({
+				content: `You need the permission \`${permission}\` to perform this action.`,
+				flags: [MessageFlags.Ephemeral],
+			});
+			return false;
+		}
+
+		return true;
 	}
 }

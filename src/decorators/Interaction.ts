@@ -13,6 +13,19 @@ export function Button(customId: string) {
 	};
 }
 
+export function ButtonPattern(pattern: string) {
+	return function (
+		target: any,
+		propertyKey: string,
+		descriptor: PropertyDescriptor,
+	) {
+		InteractionRegistry.registerButtonPattern(
+			pattern,
+			descriptor.value.bind(target),
+		);
+	};
+}
+
 export function SelectMenu(customId: string) {
 	return function (
 		target: any,
@@ -26,6 +39,19 @@ export function SelectMenu(customId: string) {
 	};
 }
 
+export function SelectMenuPattern(pattern: string) {
+	return function (
+		target: any,
+		propertyKey: string,
+		descriptor: PropertyDescriptor,
+	) {
+		InteractionRegistry.registerSelectMenuPattern(
+			pattern,
+			descriptor.value.bind(target),
+		);
+	};
+}
+
 export function Modal(customId: string) {
 	return function (
 		target: any,
@@ -34,6 +60,19 @@ export function Modal(customId: string) {
 	) {
 		InteractionRegistry.registerModal(
 			customId,
+			descriptor.value.bind(target),
+		);
+	};
+}
+
+export function ModalPattern(pattern: string) {
+	return function (
+		target: any,
+		propertyKey: string,
+		descriptor: PropertyDescriptor,
+	) {
+		InteractionRegistry.registerModalPattern(
+			pattern,
 			descriptor.value.bind(target),
 		);
 	};

@@ -3,26 +3,43 @@ import {
 	type StringSelectMenuInteraction,
 	type ModalSubmitInteraction,
 	type ButtonInteraction,
+	type Interaction,
+	MessageFlags,
 } from "discord.js";
 import { Button, SelectMenu, Modal } from "@decorators/Interaction";
 import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { EmbedEditorUtils } from "../commands/embed/EmbedEditorUtils";
 
 export class EmbedEditorInteractions {
-	private async getSession(interaction: any) {
+	private async getSession(interaction: Interaction) {
 		// Use message ID as session key if available (for buttons/select menus/modals on messages)
-		const sessionId = interaction.message?.id || interaction.user.id;
-		
+		const sessionId =
+			interaction.isMessageComponent() || interaction.isModalSubmit()
+				? interaction.message?.id || interaction.user.id
+				: interaction.user.id;
+
 		const session = await EmbedService.getEditorSession(sessionId);
 		if (!session) {
 			if (interaction.isRepliable()) {
 				await interaction.reply({
 					content: "❌ Session expired. Please start over.",
-					ephemeral: true,
+					flags: [MessageFlags.Ephemeral],
 				});
 			}
 			return null;
 		}
+
+		if (session.userId && session.userId !== interaction.user.id) {
+			if (interaction.isRepliable()) {
+				await interaction.reply({
+					content:
+						"❌ You are not allowed to interact with this editor.",
+					flags: [MessageFlags.Ephemeral],
+				});
+			}
+			return null;
+		}
+
 		return session;
 	}
 
@@ -99,7 +116,8 @@ export class EmbedEditorInteractions {
 				interaction.message.id,
 				session.name,
 				session.data,
-				{ ...session.meta, editingFieldIndex: undefined }
+				{ ...session.meta, editingFieldIndex: undefined },
+				session.userId,
 			);
 
 			const modal = EmbedEditorUtils.getModal("field_add");
@@ -121,7 +139,8 @@ export class EmbedEditorInteractions {
 					interaction.message.id,
 					session.name,
 					session.data,
-					{ ...session.meta, editingFieldIndex: index }
+					{ ...session.meta, editingFieldIndex: index },
+					session.userId,
 				);
 
 				const modal = EmbedEditorUtils.getModal("field_edit", {
@@ -138,7 +157,8 @@ export class EmbedEditorInteractions {
 					interaction.message.id,
 					session.name,
 					session.data,
-					session.meta
+					session.meta,
+					session.userId,
 				);
 				// Go back to main menu
 				await this.updateEditorMessage(interaction, session);
@@ -162,6 +182,9 @@ export class EmbedEditorInteractions {
 
 	@Button("embed_editor_cancel")
 	async handleCancel(interaction: ButtonInteraction) {
+		const session = await this.getSession(interaction);
+		if (!session) return;
+
 		await EmbedService.clearEditorSession(interaction.message.id);
 		await interaction.update({
 			content: "❌ Editor cancelled.",
@@ -175,10 +198,18 @@ export class EmbedEditorInteractions {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
-		session.data.title = interaction.fields.getTextInputValue("title") || undefined;
-		session.data.url = interaction.fields.getTextInputValue("url") || undefined;
+		session.data.title =
+			interaction.fields.getTextInputValue("title") || undefined;
+		session.data.url =
+			interaction.fields.getTextInputValue("url") || undefined;
 
-		await EmbedService.setEditorSession(interaction.message!.id, session.name, session.data, session.meta);
+		await EmbedService.setEditorSession(
+			interaction.message!.id,
+			session.name,
+			session.data,
+			session.meta,
+			session.userId,
+		);
 		await this.updateEditorMessage(interaction, session);
 	}
 
@@ -187,9 +218,16 @@ export class EmbedEditorInteractions {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
-		session.data.description = interaction.fields.getTextInputValue("description") || undefined;
+		session.data.description =
+			interaction.fields.getTextInputValue("description") || undefined;
 
-		await EmbedService.setEditorSession(interaction.message!.id, session.name, session.data, session.meta);
+		await EmbedService.setEditorSession(
+			interaction.message!.id,
+			session.name,
+			session.data,
+			session.meta,
+			session.userId,
+		);
 		await this.updateEditorMessage(interaction, session);
 	}
 
@@ -199,7 +237,8 @@ export class EmbedEditorInteractions {
 		if (!session) return;
 
 		const name = interaction.fields.getTextInputValue("name");
-		const icon_url = interaction.fields.getTextInputValue("icon_url") || undefined;
+		const icon_url =
+			interaction.fields.getTextInputValue("icon_url") || undefined;
 
 		if (name) {
 			session.data.author = { name, icon_url };
@@ -207,7 +246,13 @@ export class EmbedEditorInteractions {
 			delete session.data.author;
 		}
 
-		await EmbedService.setEditorSession(interaction.message!.id, session.name, session.data, session.meta);
+		await EmbedService.setEditorSession(
+			interaction.message!.id,
+			session.name,
+			session.data,
+			session.meta,
+			session.userId,
+		);
 		await this.updateEditorMessage(interaction, session);
 	}
 
@@ -217,7 +262,8 @@ export class EmbedEditorInteractions {
 		if (!session) return;
 
 		const text = interaction.fields.getTextInputValue("text");
-		const icon_url = interaction.fields.getTextInputValue("icon_url") || undefined;
+		const icon_url =
+			interaction.fields.getTextInputValue("icon_url") || undefined;
 
 		if (text) {
 			session.data.footer = { text, icon_url };
@@ -225,7 +271,13 @@ export class EmbedEditorInteractions {
 			delete session.data.footer;
 		}
 
-		await EmbedService.setEditorSession(interaction.message!.id, session.name, session.data, session.meta);
+		await EmbedService.setEditorSession(
+			interaction.message!.id,
+			session.name,
+			session.data,
+			session.meta,
+			session.userId,
+		);
 		await this.updateEditorMessage(interaction, session);
 	}
 
@@ -233,7 +285,7 @@ export class EmbedEditorInteractions {
 	async handleImagesModal(interaction: ModalSubmitInteraction) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
-		
+
 		const imageUrl = interaction.fields.getTextInputValue("image");
 		const thumbnailUrl = interaction.fields.getTextInputValue("thumbnail");
 
@@ -249,7 +301,13 @@ export class EmbedEditorInteractions {
 			delete session.data.thumbnail;
 		}
 
-		await EmbedService.setEditorSession(interaction.message!.id, session.name, session.data, session.meta);
+		await EmbedService.setEditorSession(
+			interaction.message!.id,
+			session.name,
+			session.data,
+			session.meta,
+			session.userId,
+		);
 		await this.updateEditorMessage(interaction, session);
 	}
 
@@ -269,7 +327,13 @@ export class EmbedEditorInteractions {
 			delete session.data.color;
 		}
 
-		await EmbedService.setEditorSession(interaction.message!.id, session.name, session.data, session.meta);
+		await EmbedService.setEditorSession(
+			interaction.message!.id,
+			session.name,
+			session.data,
+			session.meta,
+			session.userId,
+		);
 		await this.updateEditorMessage(interaction, session);
 	}
 
@@ -279,15 +343,20 @@ export class EmbedEditorInteractions {
 		if (!session) return;
 
 		if (!session.data.fields) session.data.fields = [];
-		
+
 		const name = interaction.fields.getTextInputValue("name");
 		const value = interaction.fields.getTextInputValue("value");
-		const inline = interaction.fields.getTextInputValue("inline").toLowerCase() === "true";
+		const inline =
+			interaction.fields.getTextInputValue("inline").toLowerCase() ===
+			"true";
 
 		const newField = { name, value, inline };
 		const editingIndex = session.meta?.editingFieldIndex;
 
-		if (typeof editingIndex === "number" && session.data.fields[editingIndex]) {
+		if (
+			typeof editingIndex === "number" &&
+			session.data.fields[editingIndex]
+		) {
 			// Edit existing
 			session.data.fields[editingIndex] = newField;
 		} else {
@@ -300,7 +369,8 @@ export class EmbedEditorInteractions {
 			interaction.message!.id,
 			session.name,
 			session.data,
-			{ ...session.meta, editingFieldIndex: undefined }
+			{ ...session.meta, editingFieldIndex: undefined },
+			session.userId,
 		);
 
 		await this.updateEditorMessage(interaction, session);

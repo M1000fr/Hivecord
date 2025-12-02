@@ -1,4 +1,6 @@
 import { EPermission } from '@enums/EPermission';
+import { BaseCommand } from '@class/BaseCommand';
+import type { ICommandClass } from '@interfaces/ICommandClass';
 
 export interface SubcommandOptions {
 	name: string;
@@ -12,10 +14,18 @@ export function Subcommand(options: SubcommandOptions) {
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) {
-		if (!target.constructor.subcommands) {
-			target.constructor.subcommands = new Map();
+		// Validation: @Subcommand ne peut être utilisé que sur des méthodes de classes étendant BaseCommand
+		if (!(target instanceof BaseCommand)) {
+			throw new Error(
+				`@Subcommand decorator can only be used on methods of classes extending BaseCommand. ` +
+				`Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`
+			);
 		}
-		target.constructor.subcommands.set(
+		const constructor = target.constructor as ICommandClass;
+		if (!constructor.subcommands) {
+			constructor.subcommands = new Map();
+		}
+		constructor.subcommands.set(
 			options.group ? `${options.group}:${options.name}` : options.name,
 			{
 				method: propertyKey,
