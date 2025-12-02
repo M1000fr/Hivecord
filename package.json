@@ -5,8 +5,10 @@
 	"private": true,
 	"devDependencies": {
 		"@types/bun": "latest",
-		"prettier": "^3.7.1",
-		"node-gyp": "^12.1.0"
+		"husky": "^9.1.7",
+		"lint-staged": "^16.2.7",
+		"node-gyp": "^12.1.0",
+		"prettier": "^3.7.1"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
@@ -28,7 +30,13 @@
 	"scripts": {
 		"dev": "bun .",
 		"start": "bunx prisma migrate deploy && bun .",
-		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
+		"typecheck": "bunx tsc -p tsconfig.json --noEmit",
+		"prepare": "husky"
+	},
+	"lint-staged": {
+		"**/*.{ts,js,json,md}": [
+			"prettier --write"
+		]
 	},
 	"trustedDependencies": [
 		"@napi-rs/canvas",
