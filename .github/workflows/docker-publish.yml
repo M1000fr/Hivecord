@@ -78,11 +78,16 @@ jobs:
     steps:
       - name: Deploy to production
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+          HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          envs: REGISTRY,HARBOR_USERNAME,HARBOR_PASSWORD
           script: |
+            echo $HARBOR_PASSWORD | docker login $REGISTRY -u $HARBOR_USERNAME --password-stdin
             cd /root/discord/bots/leBot
             docker compose down
             docker compose pull
