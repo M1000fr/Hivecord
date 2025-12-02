@@ -1,4 +1,8 @@
-import { ConfigProperty, toConfigKey, EConfigType } from "@decorators/ConfigProperty";
+import {
+	ConfigProperty,
+	toConfigKey,
+	EConfigType,
+} from "@decorators/ConfigProperty";
 
 export class SecurityConfig {
 	@ConfigProperty({
@@ -114,7 +118,8 @@ export class SecurityConfig {
 	securityBypassRoleId: string | null = null;
 
 	@ConfigProperty({
-		description: "Number of messages to check for deletion when sanctioning",
+		description:
+			"Number of messages to check for deletion when sanctioning",
 		displayName: "Delete Messages Limit",
 		type: EConfigType.Integer,
 		defaultValue: 50,
@@ -123,19 +128,49 @@ export class SecurityConfig {
 }
 
 export const SecurityConfigKeys = {
-	get heatpointJoinVoice() { return toConfigKey("securityHeatpointJoinVoice"); },
-	get heatpointSwitchVoice() { return toConfigKey("securityHeatpointSwitchVoice"); },
-	get heatpointStream() { return toConfigKey("securityHeatpointStream"); },
-	get heatpointReaction() { return toConfigKey("securityHeatpointReaction"); },
-	get heatpointMessage() { return toConfigKey("securityHeatpointMessage"); },
-	get heatpointDecayRate() { return toConfigKey("securityHeatpointDecayRate"); },
-	get heatpointChannelThreshold() { return toConfigKey("securityHeatpointChannelThreshold"); },
-	get heatpointGlobalThreshold() { return toConfigKey("securityHeatpointGlobalThreshold"); },
-	get heatpointLockDuration() { return toConfigKey("securityHeatpointLockDuration"); },
-	get alertChannelId() { return toConfigKey("securityAlertChannelId"); },
-	get heatpointUserWarnThreshold() { return toConfigKey("securityHeatpointUserWarnThreshold"); },
-	get heatpointUserMuteThreshold() { return toConfigKey("securityHeatpointUserMuteThreshold"); },
-	get heatpointMuteDuration() { return toConfigKey("securityHeatpointMuteDuration"); },
-	get bypassRoleId() { return toConfigKey("securityBypassRoleId"); },
-	get heatpointDeleteMessagesLimit() { return toConfigKey("securityHeatpointDeleteMessagesLimit"); },
+	get heatpointJoinVoice() {
+		return toConfigKey("securityHeatpointJoinVoice");
+	},
+	get heatpointSwitchVoice() {
+		return toConfigKey("securityHeatpointSwitchVoice");
+	},
+	get heatpointStream() {
+		return toConfigKey("securityHeatpointStream");
+	},
+	get heatpointReaction() {
+		return toConfigKey("securityHeatpointReaction");
+	},
+	get heatpointMessage() {
+		return toConfigKey("securityHeatpointMessage");
+	},
+	get heatpointDecayRate() {
+		return toConfigKey("securityHeatpointDecayRate");
+	},
+	get heatpointChannelThreshold() {
+		return toConfigKey("securityHeatpointChannelThreshold");
+	},
+	get heatpointGlobalThreshold() {
+		return toConfigKey("securityHeatpointGlobalThreshold");
+	},
+	get heatpointLockDuration() {
+		return toConfigKey("securityHeatpointLockDuration");
+	},
+	get alertChannelId() {
+		return toConfigKey("securityAlertChannelId");
+	},
+	get heatpointUserWarnThreshold() {
+		return toConfigKey("securityHeatpointUserWarnThreshold");
+	},
+	get heatpointUserMuteThreshold() {
+		return toConfigKey("securityHeatpointUserMuteThreshold");
+	},
+	get heatpointMuteDuration() {
+		return toConfigKey("securityHeatpointMuteDuration");
+	},
+	get bypassRoleId() {
+		return toConfigKey("securityBypassRoleId");
+	},
+	get heatpointDeleteMessagesLimit() {
+		return toConfigKey("securityHeatpointDeleteMessagesLimit");
+	},
 } as const;

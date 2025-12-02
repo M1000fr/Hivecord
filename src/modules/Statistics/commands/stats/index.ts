@@ -5,7 +5,7 @@ import {
 	EmbedBuilder,
 	ActionRowBuilder,
 	ButtonBuilder,
-	ButtonStyle
+	ButtonStyle,
 } from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
@@ -19,10 +19,15 @@ import { ChartGenerator } from "@utils/ChartGenerator";
 @Command(statsOptions)
 export default class StatsCommand extends BaseCommand {
 	@Subcommand({ name: "server", permission: EPermission.StatsServer })
-	async server(client: Client, interaction: ChatInputCommandInteraction): Promise<void> {
+	async server(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	): Promise<void> {
 		await interaction.deferReply();
 		if (!interaction.guild) {
-			await interaction.editReply("Cette sous-commande n'est disponible que dans un serveur.");
+			await interaction.editReply(
+				"Cette sous-commande n'est disponible que dans un serveur.",
+			);
 			return;
 		}
 		const period = "24h"; // default initial period handled via buttons
@@ -31,32 +36,52 @@ export default class StatsCommand extends BaseCommand {
 			await this.handleServerStats(interaction, timeRange, period);
 		} catch (error) {
 			console.error("Error fetching server stats:", error);
-			await interaction.editReply("Erreur lors de la récupération des statistiques serveur.");
+			await interaction.editReply(
+				"Erreur lors de la récupération des statistiques serveur.",
+			);
 		}
 	}
 
 	@Subcommand({ name: "me", permission: EPermission.StatsUser })
-	async me(client: Client, interaction: ChatInputCommandInteraction): Promise<void> {
+	async me(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	): Promise<void> {
 		await interaction.deferReply();
 		if (!interaction.guild) {
-			await interaction.editReply("Cette sous-commande n'est disponible que dans un serveur.");
+			await interaction.editReply(
+				"Cette sous-commande n'est disponible que dans un serveur.",
+			);
 			return;
 		}
 		const period = "24h"; // default period
 		const timeRange = this.getTimeRange(period);
 		try {
-			await this.handleUserStats(interaction, interaction.user.id, timeRange, interaction.user.username, period);
+			await this.handleUserStats(
+				interaction,
+				interaction.user.id,
+				timeRange,
+				interaction.user.username,
+				period,
+			);
 		} catch (error) {
 			console.error("Error fetching personal stats:", error);
-			await interaction.editReply("Erreur lors de la récupération de vos statistiques.");
+			await interaction.editReply(
+				"Erreur lors de la récupération de vos statistiques.",
+			);
 		}
 	}
 
 	@Subcommand({ name: "user", permission: EPermission.StatsUser })
-	async user(client: Client, interaction: ChatInputCommandInteraction): Promise<void> {
+	async user(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	): Promise<void> {
 		await interaction.deferReply();
 		if (!interaction.guild) {
-			await interaction.editReply("Cette sous-commande n'est disponible que dans un serveur.");
+			await interaction.editReply(
+				"Cette sous-commande n'est disponible que dans un serveur.",
+			);
 			return;
 		}
 		const target = interaction.options.getUser("target");
@@ -67,10 +92,18 @@ export default class StatsCommand extends BaseCommand {
 		const period = "24h"; // default period
 		const timeRange = this.getTimeRange(period);
 		try {
-			await this.handleUserStats(interaction, target.id, timeRange, target.username, period);
+			await this.handleUserStats(
+				interaction,
+				target.id,
+				timeRange,
+				target.username,
+				period,
+			);
 		} catch (error) {
 			console.error("Error fetching user stats:", error);
-			await interaction.editReply("Erreur lors de la récupération des statistiques utilisateur.");
+			await interaction.editReply(
+				"Erreur lors de la récupération des statistiques utilisateur.",
+			);
 		}
 	}
 
@@ -140,12 +173,16 @@ export default class StatsCommand extends BaseCommand {
 			.addFields(
 				{
 					name: "🎤 Temps vocal",
-					value: ChartGenerator.formatDuration(voiceStats.totalDuration),
+					value: ChartGenerator.formatDuration(
+						voiceStats.totalDuration,
+					),
 					inline: true,
 				},
 				{
 					name: "💬 Messages",
-					value: ChartGenerator.formatNumber(messageStats.totalMessages),
+					value: ChartGenerator.formatNumber(
+						messageStats.totalMessages,
+					),
 					inline: true,
 				},
 				{
@@ -188,7 +225,14 @@ export default class StatsCommand extends BaseCommand {
 		await interaction.editReply({
 			embeds: [embed],
 			files: [chartAttachment],
-			components: [this.buildPeriodButtons("user", userId, interaction.user.id, period)],
+			components: [
+				this.buildPeriodButtons(
+					"user",
+					userId,
+					interaction.user.id,
+					period,
+				),
+			],
 		});
 	}
 
@@ -212,12 +256,16 @@ export default class StatsCommand extends BaseCommand {
 			[
 				{
 					label: "Messages totaux",
-					value: ChartGenerator.formatNumber(serverStats.totalMessages),
+					value: ChartGenerator.formatNumber(
+						serverStats.totalMessages,
+					),
 					color: "#57F287",
 				},
 				{
 					label: "Temps vocal total",
-					value: ChartGenerator.formatDuration(serverStats.totalVoiceDuration),
+					value: ChartGenerator.formatDuration(
+						serverStats.totalVoiceDuration,
+					),
 					color: "#5865F2",
 				},
 				{
@@ -287,7 +335,9 @@ export default class StatsCommand extends BaseCommand {
 			const channelLeaderboard = topChannels
 				.map((c, i) => {
 					const msgs = ChartGenerator.formatNumber(c.messageCount);
-					const voice = ChartGenerator.formatDuration(c.voiceDuration);
+					const voice = ChartGenerator.formatDuration(
+						c.voiceDuration,
+					);
 					return `${i + 1}. <#${c.channelId}>: ${msgs} msg, ${voice}`;
 				})
 				.join("\n");
@@ -300,12 +350,24 @@ export default class StatsCommand extends BaseCommand {
 		await interaction.editReply({
 			embeds: [embed],
 			files: [statsAttachment],
-			components: [this.buildPeriodButtons("server", guildId, interaction.user.id, period)],
+			components: [
+				this.buildPeriodButtons(
+					"server",
+					guildId,
+					interaction.user.id,
+					period,
+				),
+			],
 		});
 	}
 
 	// Build the action row with period selection buttons
-	private buildPeriodButtons(scope: "server" | "user", targetId: string, invokerId: string, activePeriod: string) {
+	private buildPeriodButtons(
+		scope: "server" | "user",
+		targetId: string,
+		invokerId: string,
+		activePeriod: string,
+	) {
 		const periods: { value: string; label: string }[] = [
 			{ value: "24h", label: "24h" },
 			{ value: "7d", label: "7j" },
@@ -315,9 +377,15 @@ export default class StatsCommand extends BaseCommand {
 		for (const p of periods) {
 			row.addComponents(
 				new ButtonBuilder()
-					.setCustomId(`stats:period:${p.value}:${scope}:${targetId}:${invokerId}`)
+					.setCustomId(
+						`stats:period:${p.value}:${scope}:${targetId}:${invokerId}`,
+					)
 					.setLabel(p.label)
-					.setStyle(p.value === activePeriod ? ButtonStyle.Primary : ButtonStyle.Secondary),
+					.setStyle(
+						p.value === activePeriod
+							? ButtonStyle.Primary
+							: ButtonStyle.Secondary,
+					),
 			);
 		}
 		return row;
@@ -329,21 +397,28 @@ export default class StatsCommand extends BaseCommand {
 		const start = new Date();
 		switch (period) {
 			case "24h":
-				start.setHours(start.getHours() - 24); break;
+				start.setHours(start.getHours() - 24);
+				break;
 			case "7d":
-				start.setDate(start.getDate() - 7); break;
+				start.setDate(start.getDate() - 7);
+				break;
 			case "30d":
-				start.setDate(start.getDate() - 30); break;
+				start.setDate(start.getDate() - 30);
+				break;
 		}
 		return { start, end };
 	}
 
 	static getPeriodLabel(period: string): string {
 		switch (period) {
-			case "24h": return "dernières 24 heures";
-			case "7d": return "7 derniers jours";
-			case "30d": return "30 derniers jours";
-			default: return period;
+			case "24h":
+				return "dernières 24 heures";
+			case "7d":
+				return "7 derniers jours";
+			case "30d":
+				return "30 derniers jours";
+			default:
+				return period;
 		}
 	}
 }

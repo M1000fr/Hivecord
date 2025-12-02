@@ -6,8 +6,13 @@ import { LeBotClient } from "@class/LeBotClient";
 import { BotEvents } from "@enums/BotEvents";
 
 @Event({ name: BotEvents.GuildMemberRemove })
-export class GuildMemberRemove extends BaseEvent<typeof BotEvents.GuildMemberRemove> {
-    async run(client: LeBotClient<true>, member: GuildMember | PartialGuildMember) {
-        await InvitationService.removeInvitation(member.id);
-    }
+export class GuildMemberRemove extends BaseEvent<
+	typeof BotEvents.GuildMemberRemove
+> {
+	async run(
+		client: LeBotClient<true>,
+		member: GuildMember | PartialGuildMember,
+	) {
+		await InvitationService.removeInvitation(member.id);
+	}
 }

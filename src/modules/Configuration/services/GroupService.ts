@@ -1,124 +1,160 @@
 import { prismaClient } from "@services/prismaService";
-import { Logger } from '@utils/Logger';
-import type { GroupModel, RoleModel, PermissionModel } from "@prisma/client/models";
+import { Logger } from "@utils/Logger";
+import type {
+	GroupModel,
+	RoleModel,
+	PermissionModel,
+} from "@prisma/client/models";
 import { RedisService } from "@services/RedisService";
 
 export class GroupService {
-    private static logger = new Logger("GroupService");
+	private static logger = new Logger("GroupService");
 
-    static async createGroup(name: string, roleId: string): Promise<GroupModel> {
-        // Check if role exists
-        let role = await prismaClient.role.findUnique({ where: { id: roleId } });
-        if (!role) {
-            role = await prismaClient.role.create({ data: { id: roleId } });
-        }
+	static async createGroup(
+		name: string,
+		roleId: string,
+	): Promise<GroupModel> {
+		// Check if role exists
+		let role = await prismaClient.role.findUnique({
+			where: { id: roleId },
+		});
+		if (!role) {
+			role = await prismaClient.role.create({ data: { id: roleId } });
+		}
 
-        return prismaClient.group.create({
-            data: {
-                name,
-                roleId
-            }
-        });
-    }
+		return prismaClient.group.create({
+			data: {
+				name,
+				roleId,
+			},
+		});
+	}
 
-    static async deleteGroup(name: string): Promise<GroupModel> {
-        const group = await prismaClient.group.findFirst({ where: { name } });
-        if (!group) {
-            throw new Error(`Group ${name} not found`);
-        }
-        
-        const redis = RedisService.getInstance();
-        await redis.del(`permissions:role:${group.roleId}`);
+	static async deleteGroup(name: string): Promise<GroupModel> {
+		const group = await prismaClient.group.findFirst({ where: { name } });
+		if (!group) {
+			throw new Error(`Group ${name} not found`);
+		}
 
-        return prismaClient.group.delete({
-            where: { id: group.id }
-        });
-    }
+		const redis = RedisService.getInstance();
+		await redis.del(`permissions:role:${group.roleId}`);
 
-    static async addPermission(groupName: string, permissionName: string): Promise<void> {
-        const group = await prismaClient.group.findFirst({ where: { name: groupName } });
-        if (!group) {
-            throw new Error(`Group ${groupName} not found`);
-        }
+		return prismaClient.group.delete({
+			where: { id: group.id },
+		});
+	}
 
-        const permission = await prismaClient.permission.findFirst({ where: { name: permissionName } });
-        if (!permission) {
-            throw new Error(`Permission ${permissionName} not found`);
-        }
+	static async addPermission(
+		groupName: string,
+		permissionName: string,
+	): Promise<void> {
+		const group = await prismaClient.group.findFirst({
+			where: { name: groupName },
+		});
+		if (!group) {
+			throw new Error(`Group ${groupName} not found`);
+		}
 
-        // Check if relation exists
-        const existing = await prismaClient.groupPermission.findFirst({
-            where: {
-                groupId: group.id,
-                permissionId: permission.id
-            }
-        });
+		const permission = await prismaClient.permission.findFirst({
+			where: { name: permissionName },
+		});
+		if (!permission) {
+			throw new Error(`Permission ${permissionName} not found`);
+		}
 
-        if (!existing) {
-            await prismaClient.groupPermission.create({
-                data: {
-                    groupId: group.id,
-                    permissionId: permission.id
-                }
-            });
-            
-            const redis = RedisService.getInstance();
-            await redis.del(`permissions:role:${group.roleId}`);
-        }
-    }
+		// Check if relation exists
+		const existing = await prismaClient.groupPermission.findFirst({
+			where: {
+				groupId: group.id,
+				permissionId: permission.id,
+			},
+		});
 
-    static async removePermission(groupName: string, permissionName: string): Promise<void> {
-        const group = await prismaClient.group.findFirst({ where: { name: groupName } });
-        if (!group) {
-            throw new Error(`Group ${groupName} not found`);
-        }
+		if (!existing) {
+			await prismaClient.groupPermission.create({
+				data: {
+					groupId: group.id,
+					permissionId: permission.id,
+				},
+			});
 
-        const permission = await prismaClient.permission.findFirst({ where: { name: permissionName } });
-        if (!permission) {
-            throw new Error(`Permission ${permissionName} not found`);
-        }
+			const redis = RedisService.getInstance();
+			await redis.del(`permissions:role:${group.roleId}`);
+		}
+	}
 
-        const groupPermission = await prismaClient.groupPermission.findFirst({
-            where: {
-                groupId: group.id,
-                permissionId: permission.id
-            }
-        });
+	static async removePermission(
+		groupName: string,
+		permissionName: string,
+	): Promise<void> {
+		const group = await prismaClient.group.findFirst({
+			where: { name: groupName },
+		});
+		if (!group) {
+			throw new Error(`Group ${groupName} not found`);
+		}
 
-        if (groupPermission) {
-            await prismaClient.groupPermission.delete({
-                where: { id: groupPermission.id }
-            });
-            
-            const redis = RedisService.getInstance();
-            await redis.del(`permissions:role:${group.roleId}`);
-        }
-    }
+		const permission = await prismaClient.permission.findFirst({
+			where: { name: permissionName },
+		});
+		if (!permission) {
+			throw new Error(`Permission ${permissionName} not found`);
+		}
 
-    static async listGroups(): Promise<(GroupModel & { Role: RoleModel, Permissions: { Permissions: PermissionModel }[] })[]> {
-        return prismaClient.group.findMany({
-            include: {
-                Role: true,
-                Permissions: {
-                    include: {
-                        Permissions: true
-                    }
-                }
-            }
-        });
-    }
+		const groupPermission = await prismaClient.groupPermission.findFirst({
+			where: {
+				groupId: group.id,
+				permissionId: permission.id,
+			},
+		});
 
-    static async getGroup(name: string): Promise<(GroupModel & { Role: RoleModel, Permissions: { Permissions: PermissionModel }[] }) | null> {
-        return prismaClient.group.findFirst({
-            where: { name },
-            include: {
-                Role: true,
-                Permissions: {
-                    include: {
-                        Permissions: true
-                    }
-                }
-            }
-        });
-    }
+		if (groupPermission) {
+			await prismaClient.groupPermission.delete({
+				where: { id: groupPermission.id },
+			});
+
+			const redis = RedisService.getInstance();
+			await redis.del(`permissions:role:${group.roleId}`);
+		}
+	}
+
+	static async listGroups(): Promise<
+		(GroupModel & {
+			Role: RoleModel;
+			Permissions: { Permissions: PermissionModel }[];
+		})[]
+	> {
+		return prismaClient.group.findMany({
+			include: {
+				Role: true,
+				Permissions: {
+					include: {
+						Permissions: true,
+					},
+				},
+			},
+		});
+	}
+
+	static async getGroup(
+		name: string,
+	): Promise<
+		| (GroupModel & {
+				Role: RoleModel;
+				Permissions: { Permissions: PermissionModel }[];
+		  })
+		| null
+	> {
+		return prismaClient.group.findFirst({
+			where: { name },
+			include: {
+				Role: true,
+				Permissions: {
+					include: {
+						Permissions: true,
+					},
+				},
+			},
+		});
+	}
 }

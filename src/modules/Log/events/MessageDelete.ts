@@ -8,7 +8,9 @@ import { BotEvents } from "@enums/BotEvents";
 @Event({
 	name: BotEvents.MessageDelete,
 })
-export default class MessageDeleteEvent extends BaseEvent<typeof BotEvents.MessageDelete> {
+export default class MessageDeleteEvent extends BaseEvent<
+	typeof BotEvents.MessageDelete
+> {
 	async run(client: LeBotClient<true>, message: Message | PartialMessage) {
 		if (!message.guild) return;
 		await LogService.logMessageDelete(message);

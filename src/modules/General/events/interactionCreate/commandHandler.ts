@@ -1,18 +1,23 @@
 import { MessageFlags, type Interaction } from "discord.js";
-import { BaseEvent } from '@class/BaseEvent';
-import { Event } from '@decorators/Event';
-import { LeBotClient } from '@class/LeBotClient';
-import { PermissionService } from '@services/PermissionService';
-import { Logger } from '@utils/Logger';
+import { BaseEvent } from "@class/BaseEvent";
+import { Event } from "@decorators/Event";
+import { LeBotClient } from "@class/LeBotClient";
+import { PermissionService } from "@services/PermissionService";
+import { Logger } from "@utils/Logger";
 import { BotEvents } from "@enums/BotEvents";
 
 @Event({
 	name: BotEvents.InteractionCreate,
 })
-export default class InteractionCreateEvent extends BaseEvent<typeof BotEvents.InteractionCreate> {
+export default class InteractionCreateEvent extends BaseEvent<
+	typeof BotEvents.InteractionCreate
+> {
 	private logger = new Logger("InteractionCreateEvent");
 
-	private async sendErrorResponse(interaction: any, message: string): Promise<void> {
+	private async sendErrorResponse(
+		interaction: any,
+		message: string,
+	): Promise<void> {
 		const payload = { content: message, flags: [MessageFlags.Ephemeral] };
 		if (interaction.replied || interaction.deferred) {
 			await interaction.followUp(payload);
@@ -22,24 +27,29 @@ export default class InteractionCreateEvent extends BaseEvent<typeof BotEvents.I
 	}
 
 	async run(client: LeBotClient<true>, interaction: Interaction) {
-        if (interaction.isAutocomplete()) {
-            const command = client.commands.get(interaction.commandName);
-            if (!command) return;
+		if (interaction.isAutocomplete()) {
+			const command = client.commands.get(interaction.commandName);
+			if (!command) return;
 
-            try {
-                await command.instance.handleAutocomplete(client, interaction);
-            } catch (error: any) {
-                this.logger.error(`Error handling autocomplete for ${interaction.commandName}:`, error.message);
-            }
-            return;
-        }
+			try {
+				await command.instance.handleAutocomplete(client, interaction);
+			} catch (error: any) {
+				this.logger.error(
+					`Error handling autocomplete for ${interaction.commandName}:`,
+					error.message,
+				);
+			}
+			return;
+		}
 
 		if (!interaction.isChatInputCommand()) return;
 
 		const command = client.commands.get(interaction.commandName);
 
 		if (!command) {
-			this.logger.error(`No command matching ${interaction.commandName} was found.`);
+			this.logger.error(
+				`No command matching ${interaction.commandName} was found.`,
+			);
 			return;
 		}
 
@@ -47,7 +57,10 @@ export default class InteractionCreateEvent extends BaseEvent<typeof BotEvents.I
 			await command.instance.execute(client, interaction);
 		} catch (error) {
 			this.logger.error(error);
-			await this.sendErrorResponse(interaction, "There was an error while executing this command!");
+			await this.sendErrorResponse(
+				interaction,
+				"There was an error while executing this command!",
+			);
 		}
 	}
 }

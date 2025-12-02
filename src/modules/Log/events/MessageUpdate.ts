@@ -8,7 +8,9 @@ import { BotEvents } from "@enums/BotEvents";
 @Event({
 	name: BotEvents.MessageUpdate,
 })
-export default class MessageUpdateEvent extends BaseEvent<typeof BotEvents.MessageUpdate> {
+export default class MessageUpdateEvent extends BaseEvent<
+	typeof BotEvents.MessageUpdate
+> {
 	async run(
 		client: LeBotClient<true>,
 		oldMessage: Message | PartialMessage,

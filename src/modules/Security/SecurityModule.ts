@@ -6,15 +6,13 @@ import { MessageReactionAddEvent } from "./events/MessageReactionAddEvent";
 import SecurityCommand from "./commands/security/index";
 
 @Module({
-    name: "Security",
-    config: SecurityConfig,
-    commands: [
-        SecurityCommand
-    ],
-    events: [
-        VoiceStateUpdateEvent,
-        MessageCreateEvent,
-        MessageReactionAddEvent
-    ]
+	name: "Security",
+	config: SecurityConfig,
+	commands: [SecurityCommand],
+	events: [
+		VoiceStateUpdateEvent,
+		MessageCreateEvent,
+		MessageReactionAddEvent,
+	],
 })
 export class SecurityModule {}

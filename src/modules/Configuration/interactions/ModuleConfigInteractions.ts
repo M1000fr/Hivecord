@@ -17,7 +17,11 @@ import {
 	type ModalSubmitInteraction,
 	type ButtonInteraction,
 } from "discord.js";
-import { ButtonPattern, SelectMenuPattern, ModalPattern } from "@decorators/Interaction";
+import {
+	ButtonPattern,
+	SelectMenuPattern,
+	ModalPattern,
+} from "@decorators/Interaction";
 import { LeBotClient } from "@class/LeBotClient";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -88,7 +92,10 @@ export class ModuleConfigInteractions {
 					});
 				}
 			}
-			await this.respondToInteraction(interaction, "✅ Configuration updated.");
+			await this.respondToInteraction(
+				interaction,
+				"✅ Configuration updated.",
+			);
 		} catch (error) {
 			console.error("Failed to update config:", error);
 			await this.respondToInteraction(

@@ -221,10 +221,7 @@ export class SanctionService {
 		);
 	}
 
-	static async unmute(
-		guild: Guild,
-		targetUser: User,
-	): Promise<void> {
+	static async unmute(guild: Guild, targetUser: User): Promise<void> {
 		const member = await this.fetchMember(guild, targetUser.id);
 		if (!member) throw new Error("User not found in this guild.");
 
@@ -240,10 +237,7 @@ export class SanctionService {
 		await this.deactivateSanction(targetUser.id, SanctionType.MUTE);
 	}
 
-	static async unban(
-		guild: Guild,
-		targetUser: User,
-	): Promise<void> {
+	static async unban(guild: Guild, targetUser: User): Promise<void> {
 		try {
 			await guild.bans.fetch(targetUser.id);
 		} catch {

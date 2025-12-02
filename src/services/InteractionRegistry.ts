@@ -77,8 +77,8 @@ export class InteractionRegistry {
 	private static matchesPattern(customId: string, pattern: string): boolean {
 		// Convert pattern with wildcards (*) to regex
 		const regexPattern = pattern
-			.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape special regex chars
-			.replace(/\\\*/g, '.*'); // Replace escaped * with .*
+			.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // Escape special regex chars
+			.replace(/\\\*/g, ".*"); // Replace escaped * with .*
 		return new RegExp(`^${regexPattern}$`).test(customId);
 	}
 }

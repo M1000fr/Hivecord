@@ -43,11 +43,13 @@ export class InfluxService {
 			const queryApi = this.getQueryApi();
 			// Test connection with a simple query
 			const testQuery = `from(bucket: "${this.bucket}") |> range(start: -1m) |> limit(n: 1)`;
-			
+
 			await new Promise<void>((resolve, reject) => {
 				let hasData = false;
 				queryApi.queryRows(testQuery, {
-					next: () => { hasData = true; },
+					next: () => {
+						hasData = true;
+					},
 					error: (error) => reject(error),
 					complete: () => resolve(),
 				});
@@ -72,7 +74,10 @@ export class InfluxService {
 		try {
 			await writeApi.flush();
 		} catch (error) {
-			this.logger.error("Failed to flush InfluxDB write API", error instanceof Error ? error.stack : String(error));
+			this.logger.error(
+				"Failed to flush InfluxDB write API",
+				error instanceof Error ? error.stack : String(error),
+			);
 		}
 	}
 
@@ -82,7 +87,10 @@ export class InfluxService {
 			await writeApi.close();
 			this.logger.log("InfluxDB write API closed");
 		} catch (error) {
-			this.logger.error("Failed to close InfluxDB write API", error instanceof Error ? error.stack : String(error));
+			this.logger.error(
+				"Failed to close InfluxDB write API",
+				error instanceof Error ? error.stack : String(error),
+			);
 		}
 	}
 

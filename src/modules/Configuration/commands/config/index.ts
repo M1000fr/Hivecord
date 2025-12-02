@@ -4,14 +4,14 @@ import {
 	AttachmentBuilder,
 	MessageFlags,
 } from "discord.js";
-import { BaseCommand } from '@class/BaseCommand';
-import { Command } from '@decorators/Command';
-import { Subcommand } from '@decorators/Subcommand';
-import { EPermission } from '@enums/EPermission';
+import { BaseCommand } from "@class/BaseCommand";
+import { Command } from "@decorators/Command";
+import { Subcommand } from "@decorators/Subcommand";
+import { EPermission } from "@enums/EPermission";
 import { configOptions } from "./configOptions";
-import { LeBotClient } from '@class/LeBotClient';
-import { BackupService } from '@modules/Configuration/services/BackupService';
-import { InteractionHelper } from '@utils/InteractionHelper';
+import { LeBotClient } from "@class/LeBotClient";
+import { BackupService } from "@modules/Configuration/services/BackupService";
+import { InteractionHelper } from "@utils/InteractionHelper";
 
 @Command(configOptions)
 export default class ConfigCommand extends BaseCommand {
@@ -26,7 +26,9 @@ export default class ConfigCommand extends BaseCommand {
 			const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
 			const filename = `config-backup-${timestamp}.enc`;
 
-			const attachment = new AttachmentBuilder(buffer, { name: filename });
+			const attachment = new AttachmentBuilder(buffer, {
+				name: filename,
+			});
 
 			await interaction.editReply({
 				content: "✅ Configuration backup created successfully!",
@@ -36,7 +38,7 @@ export default class ConfigCommand extends BaseCommand {
 			console.error("Backup creation failed:", error);
 			await InteractionHelper.respondError(
 				interaction,
-				"Failed to create backup. Please check the logs for details."
+				"Failed to create backup. Please check the logs for details.",
 			);
 		}
 	}
@@ -51,7 +53,7 @@ export default class ConfigCommand extends BaseCommand {
 			if (!attachment.name.endsWith(".enc")) {
 				await InteractionHelper.respondError(
 					interaction,
-					"Invalid file format. Please provide an encrypted backup file (.enc)"
+					"Invalid file format. Please provide an encrypted backup file (.enc)",
 				);
 				return;
 			}
@@ -70,14 +72,15 @@ export default class ConfigCommand extends BaseCommand {
 
 			await InteractionHelper.respondSuccess(
 				interaction,
-				"Configuration backup restored successfully! All module configurations have been updated."
+				"Configuration backup restored successfully! All module configurations have been updated.",
 			);
 		} catch (error) {
 			console.error("Backup restoration failed:", error);
-			const errorMessage = error instanceof Error 
-				? error.message 
-				: "Failed to restore backup. Please check the logs for details.";
-			
+			const errorMessage =
+				error instanceof Error
+					? error.message
+					: "Failed to restore backup. Please check the logs for details.";
+
 			await InteractionHelper.respondError(interaction, errorMessage);
 		}
 	}

@@ -1,8 +1,13 @@
 import { prismaClient } from "@services/prismaService";
-import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "crypto";
-import { Logger } from '@utils/Logger';
+import {
+	createCipheriv,
+	createDecipheriv,
+	randomBytes,
+	scryptSync,
+} from "crypto";
+import { Logger } from "@utils/Logger";
 import { ConfigService } from "@services/ConfigService";
-import type { LeBotClient } from '@class/LeBotClient';
+import type { LeBotClient } from "@class/LeBotClient";
 import { EConfigType } from "@decorators/ConfigProperty";
 
 interface ConfigValue {
@@ -28,7 +33,8 @@ class CryptoHelper {
 	private static readonly IV_LENGTH = 16;
 
 	private static getKey(): Buffer {
-		const secret = process.env.BACKUP_SECRET || "default-secret-key-change-me";
+		const secret =
+			process.env.BACKUP_SECRET || "default-secret-key-change-me";
 		return scryptSync(secret, this.SALT, this.KEY_LENGTH);
 	}
 
@@ -42,19 +48,25 @@ class CryptoHelper {
 	static decrypt(text: string): string {
 		const parts = text.split(":");
 		if (parts.length < 2) throw new Error("Invalid encrypted text format");
-		
+
 		const ivHex = parts[0]!;
 		const encryptedParts = parts.slice(1);
 		const iv = Buffer.from(ivHex, "hex");
 		const encryptedText = Buffer.from(encryptedParts.join(":"), "hex");
 		const decipher = createDecipheriv(this.ALGORITHM, this.getKey(), iv);
-		const decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
+		const decrypted = Buffer.concat([
+			decipher.update(encryptedText),
+			decipher.final(),
+		]);
 		return decrypted.toString();
 	}
 }
 
 class ConfigExtractor {
-	static async extractModuleConfig(moduleName: string, configClass: any): Promise<ModuleConfig> {
+	static async extractModuleConfig(
+		moduleName: string,
+		configClass: any,
+	): Promise<ModuleConfig> {
 		const configProperties = configClass?.configProperties || {};
 		const configurations: Record<string, ConfigValue> = {};
 
@@ -73,13 +85,13 @@ class ConfigExtractor {
 
 	private static async getConfigValue(
 		key: string,
-		type: EConfigType
+		type: EConfigType,
 	): Promise<string | string[] | null> {
 		if (type === EConfigType.Role) {
 			// Check if it's a multi-role configuration
 			const roles = await ConfigService.getRoles(key);
 			if (roles.length > 0) return roles;
-			
+
 			const role = await ConfigService.getRole(key);
 			return role ? [role] : null;
 		}
@@ -95,8 +107,12 @@ class ConfigExtractor {
 }
 
 class ConfigRestorer {
-	static async restoreModuleConfig(moduleConfig: ModuleConfig): Promise<void> {
-		for (const [key, configValue] of Object.entries(moduleConfig.configurations)) {
+	static async restoreModuleConfig(
+		moduleConfig: ModuleConfig,
+	): Promise<void> {
+		for (const [key, configValue] of Object.entries(
+			moduleConfig.configurations,
+		)) {
 			const { value, type } = configValue;
 
 			if (type === EConfigType.Role) {
@@ -108,11 +124,11 @@ class ConfigRestorer {
 					}
 				}
 			} else if (type === EConfigType.Channel) {
-				if (typeof value === 'string') {
+				if (typeof value === "string") {
 					await ConfigService.setChannel(key, value);
 				}
 			} else {
-				if (typeof value === 'string') {
+				if (typeof value === "string") {
 					await ConfigService.set(key, value);
 				}
 			}
@@ -134,12 +150,14 @@ export class BackupService {
 			if (configClass && (configClass as any).configProperties) {
 				const moduleConfig = await ConfigExtractor.extractModuleConfig(
 					moduleName,
-					configClass
+					configClass,
 				);
-				
+
 				if (Object.keys(moduleConfig.configurations).length > 0) {
 					modules.push(moduleConfig);
-					this.logger.log(`Backed up ${Object.keys(moduleConfig.configurations).length} configs for ${moduleName}`);
+					this.logger.log(
+						`Backed up ${Object.keys(moduleConfig.configurations).length} configs for ${moduleName}`,
+					);
 				}
 			}
 		}
@@ -166,17 +184,19 @@ export class BackupService {
 
 			if (backup.version !== this.BACKUP_VERSION) {
 				this.logger.warn(
-					`Backup version mismatch: expected ${this.BACKUP_VERSION}, got ${backup.version}`
+					`Backup version mismatch: expected ${this.BACKUP_VERSION}, got ${backup.version}`,
 				);
 			}
 
-			this.logger.log(`Restoring ${backup.modules.length} modules from ${backup.timestamp}`);
+			this.logger.log(
+				`Restoring ${backup.modules.length} modules from ${backup.timestamp}`,
+			);
 
 			for (const moduleConfig of backup.modules) {
 				this.logger.log(`Restoring ${moduleConfig.moduleName}...`);
 				await ConfigRestorer.restoreModuleConfig(moduleConfig);
 				this.logger.log(
-					`Restored ${Object.keys(moduleConfig.configurations).length} configs for ${moduleConfig.moduleName}`
+					`Restored ${Object.keys(moduleConfig.configurations).length} configs for ${moduleConfig.moduleName}`,
 				);
 			}
 
@@ -184,7 +204,7 @@ export class BackupService {
 		} catch (error) {
 			this.logger.error(
 				"Failed to restore backup",
-				(error as Error)?.stack || String(error)
+				(error as Error)?.stack || String(error),
 			);
 			throw error;
 		}

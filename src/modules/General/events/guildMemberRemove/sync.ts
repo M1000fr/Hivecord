@@ -8,7 +8,9 @@ import { BotEvents } from "@enums/BotEvents";
 @Event({
 	name: BotEvents.GuildMemberRemove,
 })
-export default class GuildMemberRemoveSyncEvent extends BaseEvent<typeof BotEvents.GuildMemberRemove> {
+export default class GuildMemberRemoveSyncEvent extends BaseEvent<
+	typeof BotEvents.GuildMemberRemove
+> {
 	async run(client: LeBotClient<true>, member: GuildMember) {
 		await prismaClient.user.upsert({
 			where: { id: member.id },

@@ -60,7 +60,13 @@ export default class EmbedCommand extends BaseCommand {
 		const response = await interaction.fetchReply();
 
 		// Save to session
-		await EmbedService.setEditorSession(response.id, name, data, undefined, interaction.user.id);
+		await EmbedService.setEditorSession(
+			response.id,
+			name,
+			data,
+			undefined,
+			interaction.user.id,
+		);
 	}
 
 	@Subcommand({ name: "edit", permission: EPermission.ConfigureModules })
@@ -88,7 +94,13 @@ export default class EmbedCommand extends BaseCommand {
 		const response = await interaction.fetchReply();
 
 		// Save to session
-		await EmbedService.setEditorSession(response.id, name, data, undefined, interaction.user.id);
+		await EmbedService.setEditorSession(
+			response.id,
+			name,
+			data,
+			undefined,
+			interaction.user.id,
+		);
 	}
 
 	@Subcommand({ name: "delete", permission: EPermission.ConfigureModules })

@@ -45,7 +45,9 @@ export default class SecurityCommand extends BaseCommand {
 						interaction.options.getChannel("channel") ||
 						interaction.channel;
 					if (channel) {
-						await HeatpointService.resetHeat(`channel:${channel.id}`);
+						await HeatpointService.resetHeat(
+							`channel:${channel.id}`,
+						);
 						await interaction.reply({
 							content: `✅ Reset heatpoints for channel ${channel.toString()}.`,
 							flags: [MessageFlags.Ephemeral],

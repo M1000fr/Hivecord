@@ -1,4 +1,8 @@
-import { ConfigProperty, toConfigKey, EConfigType } from "@decorators/ConfigProperty";
+import {
+	ConfigProperty,
+	toConfigKey,
+	EConfigType,
+} from "@decorators/ConfigProperty";
 
 export class LogConfig {
 	@ConfigProperty({

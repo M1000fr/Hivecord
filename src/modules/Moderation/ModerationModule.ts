@@ -1,4 +1,4 @@
-import { Module } from '@decorators/Module';
+import { Module } from "@decorators/Module";
 import { ModerationConfig } from "./ModerationConfig";
 import BanCommand from "./commands/ban/index";
 import UnbanCommand from "./commands/unban/index";
@@ -13,21 +13,21 @@ import LockCommand from "./commands/lock/index";
 import UnlockCommand from "./commands/unlock/index";
 
 @Module({
-    name: "Moderation",
-    commands: [
-        BanCommand,
-        UnbanCommand,
-        TempmuteCommand,
-        UnmuteCommand,
-        SanctionsCommand,
-        PurgeCommand,
-        ClearCommand,
-        WarnCommand,
-        UnwarnCommand,
-        LockCommand,
-        UnlockCommand
-    ],
-    events: [],
-    config: ModerationConfig
+	name: "Moderation",
+	commands: [
+		BanCommand,
+		UnbanCommand,
+		TempmuteCommand,
+		UnmuteCommand,
+		SanctionsCommand,
+		PurgeCommand,
+		ClearCommand,
+		WarnCommand,
+		UnwarnCommand,
+		LockCommand,
+		UnlockCommand,
+	],
+	events: [],
+	config: ModerationConfig,
 })
 export class ModerationModule {}

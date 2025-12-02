@@ -1,4 +1,4 @@
-import { InteractionRegistry } from '@services/InteractionRegistry';
+import { InteractionRegistry } from "@services/InteractionRegistry";
 
 export function Button(customId: string) {
 	return function (

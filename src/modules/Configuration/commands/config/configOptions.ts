@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from "discord.js";
-import type { CommandOptions } from '@interfaces/CommandOptions';
+import type { CommandOptions } from "@interfaces/CommandOptions";
 
 export const configOptions: CommandOptions = {
 	name: "config",
@@ -7,7 +7,8 @@ export const configOptions: CommandOptions = {
 	options: [
 		{
 			name: "backup",
-			description: "Create an encrypted backup of all module configurations",
+			description:
+				"Create an encrypted backup of all module configurations",
 			type: ApplicationCommandOptionType.Subcommand,
 		},
 		{

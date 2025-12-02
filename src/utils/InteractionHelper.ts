@@ -10,16 +10,23 @@ export class InteractionHelper {
 	static async respond(
 		interaction: any,
 		content: string,
-		ephemeral = true
+		ephemeral = true,
 	): Promise<void> {
-		const payload = { content, flags: ephemeral ? [MessageFlags.Ephemeral] : [] };
-		
+		const payload = {
+			content,
+			flags: ephemeral ? [MessageFlags.Ephemeral] : [],
+		};
+
 		if (interaction.replied || interaction.deferred) {
 			await interaction.followUp(payload);
 		} else if (interaction.isModalSubmit?.()) {
 			await interaction.reply(payload);
 		} else if (interaction.update) {
-			await interaction.update({ ...payload, embeds: [], components: [] });
+			await interaction.update({
+				...payload,
+				embeds: [],
+				components: [],
+			});
 		} else {
 			await interaction.reply(payload);
 		}
@@ -30,7 +37,7 @@ export class InteractionHelper {
 	 */
 	static async respondError(
 		interaction: any,
-		error: string | Error
+		error: string | Error,
 	): Promise<void> {
 		const message = error instanceof Error ? error.message : error;
 		await this.respond(interaction, `❌ ${message}`, true);
@@ -41,7 +48,7 @@ export class InteractionHelper {
 	 */
 	static async respondSuccess(
 		interaction: any,
-		message: string
+		message: string,
 	): Promise<void> {
 		await this.respond(interaction, `✅ ${message}`, true);
 	}
@@ -53,7 +60,7 @@ export class InteractionHelper {
 		if (interaction.deferred || interaction.replied) return;
 
 		const options = ephemeral ? { flags: [MessageFlags.Ephemeral] } : {};
-		
+
 		if (interaction.deferUpdate) {
 			await interaction.deferUpdate();
 		} else if (interaction.deferReply) {

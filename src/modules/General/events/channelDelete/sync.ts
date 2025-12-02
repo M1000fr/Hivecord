@@ -9,7 +9,9 @@ import { BotEvents } from "@enums/BotEvents";
 @Event({
 	name: BotEvents.ChannelDelete,
 })
-export default class ChannelDeleteEvent extends BaseEvent<typeof BotEvents.ChannelDelete> {
+export default class ChannelDeleteEvent extends BaseEvent<
+	typeof BotEvents.ChannelDelete
+> {
 	private logger = new Logger("ChannelDeleteEvent");
 
 	async run(client: LeBotClient<true>, channel: Channel) {
@@ -21,7 +23,9 @@ export default class ChannelDeleteEvent extends BaseEvent<typeof BotEvents.Chann
 				data: { deletedAt: new Date() },
 			});
 		} catch (error) {
-			this.logger.error(`Failed to sync deleted channel ${channel.id}: ${error}`);
+			this.logger.error(
+				`Failed to sync deleted channel ${channel.id}: ${error}`,
+			);
 		}
 	}
 }

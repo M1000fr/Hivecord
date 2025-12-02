@@ -4,10 +4,10 @@ import {
 	GuildChannel,
 	MessageFlags,
 } from "discord.js";
-import { BaseCommand } from '@class/BaseCommand';
-import { Command } from '@decorators/Command';
-import { DefaultCommand } from '@decorators/DefaultCommand';
-import { EPermission } from '@enums/EPermission';
+import { BaseCommand } from "@class/BaseCommand";
+import { Command } from "@decorators/Command";
+import { DefaultCommand } from "@decorators/DefaultCommand";
+import { EPermission } from "@enums/EPermission";
 import { clearOptions } from "./pingOptions";
 
 @Command(clearOptions)

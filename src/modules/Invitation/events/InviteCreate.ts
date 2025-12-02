@@ -7,9 +7,9 @@ import { BotEvents } from "@enums/BotEvents";
 
 @Event({ name: BotEvents.InviteCreate })
 export class InviteCreate extends BaseEvent<typeof BotEvents.InviteCreate> {
-    async run(client: LeBotClient<true>, invite: Invite) {
-        if (invite.guild instanceof Guild) {
-            await InvitationService.syncInvites(invite.guild);
-        }
-    }
+	async run(client: LeBotClient<true>, invite: Invite) {
+		if (invite.guild instanceof Guild) {
+			await InvitationService.syncInvites(invite.guild);
+		}
+	}
 }

@@ -4,13 +4,13 @@ import {
 	MessageFlags,
 	PermissionsBitField,
 } from "discord.js";
-import { BaseCommand } from '@class/BaseCommand';
-import { Command } from '@decorators/Command';
-import { DefaultCommand } from '@decorators/DefaultCommand';
-import { EPermission } from '@enums/EPermission';
+import { BaseCommand } from "@class/BaseCommand";
+import { Command } from "@decorators/Command";
+import { DefaultCommand } from "@decorators/DefaultCommand";
+import { EPermission } from "@enums/EPermission";
 import { unbanOptions } from "./unbanOptions";
-import { BotPermission } from '@decorators/BotPermission';
-import { SanctionService } from '@modules/Moderation/services/SanctionService';
+import { BotPermission } from "@decorators/BotPermission";
+import { SanctionService } from "@modules/Moderation/services/SanctionService";
 
 @Command(unbanOptions)
 export default class UnbanCommand extends BaseCommand {
@@ -23,9 +23,7 @@ export default class UnbanCommand extends BaseCommand {
 
 		try {
 			await SanctionService.unban(interaction.guild, user);
-			await interaction.reply(
-				`User ${user.tag} has been unbanned.`,
-			);
+			await interaction.reply(`User ${user.tag} has been unbanned.`);
 		} catch (error: any) {
 			await interaction.reply({
 				content:

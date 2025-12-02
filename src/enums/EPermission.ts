@@ -23,7 +23,7 @@ export enum EPermission {
 	SanctionsList = "commands.sanctions.list",
 	ConfigureModules = "commands.modules",
 	Debug = "commands.debug",
-	
+
 	Warn = "commands.warn",
 	Unwarn = "commands.unwarn",
 

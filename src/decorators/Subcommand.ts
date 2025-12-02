@@ -1,6 +1,6 @@
-import { EPermission } from '@enums/EPermission';
-import { BaseCommand } from '@class/BaseCommand';
-import type { ICommandClass } from '@interfaces/ICommandClass';
+import { EPermission } from "@enums/EPermission";
+import { BaseCommand } from "@class/BaseCommand";
+import type { ICommandClass } from "@interfaces/ICommandClass";
 
 export interface SubcommandOptions {
 	name: string;
@@ -18,7 +18,7 @@ export function Subcommand(options: SubcommandOptions) {
 		if (!(target instanceof BaseCommand)) {
 			throw new Error(
 				`@Subcommand decorator can only be used on methods of classes extending BaseCommand. ` +
-				`Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`
+					`Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`,
 			);
 		}
 		const constructor = target.constructor as ICommandClass;

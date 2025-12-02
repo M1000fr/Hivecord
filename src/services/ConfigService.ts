@@ -1,5 +1,5 @@
 import { prismaClient } from "@services/prismaService";
-import { ChannelType } from '@prisma/client/enums';
+import { ChannelType } from "@prisma/client/enums";
 import { RedisService } from "@services/RedisService";
 
 const CACHE_TTL = 60; // 60 seconds
@@ -19,11 +19,13 @@ export class ConfigService {
 		const cached = await redis.get(cacheKey);
 		if (cached) return cached;
 
-		const config = await prismaClient.configuration.findUnique({ where: { key } });
+		const config = await prismaClient.configuration.findUnique({
+			where: { key },
+		});
 		const value = config?.value ?? null;
-		
+
 		if (value) await redis.set(cacheKey, value, "EX", CACHE_TTL);
-		
+
 		return value;
 	}
 
@@ -56,7 +58,9 @@ export class ConfigService {
 		const cached = await redis.get(cacheKey);
 		if (cached) return cached;
 
-		const config = await prismaClient.channelConfiguration.findFirst({ where: { key } });
+		const config = await prismaClient.channelConfiguration.findFirst({
+			where: { key },
+		});
 		const value = config?.channelId ?? null;
 
 		if (value) await redis.set(cacheKey, value, "EX", CACHE_TTL);
@@ -83,7 +87,9 @@ export class ConfigService {
 
 		await prismaClient.$transaction([
 			prismaClient.channelConfiguration.deleteMany({ where: { key } }),
-			prismaClient.channelConfiguration.create({ data: { key, channelId } }),
+			prismaClient.channelConfiguration.create({
+				data: { key, channelId },
+			}),
 		]);
 		await redis.set(cacheKey, channelId, "EX", CACHE_TTL);
 	}
@@ -150,7 +156,9 @@ export class ConfigService {
 		const cached = await redis.get(cacheKey);
 		if (cached) return cached;
 
-		const config = await prismaClient.roleConfiguration.findFirst({ where: { key } });
+		const config = await prismaClient.roleConfiguration.findFirst({
+			where: { key },
+		});
 		const value = config?.roleId ?? null;
 
 		if (value) await redis.set(cacheKey, value, "EX", CACHE_TTL);
@@ -229,7 +237,9 @@ export class ConfigService {
 		await redis.del(roleCacheKey);
 
 		try {
-			await prismaClient.roleConfiguration.delete({ where: { key_roleId: { key, roleId } } });
+			await prismaClient.roleConfiguration.delete({
+				where: { key_roleId: { key, roleId } },
+			});
 		} catch {
 			// Ignore if not found
 		}
@@ -243,9 +253,11 @@ export class ConfigService {
 		]);
 
 		return {
-			...Object.fromEntries(configs.map(c => [c.key, c.value])),
-			...Object.fromEntries(channelConfigs.map(c => [c.key, c.channelId])),
-			...Object.fromEntries(roleConfigs.map(c => [c.key, c.roleId])),
+			...Object.fromEntries(configs.map((c) => [c.key, c.value])),
+			...Object.fromEntries(
+				channelConfigs.map((c) => [c.key, c.channelId]),
+			),
+			...Object.fromEntries(roleConfigs.map((c) => [c.key, c.roleId])),
 		};
 	}
 }

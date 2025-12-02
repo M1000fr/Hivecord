@@ -7,9 +7,12 @@ import { BotEvents } from "@enums/BotEvents";
 
 @Event({ name: BotEvents.InviteDelete })
 export class InviteDelete extends BaseEvent<typeof BotEvents.InviteDelete> {
-    async run(client: LeBotClient<true>, invite: Invite) {
-        if (invite.guild instanceof Guild) {
-            await InvitationService.handleInviteDelete(invite.guild, invite.code);
-        }
-    }
+	async run(client: LeBotClient<true>, invite: Invite) {
+		if (invite.guild instanceof Guild) {
+			await InvitationService.handleInviteDelete(
+				invite.guild,
+				invite.code,
+			);
+		}
+	}
 }

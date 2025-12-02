@@ -1,15 +1,17 @@
-import { BaseEvent } from '@class/BaseEvent';
-import { Event } from '@decorators/Event';
-import { LeBotClient } from '@class/LeBotClient';
-import { SyncService } from '@modules/General/services/SyncService';
-import { Logger } from '@utils/Logger';
-import { BotEvents } from '@enums/BotEvents';
+import { BaseEvent } from "@class/BaseEvent";
+import { Event } from "@decorators/Event";
+import { LeBotClient } from "@class/LeBotClient";
+import { SyncService } from "@modules/General/services/SyncService";
+import { Logger } from "@utils/Logger";
+import { BotEvents } from "@enums/BotEvents";
 
 @Event({
 	name: BotEvents.ClientReady,
 	once: true,
 })
-export default class ReadyEvent extends BaseEvent<typeof BotEvents.ClientReady> {
+export default class ReadyEvent extends BaseEvent<
+	typeof BotEvents.ClientReady
+> {
 	private logger = new Logger("ReadyEvent");
 
 	async run(client: LeBotClient<true>) {

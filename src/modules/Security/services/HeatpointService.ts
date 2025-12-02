@@ -1,7 +1,16 @@
 import { RedisService } from "@services/RedisService";
 import { ConfigService } from "@services/ConfigService";
 import { SecurityConfigKeys } from "@modules/Security/SecurityConfig";
-import { Guild, GuildChannel, User, PermissionsBitField, TextChannel, ChannelType, CategoryChannel, VoiceChannel } from "discord.js";
+import {
+	Guild,
+	GuildChannel,
+	User,
+	PermissionsBitField,
+	TextChannel,
+	ChannelType,
+	CategoryChannel,
+	VoiceChannel,
+} from "discord.js";
 import { Logger } from "@utils/Logger";
 import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
@@ -9,8 +18,8 @@ import { SanctionType } from "@prisma/client/client";
 import { DurationParser } from "@utils/DurationParser";
 
 export class HeatpointService {
-    private static logger = new Logger("HeatpointService");
-    private static readonly LUA_SCRIPT = `
+	private static logger = new Logger("HeatpointService");
+	private static readonly LUA_SCRIPT = `
         local key_value = KEYS[1]
         local key_time = KEYS[2]
         local points = tonumber(ARGV[1])
@@ -38,126 +47,189 @@ export class HeatpointService {
         return new_val
     `;
 
-    static async addHeat(id: string, points: number): Promise<number> {
-        const redis = RedisService.getInstance();
-        const decayRateStr = await ConfigService.get(SecurityConfigKeys.heatpointDecayRate);
-        const decayRate = parseInt(decayRateStr || "1", 10);
-        const now = Math.floor(Date.now() / 1000);
+	static async addHeat(id: string, points: number): Promise<number> {
+		const redis = RedisService.getInstance();
+		const decayRateStr = await ConfigService.get(
+			SecurityConfigKeys.heatpointDecayRate,
+		);
+		const decayRate = parseInt(decayRateStr || "1", 10);
+		const now = Math.floor(Date.now() / 1000);
 
-        const result = await redis.eval(
-            this.LUA_SCRIPT,
-            2,
-            `heat:${id}`,
-            `heat:${id}:last_update`,
-            points,
-            decayRate,
-            now
-        );
+		const result = await redis.eval(
+			this.LUA_SCRIPT,
+			2,
+			`heat:${id}`,
+			`heat:${id}:last_update`,
+			points,
+			decayRate,
+			now,
+		);
 
-        return result as number;
-    }
+		return result as number;
+	}
 
-    static async getHeat(id: string): Promise<number> {
-        const redis = RedisService.getInstance();
-        const decayRateStr = await ConfigService.get(SecurityConfigKeys.heatpointDecayRate);
-        const decayRate = parseInt(decayRateStr || "1", 10);
-        const now = Math.floor(Date.now() / 1000);
+	static async getHeat(id: string): Promise<number> {
+		const redis = RedisService.getInstance();
+		const decayRateStr = await ConfigService.get(
+			SecurityConfigKeys.heatpointDecayRate,
+		);
+		const decayRate = parseInt(decayRateStr || "1", 10);
+		const now = Math.floor(Date.now() / 1000);
 
-        const key_value = `heat:${id}`;
-        const key_time = `heat:${id}:last_update`;
+		const key_value = `heat:${id}`;
+		const key_time = `heat:${id}:last_update`;
 
-        const currentVal = parseInt(await redis.get(key_value) || "0", 10);
-        const lastTime = parseInt(await redis.get(key_time) || String(now), 10);
+		const currentVal = parseInt((await redis.get(key_value)) || "0", 10);
+		const lastTime = parseInt(
+			(await redis.get(key_time)) || String(now),
+			10,
+		);
 
-        const timeDiff = now - lastTime;
-        let decay = timeDiff * decayRate;
-        if (decay < 0) decay = 0;
+		const timeDiff = now - lastTime;
+		let decay = timeDiff * decayRate;
+		if (decay < 0) decay = 0;
 
-        let newVal = currentVal - decay;
-        if (newVal < 0) newVal = 0;
+		let newVal = currentVal - decay;
+		if (newVal < 0) newVal = 0;
 
-        return newVal;
-    }
+		return newVal;
+	}
 
-    static async resetHeat(id: string): Promise<void> {
-        const redis = RedisService.getInstance();
-        await redis.del(`heat:${id}`);
-        await redis.del(`heat:${id}:last_update`);
-    }
+	static async resetHeat(id: string): Promise<void> {
+		const redis = RedisService.getInstance();
+		await redis.del(`heat:${id}`);
+		await redis.del(`heat:${id}:last_update`);
+	}
 
-    static async resetAllUserHeat(): Promise<void> {
-        const redis = RedisService.getInstance();
-        let cursor = "0";
-        do {
-            const result = await redis.scan(cursor, "MATCH", "heat:user:*", "COUNT", "100");
-            cursor = result[0];
-            const keys = result[1];
-            if (keys.length > 0) {
-                await redis.del(...keys);
-            }
-        } while (cursor !== "0");
-    }
+	static async resetAllUserHeat(): Promise<void> {
+		const redis = RedisService.getInstance();
+		let cursor = "0";
+		do {
+			const result = await redis.scan(
+				cursor,
+				"MATCH",
+				"heat:user:*",
+				"COUNT",
+				"100",
+			);
+			cursor = result[0];
+			const keys = result[1];
+			if (keys.length > 0) {
+				await redis.del(...keys);
+			}
+		} while (cursor !== "0");
+	}
 
-    static async processAction(guild: Guild, channel: GuildChannel | null, user: User, actionType: string): Promise<void> {
-        let points = 0;
+	static async processAction(
+		guild: Guild,
+		channel: GuildChannel | null,
+		user: User,
+		actionType: string,
+	): Promise<void> {
+		let points = 0;
 
-        switch (actionType) {
-            case 'join_voice':
-                points = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointJoinVoice) || "10", 10);
-                break;
-            case 'switch_voice':
-                points = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointSwitchVoice) || "5", 10);
-                break;
-            case 'stream':
-                points = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointStream) || "20", 10);
-                break;
-            case 'message':
-                points = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointMessage) || "5", 10);
-                break;
-            case 'reaction':
-                points = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointReaction) || "2", 10);
-                break;
-        }
+		switch (actionType) {
+			case "join_voice":
+				points = parseInt(
+					(await ConfigService.get(
+						SecurityConfigKeys.heatpointJoinVoice,
+					)) || "10",
+					10,
+				);
+				break;
+			case "switch_voice":
+				points = parseInt(
+					(await ConfigService.get(
+						SecurityConfigKeys.heatpointSwitchVoice,
+					)) || "5",
+					10,
+				);
+				break;
+			case "stream":
+				points = parseInt(
+					(await ConfigService.get(
+						SecurityConfigKeys.heatpointStream,
+					)) || "20",
+					10,
+				);
+				break;
+			case "message":
+				points = parseInt(
+					(await ConfigService.get(
+						SecurityConfigKeys.heatpointMessage,
+					)) || "5",
+					10,
+				);
+				break;
+			case "reaction":
+				points = parseInt(
+					(await ConfigService.get(
+						SecurityConfigKeys.heatpointReaction,
+					)) || "2",
+					10,
+				);
+				break;
+		}
 
-        if (points === 0) return;
+		if (points === 0) return;
 
-        // User Heat
-        const userHeat = await this.addHeat(`user:${user.id}`, points);
+		// User Heat
+		const userHeat = await this.addHeat(`user:${user.id}`, points);
 
-        const userSanctioned = await this.handleUserSanction(guild, user, userHeat, channel);
+		const userSanctioned = await this.handleUserSanction(
+			guild,
+			user,
+			userHeat,
+			channel,
+		);
 
-        if (userSanctioned) {
-            this.logger.debug(`User ${user.tag} sanctioned, stopping propagation.`);
-            return;
-        }
+		if (userSanctioned) {
+			this.logger.debug(
+				`User ${user.tag} sanctioned, stopping propagation.`,
+			);
+			return;
+		}
 
-        // Channel Heat
-        if (channel) {
-            const channelHeat = await this.addHeat(`channel:${channel.id}`, points);
-            const channelThreshold = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointChannelThreshold) || "100", 10);
+		// Channel Heat
+		if (channel) {
+			const channelHeat = await this.addHeat(
+				`channel:${channel.id}`,
+				points,
+			);
+			const channelThreshold = parseInt(
+				(await ConfigService.get(
+					SecurityConfigKeys.heatpointChannelThreshold,
+				)) || "100",
+				10,
+			);
 
-            // Track unique users in channel
-            const redis = RedisService.getInstance();
-            const channelUsersKey = `channel_users:${channel.id}`;
-            await redis.sadd(channelUsersKey, user.id);
-            await redis.expire(channelUsersKey, 60); // Expire after 60 seconds (sliding window)
-            const uniqueUsers = await redis.scard(channelUsersKey);
+			// Track unique users in channel
+			const redis = RedisService.getInstance();
+			const channelUsersKey = `channel_users:${channel.id}`;
+			await redis.sadd(channelUsersKey, user.id);
+			await redis.expire(channelUsersKey, 60); // Expire after 60 seconds (sliding window)
+			const uniqueUsers = await redis.scard(channelUsersKey);
 
-            if (channelHeat > channelThreshold && uniqueUsers >= 3) {
-                await this.lockChannel(channel);
-            }
-        }
+			if (channelHeat > channelThreshold && uniqueUsers >= 3) {
+				await this.lockChannel(channel);
+			}
+		}
 
-        // Global Heat
-        const globalHeat = await this.addHeat(`global:${guild.id}`, points);
-        const globalThreshold = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointGlobalThreshold) || "500", 10);
+		// Global Heat
+		const globalHeat = await this.addHeat(`global:${guild.id}`, points);
+		const globalThreshold = parseInt(
+			(await ConfigService.get(
+				SecurityConfigKeys.heatpointGlobalThreshold,
+			)) || "500",
+			10,
+		);
 
-        if (globalHeat > globalThreshold) {
-            await this.lockServer(guild);
-        }
-    }
+		if (globalHeat > globalThreshold) {
+			await this.lockServer(guild);
+		}
+	}
 
-    private static async handleUserSanction(
+	private static async handleUserSanction(
 		guild: Guild,
 		user: User,
 		heat: number,
@@ -249,7 +321,7 @@ export class HeatpointService {
 							);
 						}
 					}
-                    return true;
+					return true;
 				}
 			} catch (error: any) {
 				if (error.message !== "User is already muted.") {
@@ -257,177 +329,238 @@ export class HeatpointService {
 						`Failed to mute user ${user.tag}: ${error.message}`,
 					);
 				}
-                // Even if mute failed (e.g. already muted), we consider it handled
-                return true;
+				// Even if mute failed (e.g. already muted), we consider it handled
+				return true;
 			}
 		} else if (heat >= warnThreshold) {
-            const alreadyWarned = await redis.get(warnedKey);
-            if (!alreadyWarned) {
-                // Set processing lock
-                await redis.set(processingKey, "true", "EX", 5);
-                
-                try {
-                    const moderator = guild.client.user;
-                    if (moderator) {
-                        const reasonObj = await SanctionReasonService.getOrCreateSystemReason(
-                            "HEATPOINT_WARN",
-                            "You are generating too much activity. Please slow down or you will be muted.",
-                            SanctionType.WARN
-                        );
+			const alreadyWarned = await redis.get(warnedKey);
+			if (!alreadyWarned) {
+				// Set processing lock
+				await redis.set(processingKey, "true", "EX", 5);
 
-                        await SanctionService.warn(
-                            guild,
-                            user,
-                            moderator,
-                            reasonObj.text
-                        );
-                        await redis.set(warnedKey, "true", "EX", 300); // 5 minutes cooldown for warning
-                        this.logger.log(`Warned user ${user.tag} for high heat.`);
-                    }
-                } catch (e) {
-                    this.logger.error(`Could not warn user ${user.tag}: ${e}`);
-                }
-            }
-        }
-        return false;
-    }
+				try {
+					const moderator = guild.client.user;
+					if (moderator) {
+						const reasonObj =
+							await SanctionReasonService.getOrCreateSystemReason(
+								"HEATPOINT_WARN",
+								"You are generating too much activity. Please slow down or you will be muted.",
+								SanctionType.WARN,
+							);
 
-    static async isLocked(id: string): Promise<boolean> {
-        const redis = RedisService.getInstance();
-        const locked = await redis.get(`lock:${id}`);
-        return !!locked;
-    }
+						await SanctionService.warn(
+							guild,
+							user,
+							moderator,
+							reasonObj.text,
+						);
+						await redis.set(warnedKey, "true", "EX", 300); // 5 minutes cooldown for warning
+						this.logger.log(
+							`Warned user ${user.tag} for high heat.`,
+						);
+					}
+				} catch (e) {
+					this.logger.error(`Could not warn user ${user.tag}: ${e}`);
+				}
+			}
+		}
+		return false;
+	}
 
-    static async lock(id: string, duration: number): Promise<void> {
-        const redis = RedisService.getInstance();
-        await redis.set(`lock:${id}`, "true", "EX", duration);
-    }
+	static async isLocked(id: string): Promise<boolean> {
+		const redis = RedisService.getInstance();
+		const locked = await redis.get(`lock:${id}`);
+		return !!locked;
+	}
 
-    static async lockChannel(channel: GuildChannel): Promise<void> {
-        if (await this.isLocked(`channel:${channel.id}`)) return;
+	static async lock(id: string, duration: number): Promise<void> {
+		const redis = RedisService.getInstance();
+		await redis.set(`lock:${id}`, "true", "EX", duration);
+	}
 
-        const duration = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointLockDuration) || "60", 10);
-        const bypassRoleId = await ConfigService.get(SecurityConfigKeys.bypassRoleId);
-        
-        this.logger.log(`Locking channel ${channel.name} (${channel.id}) for ${duration}s due to high heat.`);
+	static async lockChannel(channel: GuildChannel): Promise<void> {
+		if (await this.isLocked(`channel:${channel.id}`)) return;
 
-        await this.lock(`channel:${channel.id}`, duration);
+		const duration = parseInt(
+			(await ConfigService.get(
+				SecurityConfigKeys.heatpointLockDuration,
+			)) || "60",
+			10,
+		);
+		const bypassRoleId = await ConfigService.get(
+			SecurityConfigKeys.bypassRoleId,
+		);
 
-        // Check if channel supports SendMessages permission (Text, Voice, Stage, News)
-        // We use a type guard or check for the method
-        if ('permissionOverwrites' in channel) {
-             const ch = channel as TextChannel | VoiceChannel; // Cast to common interface with permissionOverwrites
-             
-             // Lock @everyone
-             await ch.permissionOverwrites.edit(channel.guild.roles.everyone, {
-                SendMessages: false
-             });
+		this.logger.log(
+			`Locking channel ${channel.name} (${channel.id}) for ${duration}s due to high heat.`,
+		);
 
-             // Allow Bypass Role
-             if (bypassRoleId) {
-                 await ch.permissionOverwrites.edit(bypassRoleId, {
-                     SendMessages: true
-                 });
-             }
+		await this.lock(`channel:${channel.id}`, duration);
 
-             if (ch.isTextBased()) {
-                 await (ch as TextChannel).send(`🔒 Channel locked for ${duration} seconds due to high activity.`);
-             }
+		// Check if channel supports SendMessages permission (Text, Voice, Stage, News)
+		// We use a type guard or check for the method
+		if ("permissionOverwrites" in channel) {
+			const ch = channel as TextChannel | VoiceChannel; // Cast to common interface with permissionOverwrites
 
-             // Alert
-             await this.sendAlert(channel.guild, `🔒 **Channel Locked**: ${channel.toString()} has been locked for ${duration}s due to high activity. @everyone`);
+			// Lock @everyone
+			await ch.permissionOverwrites.edit(channel.guild.roles.everyone, {
+				SendMessages: false,
+			});
 
-             setTimeout(async () => {
-                // Unlock @everyone
-                await ch.permissionOverwrites.edit(channel.guild.roles.everyone, {
-                    SendMessages: null
-                });
-                
-                // Remove Bypass Role overwrite (optional, but cleaner to reset)
-                if (bypassRoleId) {
-                    await ch.permissionOverwrites.edit(bypassRoleId, {
-                        SendMessages: null
-                    });
-                }
+			// Allow Bypass Role
+			if (bypassRoleId) {
+				await ch.permissionOverwrites.edit(bypassRoleId, {
+					SendMessages: true,
+				});
+			}
 
-                if (ch.isTextBased()) {
-                    await (ch as TextChannel).send(`🔓 Channel unlocked.`);
-                }
-             }, duration * 1000);
-        }
-    }
+			if (ch.isTextBased()) {
+				await (ch as TextChannel).send(
+					`🔒 Channel locked for ${duration} seconds due to high activity.`,
+				);
+			}
 
-    static async lockServer(guild: Guild): Promise<void> {
-        if (await this.isLocked(`global:${guild.id}`)) return;
+			// Alert
+			await this.sendAlert(
+				channel.guild,
+				`🔒 **Channel Locked**: ${channel.toString()} has been locked for ${duration}s due to high activity. @everyone`,
+			);
 
-        const duration = parseInt(await ConfigService.get(SecurityConfigKeys.heatpointLockDuration) || "60", 10);
-        const bypassRoleId = await ConfigService.get(SecurityConfigKeys.bypassRoleId);
+			setTimeout(async () => {
+				// Unlock @everyone
+				await ch.permissionOverwrites.edit(
+					channel.guild.roles.everyone,
+					{
+						SendMessages: null,
+					},
+				);
 
-        this.logger.log(`Locking server ${guild.name} (${guild.id}) for ${duration}s due to high global heat.`);
+				// Remove Bypass Role overwrite (optional, but cleaner to reset)
+				if (bypassRoleId) {
+					await ch.permissionOverwrites.edit(bypassRoleId, {
+						SendMessages: null,
+					});
+				}
 
-        await this.lock(`global:${guild.id}`, duration);
+				if (ch.isTextBased()) {
+					await (ch as TextChannel).send(`🔓 Channel unlocked.`);
+				}
+			}, duration * 1000);
+		}
+	}
 
-        // Lock @everyone role
-        const everyoneRole = guild.roles.everyone;
-        const originalPermissions = everyoneRole.permissions;
-        
-        const newPermissions = new PermissionsBitField(originalPermissions);
-        newPermissions.remove(PermissionsBitField.Flags.SendMessages);
-        
-        await everyoneRole.setPermissions(newPermissions, "Global Heat Lockdown");
+	static async lockServer(guild: Guild): Promise<void> {
+		if (await this.isLocked(`global:${guild.id}`)) return;
 
-        // Handle Bypass Role
-        let bypassRole = null;
-        let bypassOriginalPermissions = null;
-        if (bypassRoleId) {
-            bypassRole = guild.roles.cache.get(bypassRoleId);
-            if (bypassRole) {
-                bypassOriginalPermissions = bypassRole.permissions;
-                const newBypassPermissions = new PermissionsBitField(bypassOriginalPermissions);
-                newBypassPermissions.add(PermissionsBitField.Flags.SendMessages);
-                await bypassRole.setPermissions(newBypassPermissions, "Global Heat Lockdown Bypass");
-            }
-        }
+		const duration = parseInt(
+			(await ConfigService.get(
+				SecurityConfigKeys.heatpointLockDuration,
+			)) || "60",
+			10,
+		);
+		const bypassRoleId = await ConfigService.get(
+			SecurityConfigKeys.bypassRoleId,
+		);
 
-        // Notify in system channel or first text channel
-        const notifyChannel = guild.systemChannel || guild.channels.cache.find(c => c.isTextBased()) as TextChannel;
-        if (notifyChannel) {
-            await notifyChannel.send(`🚨 **SERVER LOCKDOWN** 🚨\nGlobal activity threshold exceeded. Server locked for ${duration} seconds.`);
-        }
+		this.logger.log(
+			`Locking server ${guild.name} (${guild.id}) for ${duration}s due to high global heat.`,
+		);
 
-        // Alert
-        await this.sendAlert(guild, `🚨 **SERVER LOCKDOWN** 🚨\nGlobal activity threshold exceeded. Server locked for ${duration} seconds. @everyone`);
+		await this.lock(`global:${guild.id}`, duration);
 
-        setTimeout(async () => {
-            // Restore permissions for @everyone
-            const currentPerms = guild.roles.everyone.permissions;
-            const restorePerms = new PermissionsBitField(currentPerms);
-            restorePerms.add(PermissionsBitField.Flags.SendMessages);
-            
-            await guild.roles.everyone.setPermissions(restorePerms, "Global Heat Lockdown End");
+		// Lock @everyone role
+		const everyoneRole = guild.roles.everyone;
+		const originalPermissions = everyoneRole.permissions;
 
-            // Restore permissions for Bypass Role
-            if (bypassRole && bypassOriginalPermissions) {
-                 await bypassRole.setPermissions(bypassOriginalPermissions, "Global Heat Lockdown Bypass End");
-            }
-            
-            if (notifyChannel) {
-                await notifyChannel.send(`✅ **SERVER UNLOCKED**`);
-            }
-        }, duration * 1000);
-    }
+		const newPermissions = new PermissionsBitField(originalPermissions);
+		newPermissions.remove(PermissionsBitField.Flags.SendMessages);
 
-    private static async sendAlert(guild: Guild, message: string): Promise<void> {
-        const alertChannelId = await ConfigService.get(SecurityConfigKeys.alertChannelId);
-        if (alertChannelId) {
-            const channel = guild.channels.cache.get(alertChannelId) as TextChannel;
-            if (channel && channel.isTextBased()) {
-                try {
-                    await channel.send(message);
-                } catch (e) {
-                    this.logger.error(`Failed to send alert to channel ${alertChannelId}`);
-                }
-            }
-        }
-    }
+		await everyoneRole.setPermissions(
+			newPermissions,
+			"Global Heat Lockdown",
+		);
+
+		// Handle Bypass Role
+		let bypassRole = null;
+		let bypassOriginalPermissions = null;
+		if (bypassRoleId) {
+			bypassRole = guild.roles.cache.get(bypassRoleId);
+			if (bypassRole) {
+				bypassOriginalPermissions = bypassRole.permissions;
+				const newBypassPermissions = new PermissionsBitField(
+					bypassOriginalPermissions,
+				);
+				newBypassPermissions.add(
+					PermissionsBitField.Flags.SendMessages,
+				);
+				await bypassRole.setPermissions(
+					newBypassPermissions,
+					"Global Heat Lockdown Bypass",
+				);
+			}
+		}
+
+		// Notify in system channel or first text channel
+		const notifyChannel =
+			guild.systemChannel ||
+			(guild.channels.cache.find((c) => c.isTextBased()) as TextChannel);
+		if (notifyChannel) {
+			await notifyChannel.send(
+				`🚨 **SERVER LOCKDOWN** 🚨\nGlobal activity threshold exceeded. Server locked for ${duration} seconds.`,
+			);
+		}
+
+		// Alert
+		await this.sendAlert(
+			guild,
+			`🚨 **SERVER LOCKDOWN** 🚨\nGlobal activity threshold exceeded. Server locked for ${duration} seconds. @everyone`,
+		);
+
+		setTimeout(async () => {
+			// Restore permissions for @everyone
+			const currentPerms = guild.roles.everyone.permissions;
+			const restorePerms = new PermissionsBitField(currentPerms);
+			restorePerms.add(PermissionsBitField.Flags.SendMessages);
+
+			await guild.roles.everyone.setPermissions(
+				restorePerms,
+				"Global Heat Lockdown End",
+			);
+
+			// Restore permissions for Bypass Role
+			if (bypassRole && bypassOriginalPermissions) {
+				await bypassRole.setPermissions(
+					bypassOriginalPermissions,
+					"Global Heat Lockdown Bypass End",
+				);
+			}
+
+			if (notifyChannel) {
+				await notifyChannel.send(`✅ **SERVER UNLOCKED**`);
+			}
+		}, duration * 1000);
+	}
+
+	private static async sendAlert(
+		guild: Guild,
+		message: string,
+	): Promise<void> {
+		const alertChannelId = await ConfigService.get(
+			SecurityConfigKeys.alertChannelId,
+		);
+		if (alertChannelId) {
+			const channel = guild.channels.cache.get(
+				alertChannelId,
+			) as TextChannel;
+			if (channel && channel.isTextBased()) {
+				try {
+					await channel.send(message);
+				} catch (e) {
+					this.logger.error(
+						`Failed to send alert to channel ${alertChannelId}`,
+					);
+				}
+			}
+		}
+	}
 }

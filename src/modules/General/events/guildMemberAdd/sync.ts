@@ -9,7 +9,9 @@ import { BotEvents } from "@enums/BotEvents";
 @Event({
 	name: BotEvents.GuildMemberAdd,
 })
-export default class GuildMemberRegisterEvent extends BaseEvent<typeof BotEvents.GuildMemberAdd> {
+export default class GuildMemberRegisterEvent extends BaseEvent<
+	typeof BotEvents.GuildMemberAdd
+> {
 	private logger = new Logger("RegisterNewMemberEvent");
 
 	async run(client: LeBotClient<true>, member: GuildMember) {

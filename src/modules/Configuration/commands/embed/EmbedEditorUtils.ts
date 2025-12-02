@@ -212,7 +212,9 @@ export class EmbedEditorUtils {
 						new TextInputBuilder()
 							.setCustomId("image")
 							.setLabel("Main Image URL")
-							.setPlaceholder("https://... or attachment://filename.png")
+							.setPlaceholder(
+								"https://... or attachment://filename.png",
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(currentData?.image?.url || ""),
@@ -250,7 +252,7 @@ export class EmbedEditorUtils {
 			case "field_add":
 			case "field_edit":
 				modal.setCustomId("modal_embed_field").setTitle("Edit Field");
-				
+
 				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()

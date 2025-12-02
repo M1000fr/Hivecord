@@ -68,13 +68,21 @@ export class TempVoiceInteractions {
 	@Button("temp_voice_whitelist")
 	async handleWhitelistButton(interaction: ButtonInteraction) {
 		if (!(await TempVoiceService.validateOwner(interaction))) return;
-		await TempVoiceService.collectUserMentions(interaction, interaction.channel as VoiceChannel, "whitelist");
+		await TempVoiceService.collectUserMentions(
+			interaction,
+			interaction.channel as VoiceChannel,
+			"whitelist",
+		);
 	}
 
 	@Button("temp_voice_blacklist")
 	async handleBlacklistButton(interaction: ButtonInteraction) {
 		if (!(await TempVoiceService.validateOwner(interaction))) return;
-		await TempVoiceService.collectUserMentions(interaction, interaction.channel as VoiceChannel, "blacklist");
+		await TempVoiceService.collectUserMentions(
+			interaction,
+			interaction.channel as VoiceChannel,
+			"blacklist",
+		);
 	}
 
 	@Modal("temp_voice_rename_modal")
@@ -84,7 +92,12 @@ export class TempVoiceInteractions {
 
 		const newName = interaction.fields.getTextInputValue("new_name");
 		await channel.setName(newName);
-		await LogService.logTempVoice(channel.guild, interaction.user, "Rename", `Renamed <#${channel.id}> to ${newName}`);
+		await LogService.logTempVoice(
+			channel.guild,
+			interaction.user,
+			"Rename",
+			`Renamed <#${channel.id}> to ${newName}`,
+		);
 		await interaction.reply({
 			content: `Channel renamed to ${newName}`,
 			flags: MessageFlags.Ephemeral,
