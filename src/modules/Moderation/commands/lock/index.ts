@@ -1,44 +1,75 @@
-import { ChatInputCommandInteraction, Client, PermissionsBitField, TextChannel, GuildChannel, MessageFlags } from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
+import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
-import { BotPermission } from "@decorators/BotPermission";
+import {
+	ChatInputCommandInteraction,
+	Client,
+	MessageFlags,
+	PermissionsBitField,
+	TextChannel,
+} from "discord.js";
 import { lockOptions } from "./lockOptions";
 
 @Command(lockOptions)
 export default class LockCommand extends BaseCommand {
-    @DefaultCommand(EPermission.Lock)
-    @BotPermission(PermissionsBitField.Flags.ManageChannels)
-    async run(client: Client, interaction: ChatInputCommandInteraction) {
-        const target = interaction.options.getString("target") || "channel";
-        const reason = interaction.options.getString("reason") || "No reason provided";
-        const guild = interaction.guild;
+	@DefaultCommand(EPermission.Lock)
+	@BotPermission(PermissionsBitField.Flags.ManageChannels)
+	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		const target = interaction.options.getString("target") || "channel";
+		const reason =
+			interaction.options.getString("reason") || "No reason provided";
+		const guild = interaction.guild;
 
-        if (!guild) return;
+		if (!guild) return;
 
-        if (target === "channel") {
-            const channel = interaction.channel;
-            if (!channel || !('permissionOverwrites' in channel)) {
-                return interaction.reply({ content: "This channel cannot be locked.", flags: [MessageFlags.Ephemeral] });
-            }
+		if (target === "channel") {
+			const channel = interaction.channel;
+			if (!channel || !("permissionOverwrites" in channel)) {
+				return interaction.reply({
+					content: "This channel cannot be locked.",
+					flags: [MessageFlags.Ephemeral],
+				});
+			}
 
-            await (channel as TextChannel).permissionOverwrites.edit(guild.roles.everyone, {
-                SendMessages: false
-            }, { reason: `Lock Command: ${reason}` });
+			await (channel as TextChannel).permissionOverwrites.edit(
+				guild.roles.everyone,
+				{
+					SendMessages: false,
+				},
+				{ reason: `Lock Command: ${reason}` },
+			);
 
-            await interaction.reply({ content: `🔒 Channel locked. Reason: ${reason}` });
-        } else if (target === "server") {
-            if (!interaction.memberPermissions?.has(PermissionsBitField.Flags.Administrator)) {
-                 return interaction.reply({ content: "You need Administrator permission to lock the server.", flags: [MessageFlags.Ephemeral] });
-            }
+			await interaction.reply({
+				content: `🔒 Channel locked. Reason: ${reason}`,
+			});
+		} else if (target === "server") {
+			if (
+				!interaction.memberPermissions?.has(
+					PermissionsBitField.Flags.Administrator,
+				)
+			) {
+				return interaction.reply({
+					content:
+						"You need Administrator permission to lock the server.",
+					flags: [MessageFlags.Ephemeral],
+				});
+			}
 
-            const everyoneRole = guild.roles.everyone;
-            const newPermissions = new PermissionsBitField(everyoneRole.permissions);
-            newPermissions.remove(PermissionsBitField.Flags.SendMessages);
+			const everyoneRole = guild.roles.everyone;
+			const newPermissions = new PermissionsBitField(
+				everyoneRole.permissions,
+			);
+			newPermissions.remove(PermissionsBitField.Flags.SendMessages);
 
-            await everyoneRole.setPermissions(newPermissions, `Server Lock Command: ${reason}`);
-            await interaction.reply({ content: `🚨 **SERVER LOCKED**. Reason: ${reason}` });
-        }
-    }
+			await everyoneRole.setPermissions(
+				newPermissions,
+				`Server Lock Command: ${reason}`,
+			);
+			await interaction.reply({
+				content: `🚨 **SERVER LOCKED**. Reason: ${reason}`,
+			});
+		}
+	}
 }

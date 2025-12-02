@@ -1,9 +1,9 @@
 import { BaseEvent } from "@class/BaseEvent";
 import type { LeBotClient } from "@class/LeBotClient";
-import type { VoiceState } from "discord.js";
-import { StatsService } from "@modules/Statistics/services/StatsService";
 import { Event } from "@decorators/Event";
+import { StatsService } from "@modules/Statistics/services/StatsService";
 import { BotEvents } from "@src/enums/BotEvents";
+import type { VoiceState } from "discord.js";
 
 @Event({ name: BotEvents.VoiceStateUpdate })
 export default class VoiceStateUpdateEvent extends BaseEvent<

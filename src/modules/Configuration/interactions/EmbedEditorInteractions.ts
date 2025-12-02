@@ -1,13 +1,13 @@
+import { Button, Modal, SelectMenu } from "@decorators/Interaction";
+import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import {
-	EmbedBuilder,
-	type StringSelectMenuInteraction,
-	type ModalSubmitInteraction,
 	type ButtonInteraction,
+	EmbedBuilder,
 	type Interaction,
 	MessageFlags,
+	type ModalSubmitInteraction,
+	type StringSelectMenuInteraction,
 } from "discord.js";
-import { Button, SelectMenu, Modal } from "@decorators/Interaction";
-import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { EmbedEditorUtils } from "../commands/embed/EmbedEditorUtils";
 
 export class EmbedEditorInteractions {

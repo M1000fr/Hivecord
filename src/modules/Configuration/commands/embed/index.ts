@@ -1,17 +1,16 @@
+import { BaseCommand } from "@class/BaseCommand";
+import { Autocomplete } from "@decorators/Autocomplete";
+import { Command } from "@decorators/Command";
+import { Subcommand } from "@decorators/Subcommand";
+import { EPermission } from "@enums/EPermission";
+import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import {
+	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
 	EmbedBuilder,
 	MessageFlags,
-	ApplicationCommandOptionType,
-	AutocompleteInteraction,
 } from "discord.js";
-import { BaseCommand } from "@class/BaseCommand";
-import { Command } from "@decorators/Command";
-import { Subcommand } from "@decorators/Subcommand";
-import { Autocomplete } from "@decorators/Autocomplete";
-import { EPermission } from "@enums/EPermission";
-import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { EmbedEditorUtils } from "./EmbedEditorUtils";
 import { embedOptions } from "./embedOptions";
 
@@ -60,7 +59,13 @@ export default class EmbedCommand extends BaseCommand {
 		const response = await interaction.fetchReply();
 
 		// Save to session
-		await EmbedService.setEditorSession(response.id, name, data, undefined, interaction.user.id);
+		await EmbedService.setEditorSession(
+			response.id,
+			name,
+			data,
+			undefined,
+			interaction.user.id,
+		);
 	}
 
 	@Subcommand({ name: "edit", permission: EPermission.ConfigureModules })
@@ -88,7 +93,13 @@ export default class EmbedCommand extends BaseCommand {
 		const response = await interaction.fetchReply();
 
 		// Save to session
-		await EmbedService.setEditorSession(response.id, name, data, undefined, interaction.user.id);
+		await EmbedService.setEditorSession(
+			response.id,
+			name,
+			data,
+			undefined,
+			interaction.user.id,
+		);
 	}
 
 	@Subcommand({ name: "delete", permission: EPermission.ConfigureModules })

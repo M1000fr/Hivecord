@@ -1,14 +1,16 @@
-import { Message, type PartialMessage } from "discord.js";
 import { BaseEvent } from "@class/BaseEvent";
-import { Event } from "@decorators/Event";
-import { LogService } from "@modules/Log/services/LogService";
 import { LeBotClient } from "@class/LeBotClient";
+import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
+import { LogService } from "@modules/Log/services/LogService";
+import { Message, type PartialMessage } from "discord.js";
 
 @Event({
 	name: BotEvents.MessageUpdate,
 })
-export default class MessageUpdateEvent extends BaseEvent<typeof BotEvents.MessageUpdate> {
+export default class MessageUpdateEvent extends BaseEvent<
+	typeof BotEvents.MessageUpdate
+> {
 	async run(
 		client: LeBotClient<true>,
 		oldMessage: Message | PartialMessage,

@@ -1,19 +1,30 @@
-import { ChatInputCommandInteraction, Client, MessageFlags, AutocompleteInteraction } from "discord.js";
-import { PermissionService } from '@services/PermissionService';
-import type { ICommandClass } from '@interfaces/ICommandClass';
+import type { ICommandClass } from "@interfaces/ICommandClass";
+import { PermissionService } from "@services/PermissionService";
+import { Logger } from "@utils/Logger";
+import {
+	AutocompleteInteraction,
+	ChatInputCommandInteraction,
+	Client,
+	MessageFlags,
+} from "discord.js";
 
 export abstract class BaseCommand {
-    async handleAutocomplete(client: Client, interaction: AutocompleteInteraction): Promise<void> {
-        const focusedOption = interaction.options.getFocused(true);
-        const autocompletes = (this.constructor as ICommandClass).autocompletes;
+	protected logger = new Logger(this.constructor.name);
 
-        if (autocompletes && autocompletes.has(focusedOption.name)) {
-            const method = autocompletes.get(focusedOption.name);
-            if (method) {
-                await (this as any)[method](client, interaction);
-            }
-        }
-    }
+	async handleAutocomplete(
+		client: Client,
+		interaction: AutocompleteInteraction,
+	): Promise<void> {
+		const focusedOption = interaction.options.getFocused(true);
+		const autocompletes = (this.constructor as ICommandClass).autocompletes;
+
+		if (autocompletes && autocompletes.has(focusedOption.name)) {
+			const method = autocompletes.get(focusedOption.name);
+			if (method) {
+				await (this as any)[method](client, interaction);
+			}
+		}
+	}
 
 	async execute(
 		client: Client,
@@ -34,31 +45,51 @@ export abstract class BaseCommand {
 				if (subcommandInfo) {
 					const { method, permission } = subcommandInfo;
 
-					if (permission && !(await this.checkPermission(interaction, permission))) {
+					if (
+						permission &&
+						!(await this.checkPermission(interaction, permission))
+					) {
 						return;
 					}
 
 					await (this as any)[method](client, interaction);
+					this.logger.log(
+						`Command ${this.constructor.name} (subcommand: ${key}) executed successfully`,
+					);
 					executed = true;
 				}
 			}
 		}
 
 		if (!executed) {
-			const optionRoutes = (this.constructor as ICommandClass).optionRoutes;
+			const optionRoutes = (this.constructor as ICommandClass)
+				.optionRoutes;
 			if (optionRoutes) {
 				for (const [optionName, valueMap] of optionRoutes) {
-					const optionValue = interaction.options.get(optionName)?.value;
-					if (optionValue !== undefined && valueMap.has(optionValue)) {
+					const optionValue =
+						interaction.options.get(optionName)?.value;
+					if (
+						optionValue !== undefined &&
+						valueMap.has(optionValue)
+					) {
 						const route = valueMap.get(optionValue);
 						if (route) {
 							const { method, permission } = route;
 
-							if (permission && !(await this.checkPermission(interaction, permission))) {
+							if (
+								permission &&
+								!(await this.checkPermission(
+									interaction,
+									permission,
+								))
+							) {
 								return;
 							}
 
 							await (this as any)[method](client, interaction);
+							this.logger.log(
+								`Command ${this.constructor.name} (option: ${optionName}) executed successfully`,
+							);
 							executed = true;
 							break;
 						}
@@ -68,16 +99,23 @@ export abstract class BaseCommand {
 		}
 
 		if (!executed) {
-			const defaultCommand = (this.constructor as ICommandClass).defaultCommand;
+			const defaultCommand = (this.constructor as ICommandClass)
+				.defaultCommand;
 			if (defaultCommand) {
 				const permission = (this.constructor as ICommandClass)
 					.defaultCommandPermission;
-				
-				if (permission && !(await this.checkPermission(interaction, permission))) {
+
+				if (
+					permission &&
+					!(await this.checkPermission(interaction, permission))
+				) {
 					return;
 				}
 
 				await (this as any)[defaultCommand](client, interaction);
+				this.logger.log(
+					`Command ${this.constructor.name} executed successfully`,
+				);
 			}
 		}
 	}
@@ -102,6 +140,9 @@ export abstract class BaseCommand {
 		);
 
 		if (!hasPermission) {
+			this.logger.log(
+				`Permission denied for command ${this.constructor.name}: User ${interaction.user.tag} missing ${permission}`,
+			);
 			await interaction.reply({
 				content: `You need the permission \`${permission}\` to perform this action.`,
 				flags: [MessageFlags.Ephemeral],

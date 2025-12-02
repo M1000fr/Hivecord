@@ -1,94 +1,93 @@
 name: Docker Build and Push
 
 on:
-  push:
-    branches: [ "main" ]
+    push:
+        branches: ["main"]
 
 env:
-  REGISTRY: reg.m1000.fr
-  IMAGE_NAME: leserveur/lebot
+    REGISTRY: reg.m1000.fr
+    IMAGE_NAME: leserveur/lebot
 
 jobs:
-  test:
-    runs-on: self-hosted
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+    test:
+        runs-on: self-hosted
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev python3 pkg-config
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v1
+              with:
+                  bun-version: latest
 
-      - name: Install dependencies
-        run: bun install
+            - name: Install system dependencies
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev python3 pkg-config
 
-      - name: Generate Prisma Client
-        run: bunx prisma generate
-        env:
-          DATABASE_URL: "mysql://root:password@localhost:3306/lebot"
-          
-      - name: Typecheck
-        run: bun run typecheck
+            - name: Install dependencies
+              run: bun install
 
+            - name: Generate Prisma Client
+              run: bunx prisma generate
+              env:
+                  DATABASE_URL: "mysql://root:password@localhost:3306/lebot"
 
-  build:
-    needs: test
-    runs-on: self-hosted
-    permissions:
-      contents: read
-      packages: write
+            - name: Typecheck
+              run: bun run typecheck
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    build:
+        needs: test
+        runs-on: self-hosted
+        permissions:
+            contents: read
+            packages: write
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.HARBOR_USERNAME }}
-          password: ${{ secrets.HARBOR_PASSWORD }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+            - name: Log into registry ${{ env.REGISTRY }}
+              uses: docker/login-action@v3
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ secrets.HARBOR_USERNAME }}
+                  password: ${{ secrets.HARBOR_PASSWORD }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
 
-  deploy:
-    needs: build
-    runs-on: self-hosted
-    steps:
-      - name: Deploy to production
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
-          HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          envs: REGISTRY,HARBOR_USERNAME,HARBOR_PASSWORD
-          script: |
-            echo $HARBOR_PASSWORD | docker login $REGISTRY -u $HARBOR_USERNAME --password-stdin
-            cd /root/discord/bots/leBot
-            docker compose down
-            docker compose pull
-            docker compose up -d
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  tags: |
+                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+    deploy:
+        needs: build
+        runs-on: self-hosted
+        steps:
+            - name: Deploy to production
+              uses: appleboy/ssh-action@v1.0.3
+              env:
+                  HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+                  HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
+              with:
+                  host: ${{ secrets.SSH_HOST }}
+                  username: ${{ secrets.SSH_USERNAME }}
+                  key: ${{ secrets.SSH_KEY }}
+                  envs: REGISTRY,HARBOR_USERNAME,HARBOR_PASSWORD
+                  script: |
+                      echo $HARBOR_PASSWORD | docker login $REGISTRY -u $HARBOR_USERNAME --password-stdin
+                      cd /root/discord/bots/leBot
+                      docker compose down
+                      docker compose pull
+                      docker compose up -d

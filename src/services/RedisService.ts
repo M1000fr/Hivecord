@@ -1,5 +1,5 @@
+import { Logger } from "@utils/Logger";
 import Redis from "ioredis";
-import { Logger } from '@utils/Logger';
 
 export class RedisService {
 	private static instance: Redis;
@@ -28,7 +28,11 @@ export class RedisService {
 			this.logger.log("✅ Connected to Redis");
 		} catch (error) {
 			const trace = error instanceof Error ? error.stack : String(error);
-			this.logger.error("❌ Redis connection failed:", trace, "RedisService");
+			this.logger.error(
+				"❌ Redis connection failed:",
+				trace,
+				"RedisService",
+			);
 			process.exit(1);
 		}
 	}

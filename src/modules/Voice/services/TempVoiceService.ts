@@ -1,3 +1,8 @@
+import { LogService } from "@modules/Log/services/LogService";
+import { VoiceConfigKeys } from "@modules/Voice/VoiceConfig";
+import { ConfigService } from "@services/ConfigService";
+import { prismaClient } from "@services/prismaService";
+import { Logger } from "@utils/Logger";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -6,21 +11,13 @@ import {
 	EmbedBuilder,
 	GuildMember,
 	MessageFlags,
-	ModalBuilder,
 	PermissionFlagsBits,
-	TextInputBuilder,
-	TextInputStyle,
 	VoiceChannel,
 	VoiceState,
 	type ButtonInteraction,
 	type Interaction,
 	type Message,
-	type ModalSubmitInteraction,
 } from "discord.js";
-import { VoiceConfigKeys } from '@modules/Voice/VoiceConfig';
-import { ConfigService } from "@services/ConfigService";
-import { prismaClient } from "@services/prismaService";
-import { LogService } from "@modules/Log/services/LogService";
 
 type ListType = "whitelist" | "blacklist";
 
@@ -31,7 +28,12 @@ interface UserToggleResult {
 }
 
 export class TempVoiceService {
-	private static async fetchGuildMember(guild: any, userId: string): Promise<GuildMember | null> {
+	private static logger = new Logger("TempVoiceService");
+
+	private static async fetchGuildMember(
+		guild: any,
+		userId: string,
+	): Promise<GuildMember | null> {
 		try {
 			return await guild.members.fetch(userId);
 		} catch {
@@ -50,14 +52,21 @@ export class TempVoiceService {
 		});
 
 		const filter = (m: Message) => m.author.id === interaction.user.id;
-		const collector = channel.createMessageCollector({ filter, time: 15000, max: 1 });
+		const collector = channel.createMessageCollector({
+			filter,
+			time: 15000,
+			max: 1,
+		});
 
 		collector.on("collect", async (message: Message) => {
-			try { await message.delete(); } catch {}
+			try {
+				await message.delete();
+			} catch {}
 
 			if (message.mentions.users.size === 0) {
 				await interaction.followUp({
-					content: "No users mentioned. Please use @mention to mention users.",
+					content:
+						"No users mentioned. Please use @mention to mention users.",
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -65,28 +74,47 @@ export class TempVoiceService {
 
 			const results: string[] = [];
 			for (const targetUser of message.mentions.users.values()) {
-				const member = await this.fetchGuildMember(interaction.guild!, targetUser.id);
+				const member = await this.fetchGuildMember(
+					interaction.guild!,
+					targetUser.id,
+				);
 				if (!member) {
 					results.push(`❌ ${targetUser.username} - User not found`);
 					continue;
 				}
 
-				const result = await this.toggleUserInList(channel, member, listType);
+				const result = await this.toggleUserInList(
+					channel,
+					member,
+					listType,
+				);
 				results.push(this.formatToggleResult(result));
 
-				const actionDesc = result.type === "whitelist" 
-                    ? (result.action === "added" ? "Added to whitelist" : "Removed from whitelist")
-                    : (result.action === "added" ? "Added to blacklist" : "Removed from blacklist");
-                
-                await LogService.logTempVoice(
-                    interaction.guild!, 
-                    interaction.user, 
-                    "Permission Change", 
-                    `${actionDesc}: <@${member.id}> in <#${channel.id}>`
-                );
+				const actionDesc =
+					result.type === "whitelist"
+						? result.action === "added"
+							? "Added to whitelist"
+							: "Removed from whitelist"
+						: result.action === "added"
+							? "Added to blacklist"
+							: "Removed from blacklist";
+
+				await LogService.logTempVoice(
+					interaction.guild!,
+					interaction.user,
+					"Permission Change",
+					`${actionDesc}: <@${member.id}> in <#${channel.id}>`,
+				);
+
+				this.logger.log(
+					`User ${interaction.user.tag} modified ${listType} for channel ${channel.id}: ${actionDesc} for ${member.user.tag}`,
+				);
 			}
 
-			await interaction.followUp({ content: results.join("\n"), flags: MessageFlags.Ephemeral });
+			await interaction.followUp({
+				content: results.join("\n"),
+				flags: MessageFlags.Ephemeral,
+			});
 			await this.updateControlPanel(channel);
 			collector.stop();
 		});
@@ -103,13 +131,18 @@ export class TempVoiceService {
 		return await this.toggleBlacklist(channel, member);
 	}
 
-	private static async toggleWhitelist(channel: VoiceChannel, member: GuildMember): Promise<UserToggleResult> {
+	private static async toggleWhitelist(
+		channel: VoiceChannel,
+		member: GuildMember,
+	): Promise<UserToggleResult> {
 		const existing = await prismaClient.tempVoiceAllowedUser.findFirst({
 			where: { tempVoiceId: channel.id, userId: member.id },
 		});
 
 		if (existing) {
-			await prismaClient.tempVoiceAllowedUser.delete({ where: { id: existing.id } });
+			await prismaClient.tempVoiceAllowedUser.delete({
+				where: { id: existing.id },
+			});
 			await channel.permissionOverwrites.delete(member.id);
 			return { member, action: "removed", type: "whitelist" };
 		}
@@ -118,23 +151,33 @@ export class TempVoiceService {
 			where: { tempVoiceId: channel.id, userId: member.id },
 		});
 		if (blocked) {
-			await prismaClient.tempVoiceBlockedUser.delete({ where: { id: blocked.id } });
+			await prismaClient.tempVoiceBlockedUser.delete({
+				where: { id: blocked.id },
+			});
 		}
 
 		await prismaClient.tempVoiceAllowedUser.create({
 			data: { tempVoiceId: channel.id, userId: member.id },
 		});
-		await channel.permissionOverwrites.edit(member.id, { Connect: true, MoveMembers: true });
+		await channel.permissionOverwrites.edit(member.id, {
+			Connect: true,
+			MoveMembers: true,
+		});
 		return { member, action: "added", type: "whitelist" };
 	}
 
-	private static async toggleBlacklist(channel: VoiceChannel, member: GuildMember): Promise<UserToggleResult> {
+	private static async toggleBlacklist(
+		channel: VoiceChannel,
+		member: GuildMember,
+	): Promise<UserToggleResult> {
 		const existing = await prismaClient.tempVoiceBlockedUser.findFirst({
 			where: { tempVoiceId: channel.id, userId: member.id },
 		});
 
 		if (existing) {
-			await prismaClient.tempVoiceBlockedUser.delete({ where: { id: existing.id } });
+			await prismaClient.tempVoiceBlockedUser.delete({
+				where: { id: existing.id },
+			});
 			await channel.permissionOverwrites.delete(member.id);
 			return { member, action: "removed", type: "blacklist" };
 		}
@@ -143,7 +186,9 @@ export class TempVoiceService {
 			where: { tempVoiceId: channel.id, userId: member.id },
 		});
 		if (allowed) {
-			await prismaClient.tempVoiceAllowedUser.delete({ where: { id: allowed.id } });
+			await prismaClient.tempVoiceAllowedUser.delete({
+				where: { id: allowed.id },
+			});
 		}
 
 		await prismaClient.tempVoiceBlockedUser.create({
@@ -159,13 +204,23 @@ export class TempVoiceService {
 	}
 
 	private static formatToggleResult(result: UserToggleResult): string {
-		const emoji = result.type === "whitelist" 
-			? (result.action === "added" ? "✅" : "➖")
-			: (result.action === "added" ? "🔒" : "➖");
-		
-		const actionText = result.type === "whitelist"
-			? (result.action === "added" ? "added to the whitelist" : "removed from the whitelist")
-			: (result.action === "added" ? "banned from the channel" : "removed from the blacklist");
+		const emoji =
+			result.type === "whitelist"
+				? result.action === "added"
+					? "✅"
+					: "➖"
+				: result.action === "added"
+					? "🔒"
+					: "➖";
+
+		const actionText =
+			result.type === "whitelist"
+				? result.action === "added"
+					? "added to the whitelist"
+					: "removed from the whitelist"
+				: result.action === "added"
+					? "banned from the channel"
+					: "removed from the blacklist";
 
 		return `${emoji} ${result.member.displayName} has been ${actionText}`;
 	}
@@ -230,7 +285,7 @@ export class TempVoiceService {
 				name: channelName,
 				type: ChannelType.GuildVoice,
 				parent: parent?.id,
-                userLimit: 1,
+				userLimit: 1,
 				permissionOverwrites: [
 					// Copy permissions from category (Discord does this by default if parent is set, but we want to be explicit about the owner)
 					...(parent?.permissionOverwrites.cache.values() || []),
@@ -259,9 +314,20 @@ export class TempVoiceService {
 			});
 
 			await this.sendControlPanel(voiceChannel, member);
-			await LogService.logTempVoice(guild, member.user, "Created", `Created temp voice channel <#${voiceChannel.id}>`);
-		} catch (error) {
-			console.error("Error creating temp voice channel:", error);
+			await LogService.logTempVoice(
+				guild,
+				member.user,
+				"Created",
+				`Created temp voice channel <#${voiceChannel.id}>`,
+			);
+			this.logger.log(
+				`Temp voice channel created by ${member.user.tag}: ${voiceChannel.name} (${voiceChannel.id})`,
+			);
+		} catch (error: any) {
+			this.logger.error(
+				"Error creating temp voice channel:",
+				error instanceof Error ? error.stack : String(error),
+			);
 		}
 	}
 
@@ -301,7 +367,9 @@ export class TempVoiceService {
 				{
 					name: "Information",
 					value: `📝 Name : ${channel.name}\n👥 Limit : ${
-						channel.userLimit === 0 ? "Unlimited" : channel.userLimit
+						channel.userLimit === 0
+							? "Unlimited"
+							: channel.userLimit
 					}`,
 					inline: false,
 				},
@@ -396,7 +464,8 @@ export class TempVoiceService {
 		if (tempChannel.ownerId !== interaction.user.id) {
 			if (interaction.isRepliable()) {
 				await interaction.reply({
-					content: "You do not have permission to manage this channel.",
+					content:
+						"You do not have permission to manage this channel.",
 					flags: MessageFlags.Ephemeral,
 				});
 			}

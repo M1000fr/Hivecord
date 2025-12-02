@@ -1,11 +1,14 @@
-import { Guild, User, GuildMember } from "discord.js";
-import { prismaClient } from "@services/prismaService";
+import { LogService } from "@modules/Log/services/LogService";
+import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
 import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
-import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
-import { LogService } from "@modules/Log/services/LogService";
+import { prismaClient } from "@services/prismaService";
+import { Logger } from "@utils/Logger";
+import { Guild, GuildMember, User } from "discord.js";
 
 export class SanctionService {
+	private static logger = new Logger("SanctionService");
+
 	private static async fetchMember(
 		guild: Guild,
 		userId: string,
@@ -92,6 +95,10 @@ export class SanctionService {
 		if (member.roles.cache.has(muteRole.id)) {
 			throw new Error("User is already muted.");
 		}
+
+		this.logger.log(
+			`Muting user ${targetUser.tag} (${targetUser.id}) for ${durationString}. Reason: ${reason}. Moderator: ${moderator.tag}`,
+		);
 
 		const activeMute = await prismaClient.sanction.findFirst({
 			where: {
@@ -221,10 +228,7 @@ export class SanctionService {
 		);
 	}
 
-	static async unmute(
-		guild: Guild,
-		targetUser: User,
-	): Promise<void> {
+	static async unmute(guild: Guild, targetUser: User): Promise<void> {
 		const member = await this.fetchMember(guild, targetUser.id);
 		if (!member) throw new Error("User not found in this guild.");
 
@@ -240,10 +244,7 @@ export class SanctionService {
 		await this.deactivateSanction(targetUser.id, SanctionType.MUTE);
 	}
 
-	static async unban(
-		guild: Guild,
-		targetUser: User,
-	): Promise<void> {
+	static async unban(guild: Guild, targetUser: User): Promise<void> {
 		try {
 			await guild.bans.fetch(targetUser.id);
 		} catch {

@@ -74,7 +74,7 @@ model UserGroup {
     groupId Int
 
     Users  User  @relation(fields: [userId], references: [id])
-    Groups Group @relation(fields: [groupId], references: [id])
+    Groups Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
 model GroupPermission {
@@ -82,7 +82,7 @@ model GroupPermission {
     groupId      Int
     permissionId Int
 
-    Groups      Group      @relation(fields: [groupId], references: [id])
+    Groups      Group      @relation(fields: [groupId], references: [id], onDelete: Cascade)
     Permissions Permission @relation(fields: [permissionId], references: [id])
 }
 

@@ -1,28 +1,30 @@
+import { LeBotClient } from "@class/LeBotClient";
+import { EConfigType } from "@decorators/ConfigProperty";
 import {
-	type Interaction,
+	ButtonPattern,
+	ModalPattern,
+	SelectMenuPattern,
+} from "@decorators/Interaction";
+import { ConfigHelper } from "@utils/ConfigHelper";
+import { InteractionHelper } from "@utils/InteractionHelper";
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	type ButtonInteraction,
+	ButtonStyle,
+	ChannelSelectMenuBuilder,
+	type ChannelSelectMenuInteraction,
+	EmbedBuilder,
+	type Message,
+	MessageFlags,
 	ModalBuilder,
+	type ModalSubmitInteraction,
+	RoleSelectMenuBuilder,
+	type RoleSelectMenuInteraction,
+	type StringSelectMenuInteraction,
 	TextInputBuilder,
 	TextInputStyle,
-	ActionRowBuilder,
-	EmbedBuilder,
-	RoleSelectMenuBuilder,
-	ChannelSelectMenuBuilder,
-	type Message,
-	ButtonBuilder,
-	ButtonStyle,
-	MessageFlags,
-	type StringSelectMenuInteraction,
-	type RoleSelectMenuInteraction,
-	type ChannelSelectMenuInteraction,
-	type ModalSubmitInteraction,
-	type ButtonInteraction,
 } from "discord.js";
-import { ButtonPattern, SelectMenuPattern, ModalPattern } from "@decorators/Interaction";
-import { LeBotClient } from "@class/LeBotClient";
-import { InteractionHelper } from "@utils/InteractionHelper";
-import { ConfigHelper } from "@utils/ConfigHelper";
-import { EConfigType } from "@decorators/ConfigProperty";
-import { ConfigService } from "@services/ConfigService";
 
 export class ModuleConfigInteractions {
 	private async respondToInteraction(
@@ -59,21 +61,8 @@ export class ModuleConfigInteractions {
 		type: EConfigType,
 	) {
 		try {
-			// Use appropriate ConfigService method based on type
-			switch (type) {
-				case EConfigType.String:
-				case EConfigType.Boolean:
-					await ConfigService.set(propertyKey, value);
-					break;
-				case EConfigType.Role:
-					await ConfigService.setRole(propertyKey, value);
-					break;
-				case EConfigType.Channel:
-					await ConfigService.setChannel(propertyKey, value);
-					break;
-				default:
-					await ConfigService.set(propertyKey, value);
-			}
+			await ConfigHelper.saveValue(propertyKey, value, type);
+
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
 				const config = await ConfigHelper.buildModuleConfigEmbed(
@@ -88,7 +77,10 @@ export class ModuleConfigInteractions {
 					});
 				}
 			}
-			await this.respondToInteraction(interaction, "✅ Configuration updated.");
+			await this.respondToInteraction(
+				interaction,
+				"✅ Configuration updated.",
+			);
 		} catch (error) {
 			console.error("Failed to update config:", error);
 			await this.respondToInteraction(

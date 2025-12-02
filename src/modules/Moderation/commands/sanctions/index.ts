@@ -1,24 +1,27 @@
+import { BaseCommand } from "@class/BaseCommand";
+import { Pager } from "@class/Pager";
+import { Command } from "@decorators/Command";
+import { Subcommand } from "@decorators/Subcommand";
+import { EPermission } from "@enums/EPermission";
+import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
+import { SanctionType } from "@prisma/client/client";
+import { prismaClient } from "@services/prismaService";
 import {
 	ChatInputCommandInteraction,
 	Client,
+	Colors,
 	EmbedBuilder,
 	MessageFlags,
-    Colors
 } from "discord.js";
-import { BaseCommand } from '@class/BaseCommand';
-import { Command } from '@decorators/Command';
-import { Subcommand } from '@decorators/Subcommand';
-import { EPermission } from '@enums/EPermission';
 import { sanctionsOptions } from "./sanctionsOptions";
-import { prismaClient } from '@services/prismaService';
-import { Pager } from '@class/Pager';
-import { SanctionReasonService } from '@modules/Moderation/services/SanctionReasonService';
-import { SanctionType } from "@prisma/client/client";
 
 @Command(sanctionsOptions)
 export default class SanctionsCommand extends BaseCommand {
-    @Subcommand({ name: "list", permission: EPermission.SanctionsList })
-	async listSanctions(client: Client, interaction: ChatInputCommandInteraction) {
+	@Subcommand({ name: "list", permission: EPermission.SanctionsList })
+	async listSanctions(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	) {
 		const targetUser = interaction.options.getUser("user", true);
 
 		const sanctions = await prismaClient.sanction.findMany({
@@ -104,110 +107,175 @@ export default class SanctionsCommand extends BaseCommand {
 		await pager.start(interaction);
 	}
 
-    @Subcommand({ name: "add", group: "reason", permission: EPermission.ReasonManage })
-    async handleReasonAdd(client: Client, interaction: ChatInputCommandInteraction) {
-        const text = interaction.options.getString("text", true);
-        const typeStr = interaction.options.getString("type", true);
-        const duration = interaction.options.getString("duration");
+	@Subcommand({
+		name: "add",
+		group: "reason",
+		permission: EPermission.ReasonAdd,
+	})
+	async handleReasonAdd(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	) {
+		const text = interaction.options.getString("text", true);
+		const typeStr = interaction.options.getString("type", true);
+		const duration = interaction.options.getString("duration");
 
-        const type = typeStr as SanctionType;
+		const type = typeStr as SanctionType;
 
-        try {
-            const reason = await SanctionReasonService.create({
-                text,
-                type,
-                duration: duration || undefined,
-            });
+		try {
+			const reason = await SanctionReasonService.create({
+				text,
+				type,
+				duration: duration || undefined,
+			});
 
-            const embed = new EmbedBuilder()
-                .setTitle("Reason Added")
-                .setColor(Colors.Green)
-                .setDescription(`Added reason for **${type}**:\n${text}`)
-                .addFields({ name: "ID", value: reason.id.toString(), inline: true });
-            
-            if (duration) {
-                embed.addFields({ name: "Duration", value: duration, inline: true });
-            }
+			const embed = new EmbedBuilder()
+				.setTitle("Reason Added")
+				.setColor(Colors.Green)
+				.setDescription(`Added reason for **${type}**:\n${text}`)
+				.addFields({
+					name: "ID",
+					value: reason.id.toString(),
+					inline: true,
+				});
 
-            await interaction.reply({ embeds: [embed] });
-        } catch (error) {
-            await interaction.reply({ content: "Failed to add reason. It might already exist.", flags: [MessageFlags.Ephemeral] });
-        }
-    }
+			if (duration) {
+				embed.addFields({
+					name: "Duration",
+					value: duration,
+					inline: true,
+				});
+			}
 
-    @Subcommand({ name: "edit", group: "reason", permission: EPermission.ReasonManage })
-    async handleReasonEdit(client: Client, interaction: ChatInputCommandInteraction) {
-        const id = interaction.options.getInteger("id", true);
-        const text = interaction.options.getString("text");
-        const duration = interaction.options.getString("duration");
+			await interaction.reply({ embeds: [embed] });
+		} catch (error) {
+			await interaction.reply({
+				content: "Failed to add reason. It might already exist.",
+				flags: [MessageFlags.Ephemeral],
+			});
+		}
+	}
 
-        if (!text && !duration) {
-            await interaction.reply({ content: "You must provide at least one field to update.", flags: [MessageFlags.Ephemeral] });
-            return;
-        }
+	@Subcommand({
+		name: "edit",
+		group: "reason",
+		permission: EPermission.ReasonEdit,
+	})
+	async handleReasonEdit(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	) {
+		const id = interaction.options.getInteger("id", true);
+		const text = interaction.options.getString("text");
+		const duration = interaction.options.getString("duration");
 
-        try {
-            const reason = await SanctionReasonService.getById(id);
-            if (!reason) {
-                await interaction.reply({ content: `Reason with ID ${id} not found.`, flags: [MessageFlags.Ephemeral] });
-                return;
-            }
+		if (!text && !duration) {
+			await interaction.reply({
+				content: "You must provide at least one field to update.",
+				flags: [MessageFlags.Ephemeral],
+			});
+			return;
+		}
 
-            if (reason.isSystem) {
-                await interaction.reply({ content: "Cannot edit system reasons.", flags: [MessageFlags.Ephemeral] });
-                return;
-            }
+		try {
+			const reason = await SanctionReasonService.getById(id);
+			if (!reason) {
+				await interaction.reply({
+					content: `Reason with ID ${id} not found.`,
+					flags: [MessageFlags.Ephemeral],
+				});
+				return;
+			}
 
-            await SanctionReasonService.update(id, {
-                text: text || undefined,
-                duration: duration || undefined,
-            });
+			if (reason.isSystem) {
+				await interaction.reply({
+					content: "Cannot edit system reasons.",
+					flags: [MessageFlags.Ephemeral],
+				});
+				return;
+			}
 
-            await interaction.reply({ content: `Reason with ID ${id} updated.`, flags: [MessageFlags.Ephemeral] });
-        } catch (error) {
-            await interaction.reply({ content: `Failed to update reason with ID ${id}.`, flags: [MessageFlags.Ephemeral] });
-        }
-    }
+			await SanctionReasonService.update(id, {
+				text: text || undefined,
+				duration: duration || undefined,
+			});
 
-    @Subcommand({ name: "remove", group: "reason", permission: EPermission.ReasonManage })
-    async handleReasonRemove(client: Client, interaction: ChatInputCommandInteraction) {
-        const id = interaction.options.getInteger("id", true);
+			await interaction.reply({
+				content: `Reason with ID ${id} updated.`,
+				flags: [MessageFlags.Ephemeral],
+			});
+		} catch (error) {
+			await interaction.reply({
+				content: `Failed to update reason with ID ${id}.`,
+				flags: [MessageFlags.Ephemeral],
+			});
+		}
+	}
 
-        try {
-            await SanctionReasonService.delete(id);
-            await interaction.reply({ content: `Reason with ID ${id} removed.`, flags: [MessageFlags.Ephemeral] });
-        } catch (error) {
-            await interaction.reply({ content: `Failed to remove reason with ID ${id}.`, flags: [MessageFlags.Ephemeral] });
-        }
-    }
+	@Subcommand({
+		name: "remove",
+		group: "reason",
+		permission: EPermission.ReasonRemove,
+	})
+	async handleReasonRemove(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	) {
+		const id = interaction.options.getInteger("id", true);
 
-    @Subcommand({ name: "list", group: "reason", permission: EPermission.ReasonManage })
-    async handleReasonList(client: Client, interaction: ChatInputCommandInteraction) {
-        const typeStr = interaction.options.getString("type");
-        const type = typeStr ? (typeStr as SanctionType) : undefined;
+		try {
+			await SanctionReasonService.delete(id);
+			await interaction.reply({
+				content: `Reason with ID ${id} removed.`,
+				flags: [MessageFlags.Ephemeral],
+			});
+		} catch (error) {
+			await interaction.reply({
+				content: `Failed to remove reason with ID ${id}.`,
+				flags: [MessageFlags.Ephemeral],
+			});
+		}
+	}
 
-        const reasons = type 
-            ? await SanctionReasonService.getByType(type, true) 
-            : await SanctionReasonService.getAll();
+	@Subcommand({
+		name: "list",
+		group: "reason",
+		permission: EPermission.ReasonList,
+	})
+	async handleReasonList(
+		client: Client,
+		interaction: ChatInputCommandInteraction,
+	) {
+		const typeStr = interaction.options.getString("type");
+		const type = typeStr ? (typeStr as SanctionType) : undefined;
 
-        if (reasons.length === 0) {
-            await interaction.reply({ content: "No reasons found.", flags: [MessageFlags.Ephemeral] });
-            return;
-        }
+		const reasons = type
+			? await SanctionReasonService.getByType(type, true)
+			: await SanctionReasonService.getAll();
 
-        const embed = new EmbedBuilder()
-            .setTitle("Sanction Reasons")
-            .setColor(Colors.Blue);
+		if (reasons.length === 0) {
+			await interaction.reply({
+				content: "No reasons found.",
+				flags: [MessageFlags.Ephemeral],
+			});
+			return;
+		}
 
-        const description = reasons.map(r => {
-            let line = `**${r.id}**. [${r.type}] ${r.text}`;
-            if (r.duration) line += ` (${r.duration})`;
-            if (r.isSystem) line += ` [SYSTEM]`;
-            return line;
-        }).join("\n");
+		const embed = new EmbedBuilder()
+			.setTitle("Sanction Reasons")
+			.setColor(Colors.Blue);
 
-        embed.setDescription(description.substring(0, 4096));
+		const description = reasons
+			.map((r) => {
+				let line = `**${r.id}**. [${r.type}] ${r.text}`;
+				if (r.duration) line += ` (${r.duration})`;
+				if (r.isSystem) line += ` [SYSTEM]`;
+				return line;
+			})
+			.join("\n");
 
-        await interaction.reply({ embeds: [embed] });
-    }
+		embed.setDescription(description.substring(0, 4096));
+
+		await interaction.reply({ embeds: [embed] });
+	}
 }

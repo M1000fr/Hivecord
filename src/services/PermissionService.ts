@@ -1,6 +1,6 @@
 import { prismaClient } from "@services/prismaService";
-import { Logger } from '@utils/Logger';
 import { RedisService } from "@services/RedisService";
+import { Logger } from "@utils/Logger";
 
 const CACHE_TTL = 60; // 60 seconds
 
@@ -46,7 +46,12 @@ export class PermissionService {
 				// Remove duplicates
 				permissions = [...new Set(permissions)];
 
-				await redis.set(cacheKey, JSON.stringify(permissions), "EX", CACHE_TTL);
+				await redis.set(
+					cacheKey,
+					JSON.stringify(permissions),
+					"EX",
+					CACHE_TTL,
+				);
 			}
 
 			if (this.checkPermission(permissions, requiredPermission)) {

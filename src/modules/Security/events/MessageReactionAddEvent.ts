@@ -1,9 +1,9 @@
 import { BaseEvent } from "@class/BaseEvent";
-import { Event } from "@decorators/Event";
-import { MessageReaction, User } from "discord.js";
 import { LeBotClient } from "@class/LeBotClient";
+import { Event } from "@decorators/Event";
 import { HeatpointService } from "@modules/Security/services/HeatpointService";
 import { BotEvents } from "@src/enums/BotEvents";
+import { MessageReaction, User } from "discord.js";
 
 @Event({ name: typeof BotEvents.MessageReactionAdd })
 export class MessageReactionAddEvent extends BaseEvent<

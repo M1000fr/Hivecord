@@ -1,9 +1,9 @@
+import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
+import { SanctionType } from "@prisma/client/client";
+import { ConfigService } from "@services/ConfigService";
+import { prismaClient } from "@services/prismaService";
+import { Logger } from "@utils/Logger";
 import { Client } from "discord.js";
-import { prismaClient } from '@services/prismaService';
-import { SanctionType } from '@prisma/client/client';
-import { ConfigService } from '@services/ConfigService';
-import { Logger } from '@utils/Logger';
-import { ModerationConfigKeys } from '@modules/Moderation/ModerationConfig';
 
 const CHECK_EXPIRED_INTERVAL = 10 * 1000; // 10 seconds
 const CHECK_MUTE_CONSISTENCY_INTERVAL = 60 * 1000; // 60 seconds
@@ -18,7 +18,10 @@ export class SanctionScheduler {
 
 	public start() {
 		setInterval(() => this.checkExpiredSanctions(), CHECK_EXPIRED_INTERVAL);
-		setInterval(() => this.checkMuteConsistency(), CHECK_MUTE_CONSISTENCY_INTERVAL);
+		setInterval(
+			() => this.checkMuteConsistency(),
+			CHECK_MUTE_CONSISTENCY_INTERVAL,
+		);
 		this.logger.log("SanctionScheduler started.");
 	}
 
@@ -64,10 +67,10 @@ export class SanctionScheduler {
 						muteRole,
 						"Sanction consistency check: No active mute found",
 					);
-				} catch (error) {
-					console.error(
+				} catch (error: any) {
+					this.logger.error(
 						`Error removing mute role from ${memberId} during consistency check:`,
-						error,
+						error instanceof Error ? error.stack : String(error),
 					);
 				}
 			}
@@ -79,7 +82,7 @@ export class SanctionScheduler {
 		const guildId = process.env.DISCORD_GUILD_ID;
 
 		if (!guildId) {
-			console.error(
+			this.logger.error(
 				"DISCORD_GUILD_ID is not defined in environment variables.",
 			);
 			return;
@@ -141,10 +144,10 @@ export class SanctionScheduler {
 					where: { id: sanction.id },
 					data: { active: false },
 				});
-			} catch (error) {
-				console.error(
+			} catch (error: any) {
+				this.logger.error(
 					`Error processing expired sanction ${sanction.id}:`,
-					error,
+					error instanceof Error ? error.stack : String(error),
 				);
 			}
 		}

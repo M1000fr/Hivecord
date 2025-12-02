@@ -1,19 +1,29 @@
 import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
+import { BotEvents } from "@enums/BotEvents";
+import { $Enums } from "@src/prisma/client/client";
 import { prismaClient } from "@src/services/prismaService";
 import { Logger } from "@utils/Logger";
-import { ChannelType as DiscordChannelType, type DMChannel, type NonThreadGuildBasedChannel } from "discord.js";
-import { $Enums } from "@src/prisma/client/client";
-import { BotEvents } from "@enums/BotEvents";
+import {
+	ChannelType as DiscordChannelType,
+	type DMChannel,
+	type NonThreadGuildBasedChannel,
+} from "discord.js";
 
 @Event({
 	name: BotEvents.ChannelUpdate,
 })
-export default class ChannelUpdateEvent extends BaseEvent<typeof BotEvents.ChannelUpdate> {
+export default class ChannelUpdateEvent extends BaseEvent<
+	typeof BotEvents.ChannelUpdate
+> {
 	private logger = new Logger("ChannelUpdateEvent");
 
-	async run(client: LeBotClient<true>, oldChannel: NonThreadGuildBasedChannel | DMChannel, newChannel: NonThreadGuildBasedChannel | DMChannel) {
+	async run(
+		client: LeBotClient<true>,
+		oldChannel: NonThreadGuildBasedChannel | DMChannel,
+		newChannel: NonThreadGuildBasedChannel | DMChannel,
+	) {
 		if (newChannel.isDMBased()) return;
 
 		let type: $Enums.ChannelType;
@@ -34,7 +44,9 @@ export default class ChannelUpdateEvent extends BaseEvent<typeof BotEvents.Chann
 				create: { id: newChannel.id, type },
 			});
 		} catch (error) {
-			this.logger.error(`Failed to sync updated channel ${newChannel.id}: ${error}`);
+			this.logger.error(
+				`Failed to sync updated channel ${newChannel.id}: ${error}`,
+			);
 		}
 	}
 }

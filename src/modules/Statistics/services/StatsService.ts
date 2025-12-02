@@ -1,8 +1,8 @@
-import { RedisService } from "@services/RedisService";
-import { InfluxService } from "@services/InfluxService";
-import { Point } from "@influxdata/influxdb-client";
-import { Logger } from "@utils/Logger";
 import type { LeBotClient } from "@class/LeBotClient";
+import { Point } from "@influxdata/influxdb-client";
+import { InfluxService } from "@services/InfluxService";
+import { RedisService } from "@services/RedisService";
+import { Logger } from "@utils/Logger";
 
 const CACHE_TTL = 300; // 5 minutes cache for stats
 // Flush behavior tuning
@@ -60,7 +60,10 @@ export class StatsService {
 		if (this.flushTimer) {
 			clearTimeout(this.flushTimer);
 		}
-		this.flushTimer = setTimeout(() => void this.performFlush(), FLUSH_DEBOUNCE_MS);
+		this.flushTimer = setTimeout(
+			() => void this.performFlush(),
+			FLUSH_DEBOUNCE_MS,
+		);
 	}
 
 	private static async performFlush() {
@@ -83,7 +86,10 @@ export class StatsService {
 				this.pendingUserInvalidations.clear();
 			}
 		} catch (err) {
-			this.logger.error("Failed to flush Influx writes", err instanceof Error ? err.stack : String(err));
+			this.logger.error(
+				"Failed to flush Influx writes",
+				err instanceof Error ? err.stack : String(err),
+			);
 		}
 	}
 
@@ -122,7 +128,9 @@ export class StatsService {
 		if (sessionData) {
 			const { sessionId, lastTickTime } = JSON.parse(sessionData);
 			const endTime = Date.now();
-			const remainingDuration = Math.floor((endTime - lastTickTime) / 1000); // seconds since last tick
+			const remainingDuration = Math.floor(
+				(endTime - lastTickTime) / 1000,
+			); // seconds since last tick
 			if (remainingDuration > 0) {
 				const point = new Point("voice_activity")
 					.tag("userId", userId)
@@ -136,12 +144,16 @@ export class StatsService {
 			await redis.del(sessionKey);
 			this.pendingUserInvalidations.add(`${userId}|${guildId}`);
 			this.scheduleFlush();
-			this.logger.log(`Voice session ended: ${userId} in ${channelId} (final +${remainingDuration}s)`);
+			this.logger.log(
+				`Voice session ended: ${userId} in ${channelId} (final +${remainingDuration}s)`,
+			);
 		}
 	}
 
 	// Incremental per-minute recording of ongoing voice sessions
-	static async tickActiveVoiceSessions(client: LeBotClient<boolean>): Promise<void> {
+	static async tickActiveVoiceSessions(
+		client: LeBotClient<boolean>,
+	): Promise<void> {
 		const redis = RedisService.getInstance();
 		const pattern = "voice:session:*";
 		const keys = await redis.keys(pattern);
@@ -151,7 +163,8 @@ export class StatsService {
 			const data = await redis.get(key);
 			if (!data) continue;
 			try {
-				const { sessionId, startTime, lastTickTime, guildId } = JSON.parse(data);
+				const { sessionId, startTime, lastTickTime, guildId } =
+					JSON.parse(data);
 				const parts = key.split(":");
 				const userId = parts[2];
 				const channelId = parts[3];
@@ -183,14 +196,22 @@ export class StatsService {
 				InfluxService.writePoint(point);
 				await redis.set(
 					key,
-					JSON.stringify({ sessionId, startTime, lastTickTime: now, guildId }),
+					JSON.stringify({
+						sessionId,
+						startTime,
+						lastTickTime: now,
+						guildId,
+					}),
 					"EX",
 					86400,
 				);
 				this.pendingUserInvalidations.add(`${userId}|${guildId}`);
 				updated++;
 			} catch (err) {
-				this.logger.error(`Failed ticking session ${key}:`, err instanceof Error ? err.message : String(err));
+				this.logger.error(
+					`Failed ticking session ${key}:`,
+					err instanceof Error ? err.message : String(err),
+				);
 			}
 		}
 		if (updated > 0) {
@@ -289,7 +310,8 @@ export class StatsService {
 			totalDuration += duration;
 
 			// Channel breakdown
-			const currentChannelDuration = channelMap.get(result.channelId) || 0;
+			const currentChannelDuration =
+				channelMap.get(result.channelId) || 0;
 			channelMap.set(result.channelId, currentChannelDuration + duration);
 
 			// Hourly breakdown
@@ -301,10 +323,12 @@ export class StatsService {
 		const stats: UserVoiceStats = {
 			userId,
 			totalDuration,
-			channelBreakdown: Array.from(channelMap.entries()).map(([channelId, duration]) => ({
-				channelId,
-				duration,
-			})),
+			channelBreakdown: Array.from(channelMap.entries()).map(
+				([channelId, duration]) => ({
+					channelId,
+					duration,
+				}),
+			),
 			hourlyBreakdown: Array.from(hourMap.entries())
 				.map(([hour, duration]) => ({ hour, duration }))
 				.sort((a, b) => a.hour - b.hour),
@@ -367,10 +391,12 @@ export class StatsService {
 		const stats: UserMessageStats = {
 			userId,
 			totalMessages,
-			channelBreakdown: Array.from(channelMap.entries()).map(([channelId, count]) => ({
-				channelId,
-				count,
-			})),
+			channelBreakdown: Array.from(channelMap.entries()).map(
+				([channelId, count]) => ({
+					channelId,
+					count,
+				}),
+			),
 			hourlyBreakdown: Array.from(hourMap.entries())
 				.map(([hour, count]) => ({ hour, count }))
 				.sort((a, b) => a.hour - b.hour),
@@ -431,11 +457,13 @@ export class StatsService {
 				|> count()
 		`;
 
-		const [messageResults, voiceResults, uniqueResults] = await Promise.all([
-			InfluxService.query<{ _value: number }>(messageQuery),
-			InfluxService.query<{ _value: number }>(voiceQuery),
-			InfluxService.query<{ _value: number }>(uniqueUsersQuery),
-		]);
+		const [messageResults, voiceResults, uniqueResults] = await Promise.all(
+			[
+				InfluxService.query<{ _value: number }>(messageQuery),
+				InfluxService.query<{ _value: number }>(voiceQuery),
+				InfluxService.query<{ _value: number }>(uniqueUsersQuery),
+			],
+		);
 
 		const stats: ChannelStats = {
 			channelId,
@@ -515,7 +543,13 @@ export class StatsService {
 				|> count()
 		`;
 
-		const [messageResults, voiceResults, activeResults, joinResults, leaveResults] = await Promise.all([
+		const [
+			messageResults,
+			voiceResults,
+			activeResults,
+			joinResults,
+			leaveResults,
+		] = await Promise.all([
 			InfluxService.query<{ _value: number }>(messageQuery),
 			InfluxService.query<{ _value: number }>(voiceQuery),
 			InfluxService.query<{ _value: number }>(activeUsersQuery),
@@ -541,7 +575,9 @@ export class StatsService {
 		guildId: string,
 		timeRange: TimeRange,
 		limit = 10,
-	): Promise<{ channelId: string; messageCount: number; voiceDuration: number }[]> {
+	): Promise<
+		{ channelId: string; messageCount: number; voiceDuration: number }[]
+	> {
 		const bucket = InfluxService.getBucket();
 		const startTime = timeRange.start.toISOString();
 		const endTime = timeRange.end.toISOString();
@@ -564,11 +600,17 @@ export class StatsService {
 			channelId: string;
 		}>(query);
 
-		const channelMap = new Map<string, { messageCount: number; voiceDuration: number }>();
+		const channelMap = new Map<
+			string,
+			{ messageCount: number; voiceDuration: number }
+		>();
 
 		for (const result of results) {
-			const current = channelMap.get(result.channelId) || { messageCount: 0, voiceDuration: 0 };
-			
+			const current = channelMap.get(result.channelId) || {
+				messageCount: 0,
+				voiceDuration: 0,
+			};
+
 			if (result._measurement === "message_activity") {
 				current.messageCount += result._value;
 			} else if (result._measurement === "voice_activity") {
@@ -580,7 +622,12 @@ export class StatsService {
 
 		return Array.from(channelMap.entries())
 			.map(([channelId, stats]) => ({ channelId, ...stats }))
-			.sort((a, b) => (b.messageCount + b.voiceDuration) - (a.messageCount + a.voiceDuration))
+			.sort(
+				(a, b) =>
+					b.messageCount +
+					b.voiceDuration -
+					(a.messageCount + a.voiceDuration),
+			)
 			.slice(0, limit);
 	}
 
@@ -651,7 +698,10 @@ export class StatsService {
 	}
 
 	// Cache Invalidation
-	private static async invalidateUserCache(userId: string, guildId: string): Promise<void> {
+	private static async invalidateUserCache(
+		userId: string,
+		guildId: string,
+	): Promise<void> {
 		const redis = RedisService.getInstance();
 		const patterns = [
 			`stats:voice:${userId}:${guildId}:*`,

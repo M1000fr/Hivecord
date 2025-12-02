@@ -1,14 +1,18 @@
-import { ChatInputCommandInteraction, MessageFlags, AutocompleteInteraction } from "discord.js";
+import { BaseCommand } from "@class/BaseCommand";
+import { LeBotClient } from "@class/LeBotClient";
+import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
-import { Autocomplete } from "@decorators/Autocomplete";
-import { BaseCommand } from "@class/BaseCommand";
 import { EPermission } from "@enums/EPermission";
-import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
-import { LeBotClient } from "@class/LeBotClient";
-import { warnOptions } from "./options";
+import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { SanctionType } from "@prisma/client/client";
+import {
+	AutocompleteInteraction,
+	ChatInputCommandInteraction,
+	MessageFlags,
+} from "discord.js";
+import { warnOptions } from "./options";
 
 @Command({
 	name: "warn",
@@ -16,16 +20,26 @@ import { SanctionType } from "@prisma/client/client";
 	options: warnOptions,
 })
 export default class WarnCommand extends BaseCommand {
-    @Autocomplete({ optionName: "reason" })
-    async autocompleteReason(client: LeBotClient<true>, interaction: AutocompleteInteraction) {
-        const focusedOption = interaction.options.getFocused(true);
-        const reasons = await SanctionReasonService.getByType(SanctionType.WARN, false);
-        const filtered = reasons
-            .filter(r => r.text.toLowerCase().includes(focusedOption.value.toLowerCase()))
-            .map(r => ({ name: r.text, value: r.text }))
-            .slice(0, 25);
-        await interaction.respond(filtered);
-    }
+	@Autocomplete({ optionName: "reason" })
+	async autocompleteReason(
+		client: LeBotClient<true>,
+		interaction: AutocompleteInteraction,
+	) {
+		const focusedOption = interaction.options.getFocused(true);
+		const reasons = await SanctionReasonService.getByType(
+			SanctionType.WARN,
+			false,
+		);
+		const filtered = reasons
+			.filter((r) =>
+				r.text
+					.toLowerCase()
+					.includes(focusedOption.value.toLowerCase()),
+			)
+			.map((r) => ({ name: r.text, value: r.text }))
+			.slice(0, 25);
+		await interaction.respond(filtered);
+	}
 
 	@DefaultCommand(EPermission.Warn)
 	async run(

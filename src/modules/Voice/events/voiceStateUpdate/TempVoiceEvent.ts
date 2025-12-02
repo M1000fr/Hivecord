@@ -1,14 +1,16 @@
+import { BaseEvent } from "@class/BaseEvent";
+import { LeBotClient } from "@class/LeBotClient";
+import { Event } from "@decorators/Event";
+import { BotEvents } from "@enums/BotEvents";
+import { TempVoiceService } from "@modules/Voice/services/TempVoiceService";
 import { VoiceState } from "discord.js";
-import { BaseEvent } from '@class/BaseEvent';
-import { Event } from '@decorators/Event';
-import { LeBotClient } from '@class/LeBotClient';
-import { TempVoiceService } from '@modules/Voice/services/TempVoiceService';
-import { BotEvents } from '@enums/BotEvents';
 
 @Event({
 	name: BotEvents.VoiceStateUpdate,
 })
-export default class TempVoiceEvent extends BaseEvent<typeof BotEvents.VoiceStateUpdate> {
+export default class TempVoiceEvent extends BaseEvent<
+	typeof BotEvents.VoiceStateUpdate
+> {
 	async run(
 		client: LeBotClient<true>,
 		oldState: VoiceState,

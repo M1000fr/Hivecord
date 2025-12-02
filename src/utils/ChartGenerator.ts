@@ -1,5 +1,4 @@
-import { createCanvas } from "canvas";
-import type { UserVoiceStats, UserMessageStats } from "@modules/Statistics/services/StatsService";
+import { createCanvas } from "@napi-rs/canvas";
 
 export interface ChartData {
 	labels: string[];
@@ -173,11 +172,7 @@ export class ChartGenerator {
 			ctx.fillStyle = "#FFFFFF";
 			ctx.font = "12px Arial";
 			ctx.textAlign = "center";
-			ctx.fillText(
-				value.toString(),
-				x + barWidth / 2,
-				y - 5,
-			);
+			ctx.fillText(value.toString(), x + barWidth / 2, y - 5);
 
 			// Label at bottom
 			ctx.save();

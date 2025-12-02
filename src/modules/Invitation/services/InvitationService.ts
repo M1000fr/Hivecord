@@ -1,7 +1,7 @@
-import { Guild, Invite } from "discord.js";
 import { RedisService } from "@services/RedisService";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
+import { Guild, Invite } from "discord.js";
 
 export class InvitationService {
 	private static logger = new Logger("InvitationService");

@@ -1,9 +1,13 @@
 import { LeBotClient } from "@class/LeBotClient";
+import { InfluxService } from "@services/InfluxService";
 import { checkDatabaseConnection } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
-import { InfluxService } from "@services/InfluxService";
+import { Logger } from "@utils/Logger";
 import { startStatsCleanupJob } from "./jobs/statsCleanup";
 import { startVoiceSessionTickJob } from "./jobs/voiceSessionTick";
+
+const logger = new Logger("Bootstrap");
+logger.log("Starting LeBot...");
 
 // Check connections before starting
 await checkDatabaseConnection();

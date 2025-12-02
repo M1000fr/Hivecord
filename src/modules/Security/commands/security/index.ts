@@ -1,16 +1,16 @@
+import { BaseCommand } from "@class/BaseCommand";
+import { BotPermission } from "@decorators/BotPermission";
+import { Command } from "@decorators/Command";
+import { DefaultCommand } from "@decorators/DefaultCommand";
+import { EPermission } from "@enums/EPermission";
+import { HeatpointService } from "@modules/Security/services/HeatpointService";
 import {
 	ChatInputCommandInteraction,
 	Client,
 	MessageFlags,
 	PermissionsBitField,
 } from "discord.js";
-import { BaseCommand } from "@class/BaseCommand";
-import { Command } from "@decorators/Command";
-import { DefaultCommand } from "@decorators/DefaultCommand";
-import { EPermission } from "@enums/EPermission";
-import { BotPermission } from "@decorators/BotPermission";
 import { securityOptions } from "./securityOptions";
-import { HeatpointService } from "@modules/Security/services/HeatpointService";
 
 @Command(securityOptions)
 export default class SecurityCommand extends BaseCommand {
@@ -45,7 +45,9 @@ export default class SecurityCommand extends BaseCommand {
 						interaction.options.getChannel("channel") ||
 						interaction.channel;
 					if (channel) {
-						await HeatpointService.resetHeat(`channel:${channel.id}`);
+						await HeatpointService.resetHeat(
+							`channel:${channel.id}`,
+						);
 						await interaction.reply({
 							content: `✅ Reset heatpoints for channel ${channel.toString()}.`,
 							flags: [MessageFlags.Ephemeral],

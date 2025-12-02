@@ -2,28 +2,41 @@ export enum EPermission {
 	Ping = "commands.ping",
 	ReplaceRole = "commands.replaceRole",
 	ChannelClear = "commands.clear",
+	ChannelPurge = "commands.purge",
+	Config = "commands.config",
+	Invites = "commands.invites",
+
 	GroupsCreate = "commands.groups.create",
 	GroupsUpdate = "commands.groups.update",
 	GroupsDelete = "commands.groups.delete",
 	GroupsList = "commands.groups.list",
+
 	TempMute = "commands.tempmute",
-	Ban = "commands.ban",
 	Unmute = "commands.unmute",
+
+	Ban = "commands.ban",
 	Unban = "commands.unban",
-	Config = "commands.config",
+
 	SyncBackup = "commands.sync.backup",
 	SyncRestore = "commands.sync.restore",
+
 	SanctionsList = "commands.sanctions.list",
-	ChannelPurge = "commands.purge",
 	ConfigureModules = "commands.modules",
 	Debug = "commands.debug",
+
 	Warn = "commands.warn",
+	Unwarn = "commands.unwarn",
+
 	Lock = "commands.lock",
 	Unlock = "commands.unlock",
-	Unwarn = "commands.unwarn",
-	ReasonManage = "commands.reason.manage",
+
+	ReasonAdd = "commands.reason.add",
+	ReasonList = "commands.reason.list",
+	ReasonRemove = "commands.reason.remove",
+	ReasonEdit = "commands.reason.edit",
+
 	SecurityHeatpoint = "commands.security.heatpoint",
+
 	StatsServer = "commands.stats.server",
 	StatsUser = "commands.stats.user",
-	Invites = "commands.invites",
 }

@@ -1,19 +1,18 @@
 import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
+import { BotEvents } from "@enums/BotEvents";
 import { $Enums } from "@src/prisma/client/client";
 import { prismaClient } from "@src/services/prismaService";
 import { Logger } from "@utils/Logger";
-import {
-	ChannelType as DiscordChannelType,
-	type Channel,
-} from "discord.js";
-import { BotEvents } from "@enums/BotEvents";
+import { ChannelType as DiscordChannelType, type Channel } from "discord.js";
 
 @Event({
 	name: BotEvents.ChannelCreate,
 })
-export default class ChannelCreateEvent extends BaseEvent<typeof BotEvents.ChannelCreate> {
+export default class ChannelCreateEvent extends BaseEvent<
+	typeof BotEvents.ChannelCreate
+> {
 	private logger = new Logger("ChannelCreateEvent");
 
 	async run(client: LeBotClient<true>, channel: Channel) {
@@ -38,7 +37,9 @@ export default class ChannelCreateEvent extends BaseEvent<typeof BotEvents.Chann
 				},
 			});
 		} catch (error) {
-			this.logger.error(`Failed to sync created channel ${channel.id}: ${error}`);
+			this.logger.error(
+				`Failed to sync created channel ${channel.id}: ${error}`,
+			);
 		}
 	}
 }

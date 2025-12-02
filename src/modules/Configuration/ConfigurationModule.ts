@@ -1,8 +1,8 @@
 import { Module } from "@decorators/Module";
-import ModulesCommand from "./commands/modules/index";
 import ConfigCommand from "./commands/config/index";
-import GroupCommand from "./commands/group/index";
 import EmbedCommand from "./commands/embed/index";
+import GroupCommand from "./commands/group/index";
+import ModulesCommand from "./commands/modules/index";
 import { EmbedEditorInteractions } from "./interactions/EmbedEditorInteractions";
 import { ModuleConfigInteractions } from "./interactions/ModuleConfigInteractions";
 

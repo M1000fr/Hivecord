@@ -1,30 +1,23 @@
-import {
-	Client,
-	IntentsBitField,
-	Collection,
-	REST,
-	Routes,
-	ApplicationCommandOptionType,
-} from "discord.js";
-import path from "path";
-import { fileURLToPath } from "url";
 import { BaseCommand } from "@class/BaseCommand";
-import type { CommandOptions } from "@interfaces/CommandOptions";
-import { PermissionService } from "@services/PermissionService";
-import { EPermission } from "@enums/EPermission";
-import { Logger } from "@utils/Logger";
 import { SanctionScheduler } from "@class/SanctionScheduler";
-import { ModerationModule } from "@modules/Moderation/ModerationModule";
+import { EPermission } from "@enums/EPermission";
+import type { CommandOptions } from "@interfaces/CommandOptions";
+import type { EventOptions } from "@interfaces/EventOptions";
+import type { ModuleOptions } from "@interfaces/ModuleOptions";
 import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
-import { GeneralModule } from "@modules/General/GeneralModule";
-import { VoiceModule } from "@modules/Voice/VoiceModule";
-import { LogModule } from "@modules/Log/LogModule";
 import { DebugModule } from "@modules/Debug/DebugModule";
+import { GeneralModule } from "@modules/General/GeneralModule";
+import { InvitationModule } from "@modules/Invitation/InvitationModule";
+import { LogModule } from "@modules/Log/LogModule";
+import { ModerationModule } from "@modules/Moderation/ModerationModule";
 import { SecurityModule } from "@modules/Security/SecurityModule";
 import { StatisticsModule } from "@modules/Statistics/StatisticsModule";
-import { InvitationModule } from "@modules/Invitation/InvitationModule";
-import type { ModuleOptions } from "@interfaces/ModuleOptions";
-import type { EventOptions } from "@interfaces/EventOptions";
+import { VoiceModule } from "@modules/Voice/VoiceModule";
+import { PermissionService } from "@services/PermissionService";
+import { Logger } from "@utils/Logger";
+import { Client, Collection, IntentsBitField, REST, Routes } from "discord.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -157,7 +150,16 @@ export class LeBotClient<ready = false> extends Client {
 			if (!evtOptions) continue;
 
 			const instance = new EventClass();
-			const handler = (...args: any[]) => instance.run(this, ...args);
+			const handler = async (...args: any[]) => {
+				try {
+					await instance.run(this, ...args);
+				} catch (error: any) {
+					this.logger.error(
+						`Error in event ${evtOptions.name}:`,
+						error.stack,
+					);
+				}
+			};
 
 			if (evtOptions.once) {
 				this.once(evtOptions.name, handler);

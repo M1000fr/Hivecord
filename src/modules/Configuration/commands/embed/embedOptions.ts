@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType } from "discord.js";
 import type { CommandOptions } from "@interfaces/CommandOptions";
+import { ApplicationCommandOptionType } from "discord.js";
 
 export const embedOptions: CommandOptions = {
 	name: "embed",

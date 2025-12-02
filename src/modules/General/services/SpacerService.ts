@@ -70,9 +70,6 @@ export class SpacerService {
 		if (b > 255) b = 255;
 		else if (b < 0) b = 0;
 
-		return (
-			"#" +
-			((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")
-		);
+		return "#" + ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0");
 	}
 }

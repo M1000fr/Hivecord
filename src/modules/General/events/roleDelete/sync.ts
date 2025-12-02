@@ -1,15 +1,17 @@
 import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
+import { BotEvents } from "@enums/BotEvents";
 import { prismaClient } from "@src/services/prismaService";
 import { Logger } from "@utils/Logger";
 import { Role } from "discord.js";
-import { BotEvents } from "@enums/BotEvents";
 
 @Event({
 	name: BotEvents.GuildRoleDelete,
 })
-export default class RoleDeleteEvent extends BaseEvent<typeof BotEvents.GuildRoleDelete> {
+export default class RoleDeleteEvent extends BaseEvent<
+	typeof BotEvents.GuildRoleDelete
+> {
 	private logger = new Logger("RoleDeleteEvent");
 
 	async run(client: LeBotClient<true>, role: Role) {

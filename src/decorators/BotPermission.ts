@@ -1,10 +1,10 @@
+import { BaseCommand } from "@class/BaseCommand";
 import {
 	ChatInputCommandInteraction,
 	Client,
 	MessageFlags,
 	type PermissionResolvable,
 } from "discord.js";
-import { BaseCommand } from '@class/BaseCommand';
 
 export function BotPermission(...permissions: PermissionResolvable[]) {
 	return function (
@@ -16,7 +16,7 @@ export function BotPermission(...permissions: PermissionResolvable[]) {
 		if (!(target instanceof BaseCommand)) {
 			throw new Error(
 				`@BotPermission decorator can only be used on methods of classes extending BaseCommand. ` +
-				`Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`
+					`Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`,
 			);
 		}
 		const originalMethod = descriptor.value;

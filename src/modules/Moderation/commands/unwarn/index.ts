@@ -1,11 +1,15 @@
-import { ChatInputCommandInteraction, MessageFlags, AutocompleteInteraction } from "discord.js";
+import { BaseCommand } from "@class/BaseCommand";
+import { LeBotClient } from "@class/LeBotClient";
+import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
-import { Autocomplete } from "@decorators/Autocomplete";
-import { BaseCommand } from "@class/BaseCommand";
 import { EPermission } from "@enums/EPermission";
 import { SanctionService } from "@modules/Moderation/services/SanctionService";
-import { LeBotClient } from "@class/LeBotClient";
+import {
+	AutocompleteInteraction,
+	ChatInputCommandInteraction,
+	MessageFlags,
+} from "discord.js";
 import { unwarnOptions } from "./options";
 
 @Command({
@@ -14,24 +18,27 @@ import { unwarnOptions } from "./options";
 	options: unwarnOptions,
 })
 export default class UnwarnCommand extends BaseCommand {
-    @Autocomplete({ optionName: "warn_id" })
-    async autocompleteWarnId(client: LeBotClient<true>, interaction: AutocompleteInteraction) {
-        const userId = interaction.options.get("user")?.value as string;
-        if (!userId) {
-            await interaction.respond([]);
-            return;
-        }
+	@Autocomplete({ optionName: "warn_id" })
+	async autocompleteWarnId(
+		client: LeBotClient<true>,
+		interaction: AutocompleteInteraction,
+	) {
+		const userId = interaction.options.get("user")?.value as string;
+		if (!userId) {
+			await interaction.respond([]);
+			return;
+		}
 
-        const warns = await SanctionService.getActiveWarns(userId);
-        const filtered = warns
-            .map(w => ({
-                name: `#${w.id} - ${w.reason.substring(0, 50)}... (${w.createdAt.toLocaleDateString()})`,
-                value: w.id
-            }))
-            .slice(0, 25);
+		const warns = await SanctionService.getActiveWarns(userId);
+		const filtered = warns
+			.map((w) => ({
+				name: `#${w.id} - ${w.reason.substring(0, 50)}... (${w.createdAt.toLocaleDateString()})`,
+				value: w.id,
+			}))
+			.slice(0, 25);
 
-        await interaction.respond(filtered);
-    }
+		await interaction.respond(filtered);
+	}
 
 	@DefaultCommand(EPermission.Unwarn)
 	async run(

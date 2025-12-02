@@ -1,10 +1,10 @@
 import { Module } from "@decorators/Module";
-import { Ready } from "./events/Ready";
-import { InviteCreate } from "./events/InviteCreate";
-import { InviteDelete } from "./events/InviteDelete";
+import InvitesCommand from "./commands/InvitesCommand";
 import { GuildMemberAdd } from "./events/GuildMemberAdd";
 import { GuildMemberRemove } from "./events/GuildMemberRemove";
-import InvitesCommand from "./commands/InvitesCommand";
+import { InviteCreate } from "./events/InviteCreate";
+import { InviteDelete } from "./events/InviteDelete";
+import { Ready } from "./events/Ready";
 
 @Module({
 	name: "Invitation",

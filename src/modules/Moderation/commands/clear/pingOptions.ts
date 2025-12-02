@@ -1,5 +1,5 @@
+import type { CommandOptions } from "@interfaces/CommandOptions";
 import { ApplicationCommandOptionType } from "discord.js";
-import type { CommandOptions } from '@interfaces/CommandOptions';
 
 export const clearOptions: CommandOptions = {
 	name: "clear",
