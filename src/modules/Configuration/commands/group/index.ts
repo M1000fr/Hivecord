@@ -27,9 +27,13 @@ export default class GroupCommand extends BaseCommand {
 		const groups = await GroupService.listGroups();
 
 		const filtered = groups
-			.filter((g) => g.name.toLowerCase().includes(focusedValue))
+			.filter(
+				(g) =>
+					g.name.toLowerCase().includes(focusedValue) ||
+					g.id.toString().includes(focusedValue),
+			)
 			.map((g) => ({
-				name: g.name,
+				name: `${g.id}. ${g.name}`,
 				value: g.name,
 			}))
 			.slice(0, 25);
