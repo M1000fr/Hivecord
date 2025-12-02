@@ -14,6 +14,7 @@ import { LeBotClient } from "@class/LeBotClient";
 import { EPermission } from "@enums/EPermission";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { Autocomplete } from "@decorators/Autocomplete";
+import { OptionRoute } from "@decorators/OptionRoute";
 import { BotEvents } from "@src/enums/BotEvents";
 
 const DEBUG_ACTIONS = [
@@ -55,32 +56,17 @@ export default class DebugCommand extends BaseCommand {
 	async run(client: LeBotClient<true>, interaction: CommandInteraction) {
 		if (!interaction.isChatInputCommand()) return;
 
-		const action = interaction.options.getString("action", true);
-
-		switch (action) {
-			case "guild_member_add_message":
-				await this.debugGuildMemberAddMessage(client, interaction);
-				break;
-			case "voice_state_update_join":
-				await this.debugVoiceStateUpdateJoin(client, interaction);
-				break;
-			case "voice_state_update_leave":
-				await this.debugVoiceStateUpdateLeave(client, interaction);
-				break;
-			case "voice_state_update_move":
-				await this.debugVoiceStateUpdateMove(client, interaction);
-				break;
-			case "voice_state_update_stream":
-				await this.debugVoiceStateUpdateStream(client, interaction);
-				break;
-			default:
-				await interaction.reply({
-					content: "Unknown debug action.",
-					flags: [MessageFlags.Ephemeral],
-				});
-		}
+		await interaction.reply({
+			content: "Unknown debug action.",
+			flags: [MessageFlags.Ephemeral],
+		});
 	}
 
+	@OptionRoute({
+		option: "action",
+		value: "guild_member_add_message",
+		permission: EPermission.Debug,
+	})
 	private async debugGuildMemberAddMessage(
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
@@ -130,6 +116,11 @@ export default class DebugCommand extends BaseCommand {
 		} as unknown as VoiceState;
 	}
 
+	@OptionRoute({
+		option: "action",
+		value: "voice_state_update_join",
+		permission: EPermission.Debug,
+	})
 	private async debugVoiceStateUpdateJoin(
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
@@ -166,6 +157,11 @@ export default class DebugCommand extends BaseCommand {
 		);
 	}
 
+	@OptionRoute({
+		option: "action",
+		value: "voice_state_update_leave",
+		permission: EPermission.Debug,
+	})
 	private async debugVoiceStateUpdateLeave(
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
@@ -202,6 +198,11 @@ export default class DebugCommand extends BaseCommand {
 		);
 	}
 
+	@OptionRoute({
+		option: "action",
+		value: "voice_state_update_move",
+		permission: EPermission.Debug,
+	})
 	private async debugVoiceStateUpdateMove(
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
@@ -240,6 +241,11 @@ export default class DebugCommand extends BaseCommand {
 		);
 	}
 
+	@OptionRoute({
+		option: "action",
+		value: "voice_state_update_stream",
+		permission: EPermission.Debug,
+	})
 	private async debugVoiceStateUpdateStream(
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
