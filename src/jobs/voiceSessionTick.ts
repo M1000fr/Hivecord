@@ -1,6 +1,6 @@
+import type { LeBotClient } from "@class/LeBotClient";
 import { StatsService } from "@modules/Statistics/services/StatsService";
 import { Logger } from "@utils/Logger";
-import type { LeBotClient } from "@class/LeBotClient";
 
 const logger = new Logger("VoiceSessionTickJob");
 

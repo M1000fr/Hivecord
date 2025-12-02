@@ -1,32 +1,31 @@
-import {
-	type Interaction,
-	ModalBuilder,
-	TextInputBuilder,
-	TextInputStyle,
-	ActionRowBuilder,
-	EmbedBuilder,
-	RoleSelectMenuBuilder,
-	ChannelSelectMenuBuilder,
-	type Message,
-	ButtonBuilder,
-	ButtonStyle,
-	MessageFlags,
-	type StringSelectMenuInteraction,
-	type RoleSelectMenuInteraction,
-	type ChannelSelectMenuInteraction,
-	type ModalSubmitInteraction,
-	type ButtonInteraction,
-} from "discord.js";
+import { LeBotClient } from "@class/LeBotClient";
+import { EConfigType } from "@decorators/ConfigProperty";
 import {
 	ButtonPattern,
-	SelectMenuPattern,
 	ModalPattern,
+	SelectMenuPattern,
 } from "@decorators/Interaction";
-import { LeBotClient } from "@class/LeBotClient";
-import { InteractionHelper } from "@utils/InteractionHelper";
-import { ConfigHelper } from "@utils/ConfigHelper";
-import { EConfigType } from "@decorators/ConfigProperty";
 import { ConfigService } from "@services/ConfigService";
+import { ConfigHelper } from "@utils/ConfigHelper";
+import { InteractionHelper } from "@utils/InteractionHelper";
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	type ButtonInteraction,
+	ButtonStyle,
+	ChannelSelectMenuBuilder,
+	type ChannelSelectMenuInteraction,
+	EmbedBuilder,
+	type Message,
+	MessageFlags,
+	ModalBuilder,
+	type ModalSubmitInteraction,
+	RoleSelectMenuBuilder,
+	type RoleSelectMenuInteraction,
+	type StringSelectMenuInteraction,
+	TextInputBuilder,
+	TextInputStyle,
+} from "discord.js";
 
 export class ModuleConfigInteractions {
 	private async respondToInteraction(

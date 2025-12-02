@@ -1,12 +1,12 @@
+import { LeBotClient } from "@class/LeBotClient";
+import { EConfigType } from "@decorators/ConfigProperty";
+import { ConfigService } from "@services/ConfigService";
 import {
+	ActionRowBuilder,
 	EmbedBuilder,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
-	ActionRowBuilder,
 } from "discord.js";
-import { ConfigService } from "@services/ConfigService";
-import { LeBotClient } from "@class/LeBotClient";
-import { EConfigType } from "@decorators/ConfigProperty";
 
 export const TYPE_NAMES: Record<number, string> = {
 	[EConfigType.String]: "Text",

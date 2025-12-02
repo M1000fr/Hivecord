@@ -1,9 +1,9 @@
-import { GuildMember, type PartialGuildMember } from "discord.js";
 import { BaseEvent } from "@class/BaseEvent";
-import { Event } from "@decorators/Event";
-import { LogService } from "@modules/Log/services/LogService";
 import { LeBotClient } from "@class/LeBotClient";
+import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
+import { LogService } from "@modules/Log/services/LogService";
+import { GuildMember, type PartialGuildMember } from "discord.js";
 
 @Event({
 	name: BotEvents.GuildMemberRemove,

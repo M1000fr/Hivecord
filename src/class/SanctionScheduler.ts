@@ -1,9 +1,9 @@
-import { Client } from "discord.js";
-import { prismaClient } from "@services/prismaService";
+import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
 import { SanctionType } from "@prisma/client/client";
 import { ConfigService } from "@services/ConfigService";
+import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
-import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
+import { Client } from "discord.js";
 
 const CHECK_EXPIRED_INTERVAL = 10 * 1000; // 10 seconds
 const CHECK_MUTE_CONSISTENCY_INTERVAL = 60 * 1000; // 60 seconds

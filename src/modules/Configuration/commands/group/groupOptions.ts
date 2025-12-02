@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, PermissionFlagsBits } from "discord.js";
 import type { CommandOptions } from "@interfaces/CommandOptions";
+import { ApplicationCommandOptionType, PermissionFlagsBits } from "discord.js";
 
 export const groupOptions: CommandOptions = {
 	name: "group",

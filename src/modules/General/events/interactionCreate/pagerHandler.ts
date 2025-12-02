@@ -1,9 +1,9 @@
-import { type Interaction } from "discord.js";
 import { BaseEvent } from "@class/BaseEvent";
-import { Event } from "@decorators/Event";
 import { LeBotClient } from "@class/LeBotClient";
 import { Pager } from "@class/Pager";
+import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
+import { type Interaction } from "discord.js";
 
 @Event({
 	name: BotEvents.InteractionCreate,

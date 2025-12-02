@@ -1,20 +1,20 @@
-import {
-	ChatInputCommandInteraction,
-	Client,
-	AttachmentBuilder,
-	EmbedBuilder,
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
-} from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { statsOptions } from "./statsOptions";
-import { StatsService } from "@modules/Statistics/services/StatsService";
 import type { TimeRange } from "@modules/Statistics/services/StatsService";
+import { StatsService } from "@modules/Statistics/services/StatsService";
 import { ChartGenerator } from "@utils/ChartGenerator";
+import {
+	ActionRowBuilder,
+	AttachmentBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	ChatInputCommandInteraction,
+	Client,
+	EmbedBuilder,
+} from "discord.js";
+import { statsOptions } from "./statsOptions";
 
 @Command(statsOptions)
 export default class StatsCommand extends BaseCommand {

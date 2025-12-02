@@ -1,7 +1,7 @@
 import {
 	ConfigProperty,
-	toConfigKey,
 	EConfigType,
+	toConfigKey,
 } from "@decorators/ConfigProperty";
 
 export class LogConfig {

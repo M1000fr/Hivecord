@@ -1,9 +1,9 @@
-import { VoiceState } from "discord.js";
 import { BaseEvent } from "@class/BaseEvent";
-import { Event } from "@decorators/Event";
 import { LeBotClient } from "@class/LeBotClient";
-import { TempVoiceService } from "@modules/Voice/services/TempVoiceService";
+import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
+import { TempVoiceService } from "@modules/Voice/services/TempVoiceService";
+import { VoiceState } from "discord.js";
 
 @Event({
 	name: BotEvents.VoiceStateUpdate,

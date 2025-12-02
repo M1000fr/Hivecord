@@ -1,15 +1,15 @@
-import {
-	AttachmentBuilder,
-	EmbedBuilder,
-	MessageFlags,
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
-	type ButtonInteraction,
-} from "discord.js";
 import { ButtonPattern } from "@decorators/Interaction";
 import { StatsService } from "@modules/Statistics/services/StatsService";
 import { ChartGenerator } from "@utils/ChartGenerator";
+import {
+	ActionRowBuilder,
+	AttachmentBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	EmbedBuilder,
+	MessageFlags,
+	type ButtonInteraction,
+} from "discord.js";
 import StatsCommand from "../commands/stats/index";
 
 export class StatsPeriodInteractions {

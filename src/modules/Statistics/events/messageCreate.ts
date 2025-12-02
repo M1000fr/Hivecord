@@ -1,9 +1,9 @@
 import { BaseEvent } from "@class/BaseEvent";
 import type { LeBotClient } from "@class/LeBotClient";
-import type { Message } from "discord.js";
-import { StatsService } from "@modules/Statistics/services/StatsService";
 import { Event } from "@decorators/Event";
+import { StatsService } from "@modules/Statistics/services/StatsService";
 import { BotEvents } from "@src/enums/BotEvents";
+import type { Message } from "discord.js";
 
 @Event({ name: BotEvents.MessageCreate })
 export default class MessageCreateEvent extends BaseEvent<

@@ -1,5 +1,5 @@
-import { ButtonInteraction } from "discord.js";
 import { Button } from "@decorators/Interaction";
+import { ButtonInteraction } from "discord.js";
 
 export class PingCommandInteractions {
 	@Button("ping_button")

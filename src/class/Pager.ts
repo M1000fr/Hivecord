@@ -1,3 +1,5 @@
+import { PagerRegistry } from "@services/PagerRegistry";
+import { RedisService } from "@services/RedisService";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -8,8 +10,6 @@ import {
 	StringSelectMenuInteraction,
 	type RepliableInteraction,
 } from "discord.js";
-import { RedisService } from "@services/RedisService";
-import { PagerRegistry } from "@services/PagerRegistry";
 
 export interface PagerOptions<T> {
 	items: T[];

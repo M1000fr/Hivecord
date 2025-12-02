@@ -1,8 +1,8 @@
 import { BaseEvent } from "@class/BaseEvent";
-import { Event } from "@decorators/Event";
 import { LeBotClient } from "@class/LeBotClient";
-import { SyncService } from "@modules/General/services/SyncService";
+import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
+import { SyncService } from "@modules/General/services/SyncService";
 
 @Event({
 	name: BotEvents.ClientReady,

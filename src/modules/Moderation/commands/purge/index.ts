@@ -1,15 +1,15 @@
-import {
-	ChatInputCommandInteraction,
-	Client,
-	TextChannel,
-	MessageFlags,
-} from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
-import { purgeOptions } from "./purgeOptions";
 import { prismaClient } from "@services/prismaService";
+import {
+	ChatInputCommandInteraction,
+	Client,
+	MessageFlags,
+	TextChannel,
+} from "discord.js";
+import { purgeOptions } from "./purgeOptions";
 
 @Command(purgeOptions)
 export default class PurgeCommand extends BaseCommand {

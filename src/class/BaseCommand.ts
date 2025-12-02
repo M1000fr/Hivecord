@@ -1,11 +1,11 @@
+import type { ICommandClass } from "@interfaces/ICommandClass";
+import { PermissionService } from "@services/PermissionService";
 import {
+	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
 	MessageFlags,
-	AutocompleteInteraction,
 } from "discord.js";
-import { PermissionService } from "@services/PermissionService";
-import type { ICommandClass } from "@interfaces/ICommandClass";
 
 export abstract class BaseCommand {
 	async handleAutocomplete(

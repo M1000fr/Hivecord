@@ -1,5 +1,4 @@
-import { describe, expect, test, mock, beforeEach } from "bun:test";
-import { SanctionType } from "@prisma/client/enums";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 
 // Mocks
 const mockPrisma = {

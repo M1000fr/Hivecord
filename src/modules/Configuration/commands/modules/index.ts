@@ -1,17 +1,17 @@
+import { BaseCommand } from "@class/BaseCommand";
+import { LeBotClient } from "@class/LeBotClient";
+import { Autocomplete } from "@decorators/Autocomplete";
+import { Command } from "@decorators/Command";
+import { DefaultCommand } from "@decorators/DefaultCommand";
+import { EPermission } from "@enums/EPermission";
+import { ConfigHelper } from "@utils/ConfigHelper";
 import {
+	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
 	MessageFlags,
-	AutocompleteInteraction,
 } from "discord.js";
-import { BaseCommand } from "@class/BaseCommand";
-import { Command } from "@decorators/Command";
-import { DefaultCommand } from "@decorators/DefaultCommand";
-import { Autocomplete } from "@decorators/Autocomplete";
-import { EPermission } from "@enums/EPermission";
 import { modulesOptions } from "./modulesOptions";
-import { LeBotClient } from "@class/LeBotClient";
-import { ConfigHelper } from "@utils/ConfigHelper";
 
 @Command(modulesOptions)
 export default class ModulesCommand extends BaseCommand {

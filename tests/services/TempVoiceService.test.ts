@@ -1,4 +1,4 @@
-import { describe, expect, test, mock, beforeEach } from "bun:test";
+import { beforeEach, describe, mock, test } from "bun:test";
 
 // Mocks
 const mockPrisma = {
@@ -27,7 +27,6 @@ mock.module("@modules/Log/services/LogService", () => ({
 	LogService: mockLogService,
 }));
 
-import { TempVoiceService } from "../../src/modules/Voice/services/TempVoiceService";
 import { VoiceChannel } from "discord.js";
 
 describe("TempVoiceService", () => {

@@ -1,10 +1,10 @@
+import { BaseCommand } from "@class/BaseCommand";
 import {
 	ChatInputCommandInteraction,
 	Client,
 	MessageFlags,
 	type PermissionResolvable,
 } from "discord.js";
-import { BaseCommand } from "@class/BaseCommand";
 
 export function BotPermission(...permissions: PermissionResolvable[]) {
 	return function (

@@ -1,5 +1,5 @@
-import { EPermission } from "@enums/EPermission";
 import { BaseCommand } from "@class/BaseCommand";
+import { EPermission } from "@enums/EPermission";
 import type { ICommandClass } from "@interfaces/ICommandClass";
 
 export interface OptionRouteOptions {

@@ -1,5 +1,5 @@
-import type { CommandOptions } from "@interfaces/CommandOptions";
 import { BaseCommand } from "@class/BaseCommand";
+import type { CommandOptions } from "@interfaces/CommandOptions";
 
 export function Command(options: CommandOptions) {
 	return function (target: Function) {

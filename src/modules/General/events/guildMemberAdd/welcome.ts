@@ -1,26 +1,24 @@
-import {
-	GuildMember,
-	AttachmentBuilder,
-	TextChannel,
-	EmbedBuilder,
-	Colors,
-} from "discord.js";
 import { BaseEvent } from "@class/BaseEvent";
-import { Event } from "@decorators/Event";
 import { LeBotClient } from "@class/LeBotClient";
-import { ConfigService } from "@services/ConfigService";
-import { Logger } from "@utils/Logger";
-import { Canvas, loadImage, Image, GlobalFonts } from "@napi-rs/canvas";
-import GIFEncoder from "gifencoder";
-import gifFrames from "gif-frames";
-import { Stream } from "stream";
-import path from "path";
 import { MessageTemplate } from "@class/MessageTemplate";
-import { GeneralConfigKeys } from "../../GeneralConfig";
+import { Event } from "@decorators/Event";
+import { BotEvents } from "@enums/BotEvents";
 import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { InvitationService } from "@modules/Invitation/services/InvitationService";
-import { Invite } from "discord.js";
-import { BotEvents } from "@enums/BotEvents";
+import { Canvas, Image, loadImage } from "@napi-rs/canvas";
+import { ConfigService } from "@services/ConfigService";
+import { Logger } from "@utils/Logger";
+import {
+	AttachmentBuilder,
+	GuildMember,
+	Invite,
+	TextChannel,
+} from "discord.js";
+import gifFrames from "gif-frames";
+import GIFEncoder from "gifencoder";
+import path from "path";
+import { Stream } from "stream";
+import { GeneralConfigKeys } from "../../GeneralConfig";
 
 @Event({
 	name: BotEvents.MemberJoinProcessed,

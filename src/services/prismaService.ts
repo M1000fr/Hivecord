@@ -49,4 +49,4 @@ async function checkDatabaseConnection() {
 	}
 }
 
-export { prismaClient, checkDatabaseConnection };
+export { checkDatabaseConnection, prismaClient };

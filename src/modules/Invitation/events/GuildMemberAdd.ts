@@ -1,10 +1,10 @@
 import { BaseEvent } from "@class/BaseEvent";
-import { Event } from "@decorators/Event";
-import { InvitationService } from "../services/InvitationService";
-import { GuildMember } from "discord.js";
-import { Logger } from "@utils/Logger";
 import { LeBotClient } from "@class/LeBotClient";
+import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
+import { Logger } from "@utils/Logger";
+import { GuildMember } from "discord.js";
+import { InvitationService } from "../services/InvitationService";
 
 @Event({ name: BotEvents.GuildMemberAdd })
 export class GuildMemberAdd extends BaseEvent<typeof BotEvents.GuildMemberAdd> {

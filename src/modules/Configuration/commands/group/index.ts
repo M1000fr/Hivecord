@@ -1,19 +1,19 @@
-import {
-	ChatInputCommandInteraction,
-	Client,
-	EmbedBuilder,
-	Colors,
-	AutocompleteInteraction,
-} from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
+import { Pager } from "@class/Pager";
+import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
-import { Autocomplete } from "@decorators/Autocomplete";
 import { EPermission } from "@enums/EPermission";
-import { groupOptions } from "./groupOptions";
 import { GroupService } from "@modules/Configuration/services/GroupService";
 import { InteractionHelper } from "@utils/InteractionHelper";
-import { Pager } from "@class/Pager";
+import {
+	AutocompleteInteraction,
+	ChatInputCommandInteraction,
+	Client,
+	Colors,
+	EmbedBuilder,
+} from "discord.js";
+import { groupOptions } from "./groupOptions";
 
 @Command(groupOptions)
 export default class GroupCommand extends BaseCommand {

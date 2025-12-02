@@ -1,19 +1,19 @@
-import {
-	ChatInputCommandInteraction,
-	Client,
-	EmbedBuilder,
-	MessageFlags,
-	Colors,
-} from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
+import { Pager } from "@class/Pager";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { sanctionsOptions } from "./sanctionsOptions";
-import { prismaClient } from "@services/prismaService";
-import { Pager } from "@class/Pager";
 import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
 import { SanctionType } from "@prisma/client/client";
+import { prismaClient } from "@services/prismaService";
+import {
+	ChatInputCommandInteraction,
+	Client,
+	Colors,
+	EmbedBuilder,
+	MessageFlags,
+} from "discord.js";
+import { sanctionsOptions } from "./sanctionsOptions";
 
 @Command(sanctionsOptions)
 export default class SanctionsCommand extends BaseCommand {

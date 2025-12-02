@@ -1,14 +1,13 @@
-import { prismaClient } from "@services/prismaService";
+import type { LeBotClient } from "@class/LeBotClient";
+import { EConfigType } from "@decorators/ConfigProperty";
+import { ConfigService } from "@services/ConfigService";
+import { Logger } from "@utils/Logger";
 import {
 	createCipheriv,
 	createDecipheriv,
 	randomBytes,
 	scryptSync,
 } from "crypto";
-import { Logger } from "@utils/Logger";
-import { ConfigService } from "@services/ConfigService";
-import type { LeBotClient } from "@class/LeBotClient";
-import { EConfigType } from "@decorators/ConfigProperty";
 
 interface ConfigValue {
 	value: string | string[];

@@ -1,11 +1,11 @@
-import { prismaClient } from "@services/prismaService";
-import { Logger } from "@utils/Logger";
 import type {
 	GroupModel,
-	RoleModel,
 	PermissionModel,
+	RoleModel,
 } from "@prisma/client/models";
+import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
+import { Logger } from "@utils/Logger";
 
 export class GroupService {
 	private static logger = new Logger("GroupService");
@@ -136,9 +136,7 @@ export class GroupService {
 		});
 	}
 
-	static async getGroup(
-		name: string,
-	): Promise<
+	static async getGroup(name: string): Promise<
 		| (GroupModel & {
 				Role: RoleModel;
 				Permissions: { Permissions: PermissionModel }[];

@@ -1,7 +1,7 @@
 import { LeBotClient } from "@class/LeBotClient";
+import { InfluxService } from "@services/InfluxService";
 import { checkDatabaseConnection } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
-import { InfluxService } from "@services/InfluxService";
 import { startStatsCleanupJob } from "./jobs/statsCleanup";
 import { startVoiceSessionTickJob } from "./jobs/voiceSessionTick";
 

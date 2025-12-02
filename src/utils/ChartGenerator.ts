@@ -1,8 +1,4 @@
 import { createCanvas } from "canvas";
-import type {
-	UserVoiceStats,
-	UserMessageStats,
-} from "@modules/Statistics/services/StatsService";
 
 export interface ChartData {
 	labels: string[];

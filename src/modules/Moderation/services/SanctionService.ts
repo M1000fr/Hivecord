@@ -1,9 +1,9 @@
-import { Guild, User, GuildMember } from "discord.js";
-import { prismaClient } from "@services/prismaService";
+import { LogService } from "@modules/Log/services/LogService";
+import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
 import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
-import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
-import { LogService } from "@modules/Log/services/LogService";
+import { prismaClient } from "@services/prismaService";
+import { Guild, GuildMember, User } from "discord.js";
 
 export class SanctionService {
 	private static async fetchMember(

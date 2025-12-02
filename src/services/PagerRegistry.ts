@@ -1,4 +1,4 @@
-import { EmbedBuilder, InteractionCollector } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 
 export type PagerRenderer<T = any> = (
 	items: T[],

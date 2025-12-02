@@ -1,16 +1,15 @@
-import {
-	ChatInputCommandInteraction,
-	Client,
-	PermissionsBitField,
-	TextChannel,
-	GuildChannel,
-	MessageFlags,
-} from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
+import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
-import { BotPermission } from "@decorators/BotPermission";
+import {
+	ChatInputCommandInteraction,
+	Client,
+	MessageFlags,
+	PermissionsBitField,
+	TextChannel,
+} from "discord.js";
 import { unlockOptions } from "./unlockOptions";
 
 @Command(unlockOptions)

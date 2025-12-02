@@ -2,13 +2,13 @@ import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
-import { InvitationService } from "../services/InvitationService";
 import {
 	ApplicationCommandOptionType,
 	ChatInputCommandInteraction,
 	Client,
 	EmbedBuilder,
 } from "discord.js";
+import { InvitationService } from "../services/InvitationService";
 
 @Command({
 	name: "invites",

@@ -1,17 +1,16 @@
-import {
-	ChatInputCommandInteraction,
-	Client,
-	AttachmentBuilder,
-	MessageFlags,
-} from "discord.js";
 import { BaseCommand } from "@class/BaseCommand";
+import { LeBotClient } from "@class/LeBotClient";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { configOptions } from "./configOptions";
-import { LeBotClient } from "@class/LeBotClient";
 import { BackupService } from "@modules/Configuration/services/BackupService";
 import { InteractionHelper } from "@utils/InteractionHelper";
+import {
+	AttachmentBuilder,
+	ChatInputCommandInteraction,
+	Client,
+} from "discord.js";
+import { configOptions } from "./configOptions";
 
 @Command(configOptions)
 export default class ConfigCommand extends BaseCommand {

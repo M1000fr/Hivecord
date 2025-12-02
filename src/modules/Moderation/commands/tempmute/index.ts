@@ -1,21 +1,21 @@
+import { BaseCommand } from "@class/BaseCommand";
+import { Autocomplete } from "@decorators/Autocomplete";
+import { BotPermission } from "@decorators/BotPermission";
+import { Command } from "@decorators/Command";
+import { DefaultCommand } from "@decorators/DefaultCommand";
+import { EPermission } from "@enums/EPermission";
+import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
+import { SanctionService } from "@modules/Moderation/services/SanctionService";
+import { SanctionType } from "@prisma/client/client";
+import { DurationParser } from "@utils/DurationParser";
 import {
+	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
 	MessageFlags,
 	PermissionsBitField,
-	AutocompleteInteraction,
 } from "discord.js";
-import { BaseCommand } from "@class/BaseCommand";
-import { Command } from "@decorators/Command";
-import { DefaultCommand } from "@decorators/DefaultCommand";
-import { Autocomplete } from "@decorators/Autocomplete";
-import { EPermission } from "@enums/EPermission";
 import { tempMuteOptions } from "./tempMuteOptions";
-import { DurationParser } from "@utils/DurationParser";
-import { BotPermission } from "@decorators/BotPermission";
-import { SanctionService } from "@modules/Moderation/services/SanctionService";
-import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
-import { SanctionType } from "@prisma/client/client";
 
 @Command(tempMuteOptions)
 export default class TempMuteCommand extends BaseCommand {

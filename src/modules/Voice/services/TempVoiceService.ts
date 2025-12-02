@@ -1,3 +1,7 @@
+import { LogService } from "@modules/Log/services/LogService";
+import { VoiceConfigKeys } from "@modules/Voice/VoiceConfig";
+import { ConfigService } from "@services/ConfigService";
+import { prismaClient } from "@services/prismaService";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -6,21 +10,13 @@ import {
 	EmbedBuilder,
 	GuildMember,
 	MessageFlags,
-	ModalBuilder,
 	PermissionFlagsBits,
-	TextInputBuilder,
-	TextInputStyle,
 	VoiceChannel,
 	VoiceState,
 	type ButtonInteraction,
 	type Interaction,
 	type Message,
-	type ModalSubmitInteraction,
 } from "discord.js";
-import { VoiceConfigKeys } from "@modules/Voice/VoiceConfig";
-import { ConfigService } from "@services/ConfigService";
-import { prismaClient } from "@services/prismaService";
-import { LogService } from "@modules/Log/services/LogService";
 
 type ListType = "whitelist" | "blacklist";
 

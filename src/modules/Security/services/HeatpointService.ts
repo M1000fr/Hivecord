@@ -1,21 +1,19 @@
-import { RedisService } from "@services/RedisService";
-import { ConfigService } from "@services/ConfigService";
+import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
+import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { SecurityConfigKeys } from "@modules/Security/SecurityConfig";
+import { SanctionType } from "@prisma/client/client";
+import { ConfigService } from "@services/ConfigService";
+import { RedisService } from "@services/RedisService";
+import { DurationParser } from "@utils/DurationParser";
+import { Logger } from "@utils/Logger";
 import {
 	Guild,
 	GuildChannel,
-	User,
 	PermissionsBitField,
 	TextChannel,
-	ChannelType,
-	CategoryChannel,
+	User,
 	VoiceChannel,
 } from "discord.js";
-import { Logger } from "@utils/Logger";
-import { SanctionService } from "@modules/Moderation/services/SanctionService";
-import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
-import { SanctionType } from "@prisma/client/client";
-import { DurationParser } from "@utils/DurationParser";
 
 export class HeatpointService {
 	private static logger = new Logger("HeatpointService");

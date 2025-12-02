@@ -1,5 +1,5 @@
-import { prismaClient as prisma } from "@services/prismaService";
 import { SanctionType, type SanctionReason } from "@prisma/client/client";
+import { prismaClient as prisma } from "@services/prismaService";
 
 export class SanctionReasonService {
 	static async create(data: {

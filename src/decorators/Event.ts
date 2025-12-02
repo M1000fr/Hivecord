@@ -1,6 +1,6 @@
+import { BaseEvent } from "@class/BaseEvent";
 import type { EventOptions } from "@interfaces/EventOptions";
 import type { ClientEvents } from "discord.js";
-import { BaseEvent } from "@class/BaseEvent";
 
 export function Event<K extends keyof ClientEvents | string>(
 	options: EventOptions<K>,

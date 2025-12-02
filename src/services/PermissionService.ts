@@ -1,6 +1,6 @@
 import { prismaClient } from "@services/prismaService";
-import { Logger } from "@utils/Logger";
 import { RedisService } from "@services/RedisService";
+import { Logger } from "@utils/Logger";
 
 const CACHE_TTL = 60; // 60 seconds
 

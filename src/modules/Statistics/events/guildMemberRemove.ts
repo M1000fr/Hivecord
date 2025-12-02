@@ -1,9 +1,9 @@
 import { BaseEvent } from "@class/BaseEvent";
 import type { LeBotClient } from "@class/LeBotClient";
-import type { GuildMember } from "discord.js";
-import { StatsService } from "@modules/Statistics/services/StatsService";
 import { Event } from "@decorators/Event";
+import { StatsService } from "@modules/Statistics/services/StatsService";
 import { BotEvents } from "@src/enums/BotEvents";
+import type { GuildMember } from "discord.js";
 
 @Event({ name: BotEvents.GuildMemberRemove })
 export default class GuildMemberRemoveEvent extends BaseEvent<

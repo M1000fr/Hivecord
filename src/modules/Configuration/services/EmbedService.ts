@@ -1,7 +1,7 @@
-import { prismaClient } from "@services/prismaService";
-import { EmbedBuilder, type APIEmbed } from "discord.js";
 import { MessageTemplate } from "@class/MessageTemplate";
+import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
+import { EmbedBuilder, type APIEmbed } from "discord.js";
 
 const EDITOR_TTL = 3600; // 1 hour
 
@@ -71,9 +71,7 @@ export class EmbedService {
 
 	// --- Editor Session Management (Redis) ---
 
-	static async getEditorSession(
-		sessionId: string,
-	): Promise<{
+	static async getEditorSession(sessionId: string): Promise<{
 		name: string;
 		data: APIEmbed;
 		userId?: string;

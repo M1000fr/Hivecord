@@ -1,13 +1,12 @@
 import {
 	ActionRowBuilder,
-	StringSelectMenuBuilder,
-	ModalBuilder,
-	TextInputBuilder,
-	TextInputStyle,
 	ButtonBuilder,
 	ButtonStyle,
+	ModalBuilder,
+	StringSelectMenuBuilder,
+	TextInputBuilder,
+	TextInputStyle,
 	type APIEmbed,
-	Colors,
 } from "discord.js";
 
 export class EmbedEditorUtils {

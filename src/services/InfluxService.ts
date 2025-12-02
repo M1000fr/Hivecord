@@ -1,5 +1,5 @@
+import type { QueryApi, WriteApi } from "@influxdata/influxdb-client";
 import { InfluxDB, Point } from "@influxdata/influxdb-client";
-import type { WriteApi, QueryApi } from "@influxdata/influxdb-client";
 import { Logger } from "@utils/Logger";
 
 export class InfluxService {
