@@ -1,4 +1,5 @@
 import { EPermission } from '@enums/EPermission';
+import { BaseCommand } from '@class/BaseCommand';
 
 export interface OptionRouteOptions {
     option: string;
@@ -12,6 +13,13 @@ export function OptionRoute(options: OptionRouteOptions) {
         propertyKey: string,
         descriptor: PropertyDescriptor,
     ) {
+        // Validation: @OptionRoute ne peut être utilisé que sur des méthodes de classes étendant BaseCommand
+        if (!(target instanceof BaseCommand)) {
+            throw new Error(
+                `@OptionRoute decorator can only be used on methods of classes extending BaseCommand. ` +
+                `Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`
+            );
+        }
         if (!target.constructor.optionRoutes) {
             target.constructor.optionRoutes = new Map();
         }
