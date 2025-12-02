@@ -1,4 +1,5 @@
 import { BaseCommand } from '@class/BaseCommand';
+import type { ICommandClass } from '@interfaces/ICommandClass';
 
 export interface AutocompleteOptions {
     optionName: string;
@@ -17,9 +18,10 @@ export function Autocomplete(options: AutocompleteOptions) {
                 `Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`
             );
         }
-        if (!target.constructor.autocompletes) {
-            target.constructor.autocompletes = new Map();
+        const constructor = target.constructor as ICommandClass;
+        if (!constructor.autocompletes) {
+            constructor.autocompletes = new Map();
         }
-        target.constructor.autocompletes.set(options.optionName, propertyKey);
+        constructor.autocompletes.set(options.optionName, propertyKey);
     };
 }

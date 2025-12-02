@@ -1,14 +1,17 @@
 import { ChatInputCommandInteraction, Client, MessageFlags, AutocompleteInteraction } from "discord.js";
 import { PermissionService } from '@services/PermissionService';
+import type { ICommandClass } from '@interfaces/ICommandClass';
 
 export abstract class BaseCommand {
     async handleAutocomplete(client: Client, interaction: AutocompleteInteraction): Promise<void> {
         const focusedOption = interaction.options.getFocused(true);
-        const autocompletes = (this.constructor as any).autocompletes;
+        const autocompletes = (this.constructor as ICommandClass).autocompletes;
 
         if (autocompletes && autocompletes.has(focusedOption.name)) {
             const method = autocompletes.get(focusedOption.name);
-            await (this as any)[method](client, interaction);
+            if (method) {
+                await (this as any)[method](client, interaction);
+            }
         }
     }
 
@@ -24,24 +27,27 @@ export abstract class BaseCommand {
 			const key = subcommandGroup
 				? `${subcommandGroup}:${subcommand}`
 				: subcommand;
-			const subcommands = (this.constructor as any).subcommands;
+			const subcommands = (this.constructor as ICommandClass).subcommands;
 
 			if (subcommands && subcommands.has(key)) {
-				const { method, permission } = subcommands.get(key);
+				const subcommandInfo = subcommands.get(key);
+				if (subcommandInfo) {
+					const { method, permission } = subcommandInfo;
 
-				if (permission && !(await this.checkPermission(interaction, permission))) {
-					return;
+					if (permission && !(await this.checkPermission(interaction, permission))) {
+						return;
+					}
+
+					await (this as any)[method](client, interaction);
+					executed = true;
 				}
-
-				await (this as any)[method](client, interaction);
-				executed = true;
 			}
 		}
 
 		if (!executed) {
-			const defaultCommand = (this.constructor as any).defaultCommand;
+			const defaultCommand = (this.constructor as ICommandClass).defaultCommand;
 			if (defaultCommand) {
-				const permission = (this.constructor as any)
+				const permission = (this.constructor as ICommandClass)
 					.defaultCommandPermission;
 				
 				if (permission && !(await this.checkPermission(interaction, permission))) {

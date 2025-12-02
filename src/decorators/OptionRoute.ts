@@ -1,5 +1,6 @@
 import { EPermission } from '@enums/EPermission';
 import { BaseCommand } from '@class/BaseCommand';
+import type { ICommandClass } from '@interfaces/ICommandClass';
 
 export interface OptionRouteOptions {
     option: string;
@@ -20,15 +21,16 @@ export function OptionRoute(options: OptionRouteOptions) {
                 `Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`
             );
         }
-        if (!target.constructor.optionRoutes) {
-            target.constructor.optionRoutes = new Map();
+        const constructor = target.constructor as ICommandClass;
+        if (!constructor.optionRoutes) {
+            constructor.optionRoutes = new Map();
         }
 
         // Get the map for this specific option name (e.g., "action")
-        let optionMap = target.constructor.optionRoutes.get(options.option);
+        let optionMap = constructor.optionRoutes.get(options.option);
         if (!optionMap) {
             optionMap = new Map();
-            target.constructor.optionRoutes.set(options.option, optionMap);
+            constructor.optionRoutes.set(options.option, optionMap);
         }
 
         // Register the value -> method mapping

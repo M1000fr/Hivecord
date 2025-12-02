@@ -1,5 +1,6 @@
 import { EPermission } from '@enums/EPermission';
 import { BaseCommand } from '@class/BaseCommand';
+import type { ICommandClass } from '@interfaces/ICommandClass';
 
 export function DefaultCommand(permission?: EPermission) {
 	return function (
@@ -14,9 +15,10 @@ export function DefaultCommand(permission?: EPermission) {
 				`Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`
 			);
 		}
-		target.constructor.defaultCommand = propertyKey;
+		const constructor = target.constructor as ICommandClass;
+		constructor.defaultCommand = propertyKey;
 		if (permission) {
-			target.constructor.defaultCommandPermission = permission;
+			constructor.defaultCommandPermission = permission;
 		}
 	};
 }
