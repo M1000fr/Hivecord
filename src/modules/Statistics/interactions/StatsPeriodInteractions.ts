@@ -1,24 +1,14 @@
-import { AttachmentBuilder, EmbedBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import type { Interaction } from "discord.js";
-import { BaseEvent } from "@class/BaseEvent";
-import { Event } from "@decorators/Event";
-import { LeBotClient } from "@class/LeBotClient";
+import { AttachmentBuilder, EmbedBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle, type ButtonInteraction } from "discord.js";
+import { ButtonPattern } from "@decorators/Interaction";
 import { StatsService } from "@modules/Statistics/services/StatsService";
-import { PermissionService } from "@services/PermissionService";
-import { EPermission } from "@enums/EPermission";
 import { ChartGenerator } from "@utils/ChartGenerator";
 import StatsCommand from "../commands/stats/index";
-import { BotEvents } from "@enums/BotEvents";
 
-@Event({
-    name: BotEvents.InteractionCreate,
-})
-export default class StatsPeriodButtonEvent extends BaseEvent<typeof BotEvents.InteractionCreate> {
-    async run(client: LeBotClient<true>, interaction: Interaction): Promise<void> {
-        if (!interaction.isButton()) return;
+export class StatsPeriodInteractions {
+    @ButtonPattern("stats:period:*")
+    async handleStatsPeriodButton(interaction: ButtonInteraction): Promise<void> {
         const customId = interaction.customId;
-        if (!customId.startsWith("stats:period:")) return;
-
+        
         // stats:period:<range>:<scope>:<targetId>:<invokerId>
         const parts = customId.split(":");
         const period = parts[2];
@@ -31,24 +21,6 @@ export default class StatsPeriodButtonEvent extends BaseEvent<typeof BotEvents.I
         // Restrict interaction to original invoker
         if (interaction.user.id !== invokerId) {
             await interaction.reply({ content: "❌ Tu ne peux pas utiliser ces boutons.", flags: [MessageFlags.Ephemeral] });
-            return;
-        }
-
-        // Check permission (same as command requirement)
-        try {
-            const member = await interaction.guild?.members.fetch(interaction.user.id).catch(() => null);
-            if (!member) {
-                await interaction.reply({ content: "❌ Impossible de vérifier les permissions.", flags: [MessageFlags.Ephemeral] });
-                return;
-            }
-            const hasPerm = await PermissionService.hasPermission(interaction.user.id, member.roles.cache.map(r => r.id), EPermission.Stats);
-            if (!hasPerm) {
-                await interaction.reply({ content: "❌ Permission insuffisante.", flags: [MessageFlags.Ephemeral] });
-                return;
-            }
-        } catch (err) {
-            console.error("Permission check failed:", err);
-            await interaction.reply({ content: "❌ Erreur de permission.", flags: [MessageFlags.Ephemeral] });
             return;
         }
 
