@@ -104,7 +104,7 @@ export default class SanctionsCommand extends BaseCommand {
 		await pager.start(interaction);
 	}
 
-    @Subcommand({ name: "add", group: "reason", permission: EPermission.ReasonManage })
+    @Subcommand({ name: "add", group: "reason", permission: EPermission.ReasonAdd })
     async handleReasonAdd(client: Client, interaction: ChatInputCommandInteraction) {
         const text = interaction.options.getString("text", true);
         const typeStr = interaction.options.getString("type", true);
@@ -135,7 +135,7 @@ export default class SanctionsCommand extends BaseCommand {
         }
     }
 
-    @Subcommand({ name: "edit", group: "reason", permission: EPermission.ReasonManage })
+    @Subcommand({ name: "edit", group: "reason", permission: EPermission.ReasonEdit })
     async handleReasonEdit(client: Client, interaction: ChatInputCommandInteraction) {
         const id = interaction.options.getInteger("id", true);
         const text = interaction.options.getString("text");
@@ -169,7 +169,7 @@ export default class SanctionsCommand extends BaseCommand {
         }
     }
 
-    @Subcommand({ name: "remove", group: "reason", permission: EPermission.ReasonManage })
+    @Subcommand({ name: "remove", group: "reason", permission: EPermission.ReasonRemove })
     async handleReasonRemove(client: Client, interaction: ChatInputCommandInteraction) {
         const id = interaction.options.getInteger("id", true);
 
@@ -181,7 +181,7 @@ export default class SanctionsCommand extends BaseCommand {
         }
     }
 
-    @Subcommand({ name: "list", group: "reason", permission: EPermission.ReasonManage })
+    @Subcommand({ name: "list", group: "reason", permission: EPermission.ReasonList })
     async handleReasonList(client: Client, interaction: ChatInputCommandInteraction) {
         const typeStr = interaction.options.getString("type");
         const type = typeStr ? (typeStr as SanctionType) : undefined;
