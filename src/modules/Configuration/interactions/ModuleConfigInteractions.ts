@@ -5,7 +5,6 @@ import {
 	ModalPattern,
 	SelectMenuPattern,
 } from "@decorators/Interaction";
-import { ConfigService } from "@services/ConfigService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
@@ -62,21 +61,8 @@ export class ModuleConfigInteractions {
 		type: EConfigType,
 	) {
 		try {
-			// Use appropriate ConfigService method based on type
-			switch (type) {
-				case EConfigType.String:
-				case EConfigType.Boolean:
-					await ConfigService.set(propertyKey, value);
-					break;
-				case EConfigType.Role:
-					await ConfigService.setRole(propertyKey, value);
-					break;
-				case EConfigType.Channel:
-					await ConfigService.setChannel(propertyKey, value);
-					break;
-				default:
-					await ConfigService.set(propertyKey, value);
-			}
+			await ConfigHelper.saveValue(propertyKey, value, type);
+
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
 				const config = await ConfigHelper.buildModuleConfigEmbed(
