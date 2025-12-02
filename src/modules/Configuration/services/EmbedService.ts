@@ -73,7 +73,7 @@ export class EmbedService {
 
 	static async getEditorSession(
 		sessionId: string,
-	): Promise<{ name: string; data: APIEmbed; meta?: any } | null> {
+	): Promise<{ name: string; data: APIEmbed; userId?: string; meta?: any } | null> {
 		const redis = RedisService.getInstance();
 		const key = `embed:editor:${sessionId}`;
 		const data = await redis.get(key);
@@ -85,12 +85,13 @@ export class EmbedService {
 		name: string,
 		data: APIEmbed,
 		meta?: any,
+		userId?: string,
 	): Promise<void> {
 		const redis = RedisService.getInstance();
 		const key = `embed:editor:${sessionId}`;
 		await redis.set(
 			key,
-			JSON.stringify({ name, data, meta }),
+			JSON.stringify({ name, data, meta, userId }),
 			"EX",
 			EDITOR_TTL,
 		);
