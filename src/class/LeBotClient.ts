@@ -150,7 +150,16 @@ export class LeBotClient<ready = false> extends Client {
 			if (!evtOptions) continue;
 
 			const instance = new EventClass();
-			const handler = (...args: any[]) => instance.run(this, ...args);
+			const handler = async (...args: any[]) => {
+				try {
+					await instance.run(this, ...args);
+				} catch (error: any) {
+					this.logger.error(
+						`Error in event ${evtOptions.name}:`,
+						error.stack,
+					);
+				}
+			};
 
 			if (evtOptions.once) {
 				this.once(evtOptions.name, handler);

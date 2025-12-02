@@ -2,6 +2,7 @@ import { LogService } from "@modules/Log/services/LogService";
 import { VoiceConfigKeys } from "@modules/Voice/VoiceConfig";
 import { ConfigService } from "@services/ConfigService";
 import { prismaClient } from "@services/prismaService";
+import { Logger } from "@utils/Logger";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -27,6 +28,8 @@ interface UserToggleResult {
 }
 
 export class TempVoiceService {
+	private static logger = new Logger("TempVoiceService");
+
 	private static async fetchGuildMember(
 		guild: any,
 		userId: string,
@@ -101,6 +104,10 @@ export class TempVoiceService {
 					interaction.user,
 					"Permission Change",
 					`${actionDesc}: <@${member.id}> in <#${channel.id}>`,
+				);
+
+				this.logger.log(
+					`User ${interaction.user.tag} modified ${listType} for channel ${channel.id}: ${actionDesc} for ${member.user.tag}`,
 				);
 			}
 
@@ -313,8 +320,14 @@ export class TempVoiceService {
 				"Created",
 				`Created temp voice channel <#${voiceChannel.id}>`,
 			);
-		} catch (error) {
-			console.error("Error creating temp voice channel:", error);
+			this.logger.log(
+				`Temp voice channel created by ${member.user.tag}: ${voiceChannel.name} (${voiceChannel.id})`,
+			);
+		} catch (error: any) {
+			this.logger.error(
+				"Error creating temp voice channel:",
+				error instanceof Error ? error.stack : String(error),
+			);
 		}
 	}
 

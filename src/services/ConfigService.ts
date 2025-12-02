@@ -1,10 +1,13 @@
 import { ChannelType } from "@prisma/client/enums";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
+import { Logger } from "@utils/Logger";
 
 const CACHE_TTL = 60; // 60 seconds
 
 export class ConfigService {
+	private static logger = new Logger("ConfigService");
+
 	private static async ensureRoleExists(roleId: string): Promise<void> {
 		await prismaClient.role.upsert({
 			where: { id: roleId },
@@ -34,6 +37,8 @@ export class ConfigService {
 		const cacheKey = `config:value:${key}`;
 		await redis.del(cacheKey);
 
+		this.logger.log(`Config updated: ${key} = ${value}`);
+
 		await prismaClient.configuration.upsert({
 			where: { key },
 			update: { value },
@@ -46,6 +51,8 @@ export class ConfigService {
 		const redis = RedisService.getInstance();
 		const cacheKey = `config:value:${key}`;
 		await redis.del(cacheKey);
+
+		this.logger.log(`Config deleted: ${key}`);
 
 		await prismaClient.configuration.delete({
 			where: { key },

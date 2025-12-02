@@ -67,10 +67,10 @@ export class SanctionScheduler {
 						muteRole,
 						"Sanction consistency check: No active mute found",
 					);
-				} catch (error) {
-					console.error(
+				} catch (error: any) {
+					this.logger.error(
 						`Error removing mute role from ${memberId} during consistency check:`,
-						error,
+						error instanceof Error ? error.stack : String(error),
 					);
 				}
 			}
@@ -82,7 +82,7 @@ export class SanctionScheduler {
 		const guildId = process.env.DISCORD_GUILD_ID;
 
 		if (!guildId) {
-			console.error(
+			this.logger.error(
 				"DISCORD_GUILD_ID is not defined in environment variables.",
 			);
 			return;
@@ -144,10 +144,10 @@ export class SanctionScheduler {
 					where: { id: sanction.id },
 					data: { active: false },
 				});
-			} catch (error) {
-				console.error(
+			} catch (error: any) {
+				this.logger.error(
 					`Error processing expired sanction ${sanction.id}:`,
-					error,
+					error instanceof Error ? error.stack : String(error),
 				);
 			}
 		}

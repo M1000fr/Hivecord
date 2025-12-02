@@ -3,9 +3,12 @@ import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
 import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
 import { prismaClient } from "@services/prismaService";
+import { Logger } from "@utils/Logger";
 import { Guild, GuildMember, User } from "discord.js";
 
 export class SanctionService {
+	private static logger = new Logger("SanctionService");
+
 	private static async fetchMember(
 		guild: Guild,
 		userId: string,
@@ -92,6 +95,10 @@ export class SanctionService {
 		if (member.roles.cache.has(muteRole.id)) {
 			throw new Error("User is already muted.");
 		}
+
+		this.logger.log(
+			`Muting user ${targetUser.tag} (${targetUser.id}) for ${durationString}. Reason: ${reason}. Moderator: ${moderator.tag}`,
+		);
 
 		const activeMute = await prismaClient.sanction.findFirst({
 			where: {

@@ -1,5 +1,6 @@
 import type { ICommandClass } from "@interfaces/ICommandClass";
 import { PermissionService } from "@services/PermissionService";
+import { Logger } from "@utils/Logger";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
@@ -8,6 +9,8 @@ import {
 } from "discord.js";
 
 export abstract class BaseCommand {
+	protected logger = new Logger(this.constructor.name);
+
 	async handleAutocomplete(
 		client: Client,
 		interaction: AutocompleteInteraction,
@@ -50,6 +53,9 @@ export abstract class BaseCommand {
 					}
 
 					await (this as any)[method](client, interaction);
+					this.logger.log(
+						`Command ${this.constructor.name} (subcommand: ${key}) executed successfully`,
+					);
 					executed = true;
 				}
 			}
@@ -81,6 +87,9 @@ export abstract class BaseCommand {
 							}
 
 							await (this as any)[method](client, interaction);
+							this.logger.log(
+								`Command ${this.constructor.name} (option: ${optionName}) executed successfully`,
+							);
 							executed = true;
 							break;
 						}
@@ -104,6 +113,9 @@ export abstract class BaseCommand {
 				}
 
 				await (this as any)[defaultCommand](client, interaction);
+				this.logger.log(
+					`Command ${this.constructor.name} executed successfully`,
+				);
 			}
 		}
 	}
@@ -128,6 +140,9 @@ export abstract class BaseCommand {
 		);
 
 		if (!hasPermission) {
+			this.logger.log(
+				`Permission denied for command ${this.constructor.name}: User ${interaction.user.tag} missing ${permission}`,
+			);
 			await interaction.reply({
 				content: `You need the permission \`${permission}\` to perform this action.`,
 				flags: [MessageFlags.Ephemeral],
