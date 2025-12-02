@@ -29,30 +29,8 @@ export abstract class BaseCommand {
 			if (subcommands && subcommands.has(key)) {
 				const { method, permission } = subcommands.get(key);
 
-				if (permission) {
-					let roleIds: string[] = [];
-					if (interaction.member) {
-						if (Array.isArray(interaction.member.roles)) {
-							roleIds = interaction.member.roles;
-						} else {
-							roleIds = interaction.member.roles.cache.map(
-								(r) => r.id,
-							);
-						}
-					}
-
-					const hasPermission = await PermissionService.hasPermission(
-						interaction.user.id,
-						roleIds,
-						permission,
-					);
-					if (!hasPermission) {
-						await interaction.reply({
-							content: `You need the permission \`${permission}\` to perform this action.`,
-							flags: [MessageFlags.Ephemeral],
-						});
-						return;
-					}
+				if (permission && !(await this.checkPermission(interaction, permission))) {
+					return;
 				}
 
 				await (this as any)[method](client, interaction);
@@ -61,80 +39,47 @@ export abstract class BaseCommand {
 		}
 
 		if (!executed) {
-			const optionRoutes = (this.constructor as any).optionRoutes;
-			if (optionRoutes) {
-				for (const [optionName, valueMap] of optionRoutes) {
-					const optionValue = interaction.options.get(optionName)?.value;
-
-					if (optionValue !== undefined && valueMap.has(optionValue)) {
-						const { method, permission } = valueMap.get(optionValue);
-
-						if (permission) {
-							let roleIds: string[] = [];
-							if (interaction.member) {
-								if (Array.isArray(interaction.member.roles)) {
-									roleIds = interaction.member.roles;
-								} else {
-									roleIds = interaction.member.roles.cache.map(
-										(r) => r.id,
-									);
-								}
-							}
-
-							const hasPermission = await PermissionService.hasPermission(
-								interaction.user.id,
-								roleIds,
-								permission,
-							);
-							if (!hasPermission) {
-								await interaction.reply({
-									content: `You need the permission \`${permission}\` to perform this action.`,
-									flags: [MessageFlags.Ephemeral],
-								});
-								return;
-							}
-						}
-
-						await (this as any)[method](client, interaction);
-						executed = true;
-						break;
-					}
-				}
-			}
-		}
-
-		if (!executed) {
 			const defaultCommand = (this.constructor as any).defaultCommand;
 			if (defaultCommand) {
 				const permission = (this.constructor as any)
 					.defaultCommandPermission;
-				if (permission) {
-					let roleIds: string[] = [];
-					if (interaction.member) {
-						if (Array.isArray(interaction.member.roles)) {
-							roleIds = interaction.member.roles;
-						} else {
-							roleIds = interaction.member.roles.cache.map(
-								(r) => r.id,
-							);
-						}
-					}
-
-					const hasPermission = await PermissionService.hasPermission(
-						interaction.user.id,
-						roleIds,
-						permission,
-					);
-					if (!hasPermission) {
-						await interaction.reply({
-							content: `You need the permission \`${permission}\` to perform this action.`,
-							flags: [MessageFlags.Ephemeral],
-						});
-						return;
-					}
+				
+				if (permission && !(await this.checkPermission(interaction, permission))) {
+					return;
 				}
+
 				await (this as any)[defaultCommand](client, interaction);
 			}
 		}
+	}
+
+	protected async checkPermission(
+		interaction: ChatInputCommandInteraction,
+		permission: string,
+	): Promise<boolean> {
+		let roleIds: string[] = [];
+		if (interaction.member) {
+			if (Array.isArray(interaction.member.roles)) {
+				roleIds = interaction.member.roles;
+			} else {
+				roleIds = interaction.member.roles.cache.map((r) => r.id);
+			}
+		}
+
+		const hasPermission = await PermissionService.hasPermission(
+			interaction.user.id,
+			roleIds,
+			permission,
+		);
+
+		if (!hasPermission) {
+			await interaction.reply({
+				content: `You need the permission \`${permission}\` to perform this action.`,
+				flags: [MessageFlags.Ephemeral],
+			});
+			return false;
+		}
+
+		return true;
 	}
 }
