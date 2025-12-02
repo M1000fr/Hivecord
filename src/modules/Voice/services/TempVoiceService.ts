@@ -17,7 +17,6 @@ import {
 	type Message,
 	type ModalSubmitInteraction,
 } from "discord.js";
-import { Button, Modal } from '@decorators/Interaction';
 import { VoiceConfigKeys } from '@modules/Voice/VoiceConfig';
 import { ConfigService } from "@services/ConfigService";
 import { prismaClient } from "@services/prismaService";
@@ -40,7 +39,7 @@ export class TempVoiceService {
 		}
 	}
 
-	private static async collectUserMentions(
+	public static async collectUserMentions(
 		interaction: ButtonInteraction,
 		channel: VoiceChannel,
 		listType: ListType,
@@ -319,7 +318,7 @@ export class TempVoiceService {
 			);
 	}
 
-	private static async updateControlPanel(channel: VoiceChannel) {
+	public static async updateControlPanel(channel: VoiceChannel) {
 		// Find the last message from the bot in the channel which has components
 		// This is a bit hacky, ideally we should store the message ID in the DB.
 		// But for now, let's search for it.
@@ -378,7 +377,7 @@ export class TempVoiceService {
 		await channel.send({ embeds: [embed], components: [row1, row2] });
 	}
 
-	private static async validateOwner(
+	public static async validateOwner(
 		interaction: Interaction,
 	): Promise<boolean> {
 		if (
@@ -404,83 +403,5 @@ export class TempVoiceService {
 			return false;
 		}
 		return true;
-	}
-
-	@Button("temp_voice_rename")
-	static async handleRename(interaction: ButtonInteraction) {
-		if (!(await this.validateOwner(interaction))) return;
-
-		const nameInput = new TextInputBuilder({
-			customId: "new_name",
-			label: "New name",
-			style: TextInputStyle.Short,
-			required: true,
-			maxLength: 100,
-		});
-
-		const modal = new ModalBuilder({
-			customId: "temp_voice_rename_modal",
-			title: "Rename channel",
-			components: [
-				new ActionRowBuilder<TextInputBuilder>().addComponents(
-					nameInput,
-				),
-			],
-		});
-
-		await interaction.showModal(modal);
-	}
-
-	@Button("temp_voice_limit_up")
-	static async handleLimitUp(interaction: ButtonInteraction) {
-		if (!(await this.validateOwner(interaction))) return;
-		const channel = interaction.channel as VoiceChannel;
-
-		const currentLimitUp = channel.userLimit;
-		await channel.setUserLimit(currentLimitUp + 1);
-		await interaction.deferUpdate();
-		await this.updateControlPanel(channel);
-	}
-
-	@Button("temp_voice_limit_down")
-	static async handleLimitDown(interaction: ButtonInteraction) {
-		if (!(await this.validateOwner(interaction))) return;
-		const channel = interaction.channel as VoiceChannel;
-
-		const currentLimitDown = channel.userLimit;
-		if (currentLimitDown > 0) {
-			await channel.setUserLimit(currentLimitDown - 1);
-			await interaction.deferUpdate();
-			await this.updateControlPanel(channel);
-		} else {
-			await interaction.deferUpdate();
-		}
-	}
-
-	@Button("temp_voice_whitelist")
-	static async handleWhitelistButton(interaction: ButtonInteraction) {
-		if (!(await this.validateOwner(interaction))) return;
-		await this.collectUserMentions(interaction, interaction.channel as VoiceChannel, "whitelist");
-	}
-
-	@Button("temp_voice_blacklist")
-	static async handleBlacklistButton(interaction: ButtonInteraction) {
-		if (!(await this.validateOwner(interaction))) return;
-		await this.collectUserMentions(interaction, interaction.channel as VoiceChannel, "blacklist");
-	}
-
-	@Modal("temp_voice_rename_modal")
-	static async handleRenameModal(interaction: ModalSubmitInteraction) {
-		if (!(await this.validateOwner(interaction))) return;
-		const channel = interaction.channel as VoiceChannel;
-
-		const newName = interaction.fields.getTextInputValue("new_name");
-		await channel.setName(newName);
-		await LogService.logTempVoice(channel.guild, interaction.user, "Rename", `Renamed <#${channel.id}> to ${newName}`);
-		await interaction.reply({
-			content: `Channel renamed to ${newName}`,
-			flags: MessageFlags.Ephemeral,
-		});
-		await this.updateControlPanel(channel);
 	}
 }
