@@ -20,13 +20,15 @@
 		"@prisma/adapter-mariadb": "^7.0.1",
 		"@prisma/client": "^7.0.1",
 		"axios": "^1.13.2",
-		"canvas": "^3.2.0",
 		"discord.js": "^14.25.1",
 		"gif-frames": "^1.0.1",
 		"gifencoder": "^2.0.1",
 		"ioredis": "^5.8.2",
 		"mysql2": "^3.15.3",
 		"prisma": "^7.0.1"
+	},
+	"resolutions": {
+		"canvas": "npm:@napi-rs/canvas@^0.1.83"
 	},
 	"scripts": {
 		"dev": "bun .",
@@ -40,7 +42,6 @@
 		]
 	},
 	"trustedDependencies": [
-		"@napi-rs/canvas",
-		"canvas"
+		"@napi-rs/canvas"
 	]
 }
