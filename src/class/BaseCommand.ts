@@ -45,6 +45,29 @@ export abstract class BaseCommand {
 		}
 
 		if (!executed) {
+			const optionRoutes = (this.constructor as ICommandClass).optionRoutes;
+			if (optionRoutes) {
+				for (const [optionName, valueMap] of optionRoutes) {
+					const optionValue = interaction.options.get(optionName)?.value;
+					if (optionValue !== undefined && valueMap.has(optionValue)) {
+						const route = valueMap.get(optionValue);
+						if (route) {
+							const { method, permission } = route;
+
+							if (permission && !(await this.checkPermission(interaction, permission))) {
+								return;
+							}
+
+							await (this as any)[method](client, interaction);
+							executed = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		if (!executed) {
 			const defaultCommand = (this.constructor as ICommandClass).defaultCommand;
 			if (defaultCommand) {
 				const permission = (this.constructor as ICommandClass)
