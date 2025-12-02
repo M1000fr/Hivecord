@@ -182,6 +182,9 @@ export class EmbedEditorInteractions {
 
 	@Button("embed_editor_cancel")
 	async handleCancel(interaction: ButtonInteraction) {
+		const session = await this.getSession(interaction);
+		if (!session) return;
+
 		await EmbedService.clearEditorSession(interaction.message.id);
 		await interaction.update({
 			content: "❌ Editor cancelled.",
