@@ -12,10 +12,11 @@ export interface ChartData {
 }
 
 export class ChartGenerator {
-	// Generate a line chart for hourly data
-	static generateHourlyChart(
-		voiceData: { hour: number; duration: number }[],
-		messageData: { hour: number; count: number }[],
+	// Generate a line chart for time-series data
+	static generateChart(
+		voiceData: { timestamp: number; value: number }[],
+		messageData: { timestamp: number; value: number }[],
+		timeRange: { start: Date; end: Date },
 		width = 800,
 		height = 400,
 	): Buffer {
@@ -26,24 +27,23 @@ export class ChartGenerator {
 		ctx.fillStyle = "#2C2F33";
 		ctx.fillRect(0, 0, width, height);
 
-		// Prepare data (0-23 hours)
-		const hours = Array.from({ length: 24 }, (_, i) => i);
-		const voiceValues = hours.map((hour) => {
-			const data = voiceData.find((d) => d.hour === hour);
-			return data ? data.duration / 60 : 0; // Convert to minutes
-		});
-		const messageValues = hours.map((hour) => {
-			const data = messageData.find((d) => d.hour === hour);
-			return data ? data.count : 0;
-		});
-
 		const padding = 50;
 		const chartWidth = width - padding * 2;
 		const chartHeight = height - padding * 2;
 
+		const startTime = timeRange.start.getTime();
+		const endTime = timeRange.end.getTime();
+		const totalDuration = endTime - startTime;
+
+		// Helper to map timestamp to X coordinate
+		const getX = (timestamp: number) => {
+			const progress = (timestamp - startTime) / totalDuration;
+			return padding + progress * chartWidth;
+		};
+
 		// Calculate max values
-		const maxVoice = Math.max(...voiceValues, 1);
-		const maxMessage = Math.max(...messageValues, 1);
+		const maxVoice = Math.max(...voiceData.map((d) => d.value / 60), 1); // minutes
+		const maxMessage = Math.max(...messageData.map((d) => d.value), 1);
 
 		// Draw grid
 		ctx.strokeStyle = "#40444B";
@@ -60,40 +60,103 @@ export class ChartGenerator {
 		ctx.strokeStyle = "#5865F2";
 		ctx.lineWidth = 3;
 		ctx.beginPath();
-		voiceValues.forEach((value, index) => {
-			const x = padding + (chartWidth / 23) * index;
-			const y = padding + chartHeight - (value / maxVoice) * chartHeight;
-			if (index === 0) {
-				ctx.moveTo(x, y);
-			} else {
-				ctx.lineTo(x, y);
-			}
-		});
+		if (voiceData.length > 0) {
+			// Sort data by timestamp just in case
+			voiceData.sort((a, b) => a.timestamp - b.timestamp);
+
+			voiceData.forEach((point, index) => {
+				const x = getX(point.timestamp);
+				const y =
+					padding +
+					chartHeight -
+					(point.value / 60 / maxVoice) * chartHeight;
+				if (index === 0) {
+					ctx.moveTo(x, y);
+				} else {
+					ctx.lineTo(x, y);
+				}
+			});
+		}
 		ctx.stroke();
+
+		// Draw voice points
+		ctx.fillStyle = "#5865F2";
+		voiceData.forEach((point) => {
+			const x = getX(point.timestamp);
+			const y =
+				padding +
+				chartHeight -
+				(point.value / 60 / maxVoice) * chartHeight;
+			ctx.beginPath();
+			ctx.arc(x, y, 6, 0, Math.PI * 2);
+			ctx.fill();
+		});
 
 		// Draw message line (green)
 		ctx.strokeStyle = "#57F287";
 		ctx.lineWidth = 3;
 		ctx.beginPath();
-		messageValues.forEach((value, index) => {
-			const x = padding + (chartWidth / 23) * index;
-			const y =
-				padding + chartHeight - (value / maxMessage) * chartHeight;
-			if (index === 0) {
-				ctx.moveTo(x, y);
-			} else {
-				ctx.lineTo(x, y);
-			}
-		});
+		if (messageData.length > 0) {
+			messageData.sort((a, b) => a.timestamp - b.timestamp);
+
+			messageData.forEach((point, index) => {
+				const x = getX(point.timestamp);
+				const y =
+					padding +
+					chartHeight -
+					(point.value / maxMessage) * chartHeight;
+				if (index === 0) {
+					ctx.moveTo(x, y);
+				} else {
+					ctx.lineTo(x, y);
+				}
+			});
+		}
 		ctx.stroke();
 
-		// Draw X-axis labels (every 4 hours)
+		// Draw message points
+		ctx.fillStyle = "#57F287";
+		messageData.forEach((point) => {
+			const x = getX(point.timestamp);
+			const y =
+				padding +
+				chartHeight -
+				(point.value / maxMessage) * chartHeight;
+			ctx.beginPath();
+			ctx.arc(x, y, 3, 0, Math.PI * 2);
+			ctx.fill();
+		});
+
+		// Draw X-axis labels
 		ctx.fillStyle = "#FFFFFF";
 		ctx.font = "12px Arial";
 		ctx.textAlign = "center";
-		for (let i = 0; i < 24; i += 4) {
-			const x = padding + (chartWidth / 23) * i;
-			ctx.fillText(`${i}h`, x, height - padding + 20);
+
+		// Determine label format and interval based on duration
+		const isDayRange = totalDuration <= 24 * 60 * 60 * 1000;
+		const isWeekRange = totalDuration <= 7 * 24 * 60 * 60 * 1000;
+
+		let labelCount = 6;
+		if (isDayRange)
+			labelCount = 6; // Every 4 hours
+		else if (isWeekRange)
+			labelCount = 7; // Every day
+		else labelCount = 5; // Every ~6 days
+
+		for (let i = 0; i <= labelCount; i++) {
+			const progress = i / labelCount;
+			const timestamp = startTime + progress * totalDuration;
+			const date = new Date(timestamp);
+			const x = padding + progress * chartWidth;
+
+			let label = "";
+			if (isDayRange) {
+				label = `${date.getHours()}h`;
+			} else {
+				label = `${date.getDate()}/${date.getMonth() + 1}`;
+			}
+
+			ctx.fillText(label, x, height - padding + 20);
 		}
 
 		// Draw Y-axis labels (voice)
