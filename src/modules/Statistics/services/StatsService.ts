@@ -649,6 +649,7 @@ export class StatsService {
 				|> filter(fn: (r) => r._field == "duration")
 				|> group(columns: ["userId"])
 				|> sum()
+				|> group()
 				|> sort(desc: true)
 				|> limit(n: ${limit})
 		`;
@@ -682,6 +683,7 @@ export class StatsService {
 				|> filter(fn: (r) => r._field == "count")
 				|> group(columns: ["userId"])
 				|> sum()
+				|> group()
 				|> sort(desc: true)
 				|> limit(n: ${limit})
 		`;
