@@ -49,6 +49,7 @@ export class StatsService {
 	private static lastFlush = 0;
 	private static flushTimer: ReturnType<typeof setTimeout> | null = null;
 	private static pendingUserInvalidations = new Set<string>(); // format: userId|guildId
+	private static messageBuffer = new Map<string, number>();
 
 	private static scheduleFlush() {
 		const now = Date.now();
@@ -71,6 +72,25 @@ export class StatsService {
 			clearTimeout(this.flushTimer);
 			this.flushTimer = null;
 		}
+
+		// Flush aggregated messages
+		if (this.messageBuffer.size > 0) {
+			const now = new Date();
+			for (const [key, count] of this.messageBuffer) {
+				const [userId, channelId, guildId] = key.split("|");
+				if (userId && channelId && guildId) {
+					const point = new Point("message_activity")
+						.tag("userId", userId)
+						.tag("channelId", channelId)
+						.tag("guildId", guildId)
+						.intField("count", count)
+						.timestamp(now);
+					InfluxService.writePoint(point);
+				}
+			}
+			this.messageBuffer.clear();
+		}
+
 		try {
 			await InfluxService.flush();
 			this.lastFlush = Date.now();
@@ -226,14 +246,9 @@ export class StatsService {
 		channelId: string,
 		guildId: string,
 	): Promise<void> {
-		const point = new Point("message_activity")
-			.tag("userId", userId)
-			.tag("channelId", channelId)
-			.tag("guildId", guildId)
-			.intField("count", 1)
-			.timestamp(new Date());
+		const key = `${userId}|${channelId}|${guildId}`;
+		this.messageBuffer.set(key, (this.messageBuffer.get(key) || 0) + 1);
 
-		InfluxService.writePoint(point);
 		// Track user for cache invalidation after flush
 		this.pendingUserInvalidations.add(`${userId}|${guildId}`);
 		this.scheduleFlush();
