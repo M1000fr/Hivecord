@@ -56,30 +56,90 @@ export class ChartGenerator {
 			ctx.stroke();
 		}
 
+		// Prepare data for lines (fill gaps with 0s)
+		const prepareLineData = (
+			data: { timestamp: number; value: number }[],
+		) => {
+			const granularity = 3600 * 1000; // 1 hour
+			const sorted = [...data].sort((a, b) => a.timestamp - b.timestamp);
+			const result: { timestamp: number; value: number }[] = [];
+
+			// Start point
+			if (
+				sorted.length === 0 ||
+				(sorted[0] && sorted[0].timestamp > startTime)
+			) {
+				result.push({ timestamp: startTime, value: 0 });
+			}
+
+			for (let i = 0; i < sorted.length; i++) {
+				const current = sorted[i];
+				if (!current) continue;
+
+				const prev =
+					result.length > 0 ? result[result.length - 1] : null;
+
+				if (prev) {
+					const diff = current.timestamp - prev.timestamp;
+					// If gap is significant (> 1.5h), fill with 0s
+					if (diff > granularity * 1.5) {
+						// Drop to 0 after prev
+						if (prev.value > 0) {
+							result.push({
+								timestamp: prev.timestamp + granularity,
+								value: 0,
+							});
+						}
+
+						// Stay at 0 until current
+						const nextZero = current.timestamp - granularity;
+						const lastAdded = result[result.length - 1];
+
+						if (lastAdded && nextZero > lastAdded.timestamp) {
+							result.push({ timestamp: nextZero, value: 0 });
+						}
+					}
+				}
+				result.push(current);
+			}
+
+			// End point
+			const last = result[result.length - 1];
+			if (last && last.timestamp < endTime) {
+				if (last.value > 0 && last.timestamp + granularity < endTime) {
+					result.push({
+						timestamp: last.timestamp + granularity,
+						value: 0,
+					});
+				}
+				result.push({ timestamp: endTime, value: 0 });
+			}
+
+			return result;
+		};
+
+		const voiceLineData = prepareLineData(voiceData);
+		const messageLineData = prepareLineData(messageData);
+
 		// Draw voice line (blue)
 		ctx.strokeStyle = "#5865F2";
 		ctx.lineWidth = 3;
 		ctx.beginPath();
-		if (voiceData.length > 0) {
-			// Sort data by timestamp just in case
-			voiceData.sort((a, b) => a.timestamp - b.timestamp);
-
-			voiceData.forEach((point, index) => {
-				const x = getX(point.timestamp);
-				const y =
-					padding +
-					chartHeight -
-					(point.value / 60 / maxVoice) * chartHeight;
-				if (index === 0) {
-					ctx.moveTo(x, y);
-				} else {
-					ctx.lineTo(x, y);
-				}
-			});
-		}
+		voiceLineData.forEach((point, index) => {
+			const x = getX(point.timestamp);
+			const y =
+				padding +
+				chartHeight -
+				(point.value / 60 / maxVoice) * chartHeight;
+			if (index === 0) {
+				ctx.moveTo(x, y);
+			} else {
+				ctx.lineTo(x, y);
+			}
+		});
 		ctx.stroke();
 
-		// Draw voice points
+		// Draw voice points (only actual data)
 		ctx.fillStyle = "#5865F2";
 		voiceData.forEach((point) => {
 			const x = getX(point.timestamp);
@@ -96,22 +156,18 @@ export class ChartGenerator {
 		ctx.strokeStyle = "#57F287";
 		ctx.lineWidth = 3;
 		ctx.beginPath();
-		if (messageData.length > 0) {
-			messageData.sort((a, b) => a.timestamp - b.timestamp);
-
-			messageData.forEach((point, index) => {
-				const x = getX(point.timestamp);
-				const y =
-					padding +
-					chartHeight -
-					(point.value / maxMessage) * chartHeight;
-				if (index === 0) {
-					ctx.moveTo(x, y);
-				} else {
-					ctx.lineTo(x, y);
-				}
-			});
-		}
+		messageLineData.forEach((point, index) => {
+			const x = getX(point.timestamp);
+			const y =
+				padding +
+				chartHeight -
+				(point.value / maxMessage) * chartHeight;
+			if (index === 0) {
+				ctx.moveTo(x, y);
+			} else {
+				ctx.lineTo(x, y);
+			}
+		});
 		ctx.stroke();
 
 		// Draw message points
