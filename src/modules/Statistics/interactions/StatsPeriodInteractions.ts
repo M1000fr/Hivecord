@@ -194,9 +194,10 @@ export class StatsPeriodInteractions {
 					),
 				]);
 
-				const chartBuffer = ChartGenerator.generateHourlyChart(
-					voiceStats.hourlyBreakdown,
-					messageStats.hourlyBreakdown,
+				const chartBuffer = ChartGenerator.generateChart(
+					voiceStats.timeSeries,
+					messageStats.timeSeries,
+					timeRange,
 					800,
 					400,
 				);

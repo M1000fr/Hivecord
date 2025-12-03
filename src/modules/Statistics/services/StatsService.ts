@@ -18,14 +18,14 @@ export interface UserVoiceStats {
 	userId: string;
 	totalDuration: number; // seconds
 	channelBreakdown: { channelId: string; duration: number }[];
-	hourlyBreakdown: { hour: number; duration: number }[];
+	timeSeries: { timestamp: number; value: number }[];
 }
 
 export interface UserMessageStats {
 	userId: string;
 	totalMessages: number;
 	channelBreakdown: { channelId: string; count: number }[];
-	hourlyBreakdown: { hour: number; count: number }[];
+	timeSeries: { timestamp: number; value: number }[];
 }
 
 export interface ChannelStats {
@@ -49,6 +49,7 @@ export class StatsService {
 	private static lastFlush = 0;
 	private static flushTimer: ReturnType<typeof setTimeout> | null = null;
 	private static pendingUserInvalidations = new Set<string>(); // format: userId|guildId
+	private static messageBuffer = new Map<string, number>();
 
 	private static scheduleFlush() {
 		const now = Date.now();
@@ -71,6 +72,25 @@ export class StatsService {
 			clearTimeout(this.flushTimer);
 			this.flushTimer = null;
 		}
+
+		// Flush aggregated messages
+		if (this.messageBuffer.size > 0) {
+			const now = new Date();
+			for (const [key, count] of this.messageBuffer) {
+				const [userId, channelId, guildId] = key.split("|");
+				if (userId && channelId && guildId) {
+					const point = new Point("message_activity")
+						.tag("userId", userId)
+						.tag("channelId", channelId)
+						.tag("guildId", guildId)
+						.intField("count", count)
+						.timestamp(now);
+					InfluxService.writePoint(point);
+				}
+			}
+			this.messageBuffer.clear();
+		}
+
 		try {
 			await InfluxService.flush();
 			this.lastFlush = Date.now();
@@ -226,14 +246,9 @@ export class StatsService {
 		channelId: string,
 		guildId: string,
 	): Promise<void> {
-		const point = new Point("message_activity")
-			.tag("userId", userId)
-			.tag("channelId", channelId)
-			.tag("guildId", guildId)
-			.intField("count", 1)
-			.timestamp(new Date());
+		const key = `${userId}|${channelId}|${guildId}`;
+		this.messageBuffer.set(key, (this.messageBuffer.get(key) || 0) + 1);
 
-		InfluxService.writePoint(point);
 		// Track user for cache invalidation after flush
 		this.pendingUserInvalidations.add(`${userId}|${guildId}`);
 		this.scheduleFlush();
@@ -302,7 +317,7 @@ export class StatsService {
 
 		// Calculate channel breakdown
 		const channelMap = new Map<string, number>();
-		const hourMap = new Map<number, number>();
+		const timeMap = new Map<number, number>();
 		let totalDuration = 0;
 
 		for (const result of results) {
@@ -314,10 +329,12 @@ export class StatsService {
 				channelMap.get(result.channelId) || 0;
 			channelMap.set(result.channelId, currentChannelDuration + duration);
 
-			// Hourly breakdown
-			const hour = new Date(result._time).getHours();
-			const currentHourDuration = hourMap.get(hour) || 0;
-			hourMap.set(hour, currentHourDuration + duration);
+			// Time breakdown (bucket by hour)
+			const date = new Date(result._time);
+			date.setMinutes(0, 0, 0);
+			const timestamp = date.getTime();
+			const currentTimestampDuration = timeMap.get(timestamp) || 0;
+			timeMap.set(timestamp, currentTimestampDuration + duration);
 		}
 
 		const stats: UserVoiceStats = {
@@ -329,9 +346,9 @@ export class StatsService {
 					duration,
 				}),
 			),
-			hourlyBreakdown: Array.from(hourMap.entries())
-				.map(([hour, duration]) => ({ hour, duration }))
-				.sort((a, b) => a.hour - b.hour),
+			timeSeries: Array.from(timeMap.entries())
+				.map(([timestamp, value]) => ({ timestamp, value }))
+				.sort((a, b) => a.timestamp - b.timestamp),
 		};
 
 		await redis.set(cacheKey, JSON.stringify(stats), "EX", CACHE_TTL);
@@ -371,7 +388,7 @@ export class StatsService {
 		}>(messageQuery);
 
 		const channelMap = new Map<string, number>();
-		const hourMap = new Map<number, number>();
+		const timeMap = new Map<number, number>();
 		let totalMessages = 0;
 
 		for (const result of results) {
@@ -382,10 +399,12 @@ export class StatsService {
 			const currentChannelCount = channelMap.get(result.channelId) || 0;
 			channelMap.set(result.channelId, currentChannelCount + count);
 
-			// Hourly breakdown
-			const hour = new Date(result._time).getHours();
-			const currentHourCount = hourMap.get(hour) || 0;
-			hourMap.set(hour, currentHourCount + count);
+			// Time breakdown (bucket by hour)
+			const date = new Date(result._time);
+			date.setMinutes(0, 0, 0);
+			const timestamp = date.getTime();
+			const currentTimestampCount = timeMap.get(timestamp) || 0;
+			timeMap.set(timestamp, currentTimestampCount + count);
 		}
 
 		const stats: UserMessageStats = {
@@ -397,9 +416,9 @@ export class StatsService {
 					count,
 				}),
 			),
-			hourlyBreakdown: Array.from(hourMap.entries())
-				.map(([hour, count]) => ({ hour, count }))
-				.sort((a, b) => a.hour - b.hour),
+			timeSeries: Array.from(timeMap.entries())
+				.map(([timestamp, value]) => ({ timestamp, value }))
+				.sort((a, b) => a.timestamp - b.timestamp),
 		};
 
 		await redis.set(cacheKey, JSON.stringify(stats), "EX", CACHE_TTL);
@@ -649,6 +668,7 @@ export class StatsService {
 				|> filter(fn: (r) => r._field == "duration")
 				|> group(columns: ["userId"])
 				|> sum()
+				|> group()
 				|> sort(desc: true)
 				|> limit(n: ${limit})
 		`;
@@ -682,6 +702,7 @@ export class StatsService {
 				|> filter(fn: (r) => r._field == "count")
 				|> group(columns: ["userId"])
 				|> sum()
+				|> group()
 				|> sort(desc: true)
 				|> limit(n: ${limit})
 		`;
