@@ -21,5 +21,8 @@ RUN bunx prisma generate
 # Copy the rest of the application code
 COPY . .
 
+# Create data directory
+RUN mkdir -p data
+
 # Start the application
 CMD ["bun", "run", "start"]
