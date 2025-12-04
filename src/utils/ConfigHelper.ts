@@ -40,6 +40,11 @@ export class ConfigHelper {
 		if (type === EConfigType.Channel) return `<#${value}>`;
 		if (type === EConfigType.Boolean)
 			return value === "true" ? "`✅`" : "`❌`";
+		if (type === EConfigType.Attachment) {
+			if (!value) return "None";
+			const strValue = String(value);
+			return strValue.split(/[/\\]/).pop() || strValue;
+		}
 		return this.truncate(String(value), 100);
 	}
 

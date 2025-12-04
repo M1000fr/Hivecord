@@ -182,6 +182,13 @@ export class ModuleConfigInteractions {
 					selectedProperty,
 					moduleName,
 				);
+			} else if (propertyOptions.type === EConfigType.Attachment) {
+				await this.handleAttachmentProperty(
+					interaction,
+					propertyOptions,
+					selectedProperty,
+					moduleName,
+				);
 			} else {
 				await this.handleTextProperty(
 					interaction,
@@ -548,6 +555,88 @@ export class ModuleConfigInteractions {
 			embeds: [embed],
 			components: [row],
 			flags: [MessageFlags.Ephemeral],
+		});
+	}
+
+	private async handleAttachmentProperty(
+		interaction: any,
+		propertyOptions: any,
+		selectedProperty: string,
+		moduleName: string,
+	) {
+		const currentValue = await ConfigHelper.getCurrentValue(
+			selectedProperty,
+			propertyOptions.type,
+			propertyOptions.defaultValue,
+		);
+		const embed = this.buildPropertyEmbed(
+			propertyOptions,
+			selectedProperty,
+			currentValue,
+		);
+
+		embed.setDescription(
+			embed.data.description +
+				"\n\n**Please reply to this message with the file you want to upload.**\nSupported formats: Images, GIFs, Videos, Audio.",
+		);
+
+		await interaction.reply({
+			embeds: [embed],
+			flags: [MessageFlags.Ephemeral],
+		});
+
+		const filter = (m: Message) =>
+			m.author.id === interaction.user.id && m.attachments.size > 0;
+
+		const collector = interaction.channel.createMessageCollector({
+			filter,
+			time: 60000,
+			max: 1,
+		});
+
+		collector.on("collect", async (m: Message) => {
+			const attachment = m.attachments.first();
+			if (!attachment) return;
+
+			try {
+				// Download and save file
+				const response = await fetch(attachment.url);
+				if (!response.ok) throw new Error("Failed to download file");
+
+				const arrayBuffer = await response.arrayBuffer();
+				const buffer = Buffer.from(arrayBuffer);
+
+				const fileName = `${moduleName}_${selectedProperty}_${Date.now()}_${attachment.name}`;
+				const filePath = `data/${fileName}`;
+
+				// Ensure data directory exists
+				const fs = await import("fs/promises");
+				try {
+					await fs.access("data");
+				} catch {
+					await fs.mkdir("data");
+				}
+
+				await fs.writeFile(filePath, buffer);
+
+				// Update config with file path
+				await this.updateConfig(
+					interaction.client as LeBotClient<true>,
+					interaction,
+					moduleName,
+					selectedProperty,
+					filePath,
+					EConfigType.Attachment,
+				);
+
+				await m.delete().catch(() => {}); // Clean up user message
+			} catch (error) {
+				console.error("Failed to upload file:", error);
+				await interaction.followUp({
+					content: "❌ Failed to upload file.",
+					flags: [MessageFlags.Ephemeral],
+				});
+			}
 		});
 	}
 
