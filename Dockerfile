@@ -4,9 +4,8 @@ FROM oven/bun:slim
 # Set the working directory
 WORKDIR /app
 
-# Install OpenSSL, fonts, and canvas dependencies
-RUN apt-get update -y && apt-get install -y openssl fonts-dejavu-core fontconfig \
-    build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+# Install OpenSSL and fonts
+RUN apt-get update -y && apt-get install -y openssl fonts-dejavu-core fontconfig
 
 # Copy package.json and bun.lock
 COPY package.json bun.lock ./
