@@ -43,7 +43,13 @@ export class ConfigHelper {
 		if (type === EConfigType.Attachment) {
 			if (!value) return "None";
 			const strValue = String(value);
-			return strValue.split(/[/\\]/).pop() || strValue;
+			const fileName = strValue.split(/[/\\]/).pop() || strValue;
+			// Remove prefix like module_prop_1234567890123_
+			const match = fileName.match(/_\d{13}_/);
+			if (match && match.index !== undefined) {
+				return fileName.substring(match.index + match[0].length);
+			}
+			return fileName;
 		}
 		return this.truncate(String(value), 100);
 	}
