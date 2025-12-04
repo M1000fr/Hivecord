@@ -83,12 +83,14 @@ export default class WelcomeEvent extends BaseEvent<
 				GeneralConfigKeys.welcomeEmbedName,
 			);
 
-			// Use local file for background
-			const backgroundPath = path.join(
-				process.cwd(),
-				"data",
-				"welcome_banner.png",
+			// Get configured background
+			const configuredBackground = await ConfigService.get(
+				GeneralConfigKeys.welcomeBackground,
 			);
+
+			const backgroundPath = configuredBackground
+				? path.join(process.cwd(), configuredBackground)
+				: null;
 
 			const dynamicAvatarUrl = member.user.displayAvatarURL({
 				forceStatic: false,
@@ -135,13 +137,16 @@ export default class WelcomeEvent extends BaseEvent<
 
 			// Load background
 			let background: Image | null = null;
-			try {
-				background = await loadImage(backgroundPath);
-			} catch (e) {
-				this.logger.error(
-					"Failed to load background image from " + backgroundPath,
-					(e as Error)?.stack || String(e),
-				);
+			if (backgroundPath) {
+				try {
+					background = await loadImage(backgroundPath);
+				} catch (e) {
+					this.logger.error(
+						"Failed to load background image from " +
+							backgroundPath,
+						(e as Error)?.stack || String(e),
+					);
+				}
 			}
 
 			const drawBackground = () => {
@@ -154,7 +159,7 @@ export default class WelcomeEvent extends BaseEvent<
 			};
 
 			const drawText = () => {
-				ctx.font = "bold 30px sans-serif";
+				ctx.font = "30px Arial";
 				ctx.fillStyle = "#ffffff";
 				ctx.textAlign = "center";
 				ctx.strokeStyle = "black";

@@ -42,6 +42,13 @@ export class GeneralConfig {
 		type: EConfigType.RoleArray,
 	})
 	generalWelcomeRoles: string[] = [];
+
+	@ConfigProperty({
+		displayName: "Welcome Background",
+		description: "The background image for the welcome card",
+		type: EConfigType.Attachment,
+	})
+	generalWelcomeBackground: string = "";
 }
 
 export const GeneralConfigKeys = {
@@ -60,4 +67,7 @@ export const GeneralConfigKeys = {
 	get welcomeRoles() {
 		return toConfigKey("generalWelcomeRoles");
 	},
-} as const;
+	get welcomeBackground() {
+		return toConfigKey("generalWelcomeBackground");
+	},
+};
