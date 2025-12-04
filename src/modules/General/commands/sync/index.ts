@@ -1,18 +1,39 @@
 import { BaseCommand } from "@class/BaseCommand";
 import { LeBotClient } from "@class/LeBotClient";
+import { Autocomplete } from "@decorators/Autocomplete";
 import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
-import { Subcommand } from "@decorators/Subcommand";
+import { OptionRoute } from "@decorators/OptionRoute";
 import { EPermission } from "@enums/EPermission";
 import { InteractionHelper } from "@utils/InteractionHelper";
-import { ChatInputCommandInteraction, PermissionFlagsBits } from "discord.js";
+import {
+	AutocompleteInteraction,
+	ChatInputCommandInteraction,
+	PermissionFlagsBits,
+} from "discord.js";
 import { WelcomeRoleSyncService } from "../../services/WelcomeRoleSyncService";
 import { syncOptions } from "./syncOptions";
 
 @Command(syncOptions)
 export default class SyncCommand extends BaseCommand {
-	@Subcommand({
-		name: "welcome-roles",
+	@Autocomplete({ optionName: "target" })
+	async autocompleteTarget(
+		client: LeBotClient,
+		interaction: AutocompleteInteraction,
+	) {
+		const focusedValue = interaction.options.getFocused().toLowerCase();
+		const targets = [{ name: "Welcome Roles", value: "welcome-roles" }];
+
+		const filtered = targets.filter((t) =>
+			t.name.toLowerCase().includes(focusedValue),
+		);
+
+		await interaction.respond(filtered);
+	}
+
+	@OptionRoute({
+		option: "target",
+		value: "welcome-roles",
 		permission: EPermission.SyncWelcomeRoles,
 	})
 	@BotPermission(PermissionFlagsBits.ManageRoles)

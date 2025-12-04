@@ -7,9 +7,11 @@ export const syncOptions: CommandOptions = {
 	defaultMemberPermissions: PermissionFlagsBits.ManageRoles,
 	options: [
 		{
-			name: "welcome-roles",
-			description: "Synchronize welcome roles for all members",
-			type: ApplicationCommandOptionType.Subcommand,
+			name: "target",
+			description: "The target to synchronize",
+			type: ApplicationCommandOptionType.String,
+			required: true,
+			autocomplete: true,
 		},
 	],
 };
