@@ -279,6 +279,48 @@ export class InvitationService {
 		}
 	}
 
+	/**
+	 * Retrieves the leaderboard of inviters.
+	 */
+	public static async getLeaderboard(limit = 10): Promise<
+		{
+			inviterId: string;
+			active: number;
+			total: number;
+		}[]
+	> {
+		try {
+			const result = await prismaClient.$queryRaw<
+				{
+					inviterId: string;
+					active: bigint;
+					total: bigint;
+				}[]
+			>`
+                SELECT 
+                    inviterId, 
+                    COUNT(*) as total, 
+                    SUM(CASE WHEN active = 1 THEN 1 ELSE 0 END) as active 
+                FROM Invitation 
+                GROUP BY inviterId 
+                ORDER BY active DESC 
+                LIMIT ${limit}
+            `;
+
+			return result.map((row) => ({
+				inviterId: row.inviterId,
+				active: Number(row.active),
+				total: Number(row.total),
+			}));
+		} catch (error) {
+			this.logger.error(
+				"Failed to get leaderboard",
+				(error as Error).stack,
+			);
+			return [];
+		}
+	}
+
 	public static async getInviteCounts(userId: string): Promise<{
 		active: number;
 		fake: number;
