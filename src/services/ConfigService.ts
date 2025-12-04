@@ -252,6 +252,26 @@ export class ConfigService {
 		}
 	}
 
+	static async deleteRole(key: string): Promise<void> {
+		const redis = RedisService.getInstance();
+		const cacheKey = `config:role:${key}`;
+		const rolesCacheKey = `config:roles:${key}`;
+		await redis.del(cacheKey);
+		await redis.del(rolesCacheKey);
+
+		await prismaClient.roleConfiguration.deleteMany({ where: { key } });
+	}
+
+	static async deleteChannel(key: string): Promise<void> {
+		const redis = RedisService.getInstance();
+		const cacheKey = `config:channel:${key}`;
+		const channelsCacheKey = `config:channels:${key}`;
+		await redis.del(cacheKey);
+		await redis.del(channelsCacheKey);
+
+		await prismaClient.channelConfiguration.deleteMany({ where: { key } });
+	}
+
 	static async getAll(): Promise<Record<string, string>> {
 		const [configs, channelConfigs, roleConfigs] = await Promise.all([
 			prismaClient.configuration.findMany(),

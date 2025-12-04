@@ -19,6 +19,7 @@ export const TYPE_NAMES: Record<number, string> = {
 	[EConfigType.Mentionable]: "Mentionable",
 	[EConfigType.Attachment]: "Attachment",
 	[EConfigType.CustomEmbed]: "Custom Embed",
+	[EConfigType.RoleArray]: "Roles",
 };
 
 export class ConfigHelper {
@@ -32,45 +33,60 @@ export class ConfigHelper {
 			: str;
 	}
 
-	static formatValue(value: string, type: EConfigType): string {
+	static formatValue(value: string | string[], type: EConfigType): string {
 		if (type === EConfigType.Role) return `<@&${value}>`;
+		if (type === EConfigType.RoleArray && Array.isArray(value))
+			return value.map((v) => `<@&${v}>`).join(", ");
 		if (type === EConfigType.Channel) return `<#${value}>`;
 		if (type === EConfigType.Boolean)
 			return value === "true" ? "`✅`" : "`❌`";
-		return this.truncate(value, 100);
+		return this.truncate(String(value), 100);
 	}
 
 	static async fetchValue(
 		key: string,
 		type: EConfigType,
 		defaultValue?: any,
-	): Promise<string | null> {
+	): Promise<string | string[] | null> {
 		const snakeKey = this.toSnakeCase(key);
-		let value: string | null = null;
+		let value: string | string[] | null = null;
 
 		if (type === EConfigType.Role)
 			value = await ConfigService.getRole(snakeKey);
+		else if (type === EConfigType.RoleArray)
+			value = await ConfigService.getRoles(snakeKey);
 		else if (type === EConfigType.Channel)
 			value = await ConfigService.getChannel(snakeKey);
 		else value = await ConfigService.get(snakeKey);
 
 		if (value === null && defaultValue !== undefined) {
-			return String(defaultValue);
+			return defaultValue;
 		}
 		return value;
 	}
 
 	static async saveValue(
 		key: string,
-		value: string,
+		value: string | string[],
 		type: EConfigType,
 	): Promise<void> {
 		const snakeKey = this.toSnakeCase(key);
 		if (type === EConfigType.Role)
-			return ConfigService.setRole(snakeKey, value);
+			return ConfigService.setRole(snakeKey, value as string);
+		if (type === EConfigType.RoleArray)
+			return ConfigService.setRoles(snakeKey, value as string[]);
 		if (type === EConfigType.Channel)
-			return ConfigService.setChannel(snakeKey, value);
-		return ConfigService.set(snakeKey, value);
+			return ConfigService.setChannel(snakeKey, value as string);
+		return ConfigService.set(snakeKey, value as string);
+	}
+
+	static async deleteValue(key: string, type: EConfigType): Promise<void> {
+		const snakeKey = this.toSnakeCase(key);
+		if (type === EConfigType.Role || type === EConfigType.RoleArray)
+			return ConfigService.deleteRole(snakeKey);
+		if (type === EConfigType.Channel)
+			return ConfigService.deleteChannel(snakeKey);
+		return ConfigService.delete(snakeKey);
 	}
 
 	static buildCustomId(parts: string[]): string {

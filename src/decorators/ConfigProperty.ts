@@ -12,6 +12,7 @@ export enum EConfigType {
 	Attachment = ApplicationCommandOptionType.Attachment,
 	// Custom types
 	CustomEmbed = 100,
+	RoleArray = 101,
 }
 
 export interface ConfigPropertyOptions {

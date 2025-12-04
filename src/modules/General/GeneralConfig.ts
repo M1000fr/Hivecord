@@ -35,6 +35,13 @@ export class GeneralConfig {
 		defaultValue: "",
 	})
 	generalWelcomeEmbedName: string = "";
+
+	@ConfigProperty({
+		displayName: "Welcome Roles",
+		description: "Roles to add to new members",
+		type: EConfigType.RoleArray,
+	})
+	generalWelcomeRoles: string[] = [];
 }
 
 export const GeneralConfigKeys = {
@@ -49,5 +56,8 @@ export const GeneralConfigKeys = {
 	},
 	get welcomeEmbedName() {
 		return toConfigKey("generalWelcomeEmbedName");
+	},
+	get welcomeRoles() {
+		return toConfigKey("generalWelcomeRoles");
 	},
 } as const;

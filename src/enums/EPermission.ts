@@ -17,6 +17,7 @@ export enum EPermission {
 	Ban = "commands.ban",
 	Unban = "commands.unban",
 
+	SyncWelcomeRoles = "commands.sync.welcomeRoles",
 	SyncBackup = "commands.sync.backup",
 	SyncRestore = "commands.sync.restore",
 

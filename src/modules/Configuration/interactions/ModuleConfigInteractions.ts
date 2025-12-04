@@ -57,7 +57,7 @@ export class ModuleConfigInteractions {
 		interaction: any,
 		moduleName: string,
 		propertyKey: string,
-		value: string,
+		value: string | string[],
 		type: EConfigType,
 	) {
 		try {
@@ -164,6 +164,7 @@ export class ModuleConfigInteractions {
 
 			const isRoleOrChannel = [
 				EConfigType.Role,
+				EConfigType.RoleArray,
 				EConfigType.Channel,
 			].includes(propertyOptions.type);
 
@@ -202,14 +203,21 @@ export class ModuleConfigInteractions {
 
 		if (!userId || !(await this.validateUser(interaction, userId))) return;
 
-		if (moduleName && propertyKey && interaction.values[0]) {
+		if (!moduleName || !propertyKey) return;
+
+		const module = client.modules.get(moduleName.toLowerCase());
+		const configProps = (module?.options.config as any)?.configProperties;
+		const prop = configProps?.[propertyKey];
+		const isArray = prop?.type === EConfigType.RoleArray;
+
+		if (interaction.values.length > 0 || isArray) {
 			await this.updateConfig(
 				client,
 				interaction,
 				moduleName,
 				propertyKey,
-				interaction.values[0],
-				EConfigType.Role,
+				isArray ? interaction.values : interaction.values[0] || "",
+				isArray ? EConfigType.RoleArray : EConfigType.Role,
 			);
 		}
 	}
@@ -281,33 +289,104 @@ export class ModuleConfigInteractions {
 		}
 	}
 
+	@ButtonPattern("module_config_clear:*")
+	async handleClearButton(interaction: ButtonInteraction) {
+		const client = interaction.client as LeBotClient<true>;
+		const parts = ConfigHelper.parseCustomId(interaction.customId);
+		const moduleName = parts[1];
+		const propertyKey = parts[2];
+		const userId = parts[parts.length - 1];
+
+		if (!userId || !(await this.validateUser(interaction, userId))) return;
+
+		if (!moduleName || !propertyKey) return;
+
+		const module = client.modules.get(moduleName.toLowerCase());
+		const configProps = (module?.options.config as any)?.configProperties;
+		const prop = configProps?.[propertyKey];
+
+		if (prop) {
+			try {
+				await ConfigHelper.deleteValue(propertyKey, prop.type);
+
+				const mainMessage = await this.getMainMessage(interaction);
+				if (mainMessage) {
+					const config = await ConfigHelper.buildModuleConfigEmbed(
+						client,
+						moduleName,
+						interaction.user.id,
+					);
+					if (config) {
+						await mainMessage.edit({
+							embeds: [config.embed],
+							components: [config.row],
+						});
+					}
+				}
+				await this.respondToInteraction(
+					interaction,
+					"✅ Configuration cleared.",
+				);
+			} catch (error) {
+				console.error("Failed to clear config:", error);
+				await this.respondToInteraction(
+					interaction,
+					"❌ Failed to clear configuration.",
+					true,
+				);
+			}
+		}
+	}
+
 	private buildSelectComponent(
 		type: EConfigType,
 		moduleName: string,
 		selectedProperty: string,
 		userId: string,
+		defaultValue?: string | string[] | null,
 	) {
+		const isRole =
+			type === EConfigType.Role || type === EConfigType.RoleArray;
 		const customId = ConfigHelper.buildCustomId([
-			type === EConfigType.Role
-				? "module_config_role"
-				: "module_config_channel",
+			isRole ? "module_config_role" : "module_config_channel",
 			moduleName,
 			selectedProperty,
 			userId,
 		]);
-		const placeholder =
-			type === EConfigType.Role ? "Select a role" : "Select a channel";
+		const placeholder = isRole ? "Select role(s)" : "Select a channel";
 
-		const component =
-			type === EConfigType.Role
-				? new RoleSelectMenuBuilder()
-				: new ChannelSelectMenuBuilder();
+		const component = isRole
+			? new RoleSelectMenuBuilder()
+			: new ChannelSelectMenuBuilder();
 
-		return component
-			.setCustomId(customId)
-			.setPlaceholder(placeholder)
-			.setMinValues(1)
-			.setMaxValues(1);
+		component.setCustomId(customId).setPlaceholder(placeholder);
+
+		if (type === EConfigType.RoleArray) {
+			component.setMinValues(0).setMaxValues(25);
+		} else {
+			component.setMinValues(1).setMaxValues(1);
+		}
+
+		if (defaultValue) {
+			const values = Array.isArray(defaultValue)
+				? defaultValue
+				: [defaultValue];
+			const validValues = values.filter((v) => v);
+
+			if (validValues.length > 0) {
+				if (isRole) {
+					(component as RoleSelectMenuBuilder).setDefaultRoles(
+						validValues,
+					);
+				} else {
+					(component as ChannelSelectMenuBuilder).setDefaultChannels(
+						validValues,
+					);
+				}
+			}
+		}
+
+		return component;
 	}
 
 	private async handleRoleOrChannelProperty(
@@ -321,6 +400,13 @@ export class ModuleConfigInteractions {
 			propertyOptions.type,
 			propertyOptions.defaultValue,
 		);
+
+		const rawValue = await ConfigHelper.fetchValue(
+			selectedProperty,
+			propertyOptions.type,
+			propertyOptions.defaultValue,
+		);
+
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,
 			selectedProperty,
@@ -331,11 +417,37 @@ export class ModuleConfigInteractions {
 			moduleName,
 			selectedProperty,
 			interaction.user.id,
+			rawValue,
 		);
+
+		const components: any[] = [
+			new ActionRowBuilder<any>().addComponents(component),
+		];
+
+		if (
+			propertyOptions.type === EConfigType.Role ||
+			propertyOptions.type === EConfigType.Channel
+		) {
+			const clearButton = new ButtonBuilder()
+				.setCustomId(
+					ConfigHelper.buildCustomId([
+						"module_config_clear",
+						moduleName,
+						selectedProperty,
+						interaction.user.id,
+					]),
+				)
+				.setLabel("Clear Selection")
+				.setStyle(ButtonStyle.Danger);
+
+			components.push(
+				new ActionRowBuilder<any>().addComponents(clearButton),
+			);
+		}
 
 		await interaction.reply({
 			embeds: [embed],
-			components: [new ActionRowBuilder<any>().addComponents(component)],
+			components: components,
 			flags: [MessageFlags.Ephemeral],
 		});
 	}
@@ -365,7 +477,7 @@ export class ModuleConfigInteractions {
 			placeholder: "Enter text value",
 		});
 
-		if (rawValue) input.setValue(rawValue);
+		if (rawValue && typeof rawValue === "string") input.setValue(rawValue);
 
 		const modal = new ModalBuilder({
 			customId: ConfigHelper.buildCustomId([
