@@ -98,6 +98,7 @@ export default {
 						field_value:
 							"**Reason:** {{reason}}\n**Moderator:** {{moderator}}{{statusInfo}}",
 					},
+					edit_provide_field: "Please provide a field to edit.",
 				},
 				tempmute: {
 					predefined_reason_error:
