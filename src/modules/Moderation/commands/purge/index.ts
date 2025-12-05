@@ -2,6 +2,9 @@ import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import {
 	ChatInputCommandInteraction,
@@ -15,18 +18,23 @@ import { purgeOptions } from "./purgeOptions";
 export default class PurgeCommand extends BaseCommand {
 	@DefaultCommand(EPermission.ChannelPurge)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const channel = interaction.channel;
 
 		if (!channel || !(channel instanceof TextChannel)) {
 			await interaction.reply({
-				content: "This command can only be used in text channels.",
+				content: t(
+					"modules.moderation.commands.purge.text_channel_only",
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
 		await interaction.reply({
-			content: "Purging channel...",
+			content: t("modules.moderation.commands.purge.purging"),
 			flags: [MessageFlags.Ephemeral],
 		});
 
@@ -76,7 +84,9 @@ export default class PurgeCommand extends BaseCommand {
 			await channel.delete("Channel purged by " + interaction.user.tag);
 
 			// Send message in new channel
-			await newChannel.send("Channel has been renewed.");
+			await newChannel.send(
+				t("modules.moderation.commands.purge.renewed"),
+			);
 		} catch (error) {
 			console.error(error);
 		}

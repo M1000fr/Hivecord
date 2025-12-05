@@ -3,8 +3,11 @@ import { Pager } from "@class/Pager";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
 import { SanctionType } from "@prisma/client/client";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import {
 	ChatInputCommandInteraction,
@@ -22,6 +25,9 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const targetUser = interaction.options.getUser("user", true);
 
 		const sanctions = await prismaClient.sanction.findMany({
@@ -32,7 +38,12 @@ export default class SanctionsCommand extends BaseCommand {
 
 		if (sanctions.length === 0) {
 			await interaction.reply({
-				content: `No sanctions found for ${targetUser.tag}.`,
+				content: t(
+					"modules.moderation.commands.sanctions.no_sanctions",
+					{
+						user: targetUser.tag,
+					},
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -44,17 +55,25 @@ export default class SanctionsCommand extends BaseCommand {
 			userId: interaction.user.id,
 			renderPage: async (items, pageIndex, totalPages) => {
 				const embed = new EmbedBuilder()
-					.setTitle(`Sanctions for ${targetUser.tag}`)
+					.setTitle(
+						t("modules.moderation.commands.sanctions.title", {
+							user: targetUser.tag,
+						}),
+					)
 					.setColor("Red")
 					.setTimestamp()
 					.setFooter({
-						text: `Page ${pageIndex + 1}/${totalPages} • Total: ${sanctions.length}`,
+						text: t("common.pagination.page_info", {
+							current: pageIndex + 1,
+							total: totalPages,
+							count: sanctions.length,
+						}),
 					});
 
 				items.forEach((sanction) => {
 					const moderator = sanction.Moderator
 						? `<@${sanction.moderatorId}>`
-						: "Unknown";
+						: t("modules.moderation.commands.sanctions.unknown");
 					const date = new Date(
 						sanction.createdAt,
 					).toLocaleDateString();
@@ -78,24 +97,24 @@ export default class SanctionsCommand extends BaseCommand {
 					let statusInfo = "";
 					if (sanction.type === "MUTE" || sanction.type === "BAN") {
 						if (sanction.active) {
-							statusInfo = "\n**Status:** `✅`";
+							statusInfo = `\n**${t("modules.moderation.commands.sanctions.status")}:** \`✅\``;
 							if (sanction.expiresAt) {
 								const expires = Math.floor(
 									new Date(sanction.expiresAt).getTime() /
 										1000,
 								);
-								statusInfo += ` (Expires <t:${expires}:f>)`;
+								statusInfo += ` (${t("modules.moderation.commands.sanctions.expires", { time: `<t:${expires}:f>` })})`;
 							} else {
-								statusInfo += " (Permanent)";
+								statusInfo += ` (${t("modules.moderation.commands.sanctions.permanent")})`;
 							}
 						} else {
-							statusInfo = "\n**Status:** `❌`";
+							statusInfo = `\n**${t("modules.moderation.commands.sanctions.status")}:** \`❌\``;
 						}
 					}
 
 					embed.addFields({
 						name: `${emoji} ${sanction.type} #${sanction.id} - ${date}`,
-						value: `**Reason:** ${sanction.reason}\n**Moderator:** ${moderator}${statusInfo}`,
+						value: `**${t("modules.moderation.commands.sanctions.reason")}:** ${sanction.reason}\n**${t("modules.moderation.commands.sanctions.moderator")}:** ${moderator}${statusInfo}`,
 						inline: false,
 					});
 				});
@@ -116,6 +135,9 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const text = interaction.options.getString("text", true);
 		const typeStr = interaction.options.getString("type", true);
 		const duration = interaction.options.getString("duration");
@@ -130,18 +152,28 @@ export default class SanctionsCommand extends BaseCommand {
 			});
 
 			const embed = new EmbedBuilder()
-				.setTitle("Reason Added")
+				.setTitle(
+					t("modules.moderation.commands.sanctions.reason_added"),
+				)
 				.setColor(Colors.Green)
-				.setDescription(`Added reason for **${type}**:\n${text}`)
+				.setDescription(
+					t(
+						"modules.moderation.commands.sanctions.reason_added_desc",
+						{
+							type,
+							text,
+						},
+					),
+				)
 				.addFields({
-					name: "ID",
+					name: t("modules.moderation.commands.sanctions.id"),
 					value: reason.id.toString(),
 					inline: true,
 				});
 
 			if (duration) {
 				embed.addFields({
-					name: "Duration",
+					name: t("modules.moderation.commands.sanctions.duration"),
 					value: duration,
 					inline: true,
 				});
@@ -150,7 +182,9 @@ export default class SanctionsCommand extends BaseCommand {
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			await interaction.reply({
-				content: "Failed to add reason. It might already exist.",
+				content: t(
+					"modules.moderation.commands.sanctions.reason_add_failed",
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 		}
@@ -165,13 +199,18 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const id = interaction.options.getInteger("id", true);
 		const text = interaction.options.getString("text");
 		const duration = interaction.options.getString("duration");
 
 		if (!text && !duration) {
 			await interaction.reply({
-				content: "You must provide at least one field to update.",
+				content: t(
+					"modules.moderation.commands.sanctions.edit_provide_field",
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -181,7 +220,10 @@ export default class SanctionsCommand extends BaseCommand {
 			const reason = await SanctionReasonService.getById(id);
 			if (!reason) {
 				await interaction.reply({
-					content: `Reason with ID ${id} not found.`,
+					content: t(
+						"modules.moderation.commands.sanctions.reason_not_found",
+						{ id },
+					),
 					flags: [MessageFlags.Ephemeral],
 				});
 				return;
@@ -189,7 +231,9 @@ export default class SanctionsCommand extends BaseCommand {
 
 			if (reason.isSystem) {
 				await interaction.reply({
-					content: "Cannot edit system reasons.",
+					content: t(
+						"modules.moderation.commands.sanctions.cannot_edit_system",
+					),
 					flags: [MessageFlags.Ephemeral],
 				});
 				return;
@@ -201,12 +245,18 @@ export default class SanctionsCommand extends BaseCommand {
 			});
 
 			await interaction.reply({
-				content: `Reason with ID ${id} updated.`,
+				content: t(
+					"modules.moderation.commands.sanctions.reason_updated",
+					{ id },
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 		} catch (error) {
 			await interaction.reply({
-				content: `Failed to update reason with ID ${id}.`,
+				content: t(
+					"modules.moderation.commands.sanctions.reason_update_failed",
+					{ id },
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 		}
@@ -221,17 +271,26 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const id = interaction.options.getInteger("id", true);
 
 		try {
 			await SanctionReasonService.delete(id);
 			await interaction.reply({
-				content: `Reason with ID ${id} removed.`,
+				content: t(
+					"modules.moderation.commands.sanctions.reason_removed",
+					{ id },
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 		} catch (error) {
 			await interaction.reply({
-				content: `Failed to remove reason with ID ${id}.`,
+				content: t(
+					"modules.moderation.commands.sanctions.reason_remove_failed",
+					{ id },
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 		}
@@ -246,6 +305,9 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const typeStr = interaction.options.getString("type");
 		const type = typeStr ? (typeStr as SanctionType) : undefined;
 
@@ -255,14 +317,16 @@ export default class SanctionsCommand extends BaseCommand {
 
 		if (reasons.length === 0) {
 			await interaction.reply({
-				content: "No reasons found.",
+				content: t(
+					"modules.moderation.commands.sanctions.no_reasons_found",
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
 		const embed = new EmbedBuilder()
-			.setTitle("Sanction Reasons")
+			.setTitle(t("modules.moderation.commands.sanctions.reasons_title"))
 			.setColor(Colors.Blue);
 
 		const description = reasons

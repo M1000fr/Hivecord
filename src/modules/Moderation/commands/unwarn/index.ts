@@ -4,7 +4,10 @@ import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { SanctionService } from "@modules/Moderation/services/SanctionService";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
@@ -45,6 +48,9 @@ export default class UnwarnCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: ChatInputCommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 		const warnId = interaction.options.getInteger("warn_id", true);
 		const moderator = interaction.user;
@@ -61,11 +67,16 @@ export default class UnwarnCommand extends BaseCommand {
 				warnId,
 			);
 			await interaction.editReply(
-				`✅ Removed warning #${warnId} for ${user.tag}.`,
+				t("modules.moderation.commands.unwarn.success", {
+					id: warnId,
+					user: user.tag,
+				}),
 			);
 		} catch (error: any) {
 			await interaction.editReply(
-				`❌ Failed to unwarn user: ${error.message}`,
+				t("modules.moderation.commands.unwarn.failed_with_error", {
+					error: error.message,
+				}),
 			);
 		}
 	}

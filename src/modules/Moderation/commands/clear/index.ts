@@ -2,20 +2,26 @@ import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { ChatInputCommandInteraction, Client, MessageFlags } from "discord.js";
-import { clearOptions } from "./pingOptions";
+import { clearOptions } from "./clearOptions";
 
 @Command(clearOptions)
 export default class ClearCommand extends BaseCommand {
 	@DefaultCommand(EPermission.ChannelClear)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const amount = interaction.options.getString("amount", true);
 		const user = interaction.options.getUser("user");
 		let deletedMessages;
 
 		if (isNaN(Number(amount)) || Number(amount) <= 0) {
 			await interaction.reply({
-				content: "Please provide a valid number of messages to clear.",
+				content: t("modules.moderation.commands.clear.invalid_amount"),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -52,7 +58,9 @@ export default class ClearCommand extends BaseCommand {
 
 		await interaction
 			.reply({
-				content: `Deleted ${deletedMessages?.size || 0} messages.`,
+				content: t("modules.moderation.commands.clear.success", {
+					count: deletedMessages?.size || 0,
+				}),
 			})
 			.then((msg) => {
 				setTimeout(() => {

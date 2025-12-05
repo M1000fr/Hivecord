@@ -4,9 +4,12 @@ import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
 import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { SanctionType } from "@prisma/client/client";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
@@ -42,9 +45,12 @@ export default class BanCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Ban)
 	@BotPermission(PermissionsBitField.Flags.BanMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 		const reason =
-			interaction.options.getString("reason") || "No reason provided";
+			interaction.options.getString("reason") || t("common.no_reason");
 		const deleteMessagesDays =
 			interaction.options.getInteger("delete_messages") || 0;
 
@@ -59,13 +65,15 @@ export default class BanCommand extends BaseCommand {
 				deleteMessagesDays * 24 * 60 * 60,
 			);
 			await interaction.reply(
-				`User ${user.tag} has been banned. Reason: ${reason}`,
+				t("modules.moderation.commands.ban.success", {
+					userTag: user.tag,
+					reason: reason,
+				}),
 			);
 		} catch (error: any) {
 			await interaction.reply({
 				content:
-					error.message ||
-					"An error occurred while banning the user.",
+					error.message || t("modules.moderation.commands.ban.error"),
 				flags: [MessageFlags.Ephemeral],
 			});
 		}

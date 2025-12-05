@@ -4,9 +4,12 @@ import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
 import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { SanctionType } from "@prisma/client/client";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { DurationParser } from "@utils/DurationParser";
 import {
 	AutocompleteInteraction,
@@ -47,6 +50,9 @@ export default class TempMuteCommand extends BaseCommand {
 	@DefaultCommand(EPermission.TempMute)
 	@BotPermission(PermissionsBitField.Flags.ManageRoles)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 		const reason = interaction.options.getString("reason", true);
 
@@ -62,7 +68,9 @@ export default class TempMuteCommand extends BaseCommand {
 
 		if (!finalDurationString) {
 			await interaction.reply({
-				content: "You must select a predefined reason with a duration.",
+				content: t(
+					"modules.moderation.commands.tempmute.select_predefined_reason",
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -71,8 +79,9 @@ export default class TempMuteCommand extends BaseCommand {
 		const duration = DurationParser.parse(finalDurationString);
 		if (!duration) {
 			await interaction.reply({
-				content:
-					"Invalid duration format. Use format like 10m, 1h, 1d.",
+				content: t(
+					"modules.moderation.commands.tempmute.invalid_duration",
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -90,12 +99,17 @@ export default class TempMuteCommand extends BaseCommand {
 				reason,
 			);
 			await interaction.reply(
-				`User ${user.tag} has been muted for ${finalDurationString}. Reason: ${reason}`,
+				t("modules.moderation.commands.tempmute.success", {
+					user: user.tag,
+					duration: finalDurationString,
+					reason,
+				}),
 			);
 		} catch (error: any) {
 			await interaction.reply({
 				content:
-					error.message || "An error occurred while muting the user.",
+					error.message ||
+					t("modules.moderation.commands.tempmute.failed"),
 				flags: [MessageFlags.Ephemeral],
 			});
 		}

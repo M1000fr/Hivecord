@@ -3,6 +3,9 @@ import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import {
 	ChatInputCommandInteraction,
 	Client,
@@ -17,9 +20,12 @@ export default class LockCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Lock)
 	@BotPermission(PermissionsBitField.Flags.ManageChannels)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const target = interaction.options.getString("target") || "channel";
 		const reason =
-			interaction.options.getString("reason") || "No reason provided";
+			interaction.options.getString("reason") || t("common.no_reason");
 		const guild = interaction.guild;
 
 		if (!guild) return;
@@ -28,7 +34,9 @@ export default class LockCommand extends BaseCommand {
 			const channel = interaction.channel;
 			if (!channel || !("permissionOverwrites" in channel)) {
 				return interaction.reply({
-					content: "This channel cannot be locked.",
+					content: t(
+						"modules.moderation.commands.lock.channel_error",
+					),
 					flags: [MessageFlags.Ephemeral],
 				});
 			}
@@ -42,7 +50,9 @@ export default class LockCommand extends BaseCommand {
 			);
 
 			await interaction.reply({
-				content: `🔒 Channel locked. Reason: ${reason}`,
+				content: t("modules.moderation.commands.lock.channel_success", {
+					reason: reason,
+				}),
 			});
 		} else if (target === "server") {
 			if (
@@ -51,8 +61,9 @@ export default class LockCommand extends BaseCommand {
 				)
 			) {
 				return interaction.reply({
-					content:
-						"You need Administrator permission to lock the server.",
+					content: t(
+						"modules.moderation.commands.lock.server_admin_error",
+					),
 					flags: [MessageFlags.Ephemeral],
 				});
 			}
@@ -68,7 +79,9 @@ export default class LockCommand extends BaseCommand {
 				`Server Lock Command: ${reason}`,
 			);
 			await interaction.reply({
-				content: `🚨 **SERVER LOCKED**. Reason: ${reason}`,
+				content: t("modules.moderation.commands.lock.server_success", {
+					reason: reason,
+				}),
 			});
 		}
 	}
