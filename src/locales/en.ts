@@ -240,10 +240,12 @@ export default {
 				},
 			},
 			interactions: {
-				rename_label: "New name",
-				rename_title: "Rename channel",
-				renamed: "Renamed <#{{channelId}}> to {{newName}}",
-				rename_success: "Channel renamed successfully",
+				rename: {
+					label: "New name",
+					title: "Rename channel",
+					renamed: "Renamed <#{{channelId}}> to {{newName}}",
+					success: "Channel renamed successfully",
+				},
 			},
 		},
 		configuration: {
