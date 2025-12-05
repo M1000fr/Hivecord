@@ -2,6 +2,9 @@ import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { ChatInputCommandInteraction, Client } from "discord.js";
 import { pingOptions } from "./pingOptions";
 
@@ -9,6 +12,9 @@ import { pingOptions } from "./pingOptions";
 export default class PingCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Ping)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
-		await interaction.reply("Pong!");
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
+		await interaction.reply(t("modules.general.commands.ping.response"));
 	}
 }
