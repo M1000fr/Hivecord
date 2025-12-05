@@ -1,3 +1,4 @@
+import { I18nService } from "@services/I18nService";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -10,85 +11,134 @@ import {
 } from "discord.js";
 
 export class EmbedEditorUtils {
-	static getMainMenu() {
+	static getMainMenu(lng: string) {
+		const t = I18nService.getFixedT(lng);
 		return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
 			new StringSelectMenuBuilder()
 				.setCustomId("embed_editor_menu")
-				.setPlaceholder("Select an element to edit")
+				.setPlaceholder(
+					t(
+						"modules.configuration.utils.embed_editor.menu.placeholder",
+					),
+				)
 				.addOptions([
 					{
-						label: "Title & URL",
+						label: t(
+							"modules.configuration.utils.embed_editor.menu.title_url.label",
+						),
 						value: "edit_title",
-						description: "Edit the title and the title URL",
+						description: t(
+							"modules.configuration.utils.embed_editor.menu.title_url.description",
+						),
 						emoji: "📝",
 					},
 					{
-						label: "Description",
+						label: t(
+							"modules.configuration.utils.embed_editor.menu.description.label",
+						),
 						value: "edit_description",
-						description: "Edit the main content",
+						description: t(
+							"modules.configuration.utils.embed_editor.menu.description.description",
+						),
 						emoji: "📄",
 					},
 					{
-						label: "Author",
+						label: t(
+							"modules.configuration.utils.embed_editor.menu.author.label",
+						),
 						value: "edit_author",
-						description: "Edit author name and icon",
+						description: t(
+							"modules.configuration.utils.embed_editor.menu.author.description",
+						),
 						emoji: "👤",
 					},
 					{
-						label: "Footer",
+						label: t(
+							"modules.configuration.utils.embed_editor.menu.footer.label",
+						),
 						value: "edit_footer",
-						description: "Edit footer text and icon",
+						description: t(
+							"modules.configuration.utils.embed_editor.menu.footer.description",
+						),
 						emoji: "🦶",
 					},
 					{
-						label: "Thumbnail & Image",
+						label: t(
+							"modules.configuration.utils.embed_editor.menu.images.label",
+						),
 						value: "edit_images",
-						description: "Edit thumbnail and main image",
+						description: t(
+							"modules.configuration.utils.embed_editor.menu.images.description",
+						),
 						emoji: "🖼️",
 					},
 					{
-						label: "Color",
+						label: t(
+							"modules.configuration.utils.embed_editor.menu.color.label",
+						),
 						value: "edit_color",
-						description: "Change the embed color",
+						description: t(
+							"modules.configuration.utils.embed_editor.menu.color.description",
+						),
 						emoji: "🎨",
 					},
 					{
-						label: "Fields",
+						label: t(
+							"modules.configuration.utils.embed_editor.menu.fields.label",
+						),
 						value: "edit_fields",
-						description: "Add, edit or remove fields",
+						description: t(
+							"modules.configuration.utils.embed_editor.menu.fields.description",
+						),
 						emoji: "📋",
 					},
 				]),
 		);
 	}
 
-	static getControlButtons() {
+	static getControlButtons(lng: string) {
+		const t = I18nService.getFixedT(lng);
 		return new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder()
 				.setCustomId("embed_editor_save")
-				.setLabel("Save")
+				.setLabel(
+					t("modules.configuration.utils.embed_editor.buttons.save"),
+				)
 				.setStyle(ButtonStyle.Success)
 				.setEmoji("💾"),
 			new ButtonBuilder()
 				.setCustomId("embed_editor_cancel")
-				.setLabel("Cancel")
+				.setLabel(
+					t(
+						"modules.configuration.utils.embed_editor.buttons.cancel",
+					),
+				)
 				.setStyle(ButtonStyle.Secondary)
 				.setEmoji("❌"),
 		);
 	}
 
-	static getFieldsSubMenu(fields: APIEmbed["fields"] = []) {
+	static getFieldsSubMenu(lng: string, fields: APIEmbed["fields"] = []) {
+		const t = I18nService.getFixedT(lng);
 		const options = [
 			{
-				label: "Back",
+				label: t(
+					"modules.configuration.utils.embed_editor.fields.back.label",
+				),
 				value: "back",
-				description: "Return to main menu",
+				description: t(
+					"modules.configuration.utils.embed_editor.fields.back.description",
+				),
 				emoji: "⬅️",
 			},
 			{
-				label: "Add Field",
+				label: t(
+					"modules.configuration.utils.embed_editor.fields.add.label",
+				),
 				value: "field_add",
-				description: "Add a new field",
+				description: t(
+					"modules.configuration.utils.embed_editor.fields.add.description",
+				),
 				emoji: "➕",
 			},
 		];
@@ -96,15 +146,25 @@ export class EmbedEditorUtils {
 		if (fields && fields.length > 0) {
 			fields.forEach((field, index) => {
 				options.push({
-					label: `Edit: ${field.name.substring(0, 20)}...`,
+					label: t(
+						"modules.configuration.utils.embed_editor.fields.edit.label",
+						{ name: field.name.substring(0, 20) },
+					),
 					value: `field_edit_${index}`,
-					description: "Edit this field",
+					description: t(
+						"modules.configuration.utils.embed_editor.fields.edit.description",
+					),
 					emoji: "✏️",
 				});
 				options.push({
-					label: `Remove: ${field.name.substring(0, 20)}...`,
+					label: t(
+						"modules.configuration.utils.embed_editor.fields.remove.label",
+						{ name: field.name.substring(0, 20) },
+					),
 					value: `field_remove_${index}`,
-					description: "Remove this field",
+					description: t(
+						"modules.configuration.utils.embed_editor.fields.remove.description",
+					),
 					emoji: "🗑️",
 				});
 			});
@@ -113,22 +173,41 @@ export class EmbedEditorUtils {
 		return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
 			new StringSelectMenuBuilder()
 				.setCustomId("embed_editor_fields_menu")
-				.setPlaceholder("Manage Fields")
+				.setPlaceholder(
+					t(
+						"modules.configuration.utils.embed_editor.fields.placeholder",
+					),
+				)
 				.addOptions(options),
 		);
 	}
 
-	static getModal(type: string, currentData?: any): ModalBuilder {
+	static getModal(
+		lng: string,
+		type: string,
+		currentData?: any,
+	): ModalBuilder {
+		const t = I18nService.getFixedT(lng);
 		const modal = new ModalBuilder();
 
 		switch (type) {
 			case "edit_title":
-				modal.setCustomId("modal_embed_title").setTitle("Edit Title");
+				modal
+					.setCustomId("modal_embed_title")
+					.setTitle(
+						t(
+							"modules.configuration.utils.embed_editor.modals.title.title",
+						),
+					);
 				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("title")
-							.setLabel("Title")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.title.label",
+								),
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(currentData?.title || ""),
@@ -136,7 +215,11 @@ export class EmbedEditorUtils {
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("url")
-							.setLabel("URL")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.title.url_label",
+								),
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(currentData?.url || ""),
@@ -147,12 +230,20 @@ export class EmbedEditorUtils {
 			case "edit_description":
 				modal
 					.setCustomId("modal_embed_description")
-					.setTitle("Edit Description");
+					.setTitle(
+						t(
+							"modules.configuration.utils.embed_editor.modals.description.title",
+						),
+					);
 				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("description")
-							.setLabel("Description")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.description.label",
+								),
+							)
 							.setStyle(TextInputStyle.Paragraph)
 							.setRequired(false)
 							.setValue(currentData?.description || ""),
@@ -161,12 +252,22 @@ export class EmbedEditorUtils {
 				break;
 
 			case "edit_author":
-				modal.setCustomId("modal_embed_author").setTitle("Edit Author");
+				modal
+					.setCustomId("modal_embed_author")
+					.setTitle(
+						t(
+							"modules.configuration.utils.embed_editor.modals.author.title",
+						),
+					);
 				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("name")
-							.setLabel("Name")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.author.name_label",
+								),
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(currentData?.author?.name || ""),
@@ -174,7 +275,11 @@ export class EmbedEditorUtils {
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("icon_url")
-							.setLabel("Icon URL")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.author.icon_label",
+								),
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(currentData?.author?.icon_url || ""),
@@ -183,12 +288,22 @@ export class EmbedEditorUtils {
 				break;
 
 			case "edit_footer":
-				modal.setCustomId("modal_embed_footer").setTitle("Edit Footer");
+				modal
+					.setCustomId("modal_embed_footer")
+					.setTitle(
+						t(
+							"modules.configuration.utils.embed_editor.modals.footer.title",
+						),
+					);
 				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("text")
-							.setLabel("Text")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.footer.text_label",
+								),
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(currentData?.footer?.text || ""),
@@ -196,7 +311,11 @@ export class EmbedEditorUtils {
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("icon_url")
-							.setLabel("Icon URL")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.footer.icon_label",
+								),
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(currentData?.footer?.icon_url || ""),
@@ -205,14 +324,26 @@ export class EmbedEditorUtils {
 				break;
 
 			case "edit_images":
-				modal.setCustomId("modal_embed_images").setTitle("Edit Images");
+				modal
+					.setCustomId("modal_embed_images")
+					.setTitle(
+						t(
+							"modules.configuration.utils.embed_editor.modals.images.title",
+						),
+					);
 				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("image")
-							.setLabel("Main Image URL")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.images.image_label",
+								),
+							)
 							.setPlaceholder(
-								"https://... or attachment://filename.png",
+								t(
+									"modules.configuration.utils.embed_editor.modals.images.image_placeholder",
+								),
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
@@ -221,7 +352,11 @@ export class EmbedEditorUtils {
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("thumbnail")
-							.setLabel("Thumbnail URL")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.images.thumbnail_label",
+								),
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(currentData?.thumbnail?.url || ""),
@@ -230,13 +365,27 @@ export class EmbedEditorUtils {
 				break;
 
 			case "edit_color":
-				modal.setCustomId("modal_embed_color").setTitle("Edit Color");
+				modal
+					.setCustomId("modal_embed_color")
+					.setTitle(
+						t(
+							"modules.configuration.utils.embed_editor.modals.color.title",
+						),
+					);
 				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("color")
-							.setLabel("Color (Hex or Int)")
-							.setPlaceholder("#FF0000 or 16711680")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.color.label",
+								),
+							)
+							.setPlaceholder(
+								t(
+									"modules.configuration.utils.embed_editor.modals.color.placeholder",
+								),
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(
@@ -250,13 +399,23 @@ export class EmbedEditorUtils {
 
 			case "field_add":
 			case "field_edit":
-				modal.setCustomId("modal_embed_field").setTitle("Edit Field");
+				modal
+					.setCustomId("modal_embed_field")
+					.setTitle(
+						t(
+							"modules.configuration.utils.embed_editor.modals.field.title",
+						),
+					);
 
 				modal.addComponents(
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("name")
-							.setLabel("Name")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.field.name_label",
+								),
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(true)
 							.setValue(currentData?.field?.name || ""),
@@ -264,7 +423,11 @@ export class EmbedEditorUtils {
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("value")
-							.setLabel("Value")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.field.value_label",
+								),
+							)
 							.setStyle(TextInputStyle.Paragraph)
 							.setRequired(true)
 							.setValue(currentData?.field?.value || ""),
@@ -272,7 +435,11 @@ export class EmbedEditorUtils {
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
 							.setCustomId("inline")
-							.setLabel("Inline? (true/false)")
+							.setLabel(
+								t(
+									"modules.configuration.utils.embed_editor.modals.field.inline_label",
+								),
+							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(

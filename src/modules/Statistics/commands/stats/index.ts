@@ -2,8 +2,11 @@ import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import type { TimeRange } from "@modules/Statistics/services/StatsService";
 import { StatsService } from "@modules/Statistics/services/StatsService";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { ChartGenerator } from "@utils/ChartGenerator";
 import {
 	ActionRowBuilder,
@@ -23,10 +26,13 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
 			await interaction.editReply(
-				"Cette sous-commande n'est disponible que dans un serveur.",
+				t("modules.statistics.commands.stats.server_only"),
 			);
 			return;
 		}
@@ -37,7 +43,7 @@ export default class StatsCommand extends BaseCommand {
 		} catch (error) {
 			console.error("Error fetching server stats:", error);
 			await interaction.editReply(
-				"Erreur lors de la récupération des statistiques serveur.",
+				t("modules.statistics.commands.stats.server_error"),
 			);
 		}
 	}
@@ -47,10 +53,13 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
 			await interaction.editReply(
-				"Cette sous-commande n'est disponible que dans un serveur.",
+				t("modules.statistics.commands.stats.server_only"),
 			);
 			return;
 		}
@@ -67,7 +76,7 @@ export default class StatsCommand extends BaseCommand {
 		} catch (error) {
 			console.error("Error fetching personal stats:", error);
 			await interaction.editReply(
-				"Erreur lors de la récupération de vos statistiques.",
+				t("modules.statistics.commands.stats.user_error"),
 			);
 		}
 	}
@@ -77,16 +86,21 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
 			await interaction.editReply(
-				"Cette sous-commande n'est disponible que dans un serveur.",
+				t("modules.statistics.commands.stats.server_only"),
 			);
 			return;
 		}
 		const target = interaction.options.getUser("target");
 		if (!target) {
-			await interaction.editReply("Utilisateur requis.");
+			await interaction.editReply(
+				t("modules.statistics.commands.stats.user_required"),
+			);
 			return;
 		}
 		const period = "24h"; // default period
@@ -102,7 +116,7 @@ export default class StatsCommand extends BaseCommand {
 		} catch (error) {
 			console.error("Error fetching user stats:", error);
 			await interaction.editReply(
-				"Erreur lors de la récupération des statistiques utilisateur.",
+				t("modules.statistics.commands.stats.user_error"),
 			);
 		}
 	}
@@ -126,14 +140,15 @@ export default class StatsCommand extends BaseCommand {
 		return { start, end };
 	}
 
-	private getPeriodLabel(period: string): string {
+	private getPeriodLabel(period: string, locale: string): string {
+		const t = I18nService.getFixedT(locale);
 		switch (period) {
 			case "24h":
-				return "dernières 24 heures";
+				return t("modules.statistics.common.periods.24h");
 			case "7d":
-				return "7 derniers jours";
+				return t("modules.statistics.common.periods.7d");
 			case "30d":
-				return "30 derniers jours";
+				return t("modules.statistics.common.periods.30d");
 			default:
 				return period;
 		}
@@ -146,6 +161,9 @@ export default class StatsCommand extends BaseCommand {
 		username: string,
 		period: string,
 	): Promise<void> {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const guildId = interaction.guild!.id;
 
 		const [voiceStats, messageStats] = await Promise.all([
@@ -160,6 +178,10 @@ export default class StatsCommand extends BaseCommand {
 			timeRange,
 			800,
 			400,
+			{
+				voice: t("modules.statistics.common.voice_time_min"),
+				messages: t("modules.statistics.common.messages"),
+			},
 		);
 
 		const chartAttachment = new AttachmentBuilder(chartBuffer, {
@@ -168,21 +190,28 @@ export default class StatsCommand extends BaseCommand {
 
 		// Create embed
 		const embed = new EmbedBuilder()
-			.setTitle(`📊 Statistiques de ${username}`)
-			.setDescription(`Période: ${this.getPeriodLabel(period)}`)
+			.setTitle(
+				t("modules.statistics.commands.stats.user_stats_title", {
+					username,
+				}),
+			)
+			.setDescription(
+				`${t("modules.statistics.common.period")}: ${this.getPeriodLabel(period, lng)}`,
+			)
 			.setColor("#5865F2")
 			.addFields(
 				{
-					name: "🎤 Temps vocal",
+					name: t("modules.statistics.common.voice_time"),
 					value: ChartGenerator.formatDuration(
 						voiceStats.totalDuration,
 					),
 					inline: true,
 				},
 				{
-					name: "💬 Messages",
+					name: t("modules.statistics.common.messages"),
 					value: ChartGenerator.formatNumber(
 						messageStats.totalMessages,
+						lng,
 					),
 					inline: true,
 				},
@@ -203,8 +232,8 @@ export default class StatsCommand extends BaseCommand {
 				.map((c) => `<#${c.channelId}>: ${c.count} messages`)
 				.join("\n");
 			embed.addFields({
-				name: "📝 Salons les plus actifs (messages)",
-				value: topChannels || "Aucun",
+				name: t("modules.statistics.commands.stats.top_channels_msg"),
+				value: topChannels || t("common.none"),
 			});
 		}
 
@@ -218,8 +247,8 @@ export default class StatsCommand extends BaseCommand {
 				)
 				.join("\n");
 			embed.addFields({
-				name: "🎙️ Salons vocaux les plus utilisés",
-				value: topVoiceChannels || "Aucun",
+				name: t("modules.statistics.commands.stats.top_channels_voice"),
+				value: topVoiceChannels || t("common.none"),
 			});
 		}
 
@@ -242,6 +271,9 @@ export default class StatsCommand extends BaseCommand {
 		timeRange: TimeRange,
 		period: string,
 	): Promise<void> {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const guildId = interaction.guild!.id;
 
 		const [serverStats, topVoiceUsers, topMessageUsers, topChannels] =
@@ -256,36 +288,36 @@ export default class StatsCommand extends BaseCommand {
 		const statsCardBuffer = ChartGenerator.generateStatsCard(
 			[
 				{
-					label: "Messages totaux",
+					label: t("modules.statistics.common.total_messages"),
 					value: ChartGenerator.formatNumber(
 						serverStats.totalMessages,
 					),
 					color: "#57F287",
 				},
 				{
-					label: "Temps vocal total",
+					label: t("modules.statistics.common.total_voice_time"),
 					value: ChartGenerator.formatDuration(
 						serverStats.totalVoiceDuration,
 					),
 					color: "#5865F2",
 				},
 				{
-					label: "Utilisateurs actifs",
+					label: t("modules.statistics.common.active_users"),
 					value: serverStats.activeUsers.toString(),
 					color: "#FEE75C",
 				},
 				{
-					label: "Membres rejoints",
+					label: t("modules.statistics.common.members_joined"),
 					value: serverStats.joinCount.toString(),
 					color: "#57F287",
 				},
 				{
-					label: "Membres partis",
+					label: t("modules.statistics.common.members_left"),
 					value: serverStats.leaveCount.toString(),
 					color: "#ED4245",
 				},
 			],
-			"Statistiques du serveur",
+			t("modules.statistics.commands.stats.server_stats_title"),
 			500,
 			350,
 		);
@@ -295,8 +327,17 @@ export default class StatsCommand extends BaseCommand {
 		});
 
 		const embed = new EmbedBuilder()
-			.setTitle(`📊 Statistiques de ${interaction.guild!.name}`)
-			.setDescription(`Période: ${this.getPeriodLabel(period)}`)
+			.setTitle(
+				t(
+					"modules.statistics.commands.stats.server_stats_embed_title",
+					{
+						guild: interaction.guild!.name,
+					},
+				),
+			)
+			.setDescription(
+				`${t("modules.statistics.common.period")}: ${this.getPeriodLabel(period, lng)}`,
+			)
 			.setColor("#5865F2")
 			.setImage("attachment://server_stats.png")
 			.setTimestamp();
@@ -310,7 +351,7 @@ export default class StatsCommand extends BaseCommand {
 				)
 				.join("\n");
 			embed.addFields({
-				name: "🎤 Top utilisateurs (vocal)",
+				name: t("modules.statistics.commands.stats.top_users_voice"),
 				value: voiceLeaderboard,
 				inline: true,
 			});
@@ -325,7 +366,7 @@ export default class StatsCommand extends BaseCommand {
 				)
 				.join("\n");
 			embed.addFields({
-				name: "💬 Top utilisateurs (messages)",
+				name: t("modules.statistics.commands.stats.top_users_msg"),
 				value: messageLeaderboard,
 				inline: true,
 			});
@@ -343,7 +384,7 @@ export default class StatsCommand extends BaseCommand {
 				})
 				.join("\n");
 			embed.addFields({
-				name: "📍 Salons les plus actifs",
+				name: t("modules.statistics.commands.stats.top_channels"),
 				value: channelLeaderboard,
 			});
 		}
@@ -410,14 +451,15 @@ export default class StatsCommand extends BaseCommand {
 		return { start, end };
 	}
 
-	static getPeriodLabel(period: string): string {
+	static getPeriodLabel(period: string, locale: string): string {
+		const t = I18nService.getFixedT(locale);
 		switch (period) {
 			case "24h":
-				return "dernières 24 heures";
+				return t("modules.statistics.common.periods.24h");
 			case "7d":
-				return "7 derniers jours";
+				return t("modules.statistics.common.periods.7d");
 			case "30d":
-				return "30 derniers jours";
+				return t("modules.statistics.common.periods.30d");
 			default:
 				return period;
 		}

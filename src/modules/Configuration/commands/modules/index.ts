@@ -4,6 +4,9 @@ import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	AutocompleteInteraction,
@@ -36,6 +39,9 @@ export default class ModulesCommand extends BaseCommand {
 
 	@DefaultCommand(EPermission.ConfigureModules)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const lebot = client as LeBotClient<true>;
 		const moduleName = interaction.options.getString("module", true);
 
@@ -43,7 +49,9 @@ export default class ModulesCommand extends BaseCommand {
 
 		if (!module) {
 			await interaction.reply({
-				content: `Module **${moduleName}** not found.`,
+				content: t("modules.configuration.commands.modules.not_found", {
+					module: moduleName,
+				}),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -51,7 +59,9 @@ export default class ModulesCommand extends BaseCommand {
 
 		if (!module.options.config) {
 			await interaction.reply({
-				content: `Module **${module.options.name}** has no configuration options.`,
+				content: t("modules.configuration.commands.modules.no_config", {
+					module: module.options.name,
+				}),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -61,11 +71,17 @@ export default class ModulesCommand extends BaseCommand {
 			lebot,
 			moduleName,
 			interaction.user.id,
+			lng,
 		);
 
 		if (!config) {
 			await interaction.reply({
-				content: `Failed to build configuration for module **${module.options.name}**.`,
+				content: t(
+					"modules.configuration.commands.modules.build_failed",
+					{
+						module: module.options.name,
+					},
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;

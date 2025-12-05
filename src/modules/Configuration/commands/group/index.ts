@@ -5,6 +5,9 @@ import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { GroupService } from "@modules/Configuration/services/GroupService";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
 	AutocompleteInteraction,
@@ -92,18 +95,21 @@ export default class GroupCommand extends BaseCommand {
 		groupName: string,
 		title: string,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const group = await GroupService.getGroup(groupName);
 		if (!group) return;
 
 		const perms =
 			group.Permissions.map((p) => `\`${p.Permissions.name}\``).join(
 				", ",
-			) || "None";
+			) || t("common.none");
 
 		const embed = new EmbedBuilder()
 			.setTitle(title)
 			.setDescription(
-				`**Group:** ${group.name}\n**Role:** <@&${group.roleId}>\n**Permissions:**\n${perms}`,
+				`**${t("modules.configuration.commands.group.group")}:** ${group.name}\n**${t("modules.configuration.commands.group.role")}:** <@&${group.roleId}>\n**${t("modules.configuration.commands.group.permissions")}:**\n${perms}`,
 			)
 			.setColor(Colors.Blue)
 			.setTimestamp();
@@ -113,6 +119,9 @@ export default class GroupCommand extends BaseCommand {
 
 	@Subcommand({ name: "create", permission: EPermission.GroupsCreate })
 	async create(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		const role = interaction.options.getRole("role", true);
 
@@ -120,28 +129,41 @@ export default class GroupCommand extends BaseCommand {
 
 		try {
 			await GroupService.createGroup(name, role.id);
-			await this.sendGroupEmbed(interaction, name, "Group Created");
+			await this.sendGroupEmbed(
+				interaction,
+				name,
+				t("modules.configuration.commands.group.created"),
+			);
 		} catch (error: any) {
 			await InteractionHelper.respondError(
 				interaction,
-				`Failed to create group: ${error.message}`,
+				t("modules.configuration.commands.group.create_failed", {
+					error: error.message,
+				}),
 			);
 		}
 	}
 
 	@Subcommand({ name: "delete", permission: EPermission.GroupsDelete })
 	async delete(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 
 		await InteractionHelper.defer(interaction, true);
 
 		try {
 			await GroupService.deleteGroup(name);
-			await interaction.editReply(`Group \`${name}\` deleted.`);
+			await interaction.editReply(
+				t("modules.configuration.commands.group.deleted", { name }),
+			);
 		} catch (error: any) {
 			await InteractionHelper.respondError(
 				interaction,
-				`Failed to delete group: ${error.message}`,
+				t("modules.configuration.commands.group.delete_failed", {
+					error: error.message,
+				}),
 			);
 		}
 	}
@@ -152,6 +174,9 @@ export default class GroupCommand extends BaseCommand {
 		permission: EPermission.GroupsUpdate,
 	})
 	async addPerm(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const groupName = interaction.options.getString("group", true);
 		const permission = interaction.options.getString("permission", true);
 
@@ -162,12 +187,17 @@ export default class GroupCommand extends BaseCommand {
 			await this.sendGroupEmbed(
 				interaction,
 				groupName,
-				"Permission Added",
+				t("modules.configuration.commands.group.permission_added"),
 			);
 		} catch (error: any) {
 			await InteractionHelper.respondError(
 				interaction,
-				`Failed to add permission: ${error.message}`,
+				t(
+					"modules.configuration.commands.group.permission_add_failed",
+					{
+						error: error.message,
+					},
+				),
 			);
 		}
 	}
@@ -178,6 +208,9 @@ export default class GroupCommand extends BaseCommand {
 		permission: EPermission.GroupsUpdate,
 	})
 	async removePerm(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const groupName = interaction.options.getString("group", true);
 		const permission = interaction.options.getString("permission", true);
 
@@ -188,24 +221,32 @@ export default class GroupCommand extends BaseCommand {
 			await this.sendGroupEmbed(
 				interaction,
 				groupName,
-				"Permission Removed",
+				t("modules.configuration.commands.group.permission_removed"),
 			);
 		} catch (error: any) {
 			await InteractionHelper.respondError(
 				interaction,
-				`Failed to remove permission: ${error.message}`,
+				t(
+					"modules.configuration.commands.group.permission_remove_failed",
+					{ error: error.message },
+				),
 			);
 		}
 	}
 
 	@Subcommand({ name: "list", permission: EPermission.GroupsList })
 	async list(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		await InteractionHelper.defer(interaction, false);
 
 		try {
 			const groups = await GroupService.listGroups();
 			if (groups.length === 0) {
-				await interaction.editReply("No groups found.");
+				await interaction.editReply(
+					t("modules.configuration.commands.group.no_groups"),
+				);
 				return;
 			}
 
@@ -220,12 +261,20 @@ export default class GroupCommand extends BaseCommand {
 					const perms =
 						group.Permissions.map(
 							(p) => `\`${p.Permissions.name}\``,
-						).join(", ") || "None";
+						).join(", ") || t("common.none");
 
 					const embed = new EmbedBuilder()
-						.setTitle(`Group List (${pageIndex + 1}/${totalPages})`)
+						.setTitle(
+							t(
+								"modules.configuration.commands.group.list_title",
+								{
+									current: pageIndex + 1,
+									total: totalPages,
+								},
+							),
+						)
 						.setDescription(
-							`**Group:** ${group.name}\n**Role:** <@&${group.roleId}>\n**Permissions:**\n${perms}`,
+							`**${t("modules.configuration.commands.group.group")}:** ${group.name}\n**${t("modules.configuration.commands.group.role")}:** <@&${group.roleId}>\n**${t("modules.configuration.commands.group.permissions")}:**\n${perms}`,
 						)
 						.setColor(Colors.Blue)
 						.setTimestamp();
@@ -238,7 +287,9 @@ export default class GroupCommand extends BaseCommand {
 		} catch (error: any) {
 			await InteractionHelper.respondError(
 				interaction,
-				`Failed to list groups: ${error.message}`,
+				t("modules.configuration.commands.group.list_failed", {
+					error: error.message,
+				}),
 			);
 		}
 	}

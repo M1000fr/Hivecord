@@ -3,7 +3,10 @@ import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { HeatpointService } from "@modules/Security/services/HeatpointService";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import {
 	ChatInputCommandInteraction,
 	Client,
@@ -17,6 +20,9 @@ export default class SecurityCommand extends BaseCommand {
 	@DefaultCommand(EPermission.SecurityHeatpoint)
 	@BotPermission(PermissionsBitField.Flags.ModerateMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const subcommandGroup = interaction.options.getSubcommandGroup();
 		const subcommand = interaction.options.getSubcommand();
 
@@ -26,7 +32,13 @@ export default class SecurityCommand extends BaseCommand {
 				const heat = await HeatpointService.getHeat(`user:${user.id}`);
 
 				await interaction.reply({
-					content: `🔥 **Heatpoints for ${user.tag}**: ${Math.round(heat)}`,
+					content: t(
+						"modules.security.commands.security.heatpoints_user",
+						{
+							user: user.tag,
+							heat: Math.round(heat),
+						},
+					),
 					flags: [MessageFlags.Ephemeral],
 				});
 			} else if (subcommand === "reset") {
@@ -37,7 +49,9 @@ export default class SecurityCommand extends BaseCommand {
 				if (target === "all_users") {
 					await HeatpointService.resetAllUserHeat();
 					await interaction.reply({
-						content: "✅ Reset heatpoints for all users.",
+						content: t(
+							"modules.security.commands.security.reset_all_users",
+						),
 						flags: [MessageFlags.Ephemeral],
 					});
 				} else if (target === "channel") {
@@ -49,19 +63,26 @@ export default class SecurityCommand extends BaseCommand {
 							`channel:${channel.id}`,
 						);
 						await interaction.reply({
-							content: `✅ Reset heatpoints for channel ${channel.toString()}.`,
+							content: t(
+								"modules.security.commands.security.reset_channel",
+								{ channel: channel.toString() },
+							),
 							flags: [MessageFlags.Ephemeral],
 						});
 					} else {
 						await interaction.reply({
-							content: "❌ Channel not found.",
+							content: t(
+								"modules.security.commands.security.channel_not_found",
+							),
 							flags: [MessageFlags.Ephemeral],
 						});
 					}
 				} else if (target === "server") {
 					await HeatpointService.resetHeat(`global:${guild.id}`);
 					await interaction.reply({
-						content: "✅ Reset global server heatpoints.",
+						content: t(
+							"modules.security.commands.security.reset_server",
+						),
 						flags: [MessageFlags.Ephemeral],
 					});
 				}

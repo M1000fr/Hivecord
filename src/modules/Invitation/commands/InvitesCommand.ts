@@ -2,6 +2,9 @@ import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import {
 	ApplicationCommandOptionType,
 	ChatInputCommandInteraction,
@@ -37,27 +40,34 @@ import { InvitationService } from "../services/InvitationService";
 export default class InvitesCommand extends BaseCommand {
 	@Subcommand({ name: "view", permission: EPermission.Invites })
 	async view(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const targetUser =
 			interaction.options.getUser("user") || interaction.user;
 
 		const counts = await InvitationService.getInviteCounts(targetUser.id);
 
 		const embed = new EmbedBuilder()
-			.setTitle(`Invites for ${targetUser.username}`)
+			.setTitle(
+				t("modules.invitation.commands.view.title", {
+					username: targetUser.username,
+				}),
+			)
 			.setColor("#0099ff")
 			.addFields(
 				{
-					name: "Active",
+					name: t("modules.invitation.commands.view.active"),
 					value: counts.active.toString(),
 					inline: true,
 				},
 				{
-					name: "Fake (Left)",
+					name: t("modules.invitation.commands.view.fake"),
 					value: counts.fake.toString(),
 					inline: true,
 				},
 				{
-					name: "Total",
+					name: t("modules.invitation.commands.view.total"),
 					value: (counts.active + counts.fake).toString(),
 					inline: true,
 				},
@@ -69,18 +79,21 @@ export default class InvitesCommand extends BaseCommand {
 
 	@Subcommand({ name: "top", permission: EPermission.Invites })
 	async top(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const leaderboard = await InvitationService.getLeaderboard(10);
 
 		if (leaderboard.length === 0) {
 			await interaction.reply({
-				content: "No invitations found.",
+				content: t("modules.invitation.commands.top.no_invites"),
 				ephemeral: true,
 			});
 			return;
 		}
 
 		const embed = new EmbedBuilder()
-			.setTitle("🏆 Invites Leaderboard")
+			.setTitle(t("modules.invitation.commands.top.title"))
 			.setColor("#FFD700")
 			.setDescription(
 				leaderboard
@@ -97,7 +110,7 @@ export default class InvitesCommand extends BaseCommand {
 					})
 					.join("\n"),
 			)
-			.setFooter({ text: "Sorted by active invites" })
+			.setFooter({ text: t("modules.invitation.commands.top.footer") })
 			.setTimestamp();
 
 		await interaction.reply({ embeds: [embed] });

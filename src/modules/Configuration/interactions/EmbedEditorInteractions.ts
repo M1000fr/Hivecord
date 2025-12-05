@@ -1,5 +1,7 @@
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { EmbedService } from "@modules/Configuration/services/EmbedService";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
 import {
 	type ButtonInteraction,
 	EmbedBuilder,
@@ -44,13 +46,15 @@ export class EmbedEditorInteractions {
 	}
 
 	private async updateEditorMessage(interaction: any, session: any) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
 		const embed = new EmbedBuilder(session.data);
 		await interaction.update({
 			content: `**Embed Editor**: Editing \`${session.name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
 			embeds: [embed],
 			components: [
-				EmbedEditorUtils.getMainMenu(),
-				EmbedEditorUtils.getControlButtons(),
+				EmbedEditorUtils.getMainMenu(lng),
+				EmbedEditorUtils.getControlButtons(lng),
 			],
 		});
 	}
@@ -60,6 +64,8 @@ export class EmbedEditorInteractions {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
 		const value = interaction.values[0];
 		if (!value) return;
 
@@ -67,8 +73,8 @@ export class EmbedEditorInteractions {
 			// Show fields submenu
 			await interaction.update({
 				components: [
-					EmbedEditorUtils.getFieldsSubMenu(session.data.fields),
-					EmbedEditorUtils.getControlButtons(),
+					EmbedEditorUtils.getFieldsSubMenu(lng, session.data.fields),
+					EmbedEditorUtils.getControlButtons(lng),
 				],
 			});
 			return;
@@ -80,12 +86,12 @@ export class EmbedEditorInteractions {
 			content: `**Embed Editor**: Editing \`${session.name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
 			embeds: [embed],
 			components: [
-				EmbedEditorUtils.getMainMenu(),
-				EmbedEditorUtils.getControlButtons(),
+				EmbedEditorUtils.getMainMenu(lng),
+				EmbedEditorUtils.getControlButtons(lng),
 			],
 		});
 
-		const modal = EmbedEditorUtils.getModal(value, session.data);
+		const modal = EmbedEditorUtils.getModal(lng, value, session.data);
 		await interaction.showModal(modal);
 	}
 
@@ -94,6 +100,8 @@ export class EmbedEditorInteractions {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
 		const value = interaction.values[0];
 		if (!value) return;
 
@@ -106,8 +114,8 @@ export class EmbedEditorInteractions {
 			// Reset the menu selection
 			await interaction.message.edit({
 				components: [
-					EmbedEditorUtils.getFieldsSubMenu(session.data.fields),
-					EmbedEditorUtils.getControlButtons(),
+					EmbedEditorUtils.getFieldsSubMenu(lng, session.data.fields),
+					EmbedEditorUtils.getControlButtons(lng),
 				],
 			});
 
@@ -120,14 +128,14 @@ export class EmbedEditorInteractions {
 				session.userId,
 			);
 
-			const modal = EmbedEditorUtils.getModal("field_add");
+			const modal = EmbedEditorUtils.getModal(lng, "field_add");
 			await interaction.showModal(modal);
 		} else if (value.startsWith("field_edit_")) {
 			// Reset the menu selection
 			await interaction.message.edit({
 				components: [
-					EmbedEditorUtils.getFieldsSubMenu(session.data.fields),
-					EmbedEditorUtils.getControlButtons(),
+					EmbedEditorUtils.getFieldsSubMenu(lng, session.data.fields),
+					EmbedEditorUtils.getControlButtons(lng),
 				],
 			});
 
@@ -143,7 +151,7 @@ export class EmbedEditorInteractions {
 					session.userId,
 				);
 
-				const modal = EmbedEditorUtils.getModal("field_edit", {
+				const modal = EmbedEditorUtils.getModal(lng, "field_edit", {
 					index,
 					field,
 				});

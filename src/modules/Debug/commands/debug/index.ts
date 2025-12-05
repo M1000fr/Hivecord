@@ -5,6 +5,9 @@ import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { OptionRoute } from "@decorators/OptionRoute";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { BotEvents } from "@src/enums/BotEvents";
 import {
 	ApplicationCommandOptionType,
@@ -52,10 +55,13 @@ export default class DebugCommand extends BaseCommand {
 
 	@DefaultCommand(EPermission.Debug)
 	async run(client: LeBotClient<true>, interaction: CommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		if (!interaction.isChatInputCommand()) return;
 
 		await interaction.reply({
-			content: "Unknown debug action.",
+			content: t("modules.debug.commands.debug.unknown_action"),
 			flags: [MessageFlags.Ephemeral],
 		});
 	}
@@ -69,17 +75,20 @@ export default class DebugCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
 			await interaction.reply({
-				content: "Could not find member.",
+				content: t("modules.debug.commands.debug.member_not_found"),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
 		await interaction.reply({
-			content: "Simulating GuildMemberAdd event...",
+			content: t("modules.debug.commands.debug.simulating_join"),
 			flags: [MessageFlags.Ephemeral],
 		});
 
@@ -123,10 +132,13 @@ export default class DebugCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
 			await interaction.reply({
-				content: "Could not find member.",
+				content: t("modules.debug.commands.debug.member_not_found"),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -137,14 +149,14 @@ export default class DebugCommand extends BaseCommand {
 
 		if (!channel) {
 			await interaction.reply({
-				content: "No voice channel found to simulate join.",
+				content: t("modules.debug.commands.debug.no_voice_channel"),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
 		await interaction.reply({
-			content: "Simulating VoiceStateUpdate event (Join)...",
+			content: t("modules.debug.commands.debug.simulating_voice_join"),
 			flags: [MessageFlags.Ephemeral],
 		});
 
@@ -164,10 +176,13 @@ export default class DebugCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
 			await interaction.reply({
-				content: "Could not find member.",
+				content: t("modules.debug.commands.debug.member_not_found"),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -178,14 +193,14 @@ export default class DebugCommand extends BaseCommand {
 
 		if (!channel) {
 			await interaction.reply({
-				content: "No voice channel found to simulate leave.",
+				content: t("modules.debug.commands.debug.no_voice_channel"),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
 		await interaction.reply({
-			content: "Simulating VoiceStateUpdate event (Leave)...",
+			content: t("modules.debug.commands.debug.simulating_voice_leave"),
 			flags: [MessageFlags.Ephemeral],
 		});
 
@@ -205,10 +220,13 @@ export default class DebugCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
 			await interaction.reply({
-				content: "Could not find member.",
+				content: t("modules.debug.commands.debug.member_not_found"),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -221,14 +239,14 @@ export default class DebugCommand extends BaseCommand {
 
 		if (!channel1 || !channel2 || channel1.id === channel2.id) {
 			await interaction.reply({
-				content: "Need at least 2 voice channels to simulate move.",
+				content: t("modules.debug.commands.debug.need_two_channels"),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
 		await interaction.reply({
-			content: "Simulating VoiceStateUpdate event (Move)...",
+			content: t("modules.debug.commands.debug.simulating_voice_move"),
 			flags: [MessageFlags.Ephemeral],
 		});
 
@@ -248,10 +266,13 @@ export default class DebugCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
 			await interaction.reply({
-				content: "Could not find member.",
+				content: t("modules.debug.commands.debug.member_not_found"),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -262,14 +283,14 @@ export default class DebugCommand extends BaseCommand {
 
 		if (!channel) {
 			await interaction.reply({
-				content: "No voice channel found to simulate stream.",
+				content: t("modules.debug.commands.debug.no_voice_channel"),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
 		await interaction.reply({
-			content: "Simulating VoiceStateUpdate event (Stream Start)...",
+			content: t("modules.debug.commands.debug.simulating_voice_stream"),
 			flags: [MessageFlags.Ephemeral],
 		});
 

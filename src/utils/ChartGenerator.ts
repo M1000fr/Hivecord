@@ -19,6 +19,10 @@ export class ChartGenerator {
 		timeRange: { start: Date; end: Date },
 		width = 800,
 		height = 400,
+		labels: { voice: string; messages: string } = {
+			voice: "Voice Time (min)",
+			messages: "Messages",
+		},
 	): Buffer {
 		const canvas = createCanvas(width, height);
 		const ctx = canvas.getContext("2d");
@@ -239,12 +243,12 @@ export class ChartGenerator {
 		ctx.fillStyle = "#FFFFFF";
 		ctx.font = "14px Arial";
 		ctx.textAlign = "left";
-		ctx.fillText("Temps vocal (min)", padding + 20, 32);
+		ctx.fillText(labels.voice, padding + 20, 32);
 
 		ctx.fillStyle = "#57F287";
 		ctx.fillRect(padding + 180, 20, 15, 15);
 		ctx.fillStyle = "#FFFFFF";
-		ctx.fillText("Messages", padding + 200, 32);
+		ctx.fillText(labels.messages, padding + 200, 32);
 
 		return canvas.toBuffer("image/png");
 	}
@@ -366,7 +370,7 @@ export class ChartGenerator {
 	}
 
 	// Format number with thousands separator
-	static formatNumber(num: number): string {
-		return num.toLocaleString("fr-FR");
+	static formatNumber(num: number, locale = "en-US"): string {
+		return num.toLocaleString(locale);
 	}
 }

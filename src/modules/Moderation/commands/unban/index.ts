@@ -3,7 +3,10 @@ import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { SanctionService } from "@modules/Moderation/services/SanctionService";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import {
 	ChatInputCommandInteraction,
 	Client,
@@ -17,18 +20,25 @@ export default class UnbanCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Unban)
 	@BotPermission(PermissionsBitField.Flags.BanMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 
 		if (!interaction.guild) return;
 
 		try {
 			await SanctionService.unban(interaction.guild, user);
-			await interaction.reply(`User ${user.tag} has been unbanned.`);
+			await interaction.reply(
+				t("modules.moderation.commands.unban.success", {
+					user: user.tag,
+				}),
+			);
 		} catch (error: any) {
 			await interaction.reply({
 				content:
 					error.message ||
-					"An error occurred while unbanning the user.",
+					t("modules.moderation.commands.unban.failed"),
 				flags: [MessageFlags.Ephemeral],
 			});
 		}

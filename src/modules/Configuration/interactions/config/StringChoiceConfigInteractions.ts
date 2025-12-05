@@ -1,27 +1,27 @@
 import { EConfigType } from "@decorators/ConfigProperty";
-import { ButtonPattern } from "@decorators/Interaction";
+import { SelectMenuPattern } from "@decorators/Interaction";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
-	ButtonBuilder,
-	type ButtonInteraction,
-	ButtonStyle,
 	MessageFlags,
+	StringSelectMenuBuilder,
+	StringSelectMenuOptionBuilder,
+	type StringSelectMenuInteraction,
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
-export class BooleanConfigInteractions extends BaseConfigInteractions {
-	@ButtonPattern("module_config_bool:*")
-	async handleBooleanButton(interaction: ButtonInteraction) {
+export class StringChoiceConfigInteractions extends BaseConfigInteractions {
+	@SelectMenuPattern("module_config_choice:*")
+	async handleChoiceSelection(interaction: StringSelectMenuInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts } = ctx;
 		const moduleName = parts[1];
 		const propertyKey = parts[2];
-		const value = parts[3];
+		const value = interaction.values[0];
 
 		if (moduleName && propertyKey && value) {
 			await this.updateConfig(
@@ -30,7 +30,7 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 				moduleName,
 				propertyKey,
 				value,
-				EConfigType.Boolean,
+				EConfigType.StringChoice,
 			);
 		}
 	}
@@ -49,6 +49,7 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 			propertyOptions.type,
 			t,
 			propertyOptions.defaultValue,
+			propertyOptions,
 		);
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,
@@ -57,34 +58,32 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 			t,
 		);
 
-		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			this.createConfigButton(
-				"module_config_bool",
-				moduleName,
-				selectedProperty,
-				interaction.user.id,
-				"Enable",
-				ButtonStyle.Success,
-				["true"],
-			),
-			this.createConfigButton(
-				"module_config_bool",
-				moduleName,
-				selectedProperty,
-				interaction.user.id,
-				"Disable",
-				ButtonStyle.Danger,
-				["false"],
-			),
-			this.createConfigButton(
-				"module_config_clear",
-				moduleName,
-				selectedProperty,
-				interaction.user.id,
-				"Clear",
-				ButtonStyle.Secondary,
-			),
-		);
+		const choices = propertyOptions.choices || [];
+		const selectMenu = new StringSelectMenuBuilder()
+			.setCustomId(
+				ConfigHelper.buildCustomId([
+					"module_config_choice",
+					moduleName,
+					selectedProperty,
+					interaction.user.id,
+				]),
+			)
+			.setPlaceholder(t("utils.config_helper.select_placeholder"))
+			.addOptions(
+				choices.map((choice: any) => {
+					const label =
+						choice.nameLocalizations?.[lng] || choice.name;
+					return new StringSelectMenuOptionBuilder()
+						.setLabel(label)
+						.setValue(choice.value)
+						.setDefault(currentValue === choice.value); // This might not work if currentValue is formatted
+				}),
+			);
+
+		const row =
+			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+				selectMenu,
+			);
 
 		await interaction.reply({
 			embeds: [embed],

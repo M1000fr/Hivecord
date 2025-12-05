@@ -4,9 +4,12 @@ import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
 import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { SanctionType } from "@prisma/client/client";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
@@ -17,6 +20,12 @@ import { warnOptions } from "./options";
 @Command({
 	name: "warn",
 	description: "Warn a user",
+	nameLocalizations: {
+		fr: "avertir",
+	},
+	descriptionLocalizations: {
+		fr: "Avertir un utilisateur",
+	},
 	options: warnOptions,
 })
 export default class WarnCommand extends BaseCommand {
@@ -46,6 +55,9 @@ export default class WarnCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: ChatInputCommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 		const reason = interaction.options.getString("reason", true);
 		const moderator = interaction.user;
@@ -61,10 +73,17 @@ export default class WarnCommand extends BaseCommand {
 				moderator,
 				reason,
 			);
-			await interaction.editReply(`✅ Warned ${user.tag} for: ${reason}`);
+			await interaction.editReply(
+				t("modules.moderation.commands.warn.success", {
+					user: user.tag,
+					reason,
+				}),
+			);
 		} catch (error: any) {
 			await interaction.editReply(
-				`❌ Failed to warn user: ${error.message}`,
+				t("modules.moderation.commands.warn.failed_with_error", {
+					error: error.message,
+				}),
 			);
 		}
 	}

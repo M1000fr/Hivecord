@@ -5,6 +5,9 @@ import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
 import { OptionRoute } from "@decorators/OptionRoute";
 import { EPermission } from "@enums/EPermission";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
 	AutocompleteInteraction,
@@ -21,8 +24,18 @@ export default class SyncCommand extends BaseCommand {
 		client: LeBotClient,
 		interaction: AutocompleteInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const focusedValue = interaction.options.getFocused().toLowerCase();
-		const targets = [{ name: "Welcome Roles", value: "welcome-roles" }];
+		const targets = [
+			{
+				name: t(
+					"modules.general.commands.sync.autocomplete.welcome_roles",
+				),
+				value: "welcome-roles",
+			},
+		];
 
 		const filtered = targets.filter((t) =>
 			t.name.toLowerCase().includes(focusedValue),
@@ -41,6 +54,9 @@ export default class SyncCommand extends BaseCommand {
 		client: LeBotClient,
 		interaction: ChatInputCommandInteraction,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		await InteractionHelper.defer(interaction);
 
 		try {
@@ -48,7 +64,7 @@ export default class SyncCommand extends BaseCommand {
 			if (state.isRunning) {
 				await InteractionHelper.respondError(
 					interaction,
-					"A synchronization is already in progress.",
+					t("modules.general.commands.sync.in_progress"),
 				);
 				return;
 			}
@@ -56,12 +72,12 @@ export default class SyncCommand extends BaseCommand {
 			await WelcomeRoleSyncService.start(client as LeBotClient<true>);
 			await InteractionHelper.respondSuccess(
 				interaction,
-				"Welcome roles synchronization started.",
+				t("modules.general.commands.sync.started"),
 			);
 		} catch (error) {
 			await InteractionHelper.respondError(
 				interaction,
-				"Failed to start synchronization.",
+				t("modules.general.commands.sync.failed"),
 			);
 		}
 	}

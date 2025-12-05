@@ -1,6 +1,8 @@
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { LogService } from "@modules/Log/services/LogService";
 import { VoiceConfigKeys } from "@modules/Voice/VoiceConfig";
 import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
 import {
@@ -29,6 +31,10 @@ interface UserToggleResult {
 
 export class TempVoiceService {
 	private static logger = new Logger("TempVoiceService");
+
+	private static async getLanguage(): Promise<string> {
+		return (await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+	}
 
 	private static async fetchGuildMember(
 		guild: any,
@@ -343,43 +349,76 @@ export class TempVoiceService {
 
 		if (!tempChannel) return null;
 
+		const lng = await this.getLanguage();
+
 		const allowedUsers =
 			tempChannel.AllowedUsers.length > 0
 				? tempChannel.AllowedUsers.map((u) => `<@${u.userId}>`).join(
 						", ",
 					)
-				: "None";
+				: I18nService.t(
+						"modules.voice.interface.fields.whitelist.none",
+						{
+							lng,
+						},
+					);
 
 		const blockedUsers =
 			tempChannel.BlockedUsers.length > 0
 				? tempChannel.BlockedUsers.map((u) => `<@${u.userId}>`).join(
 						", ",
 					)
-				: "None";
+				: I18nService.t(
+						"modules.voice.interface.fields.blacklist.none",
+						{
+							lng,
+						},
+					);
 
 		return new EmbedBuilder()
-			.setTitle("Channel Management Interface")
+			.setTitle(I18nService.t("modules.voice.interface.title", { lng }))
 			.setDescription(
-				`Welcome to your temporary channel <@${tempChannel.ownerId}>.\nUse the buttons below to configure your channel.`,
+				I18nService.t("modules.voice.interface.description", {
+					lng,
+					user: `<@${tempChannel.ownerId}>`,
+				}),
 			)
 			.setColor("#0099ff")
 			.addFields(
 				{
-					name: "Information",
-					value: `📝 Name : ${channel.name}\n👥 Limit : ${
-						channel.userLimit === 0
-							? "Unlimited"
-							: channel.userLimit
-					}`,
+					name: I18nService.t(
+						"modules.voice.interface.fields.info.name",
+						{ lng },
+					),
+					value: I18nService.t(
+						"modules.voice.interface.fields.info.value",
+						{
+							lng,
+							name: channel.name,
+							limit:
+								channel.userLimit === 0
+									? I18nService.t(
+											"modules.voice.interface.fields.info.unlimited",
+											{ lng },
+										)
+									: channel.userLimit,
+						},
+					),
 					inline: false,
 				},
 				{
-					name: "Whitelist",
+					name: I18nService.t(
+						"modules.voice.interface.fields.whitelist.name",
+						{ lng },
+					),
 					value: allowedUsers,
 					inline: true,
 				},
 				{
-					name: "Blacklist",
+					name: I18nService.t(
+						"modules.voice.interface.fields.blacklist.name",
+						{ lng },
+					),
 					value: blockedUsers,
 					inline: true,
 				},

@@ -1,5 +1,8 @@
 import { EConfigType } from "@decorators/ConfigProperty";
 import { SelectMenuPattern } from "@decorators/Interaction";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
@@ -119,9 +122,13 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		moduleName: string,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const currentValue = await ConfigHelper.getCurrentValue(
 			selectedProperty,
 			propertyOptions.type,
+			t,
 			propertyOptions.defaultValue,
 		);
 
@@ -135,6 +142,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			propertyOptions,
 			selectedProperty,
 			currentValue,
+			t,
 		);
 		const component = this.buildSelectComponent(
 			propertyOptions.type,

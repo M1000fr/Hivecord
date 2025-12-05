@@ -1,13 +1,19 @@
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { LogService } from "@modules/Log/services/LogService";
 import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
 import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
 import { Guild, GuildMember, User } from "discord.js";
 
 export class SanctionService {
 	private static logger = new Logger("SanctionService");
+
+	private static async getLanguage(): Promise<string> {
+		return (await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+	}
 
 	private static async fetchMember(
 		guild: Guild,
@@ -35,14 +41,24 @@ export class SanctionService {
 			ModerationConfigKeys.muteRoleId,
 		);
 		if (!muteRoleId) {
+			const lng = await this.getLanguage();
 			throw new Error(
-				"Mute role is not configured. Please ask an administrator to configure it using `/modules module:Moderation`.",
+				I18nService.t(
+					"modules.moderation.services.sanction.mute_role_not_configured",
+					{ lng },
+				),
 			);
 		}
 
 		const muteRole = guild.roles.cache.get(muteRoleId);
 		if (!muteRole) {
-			throw new Error("Configured mute role not found in this guild.");
+			const lng = await this.getLanguage();
+			throw new Error(
+				I18nService.t(
+					"modules.moderation.services.sanction.mute_role_not_found",
+					{ lng },
+				),
+			);
 		}
 		return muteRole;
 	}
@@ -87,13 +103,31 @@ export class SanctionService {
 		reason: string,
 	): Promise<void> {
 		const member = await this.fetchMember(guild, targetUser.id);
-		if (!member) throw new Error("User not found in this guild.");
-		if (!member.moderatable) throw new Error("I cannot mute this user.");
+		const lng = await this.getLanguage();
+		if (!member)
+			throw new Error(
+				I18nService.t(
+					"modules.moderation.services.sanction.user_not_found",
+					{ lng },
+				),
+			);
+		if (!member.moderatable)
+			throw new Error(
+				I18nService.t(
+					"modules.moderation.services.sanction.cannot_mute",
+					{ lng },
+				),
+			);
 
 		const muteRole = await this.getMuteRole(guild);
 
 		if (member.roles.cache.has(muteRole.id)) {
-			throw new Error("User is already muted.");
+			throw new Error(
+				I18nService.t(
+					"modules.moderation.services.sanction.already_muted",
+					{ lng },
+				),
+			);
 		}
 
 		this.logger.log(
@@ -115,7 +149,12 @@ export class SanctionService {
 
 		await this.sendDM(
 			targetUser,
-			`You have been temporarily \`muted\` in \`${guild.name}\` for \`${durationString}\`.\nReason: \`${reason}\``,
+			I18nService.t("modules.moderation.services.sanction.dm.mute", {
+				lng,
+				guild: guild.name,
+				duration: durationString,
+				reason,
+			}),
 		);
 
 		await member.roles.add(muteRole);
@@ -151,15 +190,32 @@ export class SanctionService {
 			},
 		});
 
-		if (activeBan) throw new Error("User is already banned.");
+		const lng = await this.getLanguage();
+
+		if (activeBan)
+			throw new Error(
+				I18nService.t(
+					"modules.moderation.services.sanction.already_banned",
+					{ lng },
+				),
+			);
 
 		const member = await this.fetchMember(guild, targetUser.id);
 		if (member && !member.bannable)
-			throw new Error("I cannot ban this user.");
+			throw new Error(
+				I18nService.t(
+					"modules.moderation.services.sanction.cannot_ban",
+					{ lng },
+				),
+			);
 
 		await this.sendDM(
 			targetUser,
-			`You have been banned from \`${guild.name}\`.\nReason: \`${reason}\``,
+			I18nService.t("modules.moderation.services.sanction.dm.ban", {
+				lng,
+				guild: guild.name,
+				reason,
+			}),
 		);
 		await guild.members.ban(targetUser, { reason, deleteMessageSeconds });
 		await this.logSanction(targetUser, moderator, SanctionType.BAN, reason);
@@ -178,9 +234,14 @@ export class SanctionService {
 		moderator: User,
 		reason: string,
 	): Promise<void> {
+		const lng = await this.getLanguage();
 		await this.sendDM(
 			targetUser,
-			`You have been \`warned\` in \`${guild.name}\`.\nReason: \`${reason}\``,
+			I18nService.t("modules.moderation.services.sanction.dm.warn", {
+				lng,
+				guild: guild.name,
+				reason,
+			}),
 		);
 		await this.logSanction(
 			targetUser,
@@ -206,18 +267,29 @@ export class SanctionService {
 		const sanction = await prismaClient.sanction.findUnique({
 			where: { id: warnId },
 		});
+		const lng = await this.getLanguage();
 		if (
 			!sanction ||
 			sanction.userId !== targetUser.id ||
 			sanction.type !== SanctionType.WARN
 		) {
-			throw new Error("Invalid warning ID.");
+			throw new Error(
+				I18nService.t(
+					"modules.moderation.services.sanction.invalid_warn_id",
+					{ lng },
+				),
+			);
 		}
 
 		await this.deleteSanctionById(warnId);
 		await this.sendDM(
 			targetUser,
-			`Your warning \`#${warnId}\` has been removed in \`${guild.name}\`.\nWarn reason: \`${sanction.reason}\``,
+			I18nService.t("modules.moderation.services.sanction.dm.unwarn", {
+				lng,
+				guild: guild.name,
+				warnId,
+				reason: sanction.reason,
+			}),
 		);
 		await LogService.logSanction(
 			guild,
@@ -230,25 +302,46 @@ export class SanctionService {
 
 	static async unmute(guild: Guild, targetUser: User): Promise<void> {
 		const member = await this.fetchMember(guild, targetUser.id);
-		if (!member) throw new Error("User not found in this guild.");
+		const lng = await this.getLanguage();
+		if (!member)
+			throw new Error(
+				I18nService.t(
+					"modules.moderation.services.sanction.user_not_found",
+					{ lng },
+				),
+			);
 
 		const muteRole = await this.getMuteRole(guild);
 		if (!member.roles.cache.has(muteRole.id))
-			throw new Error("User is not muted.");
+			throw new Error(
+				I18nService.t(
+					"modules.moderation.services.sanction.not_muted",
+					{ lng },
+				),
+			);
 
 		await this.sendDM(
 			targetUser,
-			`You have been \`unmuted\` in \`${guild.name}\`.`,
+			I18nService.t("modules.moderation.services.sanction.dm.unmute", {
+				lng,
+				guild: guild.name,
+			}),
 		);
 		await member.roles.remove(muteRole);
 		await this.deactivateSanction(targetUser.id, SanctionType.MUTE);
 	}
 
 	static async unban(guild: Guild, targetUser: User): Promise<void> {
+		const lng = await this.getLanguage();
 		try {
 			await guild.bans.fetch(targetUser.id);
 		} catch {
-			throw new Error("User is not banned.");
+			throw new Error(
+				I18nService.t(
+					"modules.moderation.services.sanction.not_banned",
+					{ lng },
+				),
+			);
 		}
 
 		await guild.members.unban(targetUser);
