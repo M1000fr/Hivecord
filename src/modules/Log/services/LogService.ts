@@ -1,5 +1,7 @@
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { LogConfigKeys } from "@modules/Log/LogConfig";
 import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import {
 	type ColorResolvable,
 	Colors,
@@ -33,6 +35,10 @@ export class LogService {
 		return value === "true";
 	}
 
+	private static async getLanguage(): Promise<string> {
+		return (await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+	}
+
 	static async logSanction(
 		guild: Guild,
 		target: User,
@@ -45,27 +51,36 @@ export class LogService {
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 
+		const lng = await this.getLanguage();
+
 		const embed = new EmbedBuilder()
-			.setTitle(`Sanction: ${type}`)
+			.setTitle(
+				I18nService.t("modules.log.sanction.title", { lng, type }),
+			)
 			.setColor(Colors.Red)
 			.addFields(
 				{
-					name: "User",
+					name: I18nService.t("modules.log.sanction.user", { lng }),
 					value: `${target.tag} (${target.id})`,
 					inline: true,
 				},
 				{
-					name: "Moderator",
+					name: I18nService.t("modules.log.sanction.moderator", {
+						lng,
+					}),
 					value: `${moderator.tag} (${moderator.id})`,
 					inline: true,
 				},
-				{ name: "Reason", value: reason },
+				{
+					name: I18nService.t("modules.log.sanction.reason", { lng }),
+					value: reason,
+				},
 			)
 			.setTimestamp();
 
 		if (duration) {
 			embed.addFields({
-				name: "Duration",
+				name: I18nService.t("modules.log.sanction.duration", { lng }),
 				value: duration,
 				inline: true,
 			});
@@ -84,8 +99,12 @@ export class LogService {
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 
+		const lng = await this.getLanguage();
+
 		const embed = new EmbedBuilder()
-			.setTitle(`Temp Voice: ${action}`)
+			.setTitle(
+				I18nService.t("modules.log.temp_voice.title", { lng, action }),
+			)
 			.setColor(Colors.Blue)
 			.setDescription(details)
 			.setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
@@ -99,14 +118,23 @@ export class LogService {
 		const channel = await this.getLogChannel(member.guild);
 		if (!channel) return;
 
+		const lng = await this.getLanguage();
+
 		const embed = new EmbedBuilder()
-			.setTitle("Member Joined")
+			.setTitle(I18nService.t("modules.log.member.join.title", { lng }))
 			.setColor(Colors.Green)
 			.setThumbnail(member.user.displayAvatarURL())
 			.addFields(
-				{ name: "User", value: `${member.user.tag} (${member.id})` },
 				{
-					name: "Created At",
+					name: I18nService.t("modules.log.member.join.user", {
+						lng,
+					}),
+					value: `${member.user.tag} (${member.id})`,
+				},
+				{
+					name: I18nService.t("modules.log.member.join.created_at", {
+						lng,
+					}),
 					value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`,
 				},
 			)
@@ -120,20 +148,28 @@ export class LogService {
 		const channel = await this.getLogChannel(member.guild);
 		if (!channel) return;
 
+		const lng = await this.getLanguage();
+
 		const embed = new EmbedBuilder()
-			.setTitle("Member Left")
+			.setTitle(I18nService.t("modules.log.member.leave.title", { lng }))
 			.setColor(Colors.Orange)
 			.setThumbnail(member.user?.displayAvatarURL() ?? "")
 			.addFields(
 				{
-					name: "User",
-					value: `${member.user?.tag ?? "Unknown"} (${member.id})`,
+					name: I18nService.t("modules.log.member.leave.user", {
+						lng,
+					}),
+					value: `${member.user?.tag ?? I18nService.t("modules.log.member.leave.unknown", { lng })} (${member.id})`,
 				},
 				{
-					name: "Joined At",
+					name: I18nService.t("modules.log.member.leave.joined_at", {
+						lng,
+					}),
 					value: member.joinedTimestamp
 						? `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`
-						: "Unknown",
+						: I18nService.t("modules.log.member.leave.unknown", {
+								lng,
+							}),
 				},
 			)
 			.setTimestamp();
@@ -151,13 +187,33 @@ export class LogService {
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 
+		const lng = await this.getLanguage();
+
 		const embed = new EmbedBuilder()
-			.setTitle("Message Edited")
+			.setTitle(I18nService.t("modules.log.message.edit.title", { lng }))
 			.setColor(Colors.Yellow)
 			.setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
 			.addFields(
-				{ name: "Before", value: before || "*Empty Message*" },
-				{ name: "After", value: after || "*Empty Message*" },
+				{
+					name: I18nService.t("modules.log.message.edit.before", {
+						lng,
+					}),
+					value:
+						before ||
+						I18nService.t("modules.log.message.edit.empty", {
+							lng,
+						}),
+				},
+				{
+					name: I18nService.t("modules.log.message.edit.after", {
+						lng,
+					}),
+					value:
+						after ||
+						I18nService.t("modules.log.message.edit.empty", {
+							lng,
+						}),
+				},
 			)
 			.setTimestamp();
 
@@ -169,13 +225,22 @@ export class LogService {
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 
+		const lng = await this.getLanguage();
+
 		const embed = new EmbedBuilder()
-			.setTitle("Role Created")
+			.setTitle(I18nService.t("modules.log.role.create.title", { lng }))
 			.setColor(Colors.Green)
 			.addFields(
-				{ name: "Role", value: `<@&${role.id}>` },
 				{
-					name: "Color",
+					name: I18nService.t("modules.log.role.create.role", {
+						lng,
+					}),
+					value: `<@&${role.id}>`,
+				},
+				{
+					name: I18nService.t("modules.log.role.create.color", {
+						lng,
+					}),
 					value: `#${role.colors.primaryColor.toString(16).padStart(6, "0")}`,
 				},
 			)
@@ -193,10 +258,19 @@ export class LogService {
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 		const changes: string[] = [];
+		const lng = await this.getLanguage();
 
-		const checkChange = (field: string, before: any, after: any) => {
+		const checkChange = (fieldKey: string, before: any, after: any) => {
 			if (before !== after) {
-				changes.push(`**${field}**: \`${before}\` ➔ \`${after}\``);
+				const field = I18nService.t(fieldKey, { lng });
+				changes.push(
+					I18nService.t("modules.log.role.update.field_change", {
+						lng,
+						field,
+						before,
+						after,
+					}),
+				);
 			}
 		};
 
@@ -210,40 +284,68 @@ export class LogService {
 			(perm) => !newPermissions.includes(perm),
 		);
 
-		checkChange("Name", roleBefore.name, roleAfter.name);
 		checkChange(
-			"Color",
+			"modules.log.role.update.fields.name",
+			roleBefore.name,
+			roleAfter.name,
+		);
+		checkChange(
+			"modules.log.role.update.fields.color",
 			`#${roleBefore.colors.primaryColor.toString(16).padStart(6, "0")}`,
 			`#${roleAfter.colors.primaryColor.toString(16).padStart(6, "0")}`,
 		);
-		checkChange("Hoist", roleBefore.hoist, roleAfter.hoist);
-		checkChange("Position", roleBefore.position, roleAfter.position);
 		checkChange(
-			"Mentionable",
+			"modules.log.role.update.fields.hoist",
+			roleBefore.hoist,
+			roleAfter.hoist,
+		);
+		checkChange(
+			"modules.log.role.update.fields.position",
+			roleBefore.position,
+			roleAfter.position,
+		);
+		checkChange(
+			"modules.log.role.update.fields.mentionable",
 			roleBefore.mentionable,
 			roleAfter.mentionable,
 		);
 
 		if (addedPermissions.length > 0) {
 			changes.push(
-				`**Added Permissions**: \`${addedPermissions.join(", ")}\``,
+				I18nService.t("modules.log.role.update.added_perms", {
+					lng,
+					perms: addedPermissions.join(", "),
+				}),
 			);
 		}
 
 		if (removedPermissions.length > 0) {
 			changes.push(
-				`**Removed Permissions**: \`${removedPermissions.join(", ")}\``,
+				I18nService.t("modules.log.role.update.removed_perms", {
+					lng,
+					perms: removedPermissions.join(", "),
+				}),
 			);
 		}
 
 		if (changes.length === 0) return; // No changes detected
 
 		const embed = new EmbedBuilder()
-			.setTitle("Role Updated")
+			.setTitle(I18nService.t("modules.log.role.update.title", { lng }))
 			.setColor(Colors.Yellow)
 			.addFields(
-				{ name: "Role", value: `<@&${roleAfter.id}>` },
-				{ name: "Changes", value: changes.join("\n") },
+				{
+					name: I18nService.t("modules.log.role.update.role", {
+						lng,
+					}),
+					value: `<@&${roleAfter.id}>`,
+				},
+				{
+					name: I18nService.t("modules.log.role.update.changes", {
+						lng,
+					}),
+					value: changes.join("\n"),
+				},
 			)
 			.setTimestamp();
 
@@ -255,13 +357,22 @@ export class LogService {
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 
+		const lng = await this.getLanguage();
+
 		const embed = new EmbedBuilder()
-			.setTitle("Role Created")
+			.setTitle(I18nService.t("modules.log.role.delete.title", { lng }))
 			.setColor(Colors.Green)
 			.addFields(
-				{ name: "Role", value: `<@&${role.id}>` },
 				{
-					name: "Color",
+					name: I18nService.t("modules.log.role.delete.role", {
+						lng,
+					}),
+					value: `<@&${role.id}>`,
+				},
+				{
+					name: I18nService.t("modules.log.role.delete.color", {
+						lng,
+					}),
 					value: `#${role.colors.primaryColor.toString(16).padStart(6, "0")}`,
 				},
 			)
@@ -279,36 +390,64 @@ export class LogService {
 		const member = newState.member;
 		if (!member) return;
 
+		const lng = await this.getLanguage();
+
 		let action = "";
 		let color: ColorResolvable = Colors.Grey;
 		let details = "";
 
 		if (!oldState.channelId && newState.channelId) {
-			action = "Connected";
+			action = I18nService.t("modules.log.voice.connected", { lng });
 			color = Colors.Green;
-			details = `Connected to <#${newState.channelId}>`;
+			details = I18nService.t("modules.log.voice.details.connected", {
+				lng,
+				channel: `<#${newState.channelId}>`,
+			});
 		} else if (oldState.channelId && !newState.channelId) {
-			action = "Disconnected";
+			action = I18nService.t("modules.log.voice.disconnected", { lng });
 			color = Colors.Red;
-			details = `Disconnected from <#${oldState.channelId}>`;
+			details = I18nService.t("modules.log.voice.details.disconnected", {
+				lng,
+				channel: `<#${oldState.channelId}>`,
+			});
 		} else if (oldState.channelId !== newState.channelId) {
-			action = "Moved";
+			action = I18nService.t("modules.log.voice.moved", { lng });
 			color = Colors.Yellow;
-			details = `Moved from <#${oldState.channelId}> to <#${newState.channelId}>`;
+			details = I18nService.t("modules.log.voice.details.moved", {
+				lng,
+				old: `<#${oldState.channelId}>`,
+				new: `<#${newState.channelId}>`,
+			});
 		} else if (!oldState.streaming && newState.streaming) {
-			action = "Started Streaming";
+			action = I18nService.t("modules.log.voice.started_streaming", {
+				lng,
+			});
 			color = Colors.Purple;
-			details = `Started streaming in <#${newState.channelId}>`;
+			details = I18nService.t(
+				"modules.log.voice.details.started_streaming",
+				{
+					lng,
+					channel: `<#${newState.channelId}>`,
+				},
+			);
 		} else if (oldState.streaming && !newState.streaming) {
-			action = "Stopped Streaming";
+			action = I18nService.t("modules.log.voice.stopped_streaming", {
+				lng,
+			});
 			color = Colors.Grey;
-			details = `Stopped streaming in <#${newState.channelId}>`;
+			details = I18nService.t(
+				"modules.log.voice.details.stopped_streaming",
+				{
+					lng,
+					channel: `<#${newState.channelId}>`,
+				},
+			);
 		} else {
 			return; // Ignore other updates (mute/deafen)
 		}
 
 		const embed = new EmbedBuilder()
-			.setTitle(`Voice: ${action}`)
+			.setTitle(I18nService.t("modules.log.voice.title", { lng, action }))
 			.setColor(color)
 			.setDescription(details)
 			.setAuthor({
@@ -331,29 +470,43 @@ export class LogService {
 		const channel = await this.getLogChannel(newMessage.guild!);
 		if (!channel) return;
 
+		const lng = await this.getLanguage();
+
 		const embed = new EmbedBuilder()
-			.setTitle("Message Edited")
+			.setTitle(I18nService.t("modules.log.message.edit.title", { lng }))
 			.setColor(Colors.Yellow)
 			.setAuthor({
 				name: newMessage.author?.tag ?? "Unknown User",
 				iconURL: newMessage.author?.displayAvatarURL(),
 			})
 			.setDescription(
-				`Message edited in <#${newMessage.channelId}> [Jump to message](${newMessage.url})`,
+				I18nService.t("modules.log.message.edit.description", {
+					lng,
+					channel: `<#${newMessage.channelId}>`,
+					url: newMessage.url,
+				}),
 			)
 			.addFields(
 				{
-					name: "Before",
+					name: I18nService.t("modules.log.message.edit.before", {
+						lng,
+					}),
 					value:
 						oldMessage.content?.substring(0, 1024) ||
-						"*No content*",
+						I18nService.t("modules.log.message.edit.no_content", {
+							lng,
+						}),
 					inline: true,
 				},
 				{
-					name: "After",
+					name: I18nService.t("modules.log.message.edit.after", {
+						lng,
+					}),
 					value:
 						newMessage.content?.substring(0, 1024) ||
-						"*No content*",
+						I18nService.t("modules.log.message.edit.no_content", {
+							lng,
+						}),
 					inline: true,
 				},
 			)
@@ -369,23 +522,40 @@ export class LogService {
 		const channel = await this.getLogChannel(message.guild!);
 		if (!channel) return;
 
+		const lng = await this.getLanguage();
+
 		const embed = new EmbedBuilder()
-			.setTitle("Message Deleted")
+			.setTitle(
+				I18nService.t("modules.log.message.delete.title", { lng }),
+			)
 			.setColor(Colors.Red)
 			.setAuthor({
 				name: message.author?.tag ?? "Unknown User",
 				iconURL: message.author?.displayAvatarURL(),
 			})
-			.setDescription(`Message deleted in <#${message.channelId}>`)
+			.setDescription(
+				I18nService.t("modules.log.message.delete.description", {
+					lng,
+					channel: `<#${message.channelId}>`,
+				}),
+			)
 			.addFields({
-				name: "Content",
-				value: message.content?.substring(0, 1024) || "*No content*",
+				name: I18nService.t("modules.log.message.delete.content", {
+					lng,
+				}),
+				value:
+					message.content?.substring(0, 1024) ||
+					I18nService.t("modules.log.message.edit.no_content", {
+						lng,
+					}),
 			})
 			.setTimestamp();
 
 		if (message.attachments.size > 0) {
 			embed.addFields({
-				name: "Attachments",
+				name: I18nService.t("modules.log.message.delete.attachments", {
+					lng,
+				}),
 				value: `${message.attachments.size} attachment(s)`,
 			});
 		}
