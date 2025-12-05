@@ -1,5 +1,8 @@
 import { ButtonPattern } from "@decorators/Interaction";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { StatsService } from "@modules/Statistics/services/StatsService";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { ChartGenerator } from "@utils/ChartGenerator";
 import {
 	ActionRowBuilder,
@@ -17,6 +20,9 @@ export class StatsPeriodInteractions {
 	async handleStatsPeriodButton(
 		interaction: ButtonInteraction,
 	): Promise<void> {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const customId = interaction.customId;
 
 		// stats:period:<range>:<scope>:<targetId>:<invokerId>
@@ -31,7 +37,9 @@ export class StatsPeriodInteractions {
 		// Restrict interaction to original invoker
 		if (interaction.user.id !== invokerId) {
 			await interaction.reply({
-				content: "❌ Tu ne peux pas utiliser ces boutons.",
+				content: t(
+					"modules.statistics.interactions.period.not_allowed",
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -39,7 +47,9 @@ export class StatsPeriodInteractions {
 
 		if (!interaction.guild) {
 			await interaction.reply({
-				content: "❌ Contexte serveur requis.",
+				content: t(
+					"modules.statistics.interactions.period.server_only",
+				),
 				flags: [MessageFlags.Ephemeral],
 			});
 			return;
@@ -52,7 +62,9 @@ export class StatsPeriodInteractions {
 				const guildId = targetId;
 				if (guildId !== interaction.guild.id) {
 					await interaction.reply({
-						content: "❌ Serveur invalide.",
+						content: t(
+							"modules.statistics.interactions.period.invalid_server",
+						),
 						flags: [MessageFlags.Ephemeral],
 					});
 					return;
@@ -77,36 +89,43 @@ export class StatsPeriodInteractions {
 				const statsCardBuffer = ChartGenerator.generateStatsCard(
 					[
 						{
-							label: "Messages totaux",
+							label: t(
+								"modules.statistics.common.total_messages",
+							),
 							value: ChartGenerator.formatNumber(
 								serverStats.totalMessages,
+								lng,
 							),
 							color: "#57F287",
 						},
 						{
-							label: "Temps vocal total",
+							label: t(
+								"modules.statistics.common.total_voice_time",
+							),
 							value: ChartGenerator.formatDuration(
 								serverStats.totalVoiceDuration,
 							),
 							color: "#5865F2",
 						},
 						{
-							label: "Utilisateurs actifs",
+							label: t("modules.statistics.common.active_users"),
 							value: serverStats.activeUsers.toString(),
 							color: "#FEE75C",
 						},
 						{
-							label: "Membres rejoints",
+							label: t(
+								"modules.statistics.common.members_joined",
+							),
 							value: serverStats.joinCount.toString(),
 							color: "#57F287",
 						},
 						{
-							label: "Membres partis",
+							label: t("modules.statistics.common.members_left"),
 							value: serverStats.leaveCount.toString(),
 							color: "#ED4245",
 						},
 					],
-					"Statistiques du serveur",
+					t("modules.statistics.commands.stats.server_stats_title"),
 					500,
 					350,
 				);
@@ -115,9 +134,16 @@ export class StatsPeriodInteractions {
 					name: "server_stats.png",
 				});
 				const embed = new EmbedBuilder()
-					.setTitle(`📊 Statistiques de ${interaction.guild.name}`)
+					.setTitle(
+						t(
+							"modules.statistics.commands.stats.server_stats_embed_title",
+							{
+								guild: interaction.guild.name,
+							},
+						),
+					)
 					.setDescription(
-						`Période: ${StatsCommand.getPeriodLabel(period)}`,
+						`${t("modules.statistics.common.period")}: ${StatsCommand.getPeriodLabel(period, lng)}`,
 					)
 					.setColor("#5865F2")
 					.setImage("attachment://server_stats.png")
@@ -131,7 +157,9 @@ export class StatsPeriodInteractions {
 						)
 						.join("\n");
 					embed.addFields({
-						name: "🎤 Top utilisateurs (vocal)",
+						name: t(
+							"modules.statistics.commands.stats.top_users_voice",
+						),
 						value: voiceLeaderboard,
 						inline: true,
 					});
@@ -140,11 +168,13 @@ export class StatsPeriodInteractions {
 					const messageLeaderboard = topMessageUsers
 						.map(
 							(u, i) =>
-								`${i + 1}. <@${u.userId}>: ${ChartGenerator.formatNumber(u.totalMessages)} msg`,
+								`${i + 1}. <@${u.userId}>: ${ChartGenerator.formatNumber(u.totalMessages, lng)} msg`,
 						)
 						.join("\n");
 					embed.addFields({
-						name: "💬 Top utilisateurs (messages)",
+						name: t(
+							"modules.statistics.commands.stats.top_users_msg",
+						),
 						value: messageLeaderboard,
 						inline: true,
 					});
@@ -154,6 +184,7 @@ export class StatsPeriodInteractions {
 						.map((c, i) => {
 							const msgs = ChartGenerator.formatNumber(
 								c.messageCount,
+								lng,
 							);
 							const voice = ChartGenerator.formatDuration(
 								c.voiceDuration,
@@ -162,7 +193,9 @@ export class StatsPeriodInteractions {
 						})
 						.join("\n");
 					embed.addFields({
-						name: "📍 Salons les plus actifs",
+						name: t(
+							"modules.statistics.commands.stats.top_channels",
+						),
 						value: channelLeaderboard,
 					});
 				}
@@ -200,6 +233,10 @@ export class StatsPeriodInteractions {
 					timeRange,
 					800,
 					400,
+					{
+						voice: t("modules.statistics.common.voice_time_min"),
+						messages: t("modules.statistics.common.messages"),
+					},
 				);
 
 				const chartAttachment = new AttachmentBuilder(chartBuffer, {
@@ -210,25 +247,33 @@ export class StatsPeriodInteractions {
 						await interaction.guild.members
 							.fetch(userId)
 							.catch(() => null)
-					)?.user.username || "Utilisateur";
+					)?.user.username || t("common.user");
 				const embed = new EmbedBuilder()
-					.setTitle(`📊 Statistiques de ${userName}`)
+					.setTitle(
+						t(
+							"modules.statistics.commands.stats.user_stats_title",
+							{
+								username: userName,
+							},
+						),
+					)
 					.setDescription(
-						`Période: ${StatsCommand.getPeriodLabel(period)}`,
+						`${t("modules.statistics.common.period")}: ${StatsCommand.getPeriodLabel(period, lng)}`,
 					)
 					.setColor("#5865F2")
 					.addFields(
 						{
-							name: "🎤 Temps vocal",
+							name: t("modules.statistics.common.voice_time"),
 							value: ChartGenerator.formatDuration(
 								voiceStats.totalDuration,
 							),
 							inline: true,
 						},
 						{
-							name: "💬 Messages",
+							name: t("modules.statistics.common.messages"),
 							value: ChartGenerator.formatNumber(
 								messageStats.totalMessages,
+								lng,
 							),
 							inline: true,
 						},
@@ -244,10 +289,13 @@ export class StatsPeriodInteractions {
 						.map((c) => `<#${c.channelId}>: ${c.count} messages`)
 						.join("\n");
 					embed.addFields({
-						name: "📝 Salons les plus actifs (messages)",
-						value: topChannels || "Aucun",
+						name: t(
+							"modules.statistics.commands.stats.top_channels_msg",
+						),
+						value: topChannels || t("common.none"),
 					});
 				}
+
 				if (voiceStats.channelBreakdown.length > 0) {
 					const topVoiceChannels = voiceStats.channelBreakdown
 						.sort((a, b) => b.duration - a.duration)
@@ -258,8 +306,10 @@ export class StatsPeriodInteractions {
 						)
 						.join("\n");
 					embed.addFields({
-						name: "🎙️ Salons vocaux les plus utilisés",
-						value: topVoiceChannels || "Aucun",
+						name: t(
+							"modules.statistics.commands.stats.top_channels_voice",
+						),
+						value: topVoiceChannels || t("common.none"),
 					});
 				}
 
@@ -280,12 +330,16 @@ export class StatsPeriodInteractions {
 			console.error("Error updating stats period:", error);
 			if (interaction.deferred || interaction.replied) {
 				await interaction.followUp({
-					content: "Erreur lors de la mise à jour des statistiques.",
+					content: t(
+						"modules.statistics.interactions.period.update_error",
+					),
 					flags: [MessageFlags.Ephemeral],
 				});
 			} else {
 				await interaction.reply({
-					content: "Erreur lors de la mise à jour des statistiques.",
+					content: t(
+						"modules.statistics.interactions.period.update_error",
+					),
 					flags: [MessageFlags.Ephemeral],
 				});
 			}
