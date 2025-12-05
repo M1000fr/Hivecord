@@ -1,6 +1,6 @@
 export class DurationParser {
 	static parse(duration: string): number | null {
-		const regex = /^(\d+)([smhd])$/;
+		const regex = /^(\d+)([smhdwMy])$/;
 		const match = duration.match(regex);
 
 		if (!match) return null;
