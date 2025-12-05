@@ -380,7 +380,7 @@ export class TempVoiceService {
 			.setDescription(
 				I18nService.t("modules.voice.interface.description", {
 					lng,
-					user: `<@${tempChannel.ownerId}>`,
+					owner: `<@${tempChannel.ownerId}>`,
 				}),
 			)
 			.setColor("#0099ff")

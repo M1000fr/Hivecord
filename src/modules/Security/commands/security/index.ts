@@ -36,7 +36,7 @@ export default class SecurityCommand extends BaseCommand {
 						"modules.security.commands.security.heatpoints_user",
 						{
 							userTag: user.tag,
-							heat: Math.round(heat),
+							heatpoints: Math.round(heat),
 						},
 					),
 					flags: [MessageFlags.Ephemeral],
