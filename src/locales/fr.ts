@@ -5,8 +5,32 @@ export default {
 		no_reason: "Aucune raison fournie",
 		cancel: "Annuler",
 		confirm: "Confirmer",
+		yes: "Oui",
+		no: "Non",
+		none: "Aucun",
 	},
 	modules: {
+		debug: {
+			commands: {
+				debug: {
+					description: "Commande de débogage",
+					options: {
+						action: {
+							description: "Action à effectuer",
+							choices: {
+								throw_error: "Générer une erreur",
+								test_embed: "Tester l'embed",
+							},
+						},
+					},
+					success: "Action de débogage exécutée avec succès",
+					error_thrown: "Erreur générée !",
+					embed_title: "Embed de débogage",
+					embed_description: "Ceci est un embed de débogage",
+					unknown_action: "Action inconnue",
+				},
+			},
+		},
 		general: {
 			commands: {
 				ping: {
@@ -63,9 +87,21 @@ export default {
 			},
 			commands: {
 				ban: {
+					description: "Bannir un utilisateur",
 					success:
 						"L'utilisateur {{userTag}} a été banni. Raison : {{reason}}",
 					error: "Une erreur est survenue lors du bannissement de l'utilisateur.",
+				},
+				kick: {
+					description: "Expulser un utilisateur",
+				},
+				mute: {
+					description: "Rendre un utilisateur muet",
+				},
+				warn: {
+					description: "Avertir un utilisateur",
+					success: "✅ {{userTag}} averti pour : {{reason}}",
+					error: "❌ Échec de l'avertissement de l'utilisateur : {{error}}",
 				},
 				clear: {
 					invalid_amount:
@@ -87,19 +123,32 @@ export default {
 					renewed: "Le salon a été renouvelé.",
 				},
 				sanctions: {
-					list: {
-						no_sanctions:
-							"Aucune sanction trouvée pour {{userTag}}.",
-						title: "Sanctions pour {{userTag}}",
-						footer: "Page {{page}}/{{totalPages}} • Total : {{total}}",
-						unknown_moderator: "Inconnu",
-						status_active: "Statut : ✅",
-						status_inactive: "Statut : ❌",
-						expires: "Expire le {{date}}",
-						permanent: "Permanent",
-						field_value:
-							"**Raison :** {{reason}}\n**Modérateur :** {{moderator}}{{statusInfo}}",
-					},
+					no_sanctions: "Aucune sanction trouvée pour {{userTag}}.",
+					title: "Sanctions pour {{userTag}}",
+					unknown: "Inconnu",
+					status: "Statut",
+					expires: "Expire {{time}}",
+					permanent: "Permanent",
+					reason: "Raison",
+					moderator: "Modérateur",
+					edit_provide_field: "Veuillez fournir un champ à modifier.",
+					reason_added: "Raison ajoutée",
+					reason_added_desc:
+						"Raison `{{text}}` ajoutée pour le type `{{type}}`.",
+					id: "ID",
+					duration: "Durée",
+					reason_add_failed: "Échec de l'ajout de la raison.",
+					reason_not_found: "Raison #{{id}} introuvable.",
+					cannot_edit_system:
+						"Impossible de modifier les raisons système.",
+					reason_updated: "Raison #{{id}} mise à jour.",
+					reason_update_failed:
+						"Échec de la mise à jour de la raison #{{id}}.",
+					reason_removed: "Raison #{{id}} supprimée.",
+					reason_remove_failed:
+						"Échec de la suppression de la raison #{{id}}.",
+					no_reasons_found: "Aucune raison trouvée.",
+					reasons_title: "Raisons de sanction",
 				},
 				tempmute: {
 					predefined_reason_error:
@@ -132,10 +181,6 @@ export default {
 						"✅ Avertissement #{{warnId}} supprimé pour {{userTag}}.",
 					error: "❌ Échec de la suppression de l'avertissement : {{error}}",
 				},
-				warn: {
-					success: "✅ {{userTag}} averti pour : {{reason}}",
-					error: "❌ Échec de l'avertissement de l'utilisateur : {{error}}",
-				},
 			},
 		},
 		security: {
@@ -158,6 +203,26 @@ export default {
 				stats: {
 					title: "📊 Statistiques de {{name}}",
 					period: "Période : {{period}}",
+					joined_at: "Rejoint le",
+					created_at: "Créé le",
+					roles: "Rôles",
+					key_permissions: "Permissions Clés",
+					messages: "Messages",
+					voice_time: "Temps Vocal",
+					invites: "Invitations",
+					sanctions: "Sanctions",
+					footer: "ID Utilisateur : {{id}}",
+					permissions: {
+						administrator: "Administrateur",
+						manage_guild: "Gérer le serveur",
+						manage_roles: "Gérer les rôles",
+						manage_channels: "Gérer les salons",
+						kick_members: "Expulser des membres",
+						ban_members: "Bannir des membres",
+						manage_messages: "Gérer les messages",
+						mention_everyone: "Mentionner Everyone",
+						view_audit_log: "Voir les logs d'audit",
+					},
 				},
 			},
 		},
@@ -187,6 +252,7 @@ export default {
 				rename_label: "Nouveau nom",
 				rename_title: "Renommer le salon",
 				renamed: "Salon <#{{channelId}}> renommé en {{newName}}",
+				rename_success: "Salon renommé avec succès",
 			},
 		},
 		configuration: {
@@ -251,6 +317,7 @@ export default {
 					no_groups: "Aucun groupe trouvé.",
 					list_title: "Liste des groupes ({{page}}/{{totalPages}})",
 					list_error: "Échec de la liste des groupes : {{error}}",
+					list_failed: "Échec de la liste des groupes",
 				},
 			},
 			interactions: {

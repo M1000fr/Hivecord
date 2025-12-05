@@ -5,8 +5,32 @@ export default {
 		no_reason: "No reason provided",
 		cancel: "Cancel",
 		confirm: "Confirm",
+		yes: "Yes",
+		no: "No",
+		none: "None",
 	},
 	modules: {
+		debug: {
+			commands: {
+				debug: {
+					description: "Debug command",
+					options: {
+						action: {
+							description: "Action to perform",
+							choices: {
+								throw_error: "Throw Error",
+								test_embed: "Test Embed",
+							},
+						},
+					},
+					success: "Debug action executed successfully",
+					error_thrown: "Error thrown!",
+					embed_title: "Debug Embed",
+					embed_description: "This is a debug embed",
+					unknown_action: "Unknown action",
+				},
+			},
+		},
 		general: {
 			commands: {
 				ping: {
@@ -63,9 +87,21 @@ export default {
 			},
 			commands: {
 				ban: {
+					description: "Ban a user",
 					success:
 						"User {{userTag}} has been banned. Reason: {{reason}}",
 					error: "An error occurred while banning the user.",
+				},
+				kick: {
+					description: "Kick a user",
+				},
+				mute: {
+					description: "Mute a user",
+				},
+				warn: {
+					description: "Warn a user",
+					success: "✅ Warned {{userTag}} for: {{reason}}",
+					error: "❌ Failed to warn user: {{error}}",
 				},
 				clear: {
 					invalid_amount:
@@ -86,18 +122,29 @@ export default {
 					renewed: "Channel has been renewed.",
 				},
 				sanctions: {
-					list: {
-						no_sanctions: "No sanctions found for {{userTag}}.",
-						title: "Sanctions for {{userTag}}",
-						footer: "Page {{page}}/{{totalPages}} • Total: {{total}}",
-						unknown_moderator: "Unknown",
-						status_active: "Status: ✅",
-						status_inactive: "Status: ❌",
-						expires: "Expires {{date}}",
-						permanent: "Permanent",
-						field_value:
-							"**Reason:** {{reason}}\n**Moderator:** {{moderator}}{{statusInfo}}",
-					},
+					no_sanctions: "No sanctions found for {{userTag}}.",
+					title: "Sanctions for {{userTag}}",
+					unknown: "Unknown",
+					status: "Status",
+					expires: "Expires {{time}}",
+					permanent: "Permanent",
+					reason: "Reason",
+					moderator: "Moderator",
+					edit_provide_field: "Please provide a field to edit.",
+					reason_added: "Reason Added",
+					reason_added_desc:
+						"Added reason `{{text}}` for type `{{type}}`.",
+					id: "ID",
+					duration: "Duration",
+					reason_add_failed: "Failed to add reason.",
+					reason_not_found: "Reason #{{id}} not found.",
+					cannot_edit_system: "Cannot edit system reasons.",
+					reason_updated: "Reason #{{id}} updated.",
+					reason_update_failed: "Failed to update reason #{{id}}.",
+					reason_removed: "Reason #{{id}} removed.",
+					reason_remove_failed: "Failed to remove reason #{{id}}.",
+					no_reasons_found: "No reasons found.",
+					reasons_title: "Sanction Reasons",
 				},
 				tempmute: {
 					predefined_reason_error:
@@ -128,10 +175,6 @@ export default {
 					success: "✅ Removed warning #{{warnId}} for {{userTag}}.",
 					error: "❌ Failed to unwarn user: {{error}}",
 				},
-				warn: {
-					success: "✅ Warned {{userTag}} for: {{reason}}",
-					error: "❌ Failed to warn user: {{error}}",
-				},
 			},
 		},
 		security: {
@@ -151,6 +194,26 @@ export default {
 				stats: {
 					title: "📊 Statistics for {{name}}",
 					period: "Period: {{period}}",
+					joined_at: "Joined At",
+					created_at: "Created At",
+					roles: "Roles",
+					key_permissions: "Key Permissions",
+					messages: "Messages",
+					voice_time: "Voice Time",
+					invites: "Invites",
+					sanctions: "Sanctions",
+					footer: "User ID: {{id}}",
+					permissions: {
+						administrator: "Administrator",
+						manage_guild: "Manage Server",
+						manage_roles: "Manage Roles",
+						manage_channels: "Manage Channels",
+						kick_members: "Kick Members",
+						ban_members: "Ban Members",
+						manage_messages: "Manage Messages",
+						mention_everyone: "Mention Everyone",
+						view_audit_log: "View Audit Log",
+					},
 				},
 			},
 		},
@@ -180,6 +243,7 @@ export default {
 				rename_label: "New name",
 				rename_title: "Rename channel",
 				renamed: "Renamed <#{{channelId}}> to {{newName}}",
+				rename_success: "Channel renamed successfully",
 			},
 		},
 		configuration: {
@@ -240,6 +304,7 @@ export default {
 					no_groups: "No groups found.",
 					list_title: "Group List ({{page}}/{{totalPages}})",
 					list_error: "Failed to list groups: {{error}}",
+					list_failed: "Failed to list groups",
 				},
 			},
 			interactions: {
