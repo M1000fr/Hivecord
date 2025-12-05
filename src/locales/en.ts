@@ -1,4 +1,4 @@
-export const en = {
+export default {
 	common: {
 		error: "An error occurred.",
 		success: "Success!",
