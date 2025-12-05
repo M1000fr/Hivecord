@@ -1,0 +1,484 @@
+{
+	"common": {
+		"pagination": {
+			"page_info": "Page {{page}}/{{total}}"
+		},
+		"user": "Utilisateur",
+		"no_reason": "Aucune raison fournie",
+		"none": "Aucun"
+	},
+	"modules": {
+		"configuration": {
+			"commands": {
+				"config": {
+					"restore_failed": "Échec de la restauration de la configuration.",
+					"restore_success": "Configuration restaurée avec succès.",
+					"backup_success": "Sauvegarde créée avec succès !",
+					"backup_failed": "Échec de la création de la sauvegarde.",
+					"invalid_file": "Type de fichier invalide. Veuillez télécharger un fichier .enc."
+				},
+				"embed": {
+					"deleted": "Embed supprimé.",
+					"list": "Liste des embeds",
+					"new_embed_desc": "Description du nouvel embed",
+					"new_embed_title": "Nouvel Embed",
+					"preview": "Aperçu",
+					"editor_intro": "Éditeur d'embed pour `{{name}}`",
+					"not_found": "❌ Embed `{{name}}` introuvable."
+				},
+				"group": {
+					"create_failed": "Échec de la création du groupe.",
+					"delete_failed": "Échec de la suppression du groupe.",
+					"group": "Groupe",
+					"permission_add_failed": "Échec de l'ajout de la permission.",
+					"permission_remove_failed": "Échec de la suppression de la permission.",
+					"permissions": "Permissions",
+					"role": "Rôle",
+					"created": "Groupe créé",
+					"deleted": "Groupe `{{name}}` supprimé.",
+					"permission_added": "Permission ajoutée",
+					"permission_removed": "Permission supprimée",
+					"no_groups": "Aucun groupe trouvé.",
+					"list_title": "Liste des groupes ({{page}}/{{totalPages}})",
+					"list_failed": "Échec de la liste des groupes"
+				},
+				"modules": {
+					"build_failed": "Échec de la construction de la configuration du module.",
+					"not_found": "Module **{{module}}** introuvable.",
+					"no_config": "Le module **{{module}}** n'a pas d'options de configuration."
+				},
+				"backup": {},
+				"restore": {}
+			},
+			"utils": {
+				"embed_editor": {
+					"buttons": {
+						"cancel": "Annuler",
+						"save": "Sauvegarder"
+					},
+					"fields": {
+						"add": {
+							"description": "Ajouter un nouveau champ",
+							"label": "Ajouter un champ"
+						},
+						"back": {
+							"description": "Retour",
+							"label": "Retour"
+						},
+						"edit": {
+							"description": "Modifier ce champ",
+							"label": "Modifier"
+						},
+						"placeholder": "Sélectionnez une action de champ...",
+						"remove": {
+							"description": "Supprimer ce champ",
+							"label": "Supprimer"
+						}
+					},
+					"menu": {
+						"author": {
+							"description": "Modifier l'auteur",
+							"label": "Auteur"
+						},
+						"color": {
+							"description": "Modifier la couleur",
+							"label": "Couleur"
+						},
+						"description": {
+							"description": "Modifier la description",
+							"label": "Description"
+						},
+						"fields": {
+							"description": "Modifier les champs",
+							"label": "Champs"
+						},
+						"footer": {
+							"description": "Modifier le pied de page",
+							"label": "Pied de page"
+						},
+						"images": {
+							"description": "Modifier les images",
+							"label": "Images"
+						},
+						"placeholder": "Sélectionnez un élément à modifier...",
+						"title_url": {
+							"description": "Modifier le titre et l'URL",
+							"label": "Titre & URL"
+						}
+					},
+					"modals": {
+						"author": {
+							"icon_label": "URL de l'icône",
+							"name_label": "Nom",
+							"title": "Modifier l'auteur"
+						},
+						"color": {
+							"label": "Couleur (Hex)",
+							"placeholder": "#FFFFFF",
+							"title": "Modifier la couleur"
+						},
+						"description": {
+							"label": "Description",
+							"title": "Modifier la description"
+						},
+						"field": {
+							"inline_label": "En ligne (true/false)",
+							"name_label": "Nom",
+							"title": "Modifier le champ",
+							"value_label": "Valeur"
+						},
+						"footer": {
+							"icon_label": "URL de l'icône",
+							"text_label": "Texte",
+							"title": "Modifier le pied de page"
+						},
+						"images": {
+							"image_label": "URL de l'image",
+							"image_placeholder": "https://...",
+							"thumbnail_label": "URL de la miniature",
+							"title": "Modifier les images"
+						},
+						"title": {
+							"label": "Titre",
+							"title": "Modifier le titre",
+							"url_label": "URL"
+						}
+					}
+				}
+			},
+			"services": {
+				"group": {
+					"not_found": "Groupe {{name}} introuvable"
+				},
+				"permission": {
+					"not_found": "Permission {{name}} introuvable"
+				}
+			},
+			"interactions": {
+				"embed_editor": {}
+			},
+			"helper": {}
+		},
+		"debug": {
+			"commands": {
+				"debug": {
+					"member_not_found": "Membre introuvable.",
+					"need_two_channels": "Besoin d'au moins deux salons vocaux.",
+					"no_voice_channel": "Aucun salon vocal trouvé.",
+					"simulating_join": "Simulation d'arrivée de membre...",
+					"simulating_voice_join": "Simulation de connexion vocale...",
+					"simulating_voice_leave": "Simulation de déconnexion vocale...",
+					"simulating_voice_move": "Simulation de déplacement vocal...",
+					"simulating_voice_stream": "Simulation de stream vocal...",
+					"options": {
+						"action": {
+							"choices": {}
+						}
+					},
+					"unknown_action": "Action inconnue"
+				}
+			}
+		},
+		"moderation": {
+			"commands": {
+				"tempmute": {
+					"failed": "Échec du tempmute de l'utilisateur.",
+					"select_predefined_reason": "Sélectionnez une raison prédéfinie",
+					"invalid_duration": "Format de durée invalide. Utilisez un format comme 10m, 1h, 1d.",
+					"success": "L'utilisateur {{userTag}} a été rendu muet pour {{duration}}. Raison : {{reason}}"
+				},
+				"unban": {
+					"failed": "Échec du débannissement de l'utilisateur.",
+					"success": "L'utilisateur {{userTag}} a été débanni."
+				},
+				"unlock": {
+					"admin_required": "Permission Administrateur requise.",
+					"cannot_unlock_channel": "Impossible de déverrouiller ce salon.",
+					"default_reason": "Aucune raison fournie.",
+					"channel_success": "🔓 Salon déverrouillé. Raison : {{reason}}",
+					"server_success": "✅ **SERVEUR DÉVERROUILLÉ**. Raison : {{reason}}"
+				},
+				"unmute": {
+					"failed": "Échec du rétablissement de la voix de l'utilisateur.",
+					"success": "L'utilisateur {{userTag}} n'est plus muet."
+				},
+				"unwarn": {
+					"failed_with_error": "Échec de la suppression de l'avertissement : {{error}}",
+					"success": "✅ Avertissement #{{warnId}} supprimé pour {{userTag}}."
+				},
+				"warn": {
+					"failed_with_error": "Échec de l'avertissement de l'utilisateur : {{error}}",
+					"success": "✅ {{userTag}} averti pour : {{reason}}"
+				},
+				"ban": {
+					"success": "L'utilisateur {{userTag}} a été banni. Raison : {{reason}}",
+					"error": "Une erreur est survenue lors du bannissement de l'utilisateur."
+				},
+				"kick": {},
+				"mute": {},
+				"clear": {
+					"invalid_amount": "Veuillez fournir un nombre valide de messages à supprimer.",
+					"success": "{{count}} messages supprimés."
+				},
+				"lock": {
+					"channel_error": "Ce salon ne peut pas être verrouillé.",
+					"channel_success": "🔒 Salon verrouillé. Raison : {{reason}}",
+					"server_admin_error": "Vous avez besoin de la permission Administrateur pour verrouiller le serveur.",
+					"server_success": "🚨 **SERVEUR VERROUILLÉ**. Raison : {{reason}}"
+				},
+				"purge": {
+					"text_channel_only": "Cette commande ne peut être utilisée que dans les salons textuels.",
+					"purging": "Purge du salon...",
+					"renewed": "Le salon a été renouvelé."
+				},
+				"sanctions": {
+					"no_sanctions": "Aucune sanction trouvée pour {{userTag}}.",
+					"title": "Sanctions pour {{userTag}}",
+					"unknown": "Inconnu",
+					"status": "Statut",
+					"expires": "Expire {{time}}",
+					"permanent": "Permanent",
+					"reason": "Raison",
+					"moderator": "Modérateur",
+					"edit_provide_field": "Veuillez fournir un champ à modifier.",
+					"reason_added": "Raison ajoutée",
+					"reason_added_desc": "Raison `{{text}}` ajoutée pour le type `{{type}}`.",
+					"id": "ID",
+					"duration": "Durée",
+					"reason_add_failed": "Échec de l'ajout de la raison.",
+					"reason_not_found": "Raison #{{id}} introuvable.",
+					"cannot_edit_system": "Impossible de modifier les raisons système.",
+					"reason_updated": "Raison #{{id}} mise à jour.",
+					"reason_update_failed": "Échec de la mise à jour de la raison #{{id}}.",
+					"reason_removed": "Raison #{{id}} supprimée.",
+					"reason_remove_failed": "Échec de la suppression de la raison #{{id}}.",
+					"no_reasons_found": "Aucune raison trouvée.",
+					"reasons_title": "Raisons de sanction"
+				}
+			},
+			"services": {
+				"sanction": {
+					"mute_role_not_configured": "Le rôle muet n'est pas configuré. Veuillez demander à un administrateur de le configurer.",
+					"mute_role_not_found": "Le rôle muet configuré est introuvable dans ce serveur.",
+					"user_not_found": "Utilisateur introuvable dans ce serveur.",
+					"cannot_mute": "Je ne peux pas rendre cet utilisateur muet.",
+					"already_muted": "L'utilisateur est déjà muet.",
+					"dm": {
+						"mute": "Vous avez été temporairement `rendu muet` dans `{{guild}}` pour `{{duration}}`.\nRaison : `{{reason}}`",
+						"ban": "Vous avez été banni de `{{guild}}`.\nRaison : `{{reason}}`",
+						"warn": "Vous avez reçu un `avertissement` dans `{{guild}}`.\nRaison : `{{reason}}`",
+						"unwarn": "Votre avertissement `#{{warnId}}` a été retiré dans `{{guild}}`.\nRaison de l'avertissement : `{{reason}}`",
+						"unmute": "Vous n'êtes plus `muet` dans `{{guild}}`."
+					},
+					"already_banned": "L'utilisateur est déjà banni.",
+					"cannot_ban": "Je ne peux pas bannir cet utilisateur.",
+					"invalid_warn_id": "ID d'avertissement invalide.",
+					"not_muted": "L'utilisateur n'est pas muet.",
+					"not_banned": "L'utilisateur n'est pas banni."
+				}
+			}
+		},
+		"security": {
+			"commands": {
+				"security": {
+					"channel_not_found": "Salon introuvable.",
+					"heatpoints_user": "Points de chaleur pour {{user}} : {{points}}",
+					"reset_all_users": "Réinitialisation des points de chaleur de tous les utilisateurs.",
+					"reset_channel": "Réinitialisation des points de chaleur du salon.",
+					"reset_server": "Réinitialisation des points de chaleur du serveur."
+				},
+				"heatpoint": {}
+			}
+		},
+		"statistics": {
+			"commands": {
+				"stats": {
+					"server_error": "Erreur lors de la récupération des statistiques du serveur.",
+					"server_only": "Cette commande ne peut être utilisée que dans un serveur.",
+					"server_stats_embed_title": "Statistiques du serveur",
+					"server_stats_title": "Stats Serveur",
+					"top_channels": "Top Salons",
+					"top_channels_msg": "Top Salons (Messages)",
+					"top_channels_voice": "Top Salons (Vocal)",
+					"top_users_msg": "Top Utilisateurs (Messages)",
+					"top_users_voice": "Top Utilisateurs (Vocal)",
+					"user_error": "Erreur lors de la récupération des statistiques de l'utilisateur.",
+					"user_required": "L'utilisateur est requis.",
+					"user_stats_title": "Stats Utilisateur",
+					"permissions": {}
+				}
+			},
+			"common": {
+				"active_users": "Utilisateurs actifs",
+				"members_joined": "Membres rejoints",
+				"members_left": "Membres partis",
+				"messages": "Messages",
+				"period": "Période",
+				"periods": {
+					"24h": "Dernières 24 heures",
+					"30d": "Derniers 30 jours",
+					"7d": "Derniers 7 jours"
+				},
+				"total_messages": "Total Messages",
+				"total_voice_time": "Temps vocal total",
+				"voice_time": "Temps vocal",
+				"voice_time_min": "Temps vocal (min)"
+			},
+			"interactions": {
+				"period": {
+					"invalid_server": "Serveur invalide.",
+					"not_allowed": "Non autorisé.",
+					"server_only": "Serveur uniquement.",
+					"update_error": "Erreur lors de la mise à jour de la période."
+				}
+			}
+		},
+		"general": {
+			"commands": {
+				"ping": {
+					"response": "Pong !"
+				},
+				"sync": {
+					"autocomplete": {
+						"welcome_roles": "Rôles de bienvenue"
+					},
+					"in_progress": "Une synchronisation est déjà en cours.",
+					"started": "Synchronisation des rôles de bienvenue démarrée.",
+					"failed": "Échec du démarrage de la synchronisation."
+				}
+			}
+		},
+		"invitation": {
+			"commands": {
+				"view": {
+					"title": "Invitations pour {{username}}",
+					"active": "Actives",
+					"fake": "Fausses (Quitté)",
+					"total": "Total"
+				},
+				"top": {
+					"no_invites": "Aucune invitation trouvée.",
+					"title": "🏆 Classement des invitations",
+					"footer": "Trié par invitations actives"
+				}
+			}
+		},
+		"voice": {
+			"interface": {
+				"title": "Interface de gestion du salon",
+				"description": "Bienvenue dans votre salon temporaire {{owner}}.\nUtilisez les boutons ci-dessous pour configurer votre salon.",
+				"fields": {
+					"info": {
+						"name": "Informations",
+						"value": "📝 Nom : {{name}}\n👥 Limite : {{limit}}",
+						"unlimited": "Illimité"
+					},
+					"whitelist": {
+						"name": "Liste blanche",
+						"none": "Aucun"
+					},
+					"blacklist": {
+						"name": "Liste noire",
+						"none": "Aucun"
+					}
+				}
+			},
+			"interactions": {
+				"rename": {
+					"label": "Nouveau nom",
+					"title": "Renommer le salon",
+					"success": "Salon renommé avec succès"
+				}
+			}
+		},
+		"log": {
+			"sanction": {
+				"title": "Sanction : {{type}}",
+				"user": "Utilisateur",
+				"moderator": "Modérateur",
+				"reason": "Raison",
+				"duration": "Durée"
+			},
+			"temp_voice": {
+				"title": "Vocal Temporaire : {{action}}"
+			},
+			"voice": {
+				"title": "Vocal : {{action}}",
+				"connected": "Connecté",
+				"disconnected": "Déconnecté",
+				"moved": "Déplacé",
+				"started_streaming": "Stream lancé",
+				"stopped_streaming": "Stream arrêté",
+				"details": {
+					"connected": "Connecté à {{channel}}",
+					"disconnected": "Déconnecté de {{channel}}",
+					"moved": "Déplacé de {{old}} vers {{new}}",
+					"started_streaming": "A commencé à streamer dans {{channel}}",
+					"stopped_streaming": "A arrêté de streamer dans {{channel}}"
+				}
+			},
+			"member": {
+				"join": {
+					"title": "Membre rejoint",
+					"user": "Utilisateur",
+					"created_at": "Créé le"
+				},
+				"leave": {
+					"title": "Membre parti",
+					"user": "Utilisateur",
+					"joined_at": "Rejoint le",
+					"unknown": "Inconnu"
+				}
+			},
+			"message": {
+				"edit": {
+					"title": "Message modifié",
+					"before": "Avant",
+					"after": "Après",
+					"empty": "*Message vide*",
+					"description": "Message modifié dans {{channel}} [Aller au message]({{url}})",
+					"no_content": "*Aucun contenu*"
+				},
+				"delete": {
+					"title": "Message supprimé",
+					"content": "Contenu",
+					"attachments": "Fichiers joints",
+					"description": "Message supprimé dans {{channel}}"
+				}
+			},
+			"role": {
+				"create": {
+					"title": "Rôle créé",
+					"role": "Rôle",
+					"color": "Couleur"
+				},
+				"update": {
+					"title": "Rôle modifié",
+					"role": "Rôle",
+					"changes": "Modifications",
+					"field_change": "**{{field}}** : `{{before}}` ➜ `{{after}}`",
+					"added_perms": "**Permissions ajoutées** : `{{perms}}`",
+					"removed_perms": "**Permissions retirées** : `{{perms}}`",
+					"fields": {}
+				},
+				"delete": {
+					"title": "Rôle supprimé",
+					"role": "Rôle",
+					"color": "Couleur"
+				}
+			}
+		}
+	},
+	"utils": {
+		"config_helper": {
+			"title": "⚙️ Configuration : {{module}}",
+			"description": "Sélectionnez une propriété à configurer pour le module **{{module}}**.",
+			"type": "Type",
+			"current": "Actuel",
+			"not_set": "Non défini",
+			"select_placeholder": "Sélectionnez une propriété...",
+			"types": {},
+			"configure_property": "⚙️ Configurer : {{property}}"
+		}
+	}
+}

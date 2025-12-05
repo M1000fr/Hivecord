@@ -1,6 +1,6 @@
 import i18next from "i18next";
-import { default as en } from "../locales/en";
-import { default as fr } from "../locales/fr";
+import en from "../locales/en.json";
+import fr from "../locales/fr.json";
 
 export class I18nService {
 	static async init() {
