@@ -249,10 +249,12 @@ export default {
 				},
 			},
 			interactions: {
-				rename_label: "Nouveau nom",
-				rename_title: "Renommer le salon",
-				renamed: "Salon <#{{channelId}}> renommé en {{newName}}",
-				rename_success: "Salon renommé avec succès",
+				rename: {
+					label: "Nouveau nom",
+					title: "Renommer le salon",
+					renamed: "Salon <#{{channelId}}> renommé en {{newName}}",
+					success: "Salon renommé avec succès",
+				},
 			},
 		},
 		configuration: {
