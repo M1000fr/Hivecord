@@ -4,7 +4,6 @@ import path from "path";
 const SRC_DIR = path.join(__dirname, "../src");
 const LOCALES_DIR = path.join(__dirname, "../src/locales");
 
-// Regex to match t('key') or I18nService.t('key')
 // Matches single quotes, double quotes, or backticks
 const KEY_REGEX = /\b(?:t|I18nService\.t)\s*\(\s*['"`](.*?)['"`]/g;
 
