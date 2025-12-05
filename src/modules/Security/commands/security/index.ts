@@ -35,7 +35,7 @@ export default class SecurityCommand extends BaseCommand {
 					content: t(
 						"modules.security.commands.security.heatpoints_user",
 						{
-							user: user.tag,
+							userTag: user.tag,
 							heat: Math.round(heat),
 						},
 					),

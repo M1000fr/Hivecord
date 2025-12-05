@@ -100,7 +100,7 @@ export default class TempMuteCommand extends BaseCommand {
 			);
 			await interaction.reply(
 				t("modules.moderation.commands.tempmute.success", {
-					user: user.tag,
+					userTag: user.tag,
 					duration: finalDurationString,
 					reason,
 				}),

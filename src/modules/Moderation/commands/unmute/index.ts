@@ -31,7 +31,7 @@ export default class UnmuteCommand extends BaseCommand {
 			await SanctionService.unmute(interaction.guild, user);
 			await interaction.reply(
 				t("modules.moderation.commands.unmute.success", {
-					user: user.tag,
+					userTag: user.tag,
 				}),
 			);
 		} catch (error: any) {
