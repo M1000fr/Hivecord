@@ -1,5 +1,7 @@
 import { EConfigType } from "@decorators/ConfigProperty";
 import { ButtonPattern, SelectMenuPattern } from "@decorators/Interaction";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
@@ -10,11 +12,13 @@ import { AttachmentConfigInteractions } from "./AttachmentConfigInteractions";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 import { BooleanConfigInteractions } from "./BooleanConfigInteractions";
 import { RoleChannelConfigInteractions } from "./RoleChannelConfigInteractions";
+import { StringChoiceConfigInteractions } from "./StringChoiceConfigInteractions";
 import { StringConfigInteractions } from "./StringConfigInteractions";
 
 export class ModuleConfigInteractions extends BaseConfigInteractions {
 	private static booleanHandler = new BooleanConfigInteractions();
 	private static stringHandler = new StringConfigInteractions();
+	private static stringChoiceHandler = new StringChoiceConfigInteractions();
 	private static roleChannelHandler = new RoleChannelConfigInteractions();
 	private static attachmentHandler = new AttachmentConfigInteractions();
 
@@ -58,10 +62,14 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 			}
 
 			try {
+				const lng =
+					(await ConfigService.get(GeneralConfigKeys.language)) ??
+					"en";
 				const config = await ConfigHelper.buildModuleConfigEmbed(
 					client,
 					moduleName,
 					userId,
+					lng,
 				);
 				if (config && interaction.message) {
 					await interaction.message.edit({
@@ -88,6 +96,13 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 				);
 			} else if (propertyOptions.type === EConfigType.Boolean) {
 				await ModuleConfigInteractions.booleanHandler.show(
+					interaction,
+					propertyOptions,
+					selectedProperty,
+					moduleName,
+				);
+			} else if (propertyOptions.type === EConfigType.StringChoice) {
+				await ModuleConfigInteractions.stringChoiceHandler.show(
 					interaction,
 					propertyOptions,
 					selectedProperty,
@@ -136,10 +151,14 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 
 				const mainMessage = await this.getMainMessage(interaction);
 				if (mainMessage) {
+					const lng =
+						(await ConfigService.get(GeneralConfigKeys.language)) ??
+						"en";
 					const config = await ConfigHelper.buildModuleConfigEmbed(
 						client,
 						moduleName,
 						userId,
+						lng,
 					);
 					if (config) {
 						await mainMessage.edit({

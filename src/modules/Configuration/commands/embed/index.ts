@@ -4,6 +4,9 @@ import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { EmbedService } from "@modules/Configuration/services/EmbedService";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
@@ -35,25 +38,34 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "builder", permission: EPermission.ConfigureModules })
 	async builder(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		let data = await EmbedService.get(name);
 
 		if (!data) {
 			// Default template for new embed
 			data = {
-				title: "New Embed",
-				description: "This is a new embed.",
+				title: t(
+					"modules.configuration.commands.embed.new_embed_title",
+				),
+				description: t(
+					"modules.configuration.commands.embed.new_embed_desc",
+				),
 				color: 0x0099ff,
 			};
 		}
 
 		const embed = new EmbedBuilder(data);
 		await interaction.reply({
-			content: `**Embed Editor**: Editing \`${name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
+			content: t("modules.configuration.commands.embed.editor_intro", {
+				name,
+			}),
 			embeds: [embed],
 			components: [
-				EmbedEditorUtils.getMainMenu(),
-				EmbedEditorUtils.getControlButtons(),
+				EmbedEditorUtils.getMainMenu(lng),
+				EmbedEditorUtils.getControlButtons(lng),
 			],
 		});
 		const response = await interaction.fetchReply();
@@ -70,12 +82,17 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "edit", permission: EPermission.ConfigureModules })
 	async edit(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		const data = await EmbedService.get(name);
 
 		if (!data) {
 			await interaction.reply({
-				content: `❌ Embed \`${name}\` not found.`,
+				content: t("modules.configuration.commands.embed.not_found", {
+					name,
+				}),
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -83,11 +100,13 @@ export default class EmbedCommand extends BaseCommand {
 
 		const embed = new EmbedBuilder(data);
 		await interaction.reply({
-			content: `**Embed Editor**: Editing \`${name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
+			content: t("modules.configuration.commands.embed.editor_intro", {
+				name,
+			}),
 			embeds: [embed],
 			components: [
-				EmbedEditorUtils.getMainMenu(),
-				EmbedEditorUtils.getControlButtons(),
+				EmbedEditorUtils.getMainMenu(lng),
+				EmbedEditorUtils.getControlButtons(lng),
 			],
 		});
 		const response = await interaction.fetchReply();
@@ -104,25 +123,38 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "delete", permission: EPermission.ConfigureModules })
 	async delete(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		await EmbedService.delete(name);
 		await interaction.reply({
-			content: `✅ Embed \`${name}\` deleted.`,
+			content: t("modules.configuration.commands.embed.deleted", {
+				name,
+			}),
 			flags: MessageFlags.Ephemeral,
 		});
 	}
 
 	@Subcommand({ name: "list", permission: EPermission.ConfigureModules })
 	async list(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const embeds = await EmbedService.list();
 		await interaction.reply({
-			content: `**Custom Embeds:**\n${embeds.map((e) => `- \`${e}\``).join("\n") || "None"}`,
+			content: t("modules.configuration.commands.embed.list", {
+				embeds: embeds.map((e) => `- \`${e}\``).join("\n") || "None",
+			}),
 			flags: MessageFlags.Ephemeral,
 		});
 	}
 
 	@Subcommand({ name: "preview", permission: EPermission.ConfigureModules })
 	async preview(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 
 		// Dummy context
@@ -131,14 +163,18 @@ export default class EmbedCommand extends BaseCommand {
 		const embed = await EmbedService.render(name, context);
 		if (!embed) {
 			await interaction.reply({
-				content: `❌ Embed \`${name}\` not found.`,
+				content: t("modules.configuration.commands.embed.not_found", {
+					name,
+				}),
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
 
 		await interaction.reply({
-			content: `**Preview of \`${name}\`:**`,
+			content: t("modules.configuration.commands.embed.preview", {
+				name,
+			}),
 			embeds: [embed],
 			flags: MessageFlags.Ephemeral,
 		});

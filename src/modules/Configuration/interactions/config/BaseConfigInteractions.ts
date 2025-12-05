@@ -1,5 +1,7 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { EConfigType } from "@decorators/ConfigProperty";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
@@ -9,6 +11,7 @@ import {
 	type Message,
 	MessageFlags,
 } from "discord.js";
+import type { TFunction } from "i18next";
 
 export abstract class BaseConfigInteractions {
 	protected async respondToInteraction(
@@ -55,10 +58,14 @@ export abstract class BaseConfigInteractions {
 
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
+				const lng =
+					(await ConfigService.get(GeneralConfigKeys.language)) ??
+					"en";
 				const config = await ConfigHelper.buildModuleConfigEmbed(
 					client,
 					moduleName,
 					interaction.user.id,
+					lng,
 				);
 				if (config) {
 					await mainMessage.edit({
@@ -151,13 +158,16 @@ export abstract class BaseConfigInteractions {
 		propertyOptions: any,
 		selectedProperty: string,
 		currentValue: string,
+		t: TFunction,
 	) {
 		return new EmbedBuilder()
 			.setTitle(
-				`⚙️ Configure: ${propertyOptions.displayName || selectedProperty}`,
+				t("utils.config_helper.configure_property", {
+					property: propertyOptions.displayName || selectedProperty,
+				}),
 			)
 			.setDescription(
-				`${propertyOptions.description}\n\n**Current value:** ${currentValue}`,
+				`${propertyOptions.description}\n\n**${t("utils.config_helper.current")}:** ${currentValue}`,
 			)
 			.setColor("#5865F2")
 			.setTimestamp();

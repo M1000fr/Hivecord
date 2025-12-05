@@ -4,6 +4,9 @@ import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { BackupService } from "@modules/Configuration/services/BackupService";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
 	AttachmentBuilder,
@@ -16,6 +19,9 @@ import { configOptions } from "./configOptions";
 export default class ConfigCommand extends BaseCommand {
 	@Subcommand({ name: "backup", permission: EPermission.ConfigureModules })
 	async backup(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const lebot = client as LeBotClient<true>;
 
 		await InteractionHelper.defer(interaction, true);
@@ -30,20 +36,25 @@ export default class ConfigCommand extends BaseCommand {
 			});
 
 			await interaction.editReply({
-				content: "✅ Configuration backup created successfully!",
+				content: t(
+					"modules.configuration.commands.config.backup_success",
+				),
 				files: [attachment],
 			});
 		} catch (error) {
 			console.error("Backup creation failed:", error);
 			await InteractionHelper.respondError(
 				interaction,
-				"Failed to create backup. Please check the logs for details.",
+				t("modules.configuration.commands.config.backup_failed"),
 			);
 		}
 	}
 
 	@Subcommand({ name: "restore", permission: EPermission.ConfigureModules })
 	async restore(client: Client, interaction: ChatInputCommandInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		await InteractionHelper.defer(interaction, true);
 
 		try {
@@ -52,7 +63,7 @@ export default class ConfigCommand extends BaseCommand {
 			if (!attachment.name.endsWith(".enc")) {
 				await InteractionHelper.respondError(
 					interaction,
-					"Invalid file format. Please provide an encrypted backup file (.enc)",
+					t("modules.configuration.commands.config.invalid_file"),
 				);
 				return;
 			}
@@ -71,14 +82,14 @@ export default class ConfigCommand extends BaseCommand {
 
 			await InteractionHelper.respondSuccess(
 				interaction,
-				"Configuration backup restored successfully! All module configurations have been updated.",
+				t("modules.configuration.commands.config.restore_success"),
 			);
 		} catch (error) {
 			console.error("Backup restoration failed:", error);
 			const errorMessage =
 				error instanceof Error
 					? error.message
-					: "Failed to restore backup. Please check the logs for details.";
+					: t("modules.configuration.commands.config.restore_failed");
 
 			await InteractionHelper.respondError(interaction, errorMessage);
 		}

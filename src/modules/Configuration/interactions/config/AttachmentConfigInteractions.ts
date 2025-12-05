@@ -1,5 +1,8 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { EConfigType } from "@decorators/ConfigProperty";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
@@ -17,15 +20,20 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		moduleName: string,
 	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const currentValue = await ConfigHelper.getCurrentValue(
 			selectedProperty,
 			propertyOptions.type,
+			t,
 			propertyOptions.defaultValue,
 		);
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,
 			selectedProperty,
 			currentValue,
+			t,
 		);
 
 		embed.setDescription(
@@ -98,11 +106,13 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 				const formattedValue = ConfigHelper.formatValue(
 					filePath,
 					EConfigType.Attachment,
+					t,
 				);
 				const newEmbed = this.buildPropertyEmbed(
 					propertyOptions,
 					selectedProperty,
 					formattedValue,
+					t,
 				);
 				newEmbed.setDescription(
 					`${propertyOptions.description}\n\n**Current value:** ${formattedValue}\n\n✅ **File uploaded successfully!**`,

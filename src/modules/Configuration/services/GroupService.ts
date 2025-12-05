@@ -1,13 +1,20 @@
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import type {
 	GroupModel,
 	PermissionModel,
 	RoleModel,
 } from "@prisma/client/models";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 
 export class GroupService {
+	private static async getLanguage(): Promise<string> {
+		return (await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+	}
+
 	private static logger = new Logger("GroupService");
 
 	static async createGroup(
@@ -33,7 +40,16 @@ export class GroupService {
 	static async deleteGroup(name: string): Promise<GroupModel> {
 		const group = await prismaClient.group.findFirst({ where: { name } });
 		if (!group) {
-			throw new Error(`Group ${name} not found`);
+			const lng = await this.getLanguage();
+			throw new Error(
+				I18nService.t(
+					"modules.configuration.services.group.not_found",
+					{
+						lng,
+						name,
+					},
+				),
+			);
 		}
 
 		const redis = RedisService.getInstance();
@@ -52,14 +68,32 @@ export class GroupService {
 			where: { name: groupName },
 		});
 		if (!group) {
-			throw new Error(`Group ${groupName} not found`);
+			const lng = await this.getLanguage();
+			throw new Error(
+				I18nService.t(
+					"modules.configuration.services.group.not_found",
+					{
+						lng,
+						name: groupName,
+					},
+				),
+			);
 		}
 
 		const permission = await prismaClient.permission.findFirst({
 			where: { name: permissionName },
 		});
 		if (!permission) {
-			throw new Error(`Permission ${permissionName} not found`);
+			const lng = await this.getLanguage();
+			throw new Error(
+				I18nService.t(
+					"modules.configuration.services.permission.not_found",
+					{
+						lng,
+						name: permissionName,
+					},
+				),
+			);
 		}
 
 		// Check if relation exists
@@ -91,14 +125,32 @@ export class GroupService {
 			where: { name: groupName },
 		});
 		if (!group) {
-			throw new Error(`Group ${groupName} not found`);
+			const lng = await this.getLanguage();
+			throw new Error(
+				I18nService.t(
+					"modules.configuration.services.group.not_found",
+					{
+						lng,
+						name: groupName,
+					},
+				),
+			);
 		}
 
 		const permission = await prismaClient.permission.findFirst({
 			where: { name: permissionName },
 		});
 		if (!permission) {
-			throw new Error(`Permission ${permissionName} not found`);
+			const lng = await this.getLanguage();
+			throw new Error(
+				I18nService.t(
+					"modules.configuration.services.permission.not_found",
+					{
+						lng,
+						name: permissionName,
+					},
+				),
+			);
 		}
 
 		const groupPermission = await prismaClient.groupPermission.findFirst({
