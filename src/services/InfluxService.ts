@@ -69,6 +69,24 @@ export class InfluxService {
 		writeApi.writePoint(point);
 	}
 
+	public static writeExecutionMetric(
+		functionName: string,
+		durationMs: number,
+		success: boolean = true,
+		additionalTags: Record<string, string> = {},
+	): void {
+		const point = new Point("function_execution")
+			.tag("function", functionName)
+			.tag("success", String(success))
+			.floatField("duration_ms", durationMs);
+
+		for (const [key, value] of Object.entries(additionalTags)) {
+			point.tag(key, value);
+		}
+
+		this.writePoint(point);
+	}
+
 	public static async flush(): Promise<void> {
 		const writeApi = this.getWriteApi();
 		try {
