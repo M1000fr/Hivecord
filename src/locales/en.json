@@ -1,12 +1,175 @@
 {
 	"common": {
+		"pagination": {
+			"page_info": "Page {{page}}/{{total}}"
+		},
+		"user": "User",
 		"no_reason": "No reason provided",
 		"none": "None"
 	},
 	"modules": {
+		"configuration": {
+			"commands": {
+				"config": {
+					"restore_failed": "Failed to restore configuration.",
+					"restore_success": "Configuration restored successfully.",
+					"backup_success": "Backup created successfully!",
+					"backup_failed": "Failed to create backup.",
+					"invalid_file": "Invalid file type. Please upload a .enc file."
+				},
+				"embed": {
+					"deleted": "Embed deleted.",
+					"list": "Embed List",
+					"new_embed_desc": "Description for new embed",
+					"new_embed_title": "New Embed",
+					"preview": "Preview",
+					"editor_intro": "Embed Editor for `{{name}}`",
+					"not_found": "❌ Embed `{{name}}` not found."
+				},
+				"group": {
+					"create_failed": "Failed to create group.",
+					"delete_failed": "Failed to delete group.",
+					"group": "Group",
+					"permission_add_failed": "Failed to add permission.",
+					"permission_remove_failed": "Failed to remove permission.",
+					"permissions": "Permissions",
+					"role": "Role",
+					"created": "Group Created",
+					"deleted": "Group `{{name}}` deleted.",
+					"permission_added": "Permission Added",
+					"permission_removed": "Permission Removed",
+					"no_groups": "No groups found.",
+					"list_title": "Group List ({{page}}/{{totalPages}})",
+					"list_failed": "Failed to list groups"
+				},
+				"modules": {
+					"build_failed": "Failed to build module configuration.",
+					"not_found": "Module **{{module}}** not found.",
+					"no_config": "Module **{{module}}** has no configuration options."
+				},
+				"backup": {},
+				"restore": {}
+			},
+			"utils": {
+				"embed_editor": {
+					"buttons": {
+						"cancel": "Cancel",
+						"save": "Save"
+					},
+					"fields": {
+						"add": {
+							"description": "Add a new field",
+							"label": "Add Field"
+						},
+						"back": {
+							"description": "Go back",
+							"label": "Back"
+						},
+						"edit": {
+							"description": "Edit this field",
+							"label": "Edit"
+						},
+						"placeholder": "Select a field action...",
+						"remove": {
+							"description": "Remove this field",
+							"label": "Remove"
+						}
+					},
+					"menu": {
+						"author": {
+							"description": "Edit author",
+							"label": "Author"
+						},
+						"color": {
+							"description": "Edit color",
+							"label": "Color"
+						},
+						"description": {
+							"description": "Edit description",
+							"label": "Description"
+						},
+						"fields": {
+							"description": "Edit fields",
+							"label": "Fields"
+						},
+						"footer": {
+							"description": "Edit footer",
+							"label": "Footer"
+						},
+						"images": {
+							"description": "Edit images",
+							"label": "Images"
+						},
+						"placeholder": "Select an element to edit...",
+						"title_url": {
+							"description": "Edit title and URL",
+							"label": "Title & URL"
+						}
+					},
+					"modals": {
+						"author": {
+							"icon_label": "Icon URL",
+							"name_label": "Name",
+							"title": "Edit Author"
+						},
+						"color": {
+							"label": "Color (Hex)",
+							"placeholder": "#FFFFFF",
+							"title": "Edit Color"
+						},
+						"description": {
+							"label": "Description",
+							"title": "Edit Description"
+						},
+						"field": {
+							"inline_label": "Inline (true/false)",
+							"name_label": "Name",
+							"title": "Edit Field",
+							"value_label": "Value"
+						},
+						"footer": {
+							"icon_label": "Icon URL",
+							"text_label": "Text",
+							"title": "Edit Footer"
+						},
+						"images": {
+							"image_label": "Image URL",
+							"image_placeholder": "https://...",
+							"thumbnail_label": "Thumbnail URL",
+							"title": "Edit Images"
+						},
+						"title": {
+							"label": "Title",
+							"title": "Edit Title",
+							"url_label": "URL"
+						}
+					}
+				}
+			},
+			"services": {
+				"group": {
+					"not_found": "Group {{name}} not found"
+				},
+				"permission": {
+					"not_found": "Permission {{name}} not found"
+				}
+			},
+			"interactions": {
+				"embed_editor": {}
+			},
+			"helper": {}
+		},
 		"debug": {
 			"commands": {
 				"debug": {
+					"member_not_found": "Member not found.",
+					"need_two_channels": "Need at least two voice channels.",
+					"no_voice_channel": "No voice channel found.",
+					"simulating_join": "Simulating member join...",
+					"simulating_voice_join": "Simulating voice join...",
+					"simulating_voice_leave": "Simulating voice leave...",
+					"simulating_voice_move": "Simulating voice move...",
+					"simulating_voice_stream": "Simulating voice stream...",
 					"options": {
 						"action": {
 							"choices": {}
@@ -16,68 +179,43 @@
 				}
 			}
 		},
-		"general": {
-			"commands": {
-				"ping": {
-					"response": "Pong!"
-				},
-				"sync": {
-					"autocomplete": {
-						"welcome_roles": "Welcome Roles"
-					},
-					"in_progress": "A synchronization is already in progress.",
-					"started": "Welcome roles synchronization started.",
-					"failed": "Failed to start synchronization."
-				}
-			}
-		},
-		"invitation": {
-			"commands": {
-				"view": {
-					"title": "Invites for {{username}}",
-					"active": "Active",
-					"fake": "Fake (Left)",
-					"total": "Total"
-				},
-				"top": {
-					"no_invites": "No invitations found.",
-					"title": "🏆 Invites Leaderboard",
-					"footer": "Sorted by active invites"
-				}
-			}
-		},
 		"moderation": {
-			"services": {
-				"sanction": {
-					"mute_role_not_configured": "Mute role is not configured. Please ask an administrator to configure it.",
-					"mute_role_not_found": "Configured mute role not found in this guild.",
-					"user_not_found": "User not found in this guild.",
-					"cannot_mute": "I cannot mute this user.",
-					"already_muted": "User is already muted.",
-					"dm": {
-						"mute": "You have been temporarily `muted` in `{{guild}}` for `{{duration}}`.\nReason: `{{reason}}`",
-						"ban": "You have been banned from `{{guild}}`.\nReason: `{{reason}}`",
-						"warn": "You have been `warned` in `{{guild}}`.\nReason: `{{reason}}`",
-						"unwarn": "Your warning `#{{warnId}}` has been removed in `{{guild}}`.\nWarn reason: `{{reason}}`",
-						"unmute": "You have been `unmuted` in `{{guild}}`."
-					},
-					"already_banned": "User is already banned.",
-					"cannot_ban": "I cannot ban this user.",
-					"invalid_warn_id": "Invalid warning ID.",
-					"not_muted": "User is not muted.",
-					"not_banned": "User is not banned."
-				}
-			},
 			"commands": {
+				"tempmute": {
+					"failed": "Failed to tempmute user.",
+					"select_predefined_reason": "Select a predefined reason",
+					"invalid_duration": "Invalid duration format. Use format like 10m, 1h, 1d.",
+					"success": "User {{userTag}} has been muted for {{duration}}. Reason: {{reason}}"
+				},
+				"unban": {
+					"failed": "Failed to unban user.",
+					"success": "User {{userTag}} has been unbanned."
+				},
+				"unlock": {
+					"admin_required": "Administrator permission required.",
+					"cannot_unlock_channel": "Cannot unlock this channel.",
+					"default_reason": "No reason provided.",
+					"channel_success": "🔓 Channel unlocked. Reason: {{reason}}",
+					"server_success": "✅ **SERVER UNLOCKED**. Reason: {{reason}}"
+				},
+				"unmute": {
+					"failed": "Failed to unmute user.",
+					"success": "User {{userTag}} has been unmuted."
+				},
+				"unwarn": {
+					"failed_with_error": "Failed to remove warning: {{error}}",
+					"success": "✅ Removed warning #{{warnId}} for {{userTag}}."
+				},
+				"warn": {
+					"failed_with_error": "Failed to warn user: {{error}}",
+					"success": "✅ Warned {{userTag}} for: {{reason}}"
+				},
 				"ban": {
 					"success": "User {{userTag}} has been banned. Reason: {{reason}}",
 					"error": "An error occurred while banning the user."
 				},
 				"kick": {},
 				"mute": {},
-				"warn": {
-					"success": "✅ Warned {{userTag}} for: {{reason}}"
-				},
 				"clear": {
 					"invalid_amount": "Please provide a valid number of messages to clear.",
 					"success": "Deleted {{count}} messages."
@@ -116,35 +254,112 @@
 					"reason_remove_failed": "Failed to remove reason #{{id}}.",
 					"no_reasons_found": "No reasons found.",
 					"reasons_title": "Sanction Reasons"
-				},
-				"tempmute": {
-					"invalid_duration": "Invalid duration format. Use format like 10m, 1h, 1d.",
-					"success": "User {{userTag}} has been muted for {{duration}}. Reason: {{reason}}"
-				},
-				"unban": {
-					"success": "User {{userTag}} has been unbanned."
-				},
-				"unlock": {
-					"channel_success": "🔓 Channel unlocked. Reason: {{reason}}",
-					"server_success": "✅ **SERVER UNLOCKED**. Reason: {{reason}}"
-				},
-				"unmute": {
-					"success": "User {{userTag}} has been unmuted."
-				},
-				"unwarn": {
-					"success": "✅ Removed warning #{{warnId}} for {{userTag}}."
+				}
+			},
+			"services": {
+				"sanction": {
+					"mute_role_not_configured": "Mute role is not configured. Please ask an administrator to configure it.",
+					"mute_role_not_found": "Configured mute role not found in this guild.",
+					"user_not_found": "User not found in this guild.",
+					"cannot_mute": "I cannot mute this user.",
+					"already_muted": "User is already muted.",
+					"dm": {
+						"mute": "You have been temporarily `muted` in `{{guild}}` for `{{duration}}`.\nReason: `{{reason}}`",
+						"ban": "You have been banned from `{{guild}}`.\nReason: `{{reason}}`",
+						"warn": "You have been `warned` in `{{guild}}`.\nReason: `{{reason}}`",
+						"unwarn": "Your warning `#{{warnId}}` has been removed in `{{guild}}`.\nWarn reason: `{{reason}}`",
+						"unmute": "You have been `unmuted` in `{{guild}}`."
+					},
+					"already_banned": "User is already banned.",
+					"cannot_ban": "I cannot ban this user.",
+					"invalid_warn_id": "Invalid warning ID.",
+					"not_muted": "User is not muted.",
+					"not_banned": "User is not banned."
 				}
 			}
 		},
 		"security": {
 			"commands": {
+				"security": {
+					"channel_not_found": "Channel not found.",
+					"heatpoints_user": "Heatpoints for {{user}}: {{points}}",
+					"reset_all_users": "Reset all users heatpoints.",
+					"reset_channel": "Reset channel heatpoints.",
+					"reset_server": "Reset server heatpoints."
+				},
 				"heatpoint": {}
 			}
 		},
 		"statistics": {
 			"commands": {
 				"stats": {
+					"server_error": "Error fetching server stats.",
+					"server_only": "This command can only be used in a server.",
+					"server_stats_embed_title": "Server Statistics",
+					"server_stats_title": "Server Stats",
+					"top_channels": "Top Channels",
+					"top_channels_msg": "Top Channels (Messages)",
+					"top_channels_voice": "Top Channels (Voice)",
+					"top_users_msg": "Top Users (Messages)",
+					"top_users_voice": "Top Users (Voice)",
+					"user_error": "Error fetching user stats.",
+					"user_required": "User is required.",
+					"user_stats_title": "User Stats",
 					"permissions": {}
+				}
+			},
+			"common": {
+				"active_users": "Active Users",
+				"members_joined": "Members Joined",
+				"members_left": "Members Left",
+				"messages": "Messages",
+				"period": "Period",
+				"periods": {
+					"24h": "Last 24 Hours",
+					"30d": "Last 30 Days",
+					"7d": "Last 7 Days"
+				},
+				"total_messages": "Total Messages",
+				"total_voice_time": "Total Voice Time",
+				"voice_time": "Voice Time",
+				"voice_time_min": "Voice Time (min)"
+			},
+			"interactions": {
+				"period": {
+					"invalid_server": "Invalid server.",
+					"not_allowed": "Not allowed.",
+					"server_only": "Server only.",
+					"update_error": "Error updating period."
+				}
+			}
+		},
+		"general": {
+			"commands": {
+				"ping": {
+					"response": "Pong!"
+				},
+				"sync": {
+					"autocomplete": {
+						"welcome_roles": "Welcome Roles"
+					},
+					"in_progress": "A synchronization is already in progress.",
+					"started": "Welcome roles synchronization started.",
+					"failed": "Failed to start synchronization."
+				}
+			}
+		},
+		"invitation": {
+			"commands": {
+				"view": {
+					"title": "Invites for {{username}}",
+					"active": "Active",
+					"fake": "Fake (Left)",
+					"total": "Total"
+				},
+				"top": {
+					"no_invites": "No invitations found.",
+					"title": "🏆 Invites Leaderboard",
+					"footer": "Sorted by active invites"
 				}
 			}
 		},
@@ -175,46 +390,6 @@
 					"success": "Channel renamed successfully"
 				}
 			}
-		},
-		"configuration": {
-			"services": {
-				"group": {
-					"not_found": "Group {{name}} not found"
-				},
-				"permission": {
-					"not_found": "Permission {{name}} not found"
-				}
-			},
-			"commands": {
-				"config": {
-					"backup_success": "Backup created successfully!",
-					"backup_failed": "Failed to create backup.",
-					"invalid_file": "Invalid file type. Please upload a .enc file."
-				},
-				"backup": {},
-				"restore": {},
-				"modules": {
-					"not_found": "Module **{{module}}** not found.",
-					"no_config": "Module **{{module}}** has no configuration options."
-				},
-				"embed": {
-					"editor_intro": "Embed Editor for `{{name}}`",
-					"not_found": "❌ Embed `{{name}}` not found."
-				},
-				"group": {
-					"created": "Group Created",
-					"deleted": "Group `{{name}}` deleted.",
-					"permission_added": "Permission Added",
-					"permission_removed": "Permission Removed",
-					"no_groups": "No groups found.",
-					"list_title": "Group List ({{page}}/{{totalPages}})",
-					"list_failed": "Failed to list groups"
-				}
-			},
-			"interactions": {
-				"embed_editor": {}
-			},
-			"helper": {}
 		},
 		"log": {
 			"sanction": {
