@@ -1,6 +1,9 @@
 import { Button, Modal } from "@decorators/Interaction";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { LogService } from "@modules/Log/services/LogService";
 import { TempVoiceService } from "@modules/Voice/services/TempVoiceService";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import {
 	ActionRowBuilder,
 	MessageFlags,
@@ -15,11 +18,14 @@ import {
 export class TempVoiceInteractions {
 	@Button("temp_voice_rename")
 	async handleRename(interaction: ButtonInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		if (!(await TempVoiceService.validateOwner(interaction))) return;
 
 		const nameInput = new TextInputBuilder({
 			customId: "new_name",
-			label: "New name",
+			label: t("modules.voice.interactions.rename.label"),
 			style: TextInputStyle.Short,
 			required: true,
 			maxLength: 100,
@@ -27,7 +33,7 @@ export class TempVoiceInteractions {
 
 		const modal = new ModalBuilder({
 			customId: "temp_voice_rename_modal",
-			title: "Rename channel",
+			title: t("modules.voice.interactions.rename.title"),
 			components: [
 				new ActionRowBuilder<TextInputBuilder>().addComponents(
 					nameInput,
@@ -86,6 +92,9 @@ export class TempVoiceInteractions {
 
 	@Modal("temp_voice_rename_modal")
 	async handleRenameModal(interaction: ModalSubmitInteraction) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		if (!(await TempVoiceService.validateOwner(interaction))) return;
 		const channel = interaction.channel as VoiceChannel;
 
@@ -98,7 +107,9 @@ export class TempVoiceInteractions {
 			`Renamed <#${channel.id}> to ${newName}`,
 		);
 		await interaction.reply({
-			content: `Channel renamed to ${newName}`,
+			content: t("modules.voice.interactions.rename.success", {
+				name: newName,
+			}),
 			flags: MessageFlags.Ephemeral,
 		});
 		await TempVoiceService.updateControlPanel(channel);
