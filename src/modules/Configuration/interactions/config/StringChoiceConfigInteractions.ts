@@ -1,0 +1,94 @@
+import { EConfigType } from "@decorators/ConfigProperty";
+import { SelectMenuPattern } from "@decorators/Interaction";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
+import { ConfigHelper } from "@utils/ConfigHelper";
+import {
+	ActionRowBuilder,
+	MessageFlags,
+	StringSelectMenuBuilder,
+	StringSelectMenuOptionBuilder,
+	type StringSelectMenuInteraction,
+} from "discord.js";
+import { BaseConfigInteractions } from "./BaseConfigInteractions";
+
+export class StringChoiceConfigInteractions extends BaseConfigInteractions {
+	@SelectMenuPattern("module_config_choice:*")
+	async handleChoiceSelection(interaction: StringSelectMenuInteraction) {
+		const ctx = await this.getInteractionContext(interaction);
+		if (!ctx) return;
+		const { client, parts } = ctx;
+		const moduleName = parts[1];
+		const propertyKey = parts[2];
+		const value = interaction.values[0];
+
+		if (moduleName && propertyKey && value) {
+			await this.updateConfig(
+				client,
+				interaction,
+				moduleName,
+				propertyKey,
+				value,
+				EConfigType.StringChoice,
+			);
+		}
+	}
+
+	async show(
+		interaction: any,
+		propertyOptions: any,
+		selectedProperty: string,
+		moduleName: string,
+	) {
+		const lng =
+			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+		const t = I18nService.getFixedT(lng);
+		const currentValue = await ConfigHelper.getCurrentValue(
+			selectedProperty,
+			propertyOptions.type,
+			t,
+			propertyOptions.defaultValue,
+			propertyOptions,
+		);
+		const embed = this.buildPropertyEmbed(
+			propertyOptions,
+			selectedProperty,
+			currentValue,
+			t,
+		);
+
+		const choices = propertyOptions.choices || [];
+		const selectMenu = new StringSelectMenuBuilder()
+			.setCustomId(
+				ConfigHelper.buildCustomId([
+					"module_config_choice",
+					moduleName,
+					selectedProperty,
+					interaction.user.id,
+				]),
+			)
+			.setPlaceholder(t("utils.config_helper.select_placeholder"))
+			.addOptions(
+				choices.map((choice: any) => {
+					const label =
+						choice.nameLocalizations?.[lng] || choice.name;
+					return new StringSelectMenuOptionBuilder()
+						.setLabel(label)
+						.setValue(choice.value)
+						.setDefault(currentValue === choice.value); // This might not work if currentValue is formatted
+				}),
+			);
+
+		const row =
+			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+				selectMenu,
+			);
+
+		await interaction.reply({
+			embeds: [embed],
+			components: [row],
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
+}
