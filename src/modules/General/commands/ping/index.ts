@@ -12,12 +12,18 @@ import { pingOptions } from "./pingOptions";
 @Command(pingOptions)
 export default class PingCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Ping)
-	@MeasureTime("ping_command_execution_time")
+	@MeasureTime({
+		name: "ping_command_execution_time",
+		trackInteraction: true,
+		trackComponents: [ConfigService],
+	})
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
 			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
 		const t = I18nService.getFixedT(lng);
+
 		await interaction.reply(t("modules.general.commands.ping.response"));
+
 		return true;
 	}
 }
