@@ -82,6 +82,7 @@ function main() {
 	console.log(`Found ${usedKeys.size} unique keys in code.`);
 
 	const locales = ["en.json", "fr.json"];
+	let hasError = false;
 
 	locales.forEach((locale) => {
 		console.log(`\nChecking ${locale}...`);
@@ -98,6 +99,7 @@ function main() {
 		});
 
 		if (missingKeys.length > 0) {
+			hasError = true;
 			console.log(
 				`\x1b[31mFound ${missingKeys.length} missing keys in ${locale}:\x1b[0m`,
 			);
@@ -106,6 +108,10 @@ function main() {
 			console.log(`\x1b[32mNo missing keys found in ${locale}.\x1b[0m`);
 		}
 	});
+
+	if (hasError) {
+		process.exit(1);
+	}
 }
 
 main();
