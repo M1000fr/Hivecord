@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from "discord.js";
+import { ApplicationCommandOptionType, type LocalizationMap } from "discord.js";
 
 export enum EConfigType {
 	String = ApplicationCommandOptionType.String,
@@ -13,14 +13,24 @@ export enum EConfigType {
 	// Custom types
 	CustomEmbed = 100,
 	RoleArray = 101,
+	StringChoice = 102,
+}
+
+export interface ConfigChoice {
+	name: string;
+	value: string;
+	nameLocalizations?: LocalizationMap;
 }
 
 export interface ConfigPropertyOptions {
 	displayName?: string;
+	displayNameLocalizations?: LocalizationMap;
 	description: string;
+	descriptionLocalizations?: LocalizationMap;
 	type: EConfigType;
 	required?: boolean;
 	defaultValue?: any;
+	choices?: ConfigChoice[];
 }
 
 export function ConfigProperty(options: ConfigPropertyOptions) {

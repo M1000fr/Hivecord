@@ -1,4 +1,5 @@
 import { LeBotClient } from "@class/LeBotClient";
+import { I18nService } from "@services/I18nService";
 import { InfluxService } from "@services/InfluxService";
 import { checkDatabaseConnection } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
@@ -13,6 +14,9 @@ logger.log("Starting LeBot...");
 await checkDatabaseConnection();
 await RedisService.checkConnection();
 await InfluxService.checkConnection();
+
+// Initialize I18n
+await I18nService.init();
 
 const leBotInstance = new LeBotClient();
 
