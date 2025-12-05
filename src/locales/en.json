@@ -1,7 +1,7 @@
 {
 	"common": {
 		"pagination": {
-			"page_info": "Page {{page}}/{{total}}"
+			"page_info": "Page {{current}}/{{total}}"
 		},
 		"user": "User",
 		"no_reason": "No reason provided",
@@ -39,7 +39,7 @@
 					"permission_added": "Permission Added",
 					"permission_removed": "Permission Removed",
 					"no_groups": "No groups found.",
-					"list_title": "Group List ({{page}}/{{totalPages}})",
+					"list_title": "Group List ({{current}}/{{total}})",
 					"list_failed": "Failed to list groups"
 				},
 				"modules": {
@@ -204,7 +204,7 @@
 				},
 				"unwarn": {
 					"failed_with_error": "Failed to remove warning: {{error}}",
-					"success": "✅ Removed warning #{{warnId}} for {{userTag}}."
+					"success": "✅ Removed warning #{{id}} for {{userTag}}."
 				},
 				"warn": {
 					"failed_with_error": "Failed to warn user: {{error}}",
@@ -282,7 +282,7 @@
 			"commands": {
 				"security": {
 					"channel_not_found": "Channel not found.",
-					"heatpoints_user": "Heatpoints for {{user}}: {{points}}",
+					"heatpoints_user": "Heatpoints for {{userTag}}: {{heatpoints}}",
 					"reset_all_users": "Reset all users heatpoints.",
 					"reset_channel": "Reset channel heatpoints.",
 					"reset_server": "Reset server heatpoints."

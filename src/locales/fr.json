@@ -1,7 +1,7 @@
 {
 	"common": {
 		"pagination": {
-			"page_info": "Page {{page}}/{{total}}"
+			"page_info": "Page {{current}}/{{total}}"
 		},
 		"user": "Utilisateur",
 		"no_reason": "Aucune raison fournie",
@@ -39,7 +39,7 @@
 					"permission_added": "Permission ajoutée",
 					"permission_removed": "Permission supprimée",
 					"no_groups": "Aucun groupe trouvé.",
-					"list_title": "Liste des groupes ({{page}}/{{totalPages}})",
+					"list_title": "Liste des groupes ({{current}}/{{total}})",
 					"list_failed": "Échec de la liste des groupes"
 				},
 				"modules": {
@@ -204,7 +204,7 @@
 				},
 				"unwarn": {
 					"failed_with_error": "Échec de la suppression de l'avertissement : {{error}}",
-					"success": "✅ Avertissement #{{warnId}} supprimé pour {{userTag}}."
+					"success": "✅ Avertissement #{{id}} supprimé pour {{userTag}}."
 				},
 				"warn": {
 					"failed_with_error": "Échec de l'avertissement de l'utilisateur : {{error}}",
@@ -282,7 +282,7 @@
 			"commands": {
 				"security": {
 					"channel_not_found": "Salon introuvable.",
-					"heatpoints_user": "Points de chaleur pour {{user}} : {{points}}",
+					"heatpoints_user": "Points de chaleur pour {{userTag}} : {{heatpoints}}",
 					"reset_all_users": "Réinitialisation des points de chaleur de tous les utilisateurs.",
 					"reset_channel": "Réinitialisation des points de chaleur du salon.",
 					"reset_server": "Réinitialisation des points de chaleur du serveur."

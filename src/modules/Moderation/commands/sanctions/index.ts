@@ -41,7 +41,7 @@ export default class SanctionsCommand extends BaseCommand {
 				content: t(
 					"modules.moderation.commands.sanctions.no_sanctions",
 					{
-						user: targetUser.tag,
+						userTag: targetUser.tag,
 					},
 				),
 				flags: [MessageFlags.Ephemeral],
@@ -57,7 +57,7 @@ export default class SanctionsCommand extends BaseCommand {
 				const embed = new EmbedBuilder()
 					.setTitle(
 						t("modules.moderation.commands.sanctions.title", {
-							user: targetUser.tag,
+							userTag: targetUser.tag,
 						}),
 					)
 					.setColor("Red")
