@@ -31,7 +31,7 @@ export default class UnbanCommand extends BaseCommand {
 			await SanctionService.unban(interaction.guild, user);
 			await interaction.reply(
 				t("modules.moderation.commands.unban.success", {
-					user: user.tag,
+					userTag: user.tag,
 				}),
 			);
 		} catch (error: any) {

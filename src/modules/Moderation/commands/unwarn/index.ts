@@ -69,7 +69,7 @@ export default class UnwarnCommand extends BaseCommand {
 			await interaction.editReply(
 				t("modules.moderation.commands.unwarn.success", {
 					id: warnId,
-					user: user.tag,
+					userTag: user.tag,
 				}),
 			);
 		} catch (error: any) {

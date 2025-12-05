@@ -75,7 +75,7 @@ export default class WarnCommand extends BaseCommand {
 			);
 			await interaction.editReply(
 				t("modules.moderation.commands.warn.success", {
-					user: user.tag,
+					userTag: user.tag,
 					reason,
 				}),
 			);
