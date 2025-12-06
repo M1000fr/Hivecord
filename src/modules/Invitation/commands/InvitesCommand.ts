@@ -10,12 +10,14 @@ import {
 	ChatInputCommandInteraction,
 	Client,
 	EmbedBuilder,
+	InteractionContextType,
 } from "discord.js";
 import { InvitationService } from "../services/InvitationService";
 
 @Command({
 	name: "invites",
 	description: "Invitation system commands",
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "view",

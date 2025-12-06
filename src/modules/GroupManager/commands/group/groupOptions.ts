@@ -1,9 +1,14 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType, PermissionFlagsBits } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+	PermissionFlagsBits,
+} from "discord.js";
 
 export const groupOptions: CommandOptions = {
 	name: "group",
 	description: "Manage groups and permissions",
+	contexts: [InteractionContextType.Guild],
 	defaultMemberPermissions: PermissionFlagsBits.Administrator,
 	options: [
 		{

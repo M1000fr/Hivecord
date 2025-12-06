@@ -14,6 +14,7 @@ import {
 	AutocompleteInteraction,
 	CommandInteraction,
 	GuildMember,
+	InteractionContextType,
 	MessageFlags,
 	VoiceState,
 } from "discord.js";
@@ -29,6 +30,7 @@ const DEBUG_ACTIONS = [
 @Command({
 	name: "debug",
 	description: "Debug commands",
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "action",

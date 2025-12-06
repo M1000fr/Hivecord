@@ -1,9 +1,13 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+} from "discord.js";
 
 export const embedOptions: CommandOptions = {
 	name: "embed",
 	description: "Manage custom embeds",
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "builder",

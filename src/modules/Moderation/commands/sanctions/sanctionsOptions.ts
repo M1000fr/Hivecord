@@ -1,9 +1,13 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+} from "discord.js";
 
 export const sanctionsOptions: CommandOptions = {
 	name: "sanctions",
 	description: "Manage sanctions",
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "list",

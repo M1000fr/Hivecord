@@ -1,5 +1,8 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+} from "discord.js";
 
 export const clearOptions: CommandOptions = {
 	name: "clear",
@@ -10,6 +13,7 @@ export const clearOptions: CommandOptions = {
 	descriptionLocalizations: {
 		fr: "Effacer des messages dans un salon",
 	},
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "amount",

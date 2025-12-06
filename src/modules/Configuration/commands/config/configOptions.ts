@@ -1,9 +1,13 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+} from "discord.js";
 
 export const configOptions: CommandOptions = {
 	name: "config",
 	description: "Configuration management commands",
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "backup",
@@ -25,5 +29,4 @@ export const configOptions: CommandOptions = {
 			],
 		},
 	],
-	dmPermission: false,
 };

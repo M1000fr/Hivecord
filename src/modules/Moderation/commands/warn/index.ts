@@ -13,6 +13,7 @@ import { I18nService } from "@services/I18nService";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
+	InteractionContextType,
 	MessageFlags,
 } from "discord.js";
 import { warnOptions } from "./options";
@@ -27,6 +28,7 @@ import { warnOptions } from "./options";
 		fr: "Avertir un utilisateur",
 	},
 	options: warnOptions,
+	contexts: [InteractionContextType.Guild],
 })
 export default class WarnCommand extends BaseCommand {
 	@Autocomplete({ optionName: "reason" })

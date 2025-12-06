@@ -11,6 +11,7 @@ import { I18nService } from "@services/I18nService";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
+	InteractionContextType,
 	MessageFlags,
 } from "discord.js";
 import { unwarnOptions } from "./options";
@@ -19,6 +20,7 @@ import { unwarnOptions } from "./options";
 	name: "unwarn",
 	description: "Remove a warning from a user",
 	options: unwarnOptions,
+	contexts: [InteractionContextType.Guild],
 })
 export default class UnwarnCommand extends BaseCommand {
 	@Autocomplete({ optionName: "warn_id" })
