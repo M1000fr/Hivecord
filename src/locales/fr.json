@@ -478,7 +478,8 @@
 			"not_set": "Non défini",
 			"select_placeholder": "Sélectionnez une propriété...",
 			"types": {},
-			"configure_property": "⚙️ Configurer : {{property}}"
+			"configure_property": "⚙️ Configurer : {{property}}",
+			"available_variables": "Variables disponibles"
 		}
 	}
 }
