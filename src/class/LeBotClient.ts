@@ -144,7 +144,7 @@ export class LeBotClient<ready = false> extends Client {
 					} catch (error) {
 						this.logger.error(
 							`Failed to clear commands for guild ${guild.name} (${guild.id})`,
-							error,
+							(error as Error).stack,
 						);
 					}
 				}
