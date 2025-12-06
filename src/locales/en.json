@@ -27,20 +27,15 @@
 					"not_found": "❌ Embed `{{name}}` not found."
 				},
 				"group": {
-					"create_failed": "Failed to create group.",
-					"delete_failed": "Failed to delete group.",
 					"group": "Group",
-					"permission_add_failed": "Failed to add permission.",
-					"permission_remove_failed": "Failed to remove permission.",
 					"permissions": "Permissions",
 					"role": "Role",
-					"created": "Group Created",
-					"deleted": "Group `{{name}}` deleted.",
-					"permission_added": "Permission Added",
-					"permission_removed": "Permission Removed",
 					"no_groups": "No groups found.",
 					"list_title": "Group List ({{current}}/{{total}})",
-					"list_failed": "Failed to list groups"
+					"list_failed": "Failed to list groups",
+					"select_permissions": "Select permissions",
+					"permissions_title": "Permissions for {{group}}",
+					"permissions_failed": "Failed to update permissions: {{error}}"
 				},
 				"modules": {
 					"build_failed": "Failed to build module configuration.",
@@ -148,7 +143,8 @@
 			},
 			"services": {
 				"group": {
-					"not_found": "Group {{name}} not found"
+					"not_found": "Group {{name}} not found",
+					"not_found_id": "Group #{{id}} not found"
 				},
 				"permission": {
 					"not_found": "Permission {{name}} not found"

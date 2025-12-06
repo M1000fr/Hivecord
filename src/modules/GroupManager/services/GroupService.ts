@@ -207,4 +207,83 @@ export class GroupService {
 			},
 		});
 	}
+
+	static async getGroupById(id: number): Promise<
+		| (GroupModel & {
+				Role: RoleModel;
+				Permissions: { Permissions: PermissionModel }[];
+		  })
+		| null
+	> {
+		return prismaClient.group.findUnique({
+			where: { id },
+			include: {
+				Role: true,
+				Permissions: {
+					include: {
+						Permissions: true,
+					},
+				},
+			},
+		});
+	}
+
+	static async updatePermissions(
+		groupId: number,
+		permissionsToAdd: string[],
+		permissionsToRemove: string[],
+	): Promise<void> {
+		const group = await prismaClient.group.findUnique({
+			where: { id: groupId },
+		});
+		if (!group) return;
+
+		// Add permissions
+		for (const permName of permissionsToAdd) {
+			const permission = await prismaClient.permission.findFirst({
+				where: { name: permName },
+			});
+			if (!permission) continue;
+
+			const existing = await prismaClient.groupPermission.findFirst({
+				where: {
+					groupId: group.id,
+					permissionId: permission.id,
+				},
+			});
+
+			if (!existing) {
+				await prismaClient.groupPermission.create({
+					data: {
+						groupId: group.id,
+						permissionId: permission.id,
+					},
+				});
+			}
+		}
+
+		// Remove permissions
+		for (const permName of permissionsToRemove) {
+			const permission = await prismaClient.permission.findFirst({
+				where: { name: permName },
+			});
+			if (!permission) continue;
+
+			const existing = await prismaClient.groupPermission.findFirst({
+				where: {
+					groupId: group.id,
+					permissionId: permission.id,
+				},
+			});
+
+			if (existing) {
+				await prismaClient.groupPermission.delete({
+					where: { id: existing.id },
+				});
+			}
+		}
+
+		const redis = RedisService.getInstance();
+		await redis.del(`permissions:role:${group.roleId}`);
+	}
 }
