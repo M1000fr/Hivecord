@@ -6,7 +6,7 @@ async function healthCheck() {
 		} else {
 			process.exit(1);
 		}
-	} catch (error) {
+	} catch {
 		process.exit(1);
 	}
 }

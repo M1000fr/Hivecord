@@ -82,7 +82,7 @@ export default class SyncCommand extends BaseCommand {
 				interaction,
 				t("modules.general.commands.sync.started"),
 			);
-		} catch (error) {
+		} catch {
 			await InteractionHelper.respondError(
 				interaction,
 				t("modules.general.commands.sync.failed"),

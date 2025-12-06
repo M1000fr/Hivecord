@@ -1,4 +1,7 @@
-import { EConfigType } from "@decorators/ConfigProperty";
+import {
+	EConfigType,
+	type ConfigPropertyOptions,
+} from "@decorators/ConfigProperty";
 import { SelectMenuPattern } from "@decorators/Interaction";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
@@ -8,8 +11,10 @@ import {
 	ActionRowBuilder,
 	ButtonStyle,
 	ChannelSelectMenuBuilder,
-	type ChannelSelectMenuInteraction,
 	RoleSelectMenuBuilder,
+	type ChannelSelectMenuInteraction,
+	type MessageActionRowComponentBuilder,
+	type RepliableInteraction,
 	type RoleSelectMenuInteraction,
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
@@ -120,8 +125,8 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 	}
 
 	async show(
-		interaction: any,
-		propertyOptions: any,
+		interaction: RepliableInteraction,
+		propertyOptions: ConfigPropertyOptions,
 		selectedProperty: string,
 		moduleName: string,
 	) {
@@ -161,9 +166,12 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			rawValue,
 		);
 
-		const components: any[] = [
-			new ActionRowBuilder<any>().addComponents(component),
-		];
+		const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] =
+			[
+				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+					component,
+				),
+			];
 
 		if (
 			(propertyOptions.type === EConfigType.Role ||
@@ -180,7 +188,9 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			);
 
 			components.push(
-				new ActionRowBuilder<any>().addComponents(clearButton),
+				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+					clearButton,
+				),
 			);
 		}
 

@@ -1,3 +1,4 @@
+import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { SelectMenuPattern } from "@decorators/Interaction";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
@@ -8,6 +9,8 @@ import {
 	ActionRowBuilder,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
+	type Locale,
+	type RepliableInteraction,
 	type StringSelectMenuInteraction,
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
@@ -37,8 +40,8 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 	}
 
 	async show(
-		interaction: any,
-		propertyOptions: any,
+		interaction: RepliableInteraction,
+		propertyOptions: ConfigPropertyOptions,
 		selectedProperty: string,
 		moduleName: string,
 	) {
@@ -76,9 +79,10 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 			)
 			.setPlaceholder(t("utils.config_helper.select_placeholder"))
 			.addOptions(
-				choices.map((choice: any) => {
+				choices.map((choice) => {
 					const label =
-						choice.nameLocalizations?.[lng] || choice.name;
+						choice.nameLocalizations?.[lng as Locale] ||
+						choice.name;
 					return new StringSelectMenuOptionBuilder()
 						.setLabel(label)
 						.setValue(choice.value)

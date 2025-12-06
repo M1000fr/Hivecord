@@ -250,15 +250,19 @@ export class LogService {
 		const changes: string[] = [];
 		const lng = await this.getLanguage(guild.id);
 
-		const checkChange = (fieldKey: string, before: any, after: any) => {
+		const checkChange = (
+			fieldKey: string,
+			before: unknown,
+			after: unknown,
+		) => {
 			if (before !== after) {
 				const field = I18nService.t(fieldKey, { lng });
 				changes.push(
 					I18nService.t("modules.log.role.update.field_change", {
 						lng,
 						field,
-						before,
-						after,
+						before: String(before),
+						after: String(after),
 					}),
 				);
 			}

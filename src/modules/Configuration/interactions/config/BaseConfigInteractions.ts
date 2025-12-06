@@ -1,4 +1,5 @@
 import { LeBotClient } from "@class/LeBotClient";
+import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import {
 	ConfigContextData,
@@ -12,14 +13,31 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	EmbedBuilder,
-	type Message,
-	MessageFlags,
+	Locale,
+	Message,
+	type ButtonInteraction,
+	type ChannelSelectMenuInteraction,
+	type MentionableSelectMenuInteraction,
+	type ModalSubmitInteraction,
+	type RepliableInteraction,
+	type RoleSelectMenuInteraction,
+	type StringSelectMenuInteraction,
+	type UserSelectMenuInteraction,
 } from "discord.js";
 import type { TFunction } from "i18next";
 
+export type ConfigInteraction =
+	| ButtonInteraction
+	| StringSelectMenuInteraction
+	| ModalSubmitInteraction
+	| RoleSelectMenuInteraction
+	| ChannelSelectMenuInteraction
+	| UserSelectMenuInteraction
+	| MentionableSelectMenuInteraction;
+
 export abstract class BaseConfigInteractions {
 	protected async respondToInteraction(
-		interaction: any,
+		interaction: RepliableInteraction,
 		content: string,
 		isError = false,
 	) {
@@ -30,27 +48,50 @@ export abstract class BaseConfigInteractions {
 		}
 	}
 
-	protected async getMainMessage(interaction: any): Promise<Message | null> {
-		const parts = ConfigHelper.parseCustomId(interaction.customId || "");
+	protected async getMainMessage(
+		interaction: RepliableInteraction,
+	): Promise<Message | null> {
+		let customId = "";
+		if (interaction.isMessageComponent() || interaction.isModalSubmit()) {
+			customId = interaction.customId;
+		}
+		const parts = ConfigHelper.parseCustomId(customId);
 		if (parts[0] === "module_config") {
-			return interaction.message;
+			if (
+				interaction.isMessageComponent() ||
+				interaction.isModalSubmit()
+			) {
+				if (interaction.message instanceof Message)
+					return interaction.message;
+			}
+			return null;
 		}
 
-		if (interaction.isModalSubmit()) return interaction.message;
+		if (interaction.isModalSubmit()) {
+			if (interaction.message instanceof Message)
+				return interaction.message;
+			return null;
+		}
 
-		const refId = interaction.message.reference?.messageId;
-		if (!refId) return null;
+		if (interaction.isMessageComponent() || interaction.isModalSubmit()) {
+			const message = interaction.message;
+			if (!message) return null;
 
-		return (
-			(await interaction.channel?.messages
-				.fetch(refId)
-				.catch(() => null)) || null
-		);
+			const refId = message.reference?.messageId;
+			if (!refId) return null;
+
+			return (
+				(await interaction.channel?.messages
+					.fetch(refId)
+					.catch(() => null)) || null
+			);
+		}
+		return null;
 	}
 
 	protected async updateConfig(
 		client: LeBotClient<true>,
-		interaction: any,
+		interaction: RepliableInteraction,
 		moduleName: string,
 		propertyKey: string,
 		value: string | string[],
@@ -58,6 +99,8 @@ export abstract class BaseConfigInteractions {
 		silent = false,
 		deleteMessage = false,
 	) {
+		if (!interaction.guildId) return;
+
 		try {
 			await ConfigHelper.saveValue(
 				interaction.guildId,
@@ -95,7 +138,12 @@ export abstract class BaseConfigInteractions {
 				}
 			}
 
-			if (deleteMessage && interaction.message?.deletable) {
+			if (
+				deleteMessage &&
+				(interaction.isMessageComponent() ||
+					interaction.isModalSubmit()) &&
+				interaction.message?.deletable
+			) {
 				await interaction.message.delete().catch(() => {});
 			} else if (!silent) {
 				if (
@@ -103,7 +151,12 @@ export abstract class BaseConfigInteractions {
 					!interaction.replied &&
 					!interaction.deferred
 				) {
-					await interaction.deferUpdate().catch(() => {});
+					if (
+						interaction.isMessageComponent() ||
+						interaction.isModalSubmit()
+					) {
+						await interaction.deferUpdate().catch(() => {});
+					}
 				}
 			}
 		} catch (error) {
@@ -119,21 +172,21 @@ export abstract class BaseConfigInteractions {
 	}
 
 	protected async validateUser(
-		interaction: any,
+		interaction: ConfigInteraction,
 		userId: string,
 	): Promise<boolean> {
 		if (interaction.user.id !== userId) {
 			await interaction.reply({
 				content:
 					"❌ You are not allowed to interact with this component.",
-				flags: [MessageFlags.Ephemeral],
+				ephemeral: true,
 			});
 			return false;
 		}
 		return true;
 	}
 
-	protected async getInteractionContext(interaction: any) {
+	protected async getInteractionContext(interaction: ConfigInteraction) {
 		const client = interaction.client as LeBotClient<true>;
 		const parts = ConfigHelper.parseCustomId(interaction.customId);
 		const userId = parts[parts.length - 1];
@@ -151,7 +204,11 @@ export abstract class BaseConfigInteractions {
 		propertyKey: string,
 	) {
 		const module = client.modules.get(moduleName.toLowerCase());
-		const configProps = (module?.options.config as any)?.configProperties;
+		const configProps = (
+			module?.options.config as unknown as {
+				configProperties?: Record<string, ConfigPropertyOptions>;
+			}
+		)?.configProperties;
 		const propertyOptions = configProps?.[propertyKey];
 		return { module, propertyOptions };
 	}
@@ -180,7 +237,7 @@ export abstract class BaseConfigInteractions {
 	}
 
 	protected buildPropertyEmbed(
-		propertyOptions: any,
+		propertyOptions: ConfigPropertyOptions,
 		selectedProperty: string,
 		currentValue: string,
 		t: TFunction,
@@ -205,7 +262,7 @@ export abstract class BaseConfigInteractions {
 				.map((v) => {
 					const data = ConfigContextData[v];
 					const desc =
-						(data.descriptionLocalizations as any)?.[lng] ||
+						data.descriptionLocalizations?.[lng as Locale] ||
 						data.description;
 					return `- \`{${v}}\`: ${desc}`;
 				})

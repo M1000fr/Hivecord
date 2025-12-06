@@ -46,13 +46,17 @@ function extractKeysFromCode(): Set<string> {
 }
 
 function flattenKeys(
-	obj: any,
+	obj: Record<string, unknown>,
 	prefix = "",
 	result: Set<string> = new Set(),
 ): Set<string> {
 	for (const key in obj) {
 		if (typeof obj[key] === "object" && obj[key] !== null) {
-			flattenKeys(obj[key], prefix + key + ".", result);
+			flattenKeys(
+				obj[key] as Record<string, unknown>,
+				prefix + key + ".",
+				result,
+			);
 		} else {
 			result.add(prefix + key);
 		}

@@ -74,10 +74,11 @@ export default class BanCommand extends BaseCommand {
 					reason: reason,
 				}),
 			);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			await interaction.reply({
 				content:
-					error.message || t("modules.moderation.commands.ban.error"),
+					(error instanceof Error ? error.message : null) ||
+					t("modules.moderation.commands.ban.error"),
 				flags: [MessageFlags.Ephemeral],
 			});
 		}

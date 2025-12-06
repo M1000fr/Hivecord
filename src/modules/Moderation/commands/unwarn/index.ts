@@ -80,10 +80,11 @@ export default class UnwarnCommand extends BaseCommand {
 					userTag: user.tag,
 				}),
 			);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			await interaction.editReply(
 				t("modules.moderation.commands.unwarn.failed_with_error", {
-					error: error.message,
+					error:
+						error instanceof Error ? error.message : String(error),
 				}),
 			);
 		}

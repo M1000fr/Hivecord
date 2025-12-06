@@ -17,7 +17,8 @@ export class MessageReactionAddEvent extends BaseEvent<
 		if (user.bot || !reaction.message.guild) return;
 		await HeatpointService.processAction(
 			reaction.message.guild,
-			reaction.message.channel as any,
+			reaction.message
+				.channel as unknown as import("discord.js").GuildChannel,
 			user,
 			"reaction",
 		);

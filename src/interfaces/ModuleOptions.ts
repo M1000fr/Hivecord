@@ -4,7 +4,8 @@ import { BaseEvent } from "@class/BaseEvent";
 export interface ModuleOptions {
 	name: string;
 	commands?: (new () => BaseCommand)[];
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	events?: (new () => BaseEvent<any>)[];
-	interactions?: any[];
-	config?: new () => any;
+	interactions?: unknown[];
+	config?: new () => object;
 }

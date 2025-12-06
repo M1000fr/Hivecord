@@ -57,14 +57,14 @@ export class SanctionScheduler {
 							await member.send(
 								`You have been \`unmuted\` in \`${guild.name}\`.`,
 							);
-						} catch (e) {
+						} catch {
 							// Could not send DM
 						}
 						await member.roles.remove(
 							muteRole,
 							"Sanction consistency check: No active mute found",
 						);
-					} catch (error: any) {
+					} catch (error: unknown) {
 						this.logger.error(
 							`Error removing mute role from ${memberId} during consistency check in guild ${guild.name}:`,
 							error instanceof Error
@@ -138,7 +138,7 @@ export class SanctionScheduler {
 				this.logger.log(
 					`Sanction ${sanction.id} expired for user ${sanction.userId} in guild ${guild.name}`,
 				);
-			} catch (error: any) {
+			} catch (error: unknown) {
 				this.logger.error(
 					`Error processing expired sanction ${sanction.id}:`,
 					error instanceof Error ? error.stack : String(error),

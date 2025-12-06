@@ -110,10 +110,10 @@ export default class TempMuteCommand extends BaseCommand {
 					reason,
 				}),
 			);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			await interaction.reply({
 				content:
-					error.message ||
+					(error instanceof Error ? error.message : null) ||
 					t("modules.moderation.commands.tempmute.failed"),
 				flags: [MessageFlags.Ephemeral],
 			});

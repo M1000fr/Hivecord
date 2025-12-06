@@ -14,7 +14,7 @@ export class InfluxService {
 	private static queryApi: QueryApi;
 	private static logger = new Logger("InfluxService");
 	private static asyncLocalStorage = new AsyncLocalStorage<TraceContext>();
-	private static instrumentedObjects = new WeakSet<any>();
+	private static instrumentedObjects = new WeakSet<object>();
 
 	private static url = process.env.INFLUX_URL || "http://localhost:8086";
 	private static token = process.env.INFLUX_TOKEN || "";
@@ -55,10 +55,9 @@ export class InfluxService {
 			const testQuery = `from(bucket: "${this.bucket}") |> range(start: -1m) |> limit(n: 1)`;
 
 			await new Promise<void>((resolve, reject) => {
-				let hasData = false;
 				queryApi.queryRows(testQuery, {
 					next: () => {
-						hasData = true;
+						// Data received
 					},
 					error: (error) => reject(error),
 					complete: () => resolve(),
@@ -153,7 +152,7 @@ export class InfluxService {
 		return this.asyncLocalStorage.run(context, fn);
 	}
 
-	public static instrument(target: any, targetName: string): void {
+	public static instrument(target: object, targetName: string): void {
 		if (this.instrumentedObjects.has(target)) {
 			return;
 		}
@@ -170,16 +169,19 @@ export class InfluxService {
 				const self = this;
 
 				// Replace the method
-				target[key] = async function (...args: any[]) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				(target as any)[key] = async function (...args: unknown[]) {
 					const context = self.asyncLocalStorage.getStore();
 					if (!context) {
-						return originalMethod.apply(this, args);
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						return originalMethod.apply(this as any, args);
 					}
 
 					const start = performance.now();
 					let success = true;
 					try {
-						return await originalMethod.apply(this, args);
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						return await originalMethod.apply(this as any, args);
 					} catch (error) {
 						success = false;
 						throw error;

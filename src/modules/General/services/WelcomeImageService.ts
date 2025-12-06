@@ -95,9 +95,7 @@ export class WelcomeImageService {
 					encoder.setDelay(100);
 				}
 
-				encoder.addFrame(
-					ctx.getImageData(0, 0, width, height).data as any,
-				);
+				encoder.addFrame(ctx.getImageData(0, 0, width, height).data);
 			}
 		} else {
 			// Static avatar
@@ -110,7 +108,7 @@ export class WelcomeImageService {
 			);
 			this.drawAvatar(ctx, avatarImage, width / 2, 100, 80);
 			drawText();
-			encoder.addFrame(ctx.getImageData(0, 0, width, height).data as any);
+			encoder.addFrame(ctx.getImageData(0, 0, width, height).data);
 		}
 
 		encoder.finish();

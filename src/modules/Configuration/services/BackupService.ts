@@ -1,5 +1,8 @@
 import type { LeBotClient } from "@class/LeBotClient";
-import { EConfigType } from "@decorators/ConfigProperty";
+import {
+	EConfigType,
+	type ConfigPropertyOptions,
+} from "@decorators/ConfigProperty";
 import { ConfigService } from "@services/ConfigService";
 import { Logger } from "@utils/Logger";
 import {
@@ -64,14 +67,16 @@ class CryptoHelper {
 class ConfigExtractor {
 	static async extractModuleConfig(
 		moduleName: string,
-		configClass: any,
+		configClass: {
+			configProperties?: Record<string, ConfigPropertyOptions>;
+		},
 		guildId: string,
 	): Promise<ModuleConfig> {
 		const configProperties = configClass?.configProperties || {};
 		const configurations: Record<string, ConfigValue> = {};
 
 		for (const [propertyKey, options] of Object.entries(configProperties)) {
-			const opt = options as any;
+			const opt = options;
 			const snakeCaseKey = this.toSnakeCase(propertyKey);
 
 			const value = await this.getConfigValue(
@@ -155,8 +160,10 @@ export class BackupService {
 		const modules: ModuleConfig[] = [];
 
 		for (const [moduleName, moduleData] of client.modules) {
-			const configClass = moduleData.options.config;
-			if (configClass && (configClass as any).configProperties) {
+			const configClass = moduleData.options.config as unknown as
+				| { configProperties?: Record<string, ConfigPropertyOptions> }
+				| undefined;
+			if (configClass?.configProperties) {
 				const moduleConfig = await ConfigExtractor.extractModuleConfig(
 					moduleName,
 					configClass,

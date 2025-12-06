@@ -1,4 +1,5 @@
 import { LeBotClient } from "@class/LeBotClient";
+import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
@@ -9,16 +10,19 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	Message,
+	type MessageActionRowComponentBuilder,
+	type RepliableInteraction,
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
 export class AttachmentConfigInteractions extends BaseConfigInteractions {
 	async show(
-		interaction: any,
-		propertyOptions: any,
+		interaction: RepliableInteraction,
+		propertyOptions: ConfigPropertyOptions,
 		selectedProperty: string,
 		moduleName: string,
 	) {
+		if (!interaction.guildId || !interaction.channel) return;
 		const lng =
 			(await ConfigService.get(
 				interaction.guildId,
@@ -45,7 +49,8 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 				"\n\n**Please reply to this message with the file you want to upload.**\nSupported formats: Images, GIFs, Videos, Audio.",
 		);
 
-		const components: any[] = [];
+		const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] =
+			[];
 		if (!propertyOptions.nonNull) {
 			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 				this.createConfigButton(
@@ -68,7 +73,9 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 		const filter = (m: Message) =>
 			m.author.id === interaction.user.id && m.attachments.size > 0;
 
-		const collector = interaction.channel.createMessageCollector({
+		if (!interaction.channel) return;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const collector = (interaction.channel as any).createMessageCollector({
 			filter,
 			time: 60000,
 			max: 1,

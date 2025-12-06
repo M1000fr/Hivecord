@@ -10,7 +10,6 @@ import { I18nService } from "@services/I18nService";
 import {
 	ChatInputCommandInteraction,
 	Client,
-	MessageFlags,
 	PermissionsBitField,
 } from "discord.js";
 import { securityOptions } from "./securityOptions";
@@ -45,7 +44,7 @@ export default class SecurityCommand extends BaseCommand {
 							heatpoints: Math.round(heat),
 						},
 					),
-					flags: [MessageFlags.Ephemeral],
+					ephemeral: true,
 				});
 			} else if (subcommand === "reset") {
 				const target = interaction.options.getString("target", true);
@@ -60,7 +59,7 @@ export default class SecurityCommand extends BaseCommand {
 						content: t(
 							"modules.security.commands.security.reset_all_users",
 						),
-						flags: [MessageFlags.Ephemeral],
+						ephemeral: true,
 					});
 				} else if (target === "channel") {
 					const channel =
@@ -76,14 +75,14 @@ export default class SecurityCommand extends BaseCommand {
 								"modules.security.commands.security.reset_channel",
 								{ channel: channel.toString() },
 							),
-							flags: [MessageFlags.Ephemeral],
+							ephemeral: true,
 						});
 					} else {
 						await interaction.reply({
 							content: t(
 								"modules.security.commands.security.channel_not_found",
 							),
-							flags: [MessageFlags.Ephemeral],
+							ephemeral: true,
 						});
 					}
 				} else if (target === "server") {
@@ -95,7 +94,7 @@ export default class SecurityCommand extends BaseCommand {
 						content: t(
 							"modules.security.commands.security.reset_server",
 						),
-						flags: [MessageFlags.Ephemeral],
+						ephemeral: true,
 					});
 				}
 			}

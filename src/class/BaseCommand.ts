@@ -21,7 +21,15 @@ export abstract class BaseCommand {
 		if (autocompletes && autocompletes.has(focusedOption.name)) {
 			const method = autocompletes.get(focusedOption.name);
 			if (method) {
-				await (this as any)[method](client, interaction);
+				await (
+					this as unknown as Record<
+						string,
+						(
+							client: Client,
+							interaction: AutocompleteInteraction,
+						) => Promise<void>
+					>
+				)[method]!(client, interaction);
 			}
 		}
 	}
@@ -52,7 +60,15 @@ export abstract class BaseCommand {
 						return;
 					}
 
-					await (this as any)[method](client, interaction);
+					await (
+						this as unknown as Record<
+							string,
+							(
+								client: Client,
+								interaction: ChatInputCommandInteraction,
+							) => Promise<void>
+						>
+					)[method]!(client, interaction);
 					this.logger.log(
 						`Command ${this.constructor.name} (subcommand: ${key}) executed successfully`,
 					);
@@ -86,7 +102,15 @@ export abstract class BaseCommand {
 								return;
 							}
 
-							await (this as any)[method](client, interaction);
+							await (
+								this as unknown as Record<
+									string,
+									(
+										client: Client,
+										interaction: ChatInputCommandInteraction,
+									) => Promise<void>
+								>
+							)[method]!(client, interaction);
 							this.logger.log(
 								`Command ${this.constructor.name} (option: ${optionName}) executed successfully`,
 							);
@@ -112,7 +136,15 @@ export abstract class BaseCommand {
 					return;
 				}
 
-				await (this as any)[defaultCommand](client, interaction);
+				await (
+					this as unknown as Record<
+						string,
+						(
+							client: Client,
+							interaction: ChatInputCommandInteraction,
+						) => Promise<void>
+					>
+				)[defaultCommand]!(client, interaction);
 				this.logger.log(
 					`Command ${this.constructor.name} executed successfully`,
 				);

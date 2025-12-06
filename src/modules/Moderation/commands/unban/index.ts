@@ -37,10 +37,10 @@ export default class UnbanCommand extends BaseCommand {
 					userTag: user.tag,
 				}),
 			);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			await interaction.reply({
 				content:
-					error.message ||
+					(error instanceof Error ? error.message : null) ||
 					t("modules.moderation.commands.unban.failed"),
 				flags: [MessageFlags.Ephemeral],
 			});

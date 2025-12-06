@@ -8,8 +8,24 @@ import {
 	EmbedBuilder,
 	InteractionCollector,
 	StringSelectMenuInteraction,
+	type BaseMessageOptions,
+	type ChannelSelectMenuBuilder,
+	type CollectedInteraction,
+	type Interaction,
+	type MentionableSelectMenuBuilder,
 	type RepliableInteraction,
+	type RoleSelectMenuBuilder,
+	type StringSelectMenuBuilder,
+	type UserSelectMenuBuilder,
 } from "discord.js";
+
+type PagerComponentBuilder =
+	| ButtonBuilder
+	| StringSelectMenuBuilder
+	| UserSelectMenuBuilder
+	| RoleSelectMenuBuilder
+	| MentionableSelectMenuBuilder
+	| ChannelSelectMenuBuilder;
 
 export interface PagerOptions<T> {
 	items: T[];
@@ -18,12 +34,16 @@ export interface PagerOptions<T> {
 		items: T[],
 		pageIndex: number,
 		totalPages: number,
-	) => Promise<{ embeds: EmbedBuilder[]; components: any[]; files?: any[] }>;
-	filter?: (interaction: any) => boolean;
+	) => Promise<{
+		embeds: EmbedBuilder[];
+		components: ActionRowBuilder<PagerComponentBuilder>[];
+		files?: BaseMessageOptions["files"];
+	}>;
+	filter?: (interaction: Interaction) => boolean;
 	time?: number;
 	onComponent?: (
-		interaction: StringSelectMenuInteraction | ButtonInteraction,
-		collector: InteractionCollector<any>,
+		interaction: CollectedInteraction,
+		collector: InteractionCollector<CollectedInteraction>,
 	) => Promise<void>;
 	type?: string; // Unique identifier for the pager type (required for persistence)
 	userId?: string; // User ID allowed to interact (for persistence)
@@ -37,12 +57,16 @@ export class Pager<T> {
 		items: T[],
 		pageIndex: number,
 		totalPages: number,
-	) => Promise<{ embeds: EmbedBuilder[]; components: any[]; files?: any[] }>;
-	private filter: (interaction: any) => boolean;
+	) => Promise<{
+		embeds: EmbedBuilder[];
+		components: ActionRowBuilder<PagerComponentBuilder>[];
+		files?: BaseMessageOptions["files"];
+	}>;
+	private filter: (interaction: Interaction) => boolean;
 	private time: number;
 	private onComponent?: (
-		interaction: StringSelectMenuInteraction | ButtonInteraction,
-		collector: InteractionCollector<any>,
+		interaction: CollectedInteraction,
+		collector: InteractionCollector<CollectedInteraction>,
 	) => Promise<void>;
 	private type?: string;
 	private userId?: string;
@@ -154,8 +178,8 @@ export class Pager<T> {
 			} else {
 				if (this.onComponent) {
 					await this.onComponent(
-						i as StringSelectMenuInteraction | ButtonInteraction,
-						collector,
+						i as unknown as CollectedInteraction,
+						collector as unknown as InteractionCollector<CollectedInteraction>,
 					);
 				}
 			}

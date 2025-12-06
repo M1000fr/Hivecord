@@ -52,12 +52,8 @@ export class GroupPermissionInteractions {
 			const chunk = allPermissions.slice(offset, offset + 25);
 			const selectedValues = interaction.values;
 
-			const toAdd = selectedValues.filter((p) =>
-				chunk.includes(p as any),
-			);
-			const toRemove = chunk.filter(
-				(p) => !selectedValues.includes(p as any),
-			);
+			const toAdd = selectedValues.filter((p) => chunk.includes(p));
+			const toRemove = chunk.filter((p) => !selectedValues.includes(p));
 
 			await GroupService.updatePermissions(
 				id,
@@ -126,11 +122,12 @@ export class GroupPermissionInteractions {
 				embeds: [embed],
 				components: rows,
 			});
-		} catch (error: any) {
+		} catch (error) {
 			await InteractionHelper.respondError(
 				interaction,
 				t("modules.configuration.commands.group.permissions_failed", {
-					error: error.message,
+					error:
+						error instanceof Error ? error.message : String(error),
 				}),
 			);
 		}

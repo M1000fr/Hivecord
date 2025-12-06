@@ -60,7 +60,7 @@ export class EmbedService {
 	static async render(
 		guildId: string,
 		name: string,
-		context: Record<string, any>,
+		context: Record<string, unknown>,
 	): Promise<EmbedBuilder | null> {
 		const data = await this.get(guildId, name);
 		if (!data) return null;
@@ -84,7 +84,8 @@ export class EmbedService {
 		name: string;
 		data: APIEmbed;
 		userId?: string;
-		meta?: any;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		meta?: Record<string, any>;
 	} | null> {
 		const redis = RedisService.getInstance();
 		const key = `embed:editor:${sessionId}`;
@@ -97,7 +98,8 @@ export class EmbedService {
 		guildId: string,
 		name: string,
 		data: APIEmbed,
-		meta?: any,
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		meta?: Record<string, any>,
 		userId?: string,
 	): Promise<void> {
 		const redis = RedisService.getInstance();

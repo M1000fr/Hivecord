@@ -13,7 +13,7 @@ export class MessageCreateEvent extends BaseEvent<
 		if (message.author.bot || !message.guild) return;
 		await HeatpointService.processAction(
 			message.guild,
-			message.channel as any,
+			message.channel as unknown as import("discord.js").GuildChannel,
 			message.author,
 			"message",
 		);

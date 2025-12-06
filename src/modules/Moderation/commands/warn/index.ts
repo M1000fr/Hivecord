@@ -85,10 +85,11 @@ export default class WarnCommand extends BaseCommand {
 					reason,
 				}),
 			);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			await interaction.editReply(
 				t("modules.moderation.commands.warn.failed_with_error", {
-					error: error.message,
+					error:
+						error instanceof Error ? error.message : String(error),
 				}),
 			);
 		}

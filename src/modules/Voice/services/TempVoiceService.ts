@@ -11,6 +11,7 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	ChannelType,
+	DiscordAPIError,
 	EmbedBuilder,
 	GuildMember,
 	MessageFlags,
@@ -18,6 +19,7 @@ import {
 	VoiceChannel,
 	VoiceState,
 	type ButtonInteraction,
+	type Guild,
 	type Interaction,
 	type Message,
 } from "discord.js";
@@ -41,7 +43,7 @@ export class TempVoiceService {
 	}
 
 	private static async fetchGuildMember(
-		guild: any,
+		guild: Guild,
 		userId: string,
 	): Promise<GuildMember | null> {
 		try {
@@ -71,7 +73,9 @@ export class TempVoiceService {
 		collector.on("collect", async (message: Message) => {
 			try {
 				await message.delete();
-			} catch {}
+			} catch {
+				// Ignore delete error
+			}
 
 			if (message.mentions.users.size === 0) {
 				await interaction.followUp({
@@ -266,8 +270,8 @@ export class TempVoiceService {
 		if (tempChannel) {
 			try {
 				await channel.delete();
-			} catch (e: any) {
-				if (e.code !== 10003) {
+			} catch (e) {
+				if (!(e instanceof DiscordAPIError) || e.code !== 10003) {
 					console.error("Failed to delete temp channel", e);
 				}
 			}
@@ -327,7 +331,7 @@ export class TempVoiceService {
 				},
 			});
 
-			await this.sendControlPanel(voiceChannel, member);
+			await this.sendControlPanel(voiceChannel);
 			await LogService.logTempVoice(
 				guild,
 				member.user,
@@ -337,7 +341,7 @@ export class TempVoiceService {
 			this.logger.log(
 				`Temp voice channel created by ${member.user.tag}: ${voiceChannel.name} (${voiceChannel.id})`,
 			);
-		} catch (error: any) {
+		} catch (error) {
 			this.logger.error(
 				"Error creating temp voice channel:",
 				error instanceof Error ? error.stack : String(error),
@@ -453,10 +457,7 @@ export class TempVoiceService {
 		}
 	}
 
-	private static async sendControlPanel(
-		channel: VoiceChannel,
-		owner: GuildMember,
-	) {
+	private static async sendControlPanel(channel: VoiceChannel) {
 		const embed = await this.getControlPanelEmbed(channel);
 		if (!embed) return;
 

@@ -30,17 +30,22 @@ export interface ConfigPropertyOptions {
 	descriptionLocalizations?: LocalizationMap;
 	type: EConfigType;
 	required?: boolean;
-	defaultValue?: any;
+	defaultValue?: unknown;
 	choices?: ConfigChoice[];
 	nonNull?: boolean;
 }
 
+interface IConfigClass {
+	configProperties?: Record<string, ConfigPropertyOptions>;
+}
+
 export function ConfigProperty(options: ConfigPropertyOptions) {
-	return function (target: any, propertyKey: string) {
-		if (!target.constructor.configProperties) {
-			target.constructor.configProperties = {};
+	return function (target: object, propertyKey: string) {
+		const constructor = target.constructor as IConfigClass;
+		if (!constructor.configProperties) {
+			constructor.configProperties = {};
 		}
-		target.constructor.configProperties[propertyKey] = options;
+		constructor.configProperties[propertyKey] = options;
 
 		const key = toConfigKey(propertyKey);
 		ConfigRegistry.register(key, options.defaultValue);

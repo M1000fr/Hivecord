@@ -13,6 +13,7 @@ import {
 	ApplicationCommandOptionType,
 	AutocompleteInteraction,
 	CommandInteraction,
+	Guild,
 	GuildMember,
 	InteractionContextType,
 	MessageFlags,
@@ -110,8 +111,8 @@ export default class DebugCommand extends BaseCommand {
 	}
 
 	private getMockVoiceState(
-		guild: any,
-		member: any,
+		guild: Guild,
+		member: GuildMember,
 		channelId: string | null,
 		streaming = false,
 	) {

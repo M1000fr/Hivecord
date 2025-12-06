@@ -5,29 +5,29 @@ export class Logger {
 		this.context = context;
 	}
 
-	public log(message: any, context?: string) {
+	public log(message: unknown, context?: string) {
 		this.printMessage("log", message, context);
 	}
 
-	public error(message: any, trace?: string, context?: string) {
+	public error(message: unknown, trace?: string, context?: string) {
 		this.printMessage("error", message, context, trace);
 	}
 
-	public warn(message: any, context?: string) {
+	public warn(message: unknown, context?: string) {
 		this.printMessage("warn", message, context);
 	}
 
-	public debug(message: any, context?: string) {
+	public debug(message: unknown, context?: string) {
 		this.printMessage("debug", message, context);
 	}
 
-	public verbose(message: any, context?: string) {
+	public verbose(message: unknown, context?: string) {
 		this.printMessage("verbose", message, context);
 	}
 
 	private printMessage(
 		level: "log" | "error" | "warn" | "debug" | "verbose",
-		message: any,
+		message: unknown,
 		context?: string,
 		trace?: string,
 	) {
@@ -40,11 +40,13 @@ export class Logger {
 		const green = "\x1b[32m";
 		const yellow = "\x1b[33m";
 
-		let formattedMessage = message;
+		let formattedMessage: string;
 		if (message instanceof Error) {
 			formattedMessage = `${message.message}\n${message.stack}`;
-		} else if (typeof message === "object") {
+		} else if (typeof message === "object" && message !== null) {
 			formattedMessage = JSON.stringify(message, null, 2);
+		} else {
+			formattedMessage = String(message);
 		}
 
 		const output = `${green}[LeBot] ${pid}  -${reset} ${timestamp}   ${color}${level.toUpperCase()}${reset} ${yellow}[${ctx}]${reset} ${color}${formattedMessage}${reset}`;
