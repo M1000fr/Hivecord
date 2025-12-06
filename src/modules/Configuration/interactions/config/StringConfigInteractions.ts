@@ -10,7 +10,6 @@ import {
 	ButtonBuilder,
 	type ButtonInteraction,
 	ButtonStyle,
-	MessageFlags,
 	ModalBuilder,
 	type ModalSubmitInteraction,
 	TextInputBuilder,
@@ -154,7 +153,6 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		await interaction.reply({
 			embeds: [embed],
 			components: [row],
-			flags: [MessageFlags.Ephemeral],
 		});
 	}
 }

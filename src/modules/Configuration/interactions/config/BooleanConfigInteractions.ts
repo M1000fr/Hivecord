@@ -9,7 +9,6 @@ import {
 	ButtonBuilder,
 	type ButtonInteraction,
 	ButtonStyle,
-	MessageFlags,
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
@@ -93,7 +92,6 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 		await interaction.reply({
 			embeds: [embed],
 			components: [row],
-			flags: [MessageFlags.Ephemeral],
 		});
 	}
 }
