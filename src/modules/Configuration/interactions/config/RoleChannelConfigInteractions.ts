@@ -9,7 +9,6 @@ import {
 	ButtonStyle,
 	ChannelSelectMenuBuilder,
 	type ChannelSelectMenuInteraction,
-	MessageFlags,
 	RoleSelectMenuBuilder,
 	type RoleSelectMenuInteraction,
 } from "discord.js";
@@ -182,7 +181,6 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 		await interaction.reply({
 			embeds: [embed],
 			components: components,
-			flags: [MessageFlags.Ephemeral],
 		});
 	}
 }

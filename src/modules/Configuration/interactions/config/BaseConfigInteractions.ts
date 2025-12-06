@@ -76,10 +76,17 @@ export abstract class BaseConfigInteractions {
 					lng,
 				);
 				if (config) {
-					await mainMessage.edit({
-						embeds: [config.embed],
-						components: [config.row],
-					});
+					try {
+						await mainMessage.edit({
+							embeds: [config.embed],
+							components: [config.row],
+						});
+					} catch (error) {
+						console.warn(
+							"Failed to update config UI message:",
+							error,
+						);
+					}
 				}
 			}
 

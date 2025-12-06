@@ -6,7 +6,6 @@ import { I18nService } from "@services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
-	MessageFlags,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
 	type StringSelectMenuInteraction,
@@ -92,7 +91,6 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 		await interaction.reply({
 			embeds: [embed],
 			components: [row],
-			flags: [MessageFlags.Ephemeral],
 		});
 	}
 }

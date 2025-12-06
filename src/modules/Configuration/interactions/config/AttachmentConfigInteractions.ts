@@ -131,7 +131,6 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 				console.error("Failed to upload file:", error);
 				await interaction.followUp({
 					content: "❌ Failed to upload file.",
-					flags: [MessageFlags.Ephemeral],
 				});
 			}
 		});
