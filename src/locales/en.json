@@ -35,7 +35,11 @@
 					"list_failed": "Failed to list groups",
 					"select_permissions": "Select permissions",
 					"permissions_title": "Permissions for {{group}}",
-					"permissions_failed": "Failed to update permissions: {{error}}"
+					"permissions_failed": "Failed to update permissions: {{error}}",
+					"create_failed": "Failed to create group: {{error}}",
+					"created": "Group {{name}} created successfully.",
+					"delete_failed": "Failed to delete group: {{error}}",
+					"deleted": "Group {{name}} deleted successfully."
 				},
 				"modules": {
 					"build_failed": "Failed to build module configuration.",

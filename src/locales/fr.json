@@ -35,7 +35,11 @@
 					"list_failed": "Échec de la liste des groupes",
 					"select_permissions": "Sélectionnez les permissions",
 					"permissions_title": "Permissions pour {{group}}",
-					"permissions_failed": "Échec de la mise à jour des permissions : {{error}}"
+					"permissions_failed": "Échec de la mise à jour des permissions : {{error}}",
+					"create_failed": "Échec de la création du groupe : {{error}}",
+					"created": "Groupe {{name}} créé avec succès.",
+					"delete_failed": "Échec de la suppression du groupe : {{error}}",
+					"deleted": "Groupe {{name}} supprimé avec succès."
 				},
 				"modules": {
 					"build_failed": "Échec de la construction de la configuration du module.",
