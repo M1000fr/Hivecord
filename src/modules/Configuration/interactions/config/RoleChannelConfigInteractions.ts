@@ -40,6 +40,8 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 				propertyKey,
 				isArray ? interaction.values : interaction.values[0] || "",
 				isArray ? EConfigType.RoleArray : EConfigType.Role,
+				false,
+				true,
 			);
 		}
 	}
@@ -60,6 +62,8 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 				propertyKey,
 				interaction.values[0],
 				EConfigType.Channel,
+				false,
+				true,
 			);
 		}
 	}
@@ -162,8 +166,9 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 		];
 
 		if (
-			propertyOptions.type === EConfigType.Role ||
-			propertyOptions.type === EConfigType.Channel
+			(propertyOptions.type === EConfigType.Role ||
+				propertyOptions.type === EConfigType.Channel) &&
+			!propertyOptions.nonNull
 		) {
 			const clearButton = this.createConfigButton(
 				"module_config_clear",

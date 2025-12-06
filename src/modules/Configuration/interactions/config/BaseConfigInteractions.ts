@@ -56,6 +56,7 @@ export abstract class BaseConfigInteractions {
 		value: string | string[],
 		type: EConfigType,
 		silent = false,
+		deleteMessage = false,
 	) {
 		try {
 			await ConfigHelper.saveValue(
@@ -94,11 +95,16 @@ export abstract class BaseConfigInteractions {
 				}
 			}
 
-			if (!silent) {
-				await this.respondToInteraction(
-					interaction,
-					"✅ Configuration updated.",
-				);
+			if (deleteMessage && interaction.message?.deletable) {
+				await interaction.message.delete().catch(() => {});
+			} else if (!silent) {
+				if (
+					interaction.isRepliable() &&
+					!interaction.replied &&
+					!interaction.deferred
+				) {
+					await interaction.deferUpdate().catch(() => {});
+				}
 			}
 		} catch (error) {
 			console.error("Failed to update config:", error);

@@ -178,6 +178,9 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 					interaction,
 					"✅ Configuration cleared.",
 				);
+				if (interaction.message?.deletable) {
+					await interaction.message.delete().catch(() => {});
+				}
 			} catch (error) {
 				console.error("Failed to clear config:", error);
 				await this.respondToInteraction(

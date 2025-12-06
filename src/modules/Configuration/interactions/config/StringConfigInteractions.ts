@@ -34,6 +34,8 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				propertyKey,
 				interaction.fields.getTextInputValue("value"),
 				EConfigType.String,
+				false,
+				true,
 			);
 		}
 	}
@@ -146,15 +148,20 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				"Edit Value",
 				ButtonStyle.Primary,
 			),
-			this.createConfigButton(
-				"module_config_clear",
-				moduleName,
-				selectedProperty,
-				interaction.user.id,
-				"Clear Value",
-				ButtonStyle.Danger,
-			),
 		);
+
+		if (!propertyOptions.nonNull) {
+			row.addComponents(
+				this.createConfigButton(
+					"module_config_clear",
+					moduleName,
+					selectedProperty,
+					interaction.user.id,
+					"Clear Value",
+					ButtonStyle.Danger,
+				),
+			);
+		}
 
 		await interaction.reply({
 			embeds: [embed],

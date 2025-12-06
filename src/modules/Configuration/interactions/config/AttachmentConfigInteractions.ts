@@ -45,20 +45,24 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 				"\n\n**Please reply to this message with the file you want to upload.**\nSupported formats: Images, GIFs, Videos, Audio.",
 		);
 
-		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			this.createConfigButton(
-				"module_config_clear",
-				moduleName,
-				selectedProperty,
-				interaction.user.id,
-				"Clear File",
-				ButtonStyle.Danger,
-			),
-		);
+		const components: any[] = [];
+		if (!propertyOptions.nonNull) {
+			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+				this.createConfigButton(
+					"module_config_clear",
+					moduleName,
+					selectedProperty,
+					interaction.user.id,
+					"Clear File",
+					ButtonStyle.Danger,
+				),
+			);
+			components.push(row);
+		}
 
 		await interaction.reply({
 			embeds: [embed],
-			components: [row],
+			components: components,
 		});
 
 		const filter = (m: Message) =>

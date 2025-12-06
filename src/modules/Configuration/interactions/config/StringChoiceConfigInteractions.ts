@@ -30,6 +30,8 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 				propertyKey,
 				value,
 				EConfigType.StringChoice,
+				false,
+				true,
 			);
 		}
 	}
