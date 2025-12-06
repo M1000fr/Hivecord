@@ -65,7 +65,7 @@ export class WelcomeRoleSyncService {
 
 	private static async process(guild: Guild) {
 		try {
-			let state = await this.getState(guild.id);
+			const state = await this.getState(guild.id);
 			if (!state.isRunning) return;
 
 			await this.processGuild(guild);
@@ -80,7 +80,7 @@ export class WelcomeRoleSyncService {
 		} catch (error) {
 			this.logger.error(
 				`Error in welcome role sync process for guild ${guild.name}:`,
-				error as any,
+				error instanceof Error ? error.message : String(error),
 			);
 		}
 	}
@@ -102,7 +102,7 @@ export class WelcomeRoleSyncService {
 		);
 		if (guildRoleIds.length === 0) return;
 
-		let lastMemberId =
+		const lastMemberId =
 			(await this.getState(guild.id)).lastMemberId || undefined;
 
 		try {
@@ -143,7 +143,7 @@ export class WelcomeRoleSyncService {
 		} catch (error) {
 			this.logger.error(
 				`Error processing guild ${guild.name}:`,
-				error as any,
+				error instanceof Error ? error.message : String(error),
 			);
 		}
 	}

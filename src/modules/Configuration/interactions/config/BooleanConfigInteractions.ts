@@ -1,8 +1,10 @@
 import { LeBotClient } from "@class/LeBotClient";
+import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { ButtonPattern } from "@decorators/Interaction";
 import { ConfigHelper } from "@utils/ConfigHelper";
-import { type ButtonInteraction } from "discord.js";
+import { InteractionHelper } from "@utils/InteractionHelper";
+import { type ButtonInteraction, type RepliableInteraction } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
 export class BooleanConfigInteractions extends BaseConfigInteractions {
@@ -28,11 +30,19 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 	}
 
 	async show(
-		interaction: any,
-		propertyOptions: any,
+		interaction: RepliableInteraction,
+		propertyOptions: ConfigPropertyOptions,
 		selectedProperty: string,
 		moduleName: string,
 	) {
+		if (!interaction.guildId) {
+			await InteractionHelper.respondError(
+				interaction,
+				"This command can only be used in a server.",
+			);
+			return;
+		}
+
 		const currentValue = await ConfigHelper.fetchValue(
 			interaction.guildId,
 			selectedProperty,
