@@ -1,8 +1,9 @@
+import { BotPermission } from "@decorators/BotPermission";
 import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
-import { Guild, Invite } from "discord.js";
+import { Guild, Invite, PermissionsBitField } from "discord.js";
 
 export class InvitationService {
 	private static logger = new Logger("InvitationService");
@@ -11,6 +12,7 @@ export class InvitationService {
 	/**
 	 * Syncs all invites from a guild to Redis.
 	 */
+	@BotPermission(PermissionsBitField.Flags.ManageGuild)
 	public static async syncInvites(guild: Guild): Promise<void> {
 		try {
 			const invites = await guild.invites.fetch();

@@ -1,10 +1,12 @@
-import { BaseCommand } from "@class/BaseCommand";
+import { InteractionHelper } from "@utils/InteractionHelper";
+import { Logger } from "@utils/Logger";
 import {
 	ChatInputCommandInteraction,
-	Client,
-	MessageFlags,
+	Guild,
 	type PermissionResolvable,
 } from "discord.js";
+
+const logger = new Logger("BotPermission");
 
 export function BotPermission(...permissions: PermissionResolvable[]) {
 	return function (
@@ -12,52 +14,69 @@ export function BotPermission(...permissions: PermissionResolvable[]) {
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) {
-		// Validation: @BotPermission ne peut être utilisé que sur des méthodes de classes étendant BaseCommand
-		if (!(target instanceof BaseCommand)) {
-			throw new Error(
-				`@BotPermission decorator can only be used on methods of classes extending BaseCommand. ` +
-					`Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`,
-			);
-		}
 		const originalMethod = descriptor.value;
 
-		descriptor.value = async function (
-			client: Client,
-			interaction: ChatInputCommandInteraction,
-			...args: any[]
-		) {
-			if (!interaction.guild) {
-				await interaction.reply({
-					content: "This command can only be used in a server.",
-					flags: [MessageFlags.Ephemeral],
-				});
+		descriptor.value = async function (...args: any[]) {
+			let guild: Guild | undefined;
+			let interaction: ChatInputCommandInteraction | undefined;
+
+			for (const arg of args) {
+				if (arg instanceof Guild) {
+					guild = arg;
+				} else if (arg?.guild instanceof Guild) {
+					guild = arg.guild;
+					if ("reply" in arg && typeof arg.reply === "function") {
+						interaction = arg as ChatInputCommandInteraction;
+					}
+				}
+			}
+
+			if (interaction && !guild) {
+				await InteractionHelper.respondError(
+					interaction,
+					"This command can only be used in a server.",
+				);
 				return;
 			}
 
-			const me = interaction.guild.members.me;
-			if (!me) {
-				// Should not happen if interaction is in guild
-				await interaction.reply({
-					content: "I cannot verify my permissions.",
-					flags: [MessageFlags.Ephemeral],
-				});
-				return;
+			if (guild) {
+				const me = guild.members.me;
+				if (!me) {
+					if (interaction) {
+						await InteractionHelper.respondError(
+							interaction,
+							"I cannot verify my permissions.",
+						);
+					} else {
+						logger.warn(
+							`Cannot verify permissions in guild ${guild.id} (me is missing)`,
+						);
+					}
+					return;
+				}
+
+				const missingPermissions = me.permissions.missing(permissions);
+
+				if (missingPermissions.length > 0) {
+					const formattedPermissions = missingPermissions
+						.map((p) => `\`${p}\``)
+						.join(", ");
+
+					if (interaction) {
+						await InteractionHelper.respondError(
+							interaction,
+							`I am missing the following permissions to perform this action: ${formattedPermissions}`,
+						);
+					} else {
+						logger.warn(
+							`Missing permissions in guild ${guild.name} (${guild.id}) for method ${propertyKey}: ${formattedPermissions}`,
+						);
+					}
+					return;
+				}
 			}
 
-			const missingPermissions = me.permissions.missing(permissions);
-
-			if (missingPermissions.length > 0) {
-				const formattedPermissions = missingPermissions
-					.map((p) => `\`${p}\``)
-					.join(", ");
-				await interaction.reply({
-					content: `I am missing the following permissions to perform this action: ${formattedPermissions}`,
-					flags: [MessageFlags.Ephemeral],
-				});
-				return;
-			}
-
-			return originalMethod.apply(this, [client, interaction, ...args]);
+			return originalMethod.apply(this, args);
 		};
 
 		return descriptor;
