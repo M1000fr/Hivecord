@@ -19,7 +19,7 @@
 				},
 				"embed": {
 					"deleted": "Embed deleted.",
-					"list": "Embed List",
+					"list": "Embed List :\n{{embeds}}",
 					"new_embed_desc": "Description for new embed",
 					"new_embed_title": "New Embed",
 					"preview": "Preview",
