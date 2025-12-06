@@ -36,7 +36,6 @@
 					"select_permissions": "Select permissions",
 					"permissions_title": "Permissions for {{group}}",
 					"permissions_failed": "Failed to update permissions: {{error}}",
-					"create_failed": "Failed to create group: {{error}}",
 					"created": "Group {{name}} created successfully.",
 					"delete_failed": "Failed to delete group: {{error}}",
 					"deleted": "Group {{name}} deleted successfully."
@@ -203,11 +202,9 @@
 					"success": "User {{userTag}} has been unmuted."
 				},
 				"unwarn": {
-					"failed_with_error": "Failed to remove warning: {{error}}",
 					"success": "✅ Removed warning #{{id}} for {{userTag}}."
 				},
 				"warn": {
-					"failed_with_error": "Failed to warn user: {{error}}",
 					"success": "✅ Warned {{userTag}} for: {{reason}}"
 				},
 				"ban": {
@@ -435,7 +432,6 @@
 					"title": "Message Edited",
 					"before": "Before",
 					"after": "After",
-					"empty": "*Empty Message*",
 					"description": "Message edited in {{channel}} [Jump to message]({{url}})",
 					"no_content": "*No content*"
 				},

@@ -36,7 +36,6 @@
 					"select_permissions": "Sélectionnez les permissions",
 					"permissions_title": "Permissions pour {{group}}",
 					"permissions_failed": "Échec de la mise à jour des permissions : {{error}}",
-					"create_failed": "Échec de la création du groupe : {{error}}",
 					"created": "Groupe {{name}} créé avec succès.",
 					"delete_failed": "Échec de la suppression du groupe : {{error}}",
 					"deleted": "Groupe {{name}} supprimé avec succès."
@@ -203,11 +202,9 @@
 					"success": "L'utilisateur {{userTag}} n'est plus muet."
 				},
 				"unwarn": {
-					"failed_with_error": "Échec de la suppression de l'avertissement : {{error}}",
 					"success": "✅ Avertissement #{{id}} supprimé pour {{userTag}}."
 				},
 				"warn": {
-					"failed_with_error": "Échec de l'avertissement de l'utilisateur : {{error}}",
 					"success": "✅ {{userTag}} averti pour : {{reason}}"
 				},
 				"ban": {
@@ -435,7 +432,6 @@
 					"title": "Message modifié",
 					"before": "Avant",
 					"after": "Après",
-					"empty": "*Message vide*",
 					"description": "Message modifié dans {{channel}} [Aller au message]({{url}})",
 					"no_content": "*Aucun contenu*"
 				},
