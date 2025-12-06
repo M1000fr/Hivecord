@@ -10,23 +10,30 @@ const logger = new Logger("BotPermission");
 
 export function BotPermission(...permissions: PermissionResolvable[]) {
 	return function (
-		target: any,
+		target: unknown,
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) {
 		const originalMethod = descriptor.value;
 
-		descriptor.value = async function (...args: any[]) {
+		descriptor.value = async function (...args: unknown[]) {
 			let guild: Guild | undefined;
 			let interaction: ChatInputCommandInteraction | undefined;
 
 			for (const arg of args) {
 				if (arg instanceof Guild) {
 					guild = arg;
-				} else if (arg?.guild instanceof Guild) {
-					guild = arg.guild;
-					if ("reply" in arg && typeof arg.reply === "function") {
-						interaction = arg as ChatInputCommandInteraction;
+				} else {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					const typedArg = arg as any;
+					if (typedArg?.guild instanceof Guild) {
+						guild = typedArg.guild;
+						if (
+							"reply" in typedArg &&
+							typeof typedArg.reply === "function"
+						) {
+							interaction = arg as ChatInputCommandInteraction;
+						}
 					}
 				}
 			}
