@@ -104,6 +104,5 @@ jobs:
                   script: |
                       echo $HARBOR_PASSWORD | docker login $REGISTRY -u $HARBOR_USERNAME --password-stdin
                       cd /root/discord/bots/leBot
-                      docker compose down
                       docker compose pull
                       docker compose up -d
