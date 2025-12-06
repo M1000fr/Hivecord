@@ -19,7 +19,7 @@ export class GuildMemberAdd extends BaseEvent<typeof BotEvents.GuildMemberAdd> {
 			);
 			if (usedInvite.inviter) {
 				await InvitationService.addInvitation(
-					member.guild.id,
+					member.guild,
 					usedInvite.inviter.id,
 					member.id,
 					usedInvite.code,

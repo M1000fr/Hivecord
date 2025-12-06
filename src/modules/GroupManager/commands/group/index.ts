@@ -61,7 +61,7 @@ export default class GroupCommand extends BaseCommand {
 		await InteractionHelper.defer(interaction);
 
 		try {
-			await GroupService.createGroup(interaction.guildId!, name, role.id);
+			await GroupService.createGroup(interaction.guild, name, role.id);
 			await InteractionHelper.respondSuccess(
 				interaction,
 				t("modules.configuration.commands.group.created", { name }),
