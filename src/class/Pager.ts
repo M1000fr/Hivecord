@@ -1,4 +1,4 @@
-import { PagerRegistry } from "@services/PagerRegistry";
+import { PagerRegistry } from "@registers/PagerRegistry";
 import { RedisService } from "@services/RedisService";
 import {
 	ActionRowBuilder,
