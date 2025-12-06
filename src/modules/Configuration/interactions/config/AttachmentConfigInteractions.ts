@@ -9,7 +9,6 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	Message,
-	MessageFlags,
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
@@ -59,7 +58,6 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 		await interaction.reply({
 			embeds: [embed],
 			components: [row],
-			flags: [MessageFlags.Ephemeral],
 		});
 
 		const filter = (m: Message) =>

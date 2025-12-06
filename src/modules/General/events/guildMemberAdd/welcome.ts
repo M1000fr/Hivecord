@@ -228,43 +228,48 @@ export default class WelcomeEvent extends BaseEvent<
 				GeneralConfigKeys.welcomeMessage,
 			);
 
-			const welcomeMessageTemplate = new MessageTemplate(
-				welcomeMessageConfig || "Welcome {user} to {guild}!",
-			);
-			Object.entries(commonContext).forEach(([key, value]) => {
-				if (value !== null && value !== undefined) {
-					welcomeMessageTemplate.addContext(key, value);
-				}
-			});
-
-			const welcomeMessage = welcomeMessageTemplate.resolve();
-
 			encoder.finish();
 			const buffer = await finishPromise;
 			const attachment = new AttachmentBuilder(buffer, {
 				name: "welcome.gif",
 			});
 
+			const payload: any = {
+				files: [attachment],
+			};
+
 			if (welcomeEmbedName) {
 				const customEmbed = await EmbedService.render(
-					welcomeEmbedName,
 					member.guild.id,
+					welcomeEmbedName,
 					commonContext,
 				);
 
 				if (customEmbed) {
-					await channel.send({
-						embeds: [customEmbed],
-						files: [attachment],
-					});
-					return;
+					payload.embeds = [customEmbed];
 				}
 			}
 
-			await channel.send({
-				content: welcomeMessage,
-				files: [attachment],
-			});
+			let messageTemplateStr = welcomeMessageConfig;
+
+			// If no embed and no config, use default
+			if (!payload.embeds && !messageTemplateStr) {
+				messageTemplateStr = "Welcome {user} to {guild}!";
+			}
+
+			if (messageTemplateStr) {
+				const welcomeMessageTemplate = new MessageTemplate(
+					messageTemplateStr,
+				);
+				Object.entries(commonContext).forEach(([key, value]) => {
+					if (value !== null && value !== undefined) {
+						welcomeMessageTemplate.addContext(key, value);
+					}
+				});
+				payload.content = welcomeMessageTemplate.resolve();
+			}
+
+			await channel.send(payload);
 		} catch (error) {
 			this.logger.error(
 				"Error sending welcome message",

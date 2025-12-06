@@ -19,7 +19,7 @@
 				},
 				"embed": {
 					"deleted": "Embed supprimé.",
-					"list": "Liste des embeds",
+					"list": "Liste des embeds :\n{{embeds}}",
 					"new_embed_desc": "Description du nouvel embed",
 					"new_embed_title": "Nouvel Embed",
 					"preview": "Aperçu",
