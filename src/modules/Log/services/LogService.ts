@@ -198,50 +198,6 @@ export class LogService {
 		await channel.send({ embeds: [embed] });
 	}
 
-	static async logMessageEdit(
-		guild: Guild,
-		user: User,
-		before: string,
-		after: string,
-	) {
-		if (!(await this.isEnabled(guild.id, LogConfigKeys.enableMessageLogs)))
-			return;
-		const channel = await this.getLogChannel(guild);
-		if (!channel) return;
-
-		const lng = await this.getLanguage(guild.id);
-
-		const embed = new EmbedBuilder()
-			.setTitle(I18nService.t("modules.log.message.edit.title", { lng }))
-			.setColor(Colors.Yellow)
-			.setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
-			.addFields(
-				{
-					name: I18nService.t("modules.log.message.edit.before", {
-						lng,
-					}),
-					value:
-						before ||
-						I18nService.t("modules.log.message.edit.empty", {
-							lng,
-						}),
-				},
-				{
-					name: I18nService.t("modules.log.message.edit.after", {
-						lng,
-					}),
-					value:
-						after ||
-						I18nService.t("modules.log.message.edit.empty", {
-							lng,
-						}),
-				},
-			)
-			.setTimestamp();
-
-		await channel.send({ embeds: [embed] });
-	}
-
 	static async logRoleCreate(guild: Guild, role: Role) {
 		if (
 			!(await this.isEnabled(
@@ -294,15 +250,19 @@ export class LogService {
 		const changes: string[] = [];
 		const lng = await this.getLanguage(guild.id);
 
-		const checkChange = (fieldKey: string, before: any, after: any) => {
+		const checkChange = (
+			fieldKey: string,
+			before: unknown,
+			after: unknown,
+		) => {
 			if (before !== after) {
 				const field = I18nService.t(fieldKey, { lng });
 				changes.push(
 					I18nService.t("modules.log.role.update.field_change", {
 						lng,
 						field,
-						before,
-						after,
+						before: String(before),
+						after: String(after),
 					}),
 				);
 			}

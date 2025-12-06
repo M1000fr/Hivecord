@@ -10,15 +10,16 @@ export interface OptionRouteOptions {
 
 export function OptionRoute(options: OptionRouteOptions) {
 	return function (
-		target: any,
+		target: BaseCommand,
 		propertyKey: string,
-		descriptor: PropertyDescriptor,
+		_descriptor: PropertyDescriptor,
 	) {
 		// Validation: @OptionRoute ne peut être utilisé que sur des méthodes de classes étendant BaseCommand
 		if (!(target instanceof BaseCommand)) {
 			throw new Error(
 				`@OptionRoute decorator can only be used on methods of classes extending BaseCommand. ` +
-					`Method "${propertyKey}" is in class "${target.constructor.name}" which does not extend BaseCommand.`,
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					`Method "${propertyKey}" is in class "${(target as any).constructor.name}" which does not extend BaseCommand.`,
 			);
 		}
 		const constructor = target.constructor as ICommandClass;

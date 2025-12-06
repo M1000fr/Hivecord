@@ -189,7 +189,7 @@ export default class SanctionsCommand extends BaseCommand {
 			}
 
 			await interaction.reply({ embeds: [embed] });
-		} catch (error) {
+		} catch {
 			await interaction.reply({
 				content: t(
 					"modules.moderation.commands.sanctions.reason_add_failed",
@@ -263,7 +263,7 @@ export default class SanctionsCommand extends BaseCommand {
 				),
 				flags: [MessageFlags.Ephemeral],
 			});
-		} catch (error) {
+		} catch {
 			await interaction.reply({
 				content: t(
 					"modules.moderation.commands.sanctions.reason_update_failed",
@@ -300,7 +300,7 @@ export default class SanctionsCommand extends BaseCommand {
 				),
 				flags: [MessageFlags.Ephemeral],
 			});
-		} catch (error) {
+		} catch {
 			await interaction.reply({
 				content: t(
 					"modules.moderation.commands.sanctions.reason_remove_failed",

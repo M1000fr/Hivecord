@@ -1,15 +1,10 @@
+import { LeBotClient } from "@class/LeBotClient";
+import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { ButtonPattern } from "@decorators/Interaction";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
-import { ConfigService } from "@services/ConfigService";
-import { I18nService } from "@services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
-import {
-	ActionRowBuilder,
-	ButtonBuilder,
-	type ButtonInteraction,
-	ButtonStyle,
-} from "discord.js";
+import { InteractionHelper } from "@utils/InteractionHelper";
+import { type ButtonInteraction, type RepliableInteraction } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
 export class BooleanConfigInteractions extends BaseConfigInteractions {
@@ -35,64 +30,36 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 	}
 
 	async show(
-		interaction: any,
-		propertyOptions: any,
+		interaction: RepliableInteraction,
+		propertyOptions: ConfigPropertyOptions,
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId,
-				GeneralConfigKeys.language,
-			)) ?? "en";
-		const t = I18nService.getFixedT(lng);
-		const currentValue = await ConfigHelper.getCurrentValue(
+		if (!interaction.guildId) {
+			await InteractionHelper.respondError(
+				interaction,
+				"This command can only be used in a server.",
+			);
+			return;
+		}
+
+		const currentValue = await ConfigHelper.fetchValue(
 			interaction.guildId,
 			selectedProperty,
-			propertyOptions.type,
-			t,
+			EConfigType.Boolean,
 			propertyOptions.defaultValue,
 		);
-		const embed = this.buildPropertyEmbed(
-			propertyOptions,
+
+		const isTrue = String(currentValue) === "true";
+		const newValue = !isTrue;
+
+		await this.updateConfig(
+			interaction.client as LeBotClient<true>,
+			interaction,
+			moduleName,
 			selectedProperty,
-			currentValue,
-			t,
-			lng,
+			String(newValue),
+			EConfigType.Boolean,
 		);
-
-		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			this.createConfigButton(
-				"module_config_bool",
-				moduleName,
-				selectedProperty,
-				interaction.user.id,
-				"Enable",
-				ButtonStyle.Success,
-				["true"],
-			),
-			this.createConfigButton(
-				"module_config_bool",
-				moduleName,
-				selectedProperty,
-				interaction.user.id,
-				"Disable",
-				ButtonStyle.Danger,
-				["false"],
-			),
-			this.createConfigButton(
-				"module_config_clear",
-				moduleName,
-				selectedProperty,
-				interaction.user.id,
-				"Clear",
-				ButtonStyle.Secondary,
-			),
-		);
-
-		await interaction.reply({
-			embeds: [embed],
-			components: [row],
-		});
 	}
 }

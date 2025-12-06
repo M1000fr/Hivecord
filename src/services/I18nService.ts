@@ -22,7 +22,7 @@ export class I18nService {
 	 * @param key The key to translate
 	 * @param options Options for translation (interpolation, locale, etc.)
 	 */
-	static t(key: string, options?: any): string {
+	static t(key: string, options?: Record<string, unknown>): string {
 		return i18next.t(key, options) as string;
 	}
 

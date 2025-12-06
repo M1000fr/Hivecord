@@ -3,7 +3,7 @@ import { LeBotClient } from "@class/LeBotClient";
 import { Pager } from "@class/Pager";
 import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
-import { type Interaction } from "discord.js";
+import { DiscordAPIError, type Interaction } from "discord.js";
 
 @Event({
 	name: BotEvents.InteractionCreate,
@@ -19,11 +19,12 @@ export default class PagerHandlerEvent extends BaseEvent<
 		// If it returns true, it was handled
 		try {
 			await Pager.handleInteraction(interaction);
-		} catch (error) {
+		} catch (error: unknown) {
 			// Ignore unknown interaction errors, as they might happen if the interaction was already handled
 			if (
-				(error as any).code !== 10062 &&
-				(error as any).code !== 40060
+				error instanceof DiscordAPIError &&
+				error.code !== 10062 &&
+				error.code !== 40060
 			) {
 				console.error("Error handling pager interaction:", error);
 			}

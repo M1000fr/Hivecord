@@ -1,3 +1,6 @@
+import { LeBotClient } from "@class/LeBotClient";
+import { type IConfigClass } from "@decorators/ConfigContext";
+import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { ButtonPattern, ModalPattern } from "@decorators/Interaction";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
@@ -12,6 +15,7 @@ import {
 	ButtonStyle,
 	ModalBuilder,
 	type ModalSubmitInteraction,
+	type RepliableInteraction,
 	TextInputBuilder,
 	TextInputStyle,
 } from "discord.js";
@@ -34,6 +38,8 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				propertyKey,
 				interaction.fields.getTextInputValue("value"),
 				EConfigType.String,
+				false,
+				true,
 			);
 		}
 	}
@@ -106,8 +112,8 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 	}
 
 	async show(
-		interaction: any,
-		propertyOptions: any,
+		interaction: RepliableInteraction,
+		propertyOptions: ConfigPropertyOptions,
 		selectedProperty: string,
 		moduleName: string,
 	) {
@@ -125,8 +131,12 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			propertyOptions.defaultValue,
 		);
 
-		const module = interaction.client.modules.get(moduleName.toLowerCase());
-		const configContexts = (module?.options.config as any)?.configContexts;
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const configContexts = (
+			module?.options.config as unknown as IConfigClass
+		)?.configContexts;
 
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,
@@ -146,15 +156,20 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				"Edit Value",
 				ButtonStyle.Primary,
 			),
-			this.createConfigButton(
-				"module_config_clear",
-				moduleName,
-				selectedProperty,
-				interaction.user.id,
-				"Clear Value",
-				ButtonStyle.Danger,
-			),
 		);
+
+		if (!propertyOptions.nonNull) {
+			row.addComponents(
+				this.createConfigButton(
+					"module_config_clear",
+					moduleName,
+					selectedProperty,
+					interaction.user.id,
+					"Clear Value",
+					ButtonStyle.Danger,
+				),
+			);
+		}
 
 		await interaction.reply({
 			embeds: [embed],

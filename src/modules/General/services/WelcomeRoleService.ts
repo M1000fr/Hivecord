@@ -1,6 +1,6 @@
 import { ConfigService } from "@services/ConfigService";
 import { Logger } from "@utils/Logger";
-import { GuildMember } from "discord.js";
+import { DiscordAPIError, type GuildMember } from "discord.js";
 import { GeneralConfigKeys } from "../GeneralConfig";
 
 export class WelcomeRoleService {
@@ -53,12 +53,15 @@ export class WelcomeRoleService {
 			);
 		} catch (error) {
 			// Ignore if member left or other common errors to avoid spamming logs
-			if ((error as any).code === 10007 || (error as any).code === 50013)
+			if (
+				error instanceof DiscordAPIError &&
+				(error.code === 10007 || error.code === 50013)
+			)
 				return;
 
 			this.logger.error(
 				`Failed to add welcome roles to ${member.user.tag}:`,
-				error as any,
+				error instanceof Error ? error.message : String(error),
 			);
 		}
 	}

@@ -2,43 +2,39 @@ import { BaseCommand } from "@class/BaseCommand";
 import { SanctionScheduler } from "@class/SanctionScheduler";
 import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import type { EventOptions } from "@interfaces/EventOptions";
+import type { ICommandClass } from "@interfaces/ICommandClass";
+import type { IEventClass } from "@interfaces/IEventClass";
+import type { IModuleInstance } from "@interfaces/IModuleInstance";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
-import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
-import { DebugModule } from "@modules/Debug/DebugModule";
-import { GeneralModule } from "@modules/General/GeneralModule";
-import { GroupManagerModule } from "@modules/GroupManager/GroupManagerModule";
-import { InvitationModule } from "@modules/Invitation/InvitationModule";
-import { LogModule } from "@modules/Log/LogModule";
-import { ModerationModule } from "@modules/Moderation/ModerationModule";
-import { SecurityModule } from "@modules/Security/SecurityModule";
-import { StatisticsModule } from "@modules/Statistics/StatisticsModule";
-import { VoiceModule } from "@modules/Voice/VoiceModule";
 import { PermissionService } from "@services/PermissionService";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
 import { createHash } from "crypto";
 import {
-	type ApplicationCommandDataResolvable,
 	Client,
 	Collection,
+	DiscordAPIError,
 	IntentsBitField,
 	PermissionsBitField,
+	type ApplicationCommandDataResolvable,
 } from "discord.js";
+import { promises as fs } from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export class LeBotClient<ready = false> extends Client {
+export class LeBotClient<
+	Ready extends boolean = boolean,
+> extends Client<Ready> {
 	public commands = new Collection<
 		string,
 		{ instance: BaseCommand; options: CommandOptions }
 	>();
 	public modules = new Collection<
 		string,
-		{ instance: any; options: ModuleOptions }
+		{ instance: IModuleInstance; options: ModuleOptions }
 	>();
 	private logger = new Logger("LeBotClient");
 	private scheduler: SanctionScheduler;
@@ -66,7 +62,11 @@ export class LeBotClient<ready = false> extends Client {
 		});
 
 		process.on("unhandledRejection", (reason) => {
-			this.logger.error(reason, undefined, "UnhandledRejection");
+			this.logger.error(
+				reason instanceof Error ? reason.message : String(reason),
+				reason instanceof Error ? reason.stack : undefined,
+				"UnhandledRejection",
+			);
 		});
 	}
 
@@ -75,8 +75,11 @@ export class LeBotClient<ready = false> extends Client {
 		this.scheduler.start();
 		try {
 			return await this.login(token);
-		} catch (error: any) {
-			if (error.code === "DisallowedIntents") {
+		} catch (error: unknown) {
+			if (
+				error instanceof DiscordAPIError &&
+				error.code === "DisallowedIntents"
+			) {
 				this.logger.error(
 					"Privileged intent provided is not enabled or whitelisted in the Discord Developer Portal.",
 				);
@@ -94,12 +97,11 @@ export class LeBotClient<ready = false> extends Client {
 		const debugGuildId = process.env.DEBUG_DISCORD_GUILD_ID;
 
 		const commandsData = this.commands.map((c) => {
-			const options = { ...c.options };
+			const options = { ...c.options } as Record<string, unknown>;
 			if (options.defaultMemberPermissions) {
-				(options as any).defaultMemberPermissions =
-					PermissionsBitField.resolve(
-						options.defaultMemberPermissions,
-					).toString();
+				options.defaultMemberPermissions = PermissionsBitField.resolve(
+					options.defaultMemberPermissions as import("discord.js").PermissionResolvable,
+				).toString();
 			}
 			return options;
 		});
@@ -129,14 +131,14 @@ export class LeBotClient<ready = false> extends Client {
 				);
 				const guild = await this.guilds.fetch(debugGuildId);
 				await guild.commands.set(
-					commandsData as ApplicationCommandDataResolvable[],
+					commandsData as unknown as ApplicationCommandDataResolvable[],
 				);
 			} else {
 				this.logger.log(
 					`Started refreshing ${commandsData.length} application (/) commands GLOBALLY.`,
 				);
 				await this.application?.commands.set(
-					commandsData as ApplicationCommandDataResolvable[],
+					commandsData as unknown as ApplicationCommandDataResolvable[],
 				);
 
 				// Clear guild-specific commands to avoid duplicates
@@ -179,11 +181,11 @@ export class LeBotClient<ready = false> extends Client {
 		if (!options.commands) return;
 
 		for (const CommandClass of options.commands) {
-			const cmdOptions = (CommandClass as any)
-				.commandOptions as CommandOptions;
+			const cmdOptions = (CommandClass as unknown as ICommandClass)
+				.commandOptions;
 			if (!cmdOptions) continue;
 
-			const instance = new CommandClass();
+			const instance = new (CommandClass as unknown as ICommandClass)();
 			this.commands.set(cmdOptions.name, {
 				instance,
 				options: cmdOptions,
@@ -195,18 +197,18 @@ export class LeBotClient<ready = false> extends Client {
 		if (!options.events) return;
 
 		for (const EventClass of options.events) {
-			const evtOptions = (EventClass as any)
-				.eventOptions as EventOptions<any>;
+			const evtOptions = (EventClass as unknown as IEventClass)
+				.eventOptions;
 			if (!evtOptions) continue;
 
-			const instance = new EventClass();
-			const handler = async (...args: any[]) => {
+			const instance = new (EventClass as unknown as IEventClass)();
+			const handler = async (...args: unknown[]) => {
 				try {
 					await instance.run(this, ...args);
-				} catch (error: any) {
+				} catch (error: unknown) {
 					this.logger.error(
 						`Error in event ${evtOptions.name}:`,
-						error.stack,
+						error instanceof Error ? error.stack : String(error),
 					);
 				}
 			};
@@ -220,35 +222,70 @@ export class LeBotClient<ready = false> extends Client {
 	}
 
 	private async loadModules() {
-		const modules = [
-			ModerationModule,
-			ConfigurationModule,
-			GeneralModule,
-			VoiceModule,
-			LogModule,
-			DebugModule,
-			SecurityModule,
-			StatisticsModule,
-			InvitationModule,
-			GroupManagerModule,
-		];
+		const modulesPath = path.join(__dirname, "../modules");
+		const folders = await fs.readdir(modulesPath);
 
-		for (const ModuleClass of modules) {
-			const moduleInstance = new ModuleClass();
-			const options = (moduleInstance as any)
-				.moduleOptions as ModuleOptions;
+		for (const folder of folders) {
+			const folderPath = path.join(modulesPath, folder);
+			const stat = await fs.stat(folderPath);
+			if (!stat.isDirectory()) continue;
 
-			this.modules.set(options.name.toLowerCase(), {
-				instance: moduleInstance,
-				options,
-			});
-			this.logger.log(`Loading module: ${options.name}`);
+			const filesInFolder = await fs.readdir(folderPath);
+			const candidateFiles = filesInFolder.filter(
+				(f) =>
+					f.startsWith(folder) &&
+					(f.endsWith(".ts") || f.endsWith(".js")),
+			);
 
-			this.loadCommands(options);
-			this.loadEvents(options);
+			let moduleLoaded = false;
+
+			for (const moduleFile of candidateFiles) {
+				if (moduleLoaded) break;
+
+				const moduleFilePath = path.join(folderPath, moduleFile);
+				try {
+					const imported = await import(
+						pathToFileURL(moduleFilePath).href
+					);
+
+					for (const exportedKey in imported) {
+						const ExportedClass = imported[exportedKey];
+
+						if (typeof ExportedClass !== "function") continue;
+
+						try {
+							// eslint-disable-next-line @typescript-eslint/no-explicit-any
+							const instance = new (ExportedClass as any)();
+							if ("moduleOptions" in instance) {
+								const options = (
+									instance as unknown as IModuleInstance
+								).moduleOptions;
+
+								this.modules.set(options.name.toLowerCase(), {
+									instance:
+										instance as unknown as IModuleInstance,
+									options,
+								});
+								this.logger.log(
+									`Loading module: ${options.name}`,
+								);
+
+								this.loadCommands(options);
+								this.loadEvents(options);
+								moduleLoaded = true;
+								break;
+							}
+						} catch {
+							// Ignore instantiation errors
+						}
+					}
+				} catch {
+					// Ignore import errors
+				}
+			}
 		}
 
-		for (const [_, module] of this.modules) {
+		for (const module of this.modules.values()) {
 			if (typeof module.instance.setup === "function") {
 				await module.instance.setup(this);
 			}

@@ -1,6 +1,6 @@
 export class MessageTemplate {
 	private template: string;
-	private context: Record<string, any> = {};
+	private context: Record<string, unknown> = {};
 
 	constructor(template: string) {
 		this.template = template;
@@ -11,7 +11,7 @@ export class MessageTemplate {
 	 * @param key The key to access the variable (e.g. 'user')
 	 * @param value The value or object
 	 */
-	public addContext(key: string, value: any): this {
+	public addContext(key: string, value: unknown): this {
 		this.context[key] = value;
 		return this;
 	}
@@ -35,11 +35,13 @@ export class MessageTemplate {
 			return obj.map((item) => this.resolveObject(item)) as unknown as T;
 		}
 		if (obj !== null && typeof obj === "object") {
-			const result: any = {};
+			const result: Record<string, unknown> = {};
 			for (const key in obj) {
-				result[key] = this.resolveObject((obj as any)[key]);
+				result[key] = this.resolveObject(
+					(obj as Record<string, unknown>)[key],
+				);
 			}
-			return result;
+			return result as unknown as T;
 		}
 		return obj;
 	}
@@ -67,7 +69,7 @@ export class MessageTemplate {
 		});
 	}
 
-	private getValue(obj: any, path: string): any {
+	private getValue(obj: unknown, path: string): unknown {
 		// Security: Forbidden keys to prevent access to sensitive data or internal structures
 		const forbiddenKeys = [
 			"client",
@@ -85,9 +87,11 @@ export class MessageTemplate {
 				return undefined;
 			}
 
+			const accRecord = acc as Record<string, unknown>;
+
 			// Try exact match first
-			if (acc[part] !== undefined) {
-				return acc[part];
+			if (accRecord[part] !== undefined) {
+				return accRecord[part];
 			}
 
 			// Try case-insensitive match
@@ -101,11 +105,11 @@ export class MessageTemplate {
 				return undefined;
 			}
 
-			return key ? acc[key] : undefined;
+			return key ? accRecord[key] : undefined;
 		}, obj);
 	}
 
-	private getAllPropertyNames(obj: any): string[] {
+	private getAllPropertyNames(obj: unknown): string[] {
 		const props = new Set<string>();
 		let currentObj = obj;
 

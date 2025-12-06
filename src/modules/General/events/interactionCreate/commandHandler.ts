@@ -3,7 +3,7 @@ import { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
 import { Logger } from "@utils/Logger";
-import { MessageFlags, type Interaction } from "discord.js";
+import { type Interaction, type RepliableInteraction } from "discord.js";
 
 @Event({
 	name: BotEvents.InteractionCreate,
@@ -14,10 +14,13 @@ export default class InteractionCreateEvent extends BaseEvent<
 	private logger = new Logger("InteractionCreateEvent");
 
 	private async sendErrorResponse(
-		interaction: any,
+		interaction: RepliableInteraction,
 		message: string,
 	): Promise<void> {
-		const payload = { content: message, flags: [MessageFlags.Ephemeral] };
+		const payload = {
+			content: message,
+			ephemeral: true,
+		};
 		if (interaction.replied || interaction.deferred) {
 			await interaction.followUp(payload);
 		} else {
@@ -32,10 +35,10 @@ export default class InteractionCreateEvent extends BaseEvent<
 
 			try {
 				await command.instance.handleAutocomplete(client, interaction);
-			} catch (error: any) {
+			} catch (error: unknown) {
 				this.logger.error(
 					`Error handling autocomplete for ${interaction.commandName}:`,
-					error.message,
+					error instanceof Error ? error.message : String(error),
 				);
 			}
 			return;

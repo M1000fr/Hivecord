@@ -69,11 +69,12 @@ export default class GroupCommand extends BaseCommand {
 				interaction,
 				t("modules.configuration.commands.group.created", { name }),
 			);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			await InteractionHelper.respondError(
 				interaction,
 				t("modules.configuration.commands.group.create_failed", {
-					error: error.message,
+					error:
+						error instanceof Error ? error.message : String(error),
 				}),
 			);
 		}
@@ -97,11 +98,12 @@ export default class GroupCommand extends BaseCommand {
 				interaction,
 				t("modules.configuration.commands.group.deleted", { name }),
 			);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			await InteractionHelper.respondError(
 				interaction,
 				t("modules.configuration.commands.group.delete_failed", {
-					error: error.message,
+					error:
+						error instanceof Error ? error.message : String(error),
 				}),
 			);
 		}
@@ -196,11 +198,12 @@ export default class GroupCommand extends BaseCommand {
 				embeds: [embed],
 				components: rows,
 			});
-		} catch (error: any) {
+		} catch (error: unknown) {
 			await InteractionHelper.respondError(
 				interaction,
 				t("modules.configuration.commands.group.permissions_failed", {
-					error: error.message,
+					error:
+						error instanceof Error ? error.message : String(error),
 				}),
 			);
 		}
@@ -259,11 +262,12 @@ export default class GroupCommand extends BaseCommand {
 			});
 
 			await pager.start(interaction);
-		} catch (error: any) {
+		} catch (error: unknown) {
 			await InteractionHelper.respondError(
 				interaction,
 				t("modules.configuration.commands.group.list_failed", {
-					error: error.message,
+					error:
+						error instanceof Error ? error.message : String(error),
 				}),
 			);
 		}

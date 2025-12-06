@@ -340,16 +340,19 @@ export class HeatpointService {
 									`Deleted ${userMessages.size} messages from ${user.tag} in ${channel.name}.`,
 								);
 							}
-						} catch (delError: any) {
+						} catch (delError: unknown) {
 							this.logger.error(
-								`Failed to delete messages for ${user.tag}: ${delError.message}`,
+								`Failed to delete messages for ${user.tag}: ${delError instanceof Error ? delError.message : String(delError)}`,
 							);
 						}
 					}
 					return true;
 				}
-			} catch (error: any) {
-				if (error.message !== "User is already muted.") {
+			} catch (error: unknown) {
+				if (
+					error instanceof Error &&
+					error.message !== "User is already muted."
+				) {
 					this.logger.error(
 						`Failed to mute user ${user.tag}: ${error.message}`,
 					);
@@ -586,7 +589,7 @@ export class HeatpointService {
 			if (channel && channel.isTextBased()) {
 				try {
 					await channel.send(message);
-				} catch (e) {
+				} catch {
 					this.logger.error(
 						`Failed to send alert to channel ${alertChannelId}`,
 					);

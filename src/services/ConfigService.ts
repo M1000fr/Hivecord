@@ -1,4 +1,5 @@
 import { ChannelType } from "@prisma/client/enums";
+import { ConfigRegistry } from "@registers/ConfigRegistry";
 import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
@@ -25,7 +26,14 @@ export class ConfigService {
 		const config = await prismaClient.configuration.findUnique({
 			where: { guildId_key: { guildId, key } },
 		});
-		const value = config?.value ?? null;
+		let value = config?.value ?? null;
+
+		if (value === null) {
+			const defaultValue = ConfigRegistry.getDefault(key);
+			if (defaultValue !== undefined) {
+				value = String(defaultValue);
+			}
+		}
 
 		if (value) await redis.set(cacheKey, value, "EX", CACHE_TTL);
 

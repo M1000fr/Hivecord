@@ -1,4 +1,13 @@
-import { MessageFlags } from "discord.js";
+import {
+	type CommandInteraction,
+	type MessageComponentInteraction,
+	type ModalSubmitInteraction,
+} from "discord.js";
+
+type RepliableInteraction =
+	| CommandInteraction
+	| MessageComponentInteraction
+	| ModalSubmitInteraction;
 
 /**
  * Helper utility for common Discord interaction patterns
@@ -8,20 +17,20 @@ export class InteractionHelper {
 	 * Send a response to an interaction, handling replied/deferred states
 	 */
 	static async respond(
-		interaction: any,
+		interaction: RepliableInteraction,
 		content: string,
 		ephemeral = true,
 	): Promise<void> {
 		const payload = {
 			content,
-			flags: ephemeral ? [MessageFlags.Ephemeral] : [],
+			ephemeral,
 		};
 
 		if (interaction.replied || interaction.deferred) {
 			await interaction.followUp(payload);
-		} else if (interaction.isModalSubmit?.()) {
+		} else if (interaction.isModalSubmit()) {
 			await interaction.reply(payload);
-		} else if (interaction.update) {
+		} else if (interaction.isMessageComponent()) {
 			await interaction.update({
 				...payload,
 				embeds: [],
@@ -36,7 +45,7 @@ export class InteractionHelper {
 	 * Send an error message to an interaction
 	 */
 	static async respondError(
-		interaction: any,
+		interaction: RepliableInteraction,
 		error: string | Error,
 	): Promise<void> {
 		const message = error instanceof Error ? error.message : error;
@@ -47,7 +56,7 @@ export class InteractionHelper {
 	 * Send a success message to an interaction
 	 */
 	static async respondSuccess(
-		interaction: any,
+		interaction: RepliableInteraction,
 		message: string,
 	): Promise<void> {
 		await this.respond(interaction, `✅ ${message}`, true);
@@ -56,15 +65,16 @@ export class InteractionHelper {
 	/**
 	 * Defer the interaction reply or update based on interaction type
 	 */
-	static async defer(interaction: any, ephemeral = true): Promise<void> {
+	static async defer(
+		interaction: RepliableInteraction,
+		ephemeral = true,
+	): Promise<void> {
 		if (interaction.deferred || interaction.replied) return;
 
-		const options = ephemeral ? { flags: [MessageFlags.Ephemeral] } : {};
-
-		if (interaction.deferUpdate) {
+		if (interaction.isMessageComponent() || interaction.isModalSubmit()) {
 			await interaction.deferUpdate();
-		} else if (interaction.deferReply) {
-			await interaction.deferReply(options);
+		} else {
+			await interaction.deferReply({ ephemeral });
 		}
 	}
 }

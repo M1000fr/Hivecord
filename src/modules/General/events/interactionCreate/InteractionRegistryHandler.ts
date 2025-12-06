@@ -2,7 +2,7 @@ import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
-import { InteractionRegistry } from "@services/InteractionRegistry";
+import { InteractionRegistry } from "@registers/InteractionRegistry";
 import { type Interaction } from "discord.js";
 
 @Event({

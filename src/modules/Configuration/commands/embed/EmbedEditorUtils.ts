@@ -185,10 +185,12 @@ export class EmbedEditorUtils {
 	static getModal(
 		lng: string,
 		type: string,
-		currentData?: any,
+		currentData?: unknown,
 	): ModalBuilder {
 		const t = I18nService.getFixedT(lng);
 		const modal = new ModalBuilder();
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const data = currentData as any;
 
 		switch (type) {
 			case "edit_title":
@@ -210,7 +212,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
-							.setValue(currentData?.title || ""),
+							.setValue(data?.title || ""),
 					),
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
@@ -222,7 +224,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
-							.setValue(currentData?.url || ""),
+							.setValue(data?.url || ""),
 					),
 				);
 				break;
@@ -246,7 +248,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Paragraph)
 							.setRequired(false)
-							.setValue(currentData?.description || ""),
+							.setValue(data?.description || ""),
 					),
 				);
 				break;
@@ -270,7 +272,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
-							.setValue(currentData?.author?.name || ""),
+							.setValue(data?.author?.name || ""),
 					),
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
@@ -282,7 +284,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
-							.setValue(currentData?.author?.icon_url || ""),
+							.setValue(data?.author?.icon_url || ""),
 					),
 				);
 				break;
@@ -306,7 +308,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
-							.setValue(currentData?.footer?.text || ""),
+							.setValue(data?.footer?.text || ""),
 					),
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
@@ -318,7 +320,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
-							.setValue(currentData?.footer?.icon_url || ""),
+							.setValue(data?.footer?.icon_url || ""),
 					),
 				);
 				break;
@@ -347,7 +349,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
-							.setValue(currentData?.image?.url || ""),
+							.setValue(data?.image?.url || ""),
 					),
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
@@ -359,7 +361,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
-							.setValue(currentData?.thumbnail?.url || ""),
+							.setValue(data?.thumbnail?.url || ""),
 					),
 				);
 				break;
@@ -389,8 +391,8 @@ export class EmbedEditorUtils {
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
 							.setValue(
-								currentData?.color
-									? `#${currentData.color.toString(16)}`
+								data?.color
+									? `#${data.color.toString(16)}`
 									: "",
 							),
 					),
@@ -418,7 +420,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(true)
-							.setValue(currentData?.field?.name || ""),
+							.setValue(data?.field?.name || ""),
 					),
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
@@ -430,7 +432,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Paragraph)
 							.setRequired(true)
-							.setValue(currentData?.field?.value || ""),
+							.setValue(data?.field?.value || ""),
 					),
 					new ActionRowBuilder<TextInputBuilder>().addComponents(
 						new TextInputBuilder()
@@ -442,9 +444,7 @@ export class EmbedEditorUtils {
 							)
 							.setStyle(TextInputStyle.Short)
 							.setRequired(false)
-							.setValue(
-								currentData?.field?.inline ? "true" : "false",
-							),
+							.setValue(data?.field?.inline ? "true" : "false"),
 					),
 				);
 				break;

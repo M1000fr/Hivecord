@@ -1,38 +1,43 @@
-import { Collection } from "discord.js";
+import { Collection, type Interaction } from "discord.js";
+
+type InteractionHandler = (interaction: Interaction) => Promise<void>;
 
 export class InteractionRegistry {
-	static buttons = new Collection<string, Function>();
-	static selectMenus = new Collection<string, Function>();
-	static modals = new Collection<string, Function>();
-	static buttonPatterns = new Collection<string, Function>();
-	static selectMenuPatterns = new Collection<string, Function>();
-	static modalPatterns = new Collection<string, Function>();
+	static buttons = new Collection<string, InteractionHandler>();
+	static selectMenus = new Collection<string, InteractionHandler>();
+	static modals = new Collection<string, InteractionHandler>();
+	static buttonPatterns = new Collection<string, InteractionHandler>();
+	static selectMenuPatterns = new Collection<string, InteractionHandler>();
+	static modalPatterns = new Collection<string, InteractionHandler>();
 
-	static registerButton(customId: string, handler: Function) {
+	static registerButton(customId: string, handler: InteractionHandler) {
 		this.buttons.set(customId, handler);
 	}
 
-	static registerSelectMenu(customId: string, handler: Function) {
+	static registerSelectMenu(customId: string, handler: InteractionHandler) {
 		this.selectMenus.set(customId, handler);
 	}
 
-	static registerModal(customId: string, handler: Function) {
+	static registerModal(customId: string, handler: InteractionHandler) {
 		this.modals.set(customId, handler);
 	}
 
-	static registerButtonPattern(pattern: string, handler: Function) {
+	static registerButtonPattern(pattern: string, handler: InteractionHandler) {
 		this.buttonPatterns.set(pattern, handler);
 	}
 
-	static registerSelectMenuPattern(pattern: string, handler: Function) {
+	static registerSelectMenuPattern(
+		pattern: string,
+		handler: InteractionHandler,
+	) {
 		this.selectMenuPatterns.set(pattern, handler);
 	}
 
-	static registerModalPattern(pattern: string, handler: Function) {
+	static registerModalPattern(pattern: string, handler: InteractionHandler) {
 		this.modalPatterns.set(pattern, handler);
 	}
 
-	static getButtonHandler(customId: string): Function | null {
+	static getButtonHandler(customId: string): InteractionHandler | null {
 		// Try exact match first
 		const exactHandler = this.buttons.get(customId);
 		if (exactHandler) return exactHandler;
@@ -46,7 +51,7 @@ export class InteractionRegistry {
 		return null;
 	}
 
-	static getSelectMenuHandler(customId: string): Function | null {
+	static getSelectMenuHandler(customId: string): InteractionHandler | null {
 		// Try exact match first
 		const exactHandler = this.selectMenus.get(customId);
 		if (exactHandler) return exactHandler;
@@ -60,7 +65,7 @@ export class InteractionRegistry {
 		return null;
 	}
 
-	static getModalHandler(customId: string): Function | null {
+	static getModalHandler(customId: string): InteractionHandler | null {
 		// Try exact match first
 		const exactHandler = this.modals.get(customId);
 		if (exactHandler) return exactHandler;

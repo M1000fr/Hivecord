@@ -3,14 +3,25 @@ import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import {
+	type APIEmbed,
 	type ButtonInteraction,
 	EmbedBuilder,
 	type Interaction,
+	type MessageComponentInteraction,
 	MessageFlags,
 	type ModalSubmitInteraction,
 	type StringSelectMenuInteraction,
 } from "discord.js";
 import { EmbedEditorUtils } from "../commands/embed/EmbedEditorUtils";
+
+interface EmbedEditorSession {
+	userId?: string;
+	guildId: string;
+	data: APIEmbed;
+	name: string;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	meta?: Record<string, any>;
+}
 
 export class EmbedEditorInteractions {
 	private async getSession(interaction: Interaction) {
@@ -45,14 +56,18 @@ export class EmbedEditorInteractions {
 		return session;
 	}
 
-	private async updateEditorMessage(interaction: any, session: any) {
+	private async updateEditorMessage(
+		interaction: MessageComponentInteraction | ModalSubmitInteraction,
+		session: EmbedEditorSession,
+	) {
 		const lng =
 			(await ConfigService.get(
 				session.guildId,
 				GeneralConfigKeys.language,
 			)) ?? "en";
 		const embed = new EmbedBuilder(session.data);
-		await interaction.update({
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		await (interaction as any).update({
 			content: `**Embed Editor**: Editing \`${session.name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
 			embeds: [embed],
 			components: [

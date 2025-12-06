@@ -1,10 +1,14 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { EConfigType } from "@decorators/ConfigProperty";
+import {
+	EConfigType,
+	type ConfigPropertyOptions,
+} from "@decorators/ConfigProperty";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import {
 	ActionRowBuilder,
 	EmbedBuilder,
+	Locale,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
 } from "discord.js";
@@ -30,7 +34,7 @@ export class ConfigHelper {
 		value: string | string[],
 		type: EConfigType,
 		t: TFunction,
-		options?: any,
+		options?: ConfigPropertyOptions,
 		locale?: string,
 	): string {
 		if (type === EConfigType.Role) return `<@&${value}>`;
@@ -38,11 +42,13 @@ export class ConfigHelper {
 			return value.map((v) => `<@&${v}>`).join(", ");
 		if (type === EConfigType.Channel) return `<#${value}>`;
 		if (type === EConfigType.Boolean)
-			return value === "true" ? "`✅`" : "`❌`";
+			return String(value) === "true" ? "`✅`" : "`❌`";
 		if (type === EConfigType.StringChoice && options?.choices && locale) {
-			const choice = options.choices.find((c: any) => c.value === value);
+			const choice = options.choices.find((c) => c.value === value);
 			if (choice) {
-				return choice.nameLocalizations?.[locale] || choice.name;
+				return (
+					choice.nameLocalizations?.[locale as Locale] || choice.name
+				);
 			}
 		}
 		if (type === EConfigType.Attachment) {
@@ -63,7 +69,7 @@ export class ConfigHelper {
 		guildId: string,
 		key: string,
 		type: EConfigType,
-		defaultValue?: any,
+		defaultValue?: unknown,
 	): Promise<string | string[] | null> {
 		const snakeKey = this.toSnakeCase(key);
 		let value: string | string[] | null = null;
@@ -77,7 +83,7 @@ export class ConfigHelper {
 		else value = await ConfigService.get(guildId, snakeKey);
 
 		if (value === null && defaultValue !== undefined) {
-			return defaultValue;
+			return String(defaultValue);
 		}
 		return value;
 	}
@@ -124,8 +130,8 @@ export class ConfigHelper {
 		key: string,
 		type: EConfigType,
 		t: TFunction,
-		defaultValue?: any,
-		options?: any,
+		defaultValue?: unknown,
+		options?: ConfigPropertyOptions,
 		locale?: string,
 	): Promise<string> {
 		try {
@@ -133,7 +139,7 @@ export class ConfigHelper {
 				guildId,
 				key,
 				type,
-				defaultValue,
+				options?.nonNull ? defaultValue : undefined,
 			);
 			return value
 				? this.formatValue(value, type, t, options, locale)
@@ -155,7 +161,11 @@ export class ConfigHelper {
 		if (!module?.options.config) return null;
 
 		const configProperties =
-			(module.options.config as any).configProperties || {};
+			(
+				module.options.config as unknown as {
+					configProperties: Record<string, ConfigPropertyOptions>;
+				}
+			).configProperties || {};
 
 		const embed = new EmbedBuilder()
 			.setTitle(
@@ -174,13 +184,14 @@ export class ConfigHelper {
 		for (const [idx, [key, options]] of Object.entries(
 			configProperties,
 		).entries()) {
-			const opt = options as any;
+			const opt = options;
 			const displayName =
-				opt.displayNameLocalizations?.[locale] ||
+				opt.displayNameLocalizations?.[locale as Locale] ||
 				opt.displayName ||
 				key;
 			const description =
-				opt.descriptionLocalizations?.[locale] || opt.description;
+				opt.descriptionLocalizations?.[locale as Locale] ||
+				opt.description;
 
 			const currentValue = await this.getCurrentValue(
 				guildId,
@@ -210,13 +221,13 @@ export class ConfigHelper {
 			.setPlaceholder(t("utils.config_helper.select_placeholder"))
 			.addOptions(
 				Object.entries(configProperties).map(([key, options], idx) => {
-					const opt = options as any;
+					const opt = options;
 					const displayName =
-						opt.displayNameLocalizations?.[locale] ||
+						opt.displayNameLocalizations?.[locale as Locale] ||
 						opt.displayName ||
 						key;
 					const description =
-						opt.descriptionLocalizations?.[locale] ||
+						opt.descriptionLocalizations?.[locale as Locale] ||
 						opt.description;
 
 					return new StringSelectMenuOptionBuilder()

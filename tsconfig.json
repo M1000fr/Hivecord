@@ -23,6 +23,7 @@
 			"@services/*": ["./src/services/*"],
 			"@types/*": ["./src/types/*"],
 			"@utils/*": ["./src/utils/*"],
+			"@registers/*": ["./src/registers/*"],
 			"@prisma/*": ["./src/prisma/*"]
 		},
 		// Best practices

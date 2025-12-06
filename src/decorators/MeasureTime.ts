@@ -3,7 +3,7 @@ import { InfluxService } from "@services/InfluxService";
 interface MeasureTimeOptions {
 	name?: string;
 	trackInteraction?: boolean;
-	trackComponents?: any[];
+	trackComponents?: unknown[];
 }
 
 /**
@@ -17,7 +17,7 @@ export function MeasureTime(nameOrOptions?: string | MeasureTimeOptions) {
 			: nameOrOptions || {};
 
 	return function (
-		target: any,
+		target: unknown,
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) {
@@ -27,13 +27,20 @@ export function MeasureTime(nameOrOptions?: string | MeasureTimeOptions) {
 		// Instrument requested components
 		if (options.trackComponents) {
 			for (const component of options.trackComponents) {
-				if (component && component.name) {
-					InfluxService.instrument(component, component.name);
+				if (
+					component &&
+					typeof component === "object" &&
+					"name" in component
+				) {
+					InfluxService.instrument(
+						component,
+						(component as { name: string }).name,
+					);
 				}
 			}
 		}
 
-		descriptor.value = async function (this: any, ...args: any[]) {
+		descriptor.value = async function (this: unknown, ...args: unknown[]) {
 			// If tracking is enabled, look for an interaction object in args and proxy it
 			if (options.trackInteraction) {
 				args = args.map((arg) => {
@@ -44,7 +51,10 @@ export function MeasureTime(nameOrOptions?: string | MeasureTimeOptions) {
 						"reply" in arg &&
 						"client" in arg
 					) {
-						return createInteractionProxy(arg, metricName);
+						return createInteractionProxy(
+							arg as object,
+							metricName,
+						);
 					}
 					return arg;
 				});
@@ -76,7 +86,7 @@ export function MeasureTime(nameOrOptions?: string | MeasureTimeOptions) {
 	};
 }
 
-function createInteractionProxy(interaction: any, parentMetric: string) {
+function createInteractionProxy(interaction: object, parentMetric: string) {
 	return new Proxy(interaction, {
 		get(target, prop, receiver) {
 			const value = Reflect.get(target, prop, receiver);
@@ -96,7 +106,7 @@ function createInteractionProxy(interaction: any, parentMetric: string) {
 				typeof prop === "string" &&
 				methodsToTrack.includes(prop)
 			) {
-				return async function (this: any, ...args: any[]) {
+				return async function (this: unknown, ...args: unknown[]) {
 					const start = performance.now();
 					let success = true;
 					try {

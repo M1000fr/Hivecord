@@ -1,14 +1,24 @@
-import { EmbedBuilder } from "discord.js";
+import {
+	ActionRowBuilder,
+	EmbedBuilder,
+	type BaseMessageOptions,
+	type Interaction,
+} from "discord.js";
 
-export type PagerRenderer<T = any> = (
+export type PagerRenderer<T = unknown> = (
 	items: T[],
 	pageIndex: number,
 	totalPages: number,
-) => Promise<{ embeds: EmbedBuilder[]; components: any[]; files?: any[] }>;
+) => Promise<{
+	embeds: EmbedBuilder[];
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	components: ActionRowBuilder<any>[];
+	files?: BaseMessageOptions["files"];
+}>;
 
 export type PagerComponentHandler = (
-	interaction: any,
-	items: any[],
+	interaction: Interaction,
+	items: unknown[],
 	pageIndex: number,
 ) => Promise<void>;
 

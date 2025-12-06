@@ -1,6 +1,8 @@
 import { EPermission } from "@enums/EPermission";
+import type { CommandOptions } from "./CommandOptions";
 
 export interface ICommandClass {
+	commandOptions?: CommandOptions;
 	autocompletes?: Map<string, string>;
 	defaultCommand?: string;
 	defaultCommandPermission?: EPermission;

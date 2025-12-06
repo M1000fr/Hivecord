@@ -32,9 +32,10 @@ export class LogConfig {
 			"en-US": "Enable logs for sanctions (ban, mute, etc.)",
 		},
 		type: EConfigType.Boolean,
-		defaultValue: false,
+		defaultValue: true,
+		nonNull: true,
 	})
-	logEnableSanctionLogs: boolean = false;
+	logEnableSanctionLogs: boolean = true;
 
 	@ConfigProperty({
 		displayName: "Enable Voice Logs",
@@ -50,9 +51,10 @@ export class LogConfig {
 				"Enable logs for private voice channels (create, whitelist, blacklist)",
 		},
 		type: EConfigType.Boolean,
-		defaultValue: false,
+		defaultValue: true,
+		nonNull: true,
 	})
-	logEnableVoiceLogs: boolean = false;
+	logEnableVoiceLogs: boolean = true;
 
 	@ConfigProperty({
 		displayName: "Enable Member Logs",
@@ -66,9 +68,10 @@ export class LogConfig {
 			"en-US": "Enable logs for member join/leave",
 		},
 		type: EConfigType.Boolean,
-		defaultValue: false,
+		defaultValue: true,
+		nonNull: true,
 	})
-	logEnableMemberLogs: boolean = false;
+	logEnableMemberLogs: boolean = true;
 
 	@ConfigProperty({
 		displayName: "Enable Voice Connection Logs",
@@ -82,9 +85,10 @@ export class LogConfig {
 			"en-US": "Enable logs for voice connection/disconnection/stream",
 		},
 		type: EConfigType.Boolean,
-		defaultValue: false,
+		defaultValue: true,
+		nonNull: true,
 	})
-	logEnableVoiceConnectionLogs: boolean = false;
+	logEnableVoiceConnectionLogs: boolean = true;
 
 	@ConfigProperty({
 		displayName: "Enable Message Edit/Delete Logs",
@@ -98,9 +102,10 @@ export class LogConfig {
 			"en-US": "Enable logs for message edits and deletions",
 		},
 		type: EConfigType.Boolean,
-		defaultValue: false,
+		defaultValue: true,
+		nonNull: true,
 	})
-	logEnableMessageLogs: boolean = false;
+	logEnableMessageLogs: boolean = true;
 
 	@ConfigProperty({
 		displayName: "Enable Role Update Logs",
@@ -114,9 +119,10 @@ export class LogConfig {
 			"en-US": "Enable logs for role creations, deletions and updates",
 		},
 		type: EConfigType.Boolean,
-		defaultValue: false,
+		defaultValue: true,
+		nonNull: true,
 	})
-	logEnableRoleUpdateLogs: boolean = false;
+	logEnableRoleUpdateLogs: boolean = true;
 }
 
 export const LogConfigKeys = {

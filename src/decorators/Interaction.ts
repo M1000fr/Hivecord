@@ -1,8 +1,8 @@
-import { InteractionRegistry } from "@services/InteractionRegistry";
+import { InteractionRegistry } from "@registers/InteractionRegistry";
 
 export function Button(customId: string) {
 	return function (
-		target: any,
+		target: object,
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) {
@@ -15,7 +15,7 @@ export function Button(customId: string) {
 
 export function ButtonPattern(pattern: string) {
 	return function (
-		target: any,
+		target: object,
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) {
@@ -28,7 +28,7 @@ export function ButtonPattern(pattern: string) {
 
 export function SelectMenu(customId: string) {
 	return function (
-		target: any,
+		target: object,
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) {
@@ -41,7 +41,7 @@ export function SelectMenu(customId: string) {
 
 export function SelectMenuPattern(pattern: string) {
 	return function (
-		target: any,
+		target: object,
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) {
@@ -54,7 +54,7 @@ export function SelectMenuPattern(pattern: string) {
 
 export function Modal(customId: string) {
 	return function (
-		target: any,
+		target: object,
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) {
@@ -67,7 +67,7 @@ export function Modal(customId: string) {
 
 export function ModalPattern(pattern: string) {
 	return function (
-		target: any,
+		target: object,
 		propertyKey: string,
 		descriptor: PropertyDescriptor,
 	) {
