@@ -5,12 +5,19 @@ import { EPermission } from "@enums/EPermission";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
-import { ChatInputCommandInteraction, Client, MessageFlags } from "discord.js";
+import { BotPermission } from "@src/decorators/BotPermission";
+import {
+	ChatInputCommandInteraction,
+	Client,
+	MessageFlags,
+	PermissionFlagsBits,
+} from "discord.js";
 import { clearOptions } from "./clearOptions";
 
 @Command(clearOptions)
 export default class ClearCommand extends BaseCommand {
 	@DefaultCommand(EPermission.ChannelClear)
+	@BotPermission(PermissionFlagsBits.ManageMessages)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
 			(await ConfigService.get(
