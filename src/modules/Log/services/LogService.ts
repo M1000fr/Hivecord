@@ -198,50 +198,6 @@ export class LogService {
 		await channel.send({ embeds: [embed] });
 	}
 
-	static async logMessageEdit(
-		guild: Guild,
-		user: User,
-		before: string,
-		after: string,
-	) {
-		if (!(await this.isEnabled(guild.id, LogConfigKeys.enableMessageLogs)))
-			return;
-		const channel = await this.getLogChannel(guild);
-		if (!channel) return;
-
-		const lng = await this.getLanguage(guild.id);
-
-		const embed = new EmbedBuilder()
-			.setTitle(I18nService.t("modules.log.message.edit.title", { lng }))
-			.setColor(Colors.Yellow)
-			.setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
-			.addFields(
-				{
-					name: I18nService.t("modules.log.message.edit.before", {
-						lng,
-					}),
-					value:
-						before ||
-						I18nService.t("modules.log.message.edit.empty", {
-							lng,
-						}),
-				},
-				{
-					name: I18nService.t("modules.log.message.edit.after", {
-						lng,
-					}),
-					value:
-						after ||
-						I18nService.t("modules.log.message.edit.empty", {
-							lng,
-						}),
-				},
-			)
-			.setTimestamp();
-
-		await channel.send({ embeds: [embed] });
-	}
-
 	static async logRoleCreate(guild: Guild, role: Role) {
 		if (
 			!(await this.isEnabled(

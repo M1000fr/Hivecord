@@ -28,6 +28,7 @@ export class GeneralConfig {
 			},
 		],
 		defaultValue: "en",
+		nonNull: true,
 	})
 	generalLanguage: string = "en";
 

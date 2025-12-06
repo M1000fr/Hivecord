@@ -38,7 +38,7 @@ export class ConfigHelper {
 			return value.map((v) => `<@&${v}>`).join(", ");
 		if (type === EConfigType.Channel) return `<#${value}>`;
 		if (type === EConfigType.Boolean)
-			return value === "true" ? "`✅`" : "`❌`";
+			return String(value) === "true" ? "`✅`" : "`❌`";
 		if (type === EConfigType.StringChoice && options?.choices && locale) {
 			const choice = options.choices.find((c: any) => c.value === value);
 			if (choice) {
@@ -133,7 +133,7 @@ export class ConfigHelper {
 				guildId,
 				key,
 				type,
-				defaultValue,
+				options?.nonNull ? defaultValue : undefined,
 			);
 			return value
 				? this.formatValue(value, type, t, options, locale)

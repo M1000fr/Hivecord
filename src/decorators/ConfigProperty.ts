@@ -1,3 +1,4 @@
+import { ConfigRegistry } from "@registers/ConfigRegistry";
 import { ApplicationCommandOptionType, type LocalizationMap } from "discord.js";
 
 export enum EConfigType {
@@ -31,6 +32,7 @@ export interface ConfigPropertyOptions {
 	required?: boolean;
 	defaultValue?: any;
 	choices?: ConfigChoice[];
+	nonNull?: boolean;
 }
 
 export function ConfigProperty(options: ConfigPropertyOptions) {
@@ -39,6 +41,9 @@ export function ConfigProperty(options: ConfigPropertyOptions) {
 			target.constructor.configProperties = {};
 		}
 		target.constructor.configProperties[propertyKey] = options;
+
+		const key = toConfigKey(propertyKey);
+		ConfigRegistry.register(key, options.defaultValue);
 	};
 }
 
