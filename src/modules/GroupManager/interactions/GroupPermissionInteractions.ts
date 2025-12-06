@@ -1,9 +1,9 @@
 import { SelectMenuPattern } from "@decorators/Interaction";
-import { EPermission } from "@enums/EPermission";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { GroupService } from "@modules/GroupManager/services/GroupService";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { PermissionService } from "@services/PermissionService";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
 	ActionRowBuilder,
@@ -48,7 +48,7 @@ export class GroupPermissionInteractions {
 				return;
 			}
 
-			const allPermissions = Object.values(EPermission);
+			const allPermissions = await PermissionService.getAllPermissions();
 			const chunk = allPermissions.slice(offset, offset + 25);
 			const selectedValues = interaction.values;
 

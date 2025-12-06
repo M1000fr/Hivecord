@@ -117,6 +117,37 @@ export class LeBotClient<ready = false> extends Client {
 				await rest.put(Routes.applicationCommands(this.user.id), {
 					body: commandsData,
 				});
+
+				// Clear guild-specific commands to avoid duplicates
+				this.logger.log("Clearing guild-specific commands...");
+				for (const guild of this.guilds.cache.values()) {
+					try {
+						const currentCommands = (await rest.get(
+							Routes.applicationGuildCommands(
+								this.user.id,
+								guild.id,
+							),
+						)) as unknown[];
+
+						if (currentCommands.length > 0) {
+							this.logger.log(
+								`Clearing commands for guild ${guild.name} (${guild.id})`,
+							);
+							await rest.put(
+								Routes.applicationGuildCommands(
+									this.user.id,
+									guild.id,
+								),
+								{ body: [] },
+							);
+						}
+					} catch (error) {
+						this.logger.error(
+							`Failed to clear commands for guild ${guild.name} (${guild.id})`,
+							(error as Error).stack,
+						);
+					}
+				}
 			}
 
 			this.logger.log(
