@@ -15,8 +15,16 @@ import { SecurityModule } from "@modules/Security/SecurityModule";
 import { StatisticsModule } from "@modules/Statistics/StatisticsModule";
 import { VoiceModule } from "@modules/Voice/VoiceModule";
 import { PermissionService } from "@services/PermissionService";
+import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
-import { Client, Collection, IntentsBitField, REST, Routes } from "discord.js";
+import { createHash } from "crypto";
+import {
+	type ApplicationCommandDataResolvable,
+	Client,
+	Collection,
+	IntentsBitField,
+	PermissionsBitField,
+} from "discord.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -84,14 +92,14 @@ export class LeBotClient<ready = false> extends Client {
 		}
 
 		const debugGuildId = process.env.DEBUG_DISCORD_GUILD_ID;
-		const rest = new REST().setToken(this.token);
 
 		const commandsData = this.commands.map((c) => {
 			const options = { ...c.options };
-			if (typeof options.defaultMemberPermissions === "bigint") {
-				// @ts-ignore - JSON.stringify cannot serialize BigInt
-				options.defaultMemberPermissions =
-					options.defaultMemberPermissions.toString();
+			if (options.defaultMemberPermissions) {
+				(options as any).defaultMemberPermissions =
+					PermissionsBitField.resolve(
+						options.defaultMemberPermissions,
+					).toString();
 			}
 			return options;
 		});
@@ -100,46 +108,48 @@ export class LeBotClient<ready = false> extends Client {
 		try {
 			await PermissionService.registerPermissions(permissions);
 
+			// Calculate hash of commands
+			const hash = createHash("md5")
+				.update(JSON.stringify(commandsData))
+				.digest("hex");
+			const dbKey = `lebot:commands_hash:${debugGuildId || "global"}`;
+			const storedState = await prismaClient.botState.findUnique({
+				where: { key: dbKey },
+			});
+			const storedHash = storedState?.value;
+
+			if (hash === storedHash) {
+				this.logger.log("Commands are up to date (hash match).");
+				return;
+			}
+
 			if (debugGuildId) {
 				this.logger.log(
 					`Started refreshing ${commandsData.length} application (/) commands for DEBUG guild ${debugGuildId}.`,
 				);
-				await rest.put(
-					Routes.applicationGuildCommands(this.user.id, debugGuildId),
-					{
-						body: commandsData,
-					},
+				const guild = await this.guilds.fetch(debugGuildId);
+				await guild.commands.set(
+					commandsData as ApplicationCommandDataResolvable[],
 				);
 			} else {
 				this.logger.log(
 					`Started refreshing ${commandsData.length} application (/) commands GLOBALLY.`,
 				);
-				await rest.put(Routes.applicationCommands(this.user.id), {
-					body: commandsData,
-				});
+				await this.application?.commands.set(
+					commandsData as ApplicationCommandDataResolvable[],
+				);
 
 				// Clear guild-specific commands to avoid duplicates
 				this.logger.log("Clearing guild-specific commands...");
 				for (const guild of this.guilds.cache.values()) {
 					try {
-						const currentCommands = (await rest.get(
-							Routes.applicationGuildCommands(
-								this.user.id,
-								guild.id,
-							),
-						)) as unknown[];
+						const currentCommands = await guild.commands.fetch();
 
-						if (currentCommands.length > 0) {
+						if (currentCommands.size > 0) {
 							this.logger.log(
 								`Clearing commands for guild ${guild.name} (${guild.id})`,
 							);
-							await rest.put(
-								Routes.applicationGuildCommands(
-									this.user.id,
-									guild.id,
-								),
-								{ body: [] },
-							);
+							await guild.commands.set([]);
 						}
 					} catch (error) {
 						this.logger.error(
@@ -149,6 +159,13 @@ export class LeBotClient<ready = false> extends Client {
 					}
 				}
 			}
+
+			// Update hash in DB
+			await prismaClient.botState.upsert({
+				where: { key: dbKey },
+				update: { value: hash },
+				create: { key: dbKey, value: hash },
+			});
 
 			this.logger.log(
 				`Successfully reloaded ${commandsData.length} application (/) commands.`,
