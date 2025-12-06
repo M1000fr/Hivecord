@@ -156,7 +156,7 @@ export default class EmbedCommand extends BaseCommand {
 			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const embeds = await EmbedService.list(interaction.guildId!);
-		console.log(embeds);
+
 		await interaction.reply({
 			content: t("modules.configuration.commands.embed.list", {
 				embeds: embeds.map((e) => `- \`${e}\``).join("\n") || "None",
