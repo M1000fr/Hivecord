@@ -11,6 +11,7 @@ import {
 	Client,
 	EmbedBuilder,
 	InteractionContextType,
+	MessageFlags,
 } from "discord.js";
 import { InvitationService } from "../services/InvitationService";
 
@@ -101,7 +102,7 @@ export default class InvitesCommand extends BaseCommand {
 		if (leaderboard.length === 0) {
 			await interaction.reply({
 				content: t("modules.invitation.commands.top.no_invites"),
-				ephemeral: true,
+				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
