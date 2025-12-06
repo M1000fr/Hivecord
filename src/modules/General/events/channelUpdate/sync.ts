@@ -41,7 +41,11 @@ export default class ChannelUpdateEvent extends BaseEvent<
 			await prismaClient.channel.upsert({
 				where: { id: newChannel.id },
 				update: { type, deletedAt: null },
-				create: { id: newChannel.id, type },
+				create: {
+					id: newChannel.id,
+					guildId: newChannel.guild.id,
+					type,
+				},
 			});
 		} catch (error) {
 			this.logger.error(

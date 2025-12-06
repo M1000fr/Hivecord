@@ -40,7 +40,10 @@ export default class ModulesCommand extends BaseCommand {
 	@DefaultCommand(EPermission.ConfigureModules)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const lebot = client as LeBotClient<true>;
 		const moduleName = interaction.options.getString("module", true);
@@ -69,6 +72,7 @@ export default class ModulesCommand extends BaseCommand {
 
 		const config = await ConfigHelper.buildModuleConfigEmbed(
 			lebot,
+			interaction.guildId!,
 			moduleName,
 			interaction.user.id,
 			lng,

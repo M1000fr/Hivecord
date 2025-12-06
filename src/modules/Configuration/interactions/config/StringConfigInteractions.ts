@@ -65,6 +65,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 
 		const rawValue =
 			(await ConfigHelper.fetchValue(
+				interaction.guildId!,
 				propertyKey,
 				EConfigType.String,
 				propertyOptions.defaultValue,
@@ -112,9 +113,13 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		moduleName: string,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const currentValue = await ConfigHelper.getCurrentValue(
+			interaction.guildId!,
 			selectedProperty,
 			propertyOptions.type,
 			t,

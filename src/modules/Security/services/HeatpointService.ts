@@ -45,9 +45,14 @@ export class HeatpointService {
         return new_val
     `;
 
-	static async addHeat(id: string, points: number): Promise<number> {
+	static async addHeat(
+		guildId: string,
+		id: string,
+		points: number,
+	): Promise<number> {
 		const redis = RedisService.getInstance();
 		const decayRateStr = await ConfigService.get(
+			guildId,
 			SecurityConfigKeys.heatpointDecayRate,
 		);
 		const decayRate = parseInt(decayRateStr || "1", 10);
@@ -56,8 +61,8 @@ export class HeatpointService {
 		const result = await redis.eval(
 			this.LUA_SCRIPT,
 			2,
-			`heat:${id}`,
-			`heat:${id}:last_update`,
+			`heat:${guildId}:${id}`,
+			`heat:${guildId}:${id}:last_update`,
 			points,
 			decayRate,
 			now,
@@ -66,16 +71,17 @@ export class HeatpointService {
 		return result as number;
 	}
 
-	static async getHeat(id: string): Promise<number> {
+	static async getHeat(guildId: string, id: string): Promise<number> {
 		const redis = RedisService.getInstance();
 		const decayRateStr = await ConfigService.get(
+			guildId,
 			SecurityConfigKeys.heatpointDecayRate,
 		);
 		const decayRate = parseInt(decayRateStr || "1", 10);
 		const now = Math.floor(Date.now() / 1000);
 
-		const key_value = `heat:${id}`;
-		const key_time = `heat:${id}:last_update`;
+		const key_value = `heat:${guildId}:${id}`;
+		const key_time = `heat:${guildId}:${id}:last_update`;
 
 		const currentVal = parseInt((await redis.get(key_value)) || "0", 10);
 		const lastTime = parseInt(
@@ -93,20 +99,20 @@ export class HeatpointService {
 		return newVal;
 	}
 
-	static async resetHeat(id: string): Promise<void> {
+	static async resetHeat(guildId: string, id: string): Promise<void> {
 		const redis = RedisService.getInstance();
-		await redis.del(`heat:${id}`);
-		await redis.del(`heat:${id}:last_update`);
+		await redis.del(`heat:${guildId}:${id}`);
+		await redis.del(`heat:${guildId}:${id}:last_update`);
 	}
 
-	static async resetAllUserHeat(): Promise<void> {
+	static async resetAllUserHeat(guildId: string): Promise<void> {
 		const redis = RedisService.getInstance();
 		let cursor = "0";
 		do {
 			const result = await redis.scan(
 				cursor,
 				"MATCH",
-				"heat:user:*",
+				`heat:${guildId}:user:*`,
 				"COUNT",
 				"100",
 			);
@@ -130,6 +136,7 @@ export class HeatpointService {
 			case "join_voice":
 				points = parseInt(
 					(await ConfigService.get(
+						guild.id,
 						SecurityConfigKeys.heatpointJoinVoice,
 					)) || "10",
 					10,
@@ -138,6 +145,7 @@ export class HeatpointService {
 			case "switch_voice":
 				points = parseInt(
 					(await ConfigService.get(
+						guild.id,
 						SecurityConfigKeys.heatpointSwitchVoice,
 					)) || "5",
 					10,
@@ -146,6 +154,7 @@ export class HeatpointService {
 			case "stream":
 				points = parseInt(
 					(await ConfigService.get(
+						guild.id,
 						SecurityConfigKeys.heatpointStream,
 					)) || "20",
 					10,
@@ -154,6 +163,7 @@ export class HeatpointService {
 			case "message":
 				points = parseInt(
 					(await ConfigService.get(
+						guild.id,
 						SecurityConfigKeys.heatpointMessage,
 					)) || "5",
 					10,
@@ -162,6 +172,7 @@ export class HeatpointService {
 			case "reaction":
 				points = parseInt(
 					(await ConfigService.get(
+						guild.id,
 						SecurityConfigKeys.heatpointReaction,
 					)) || "2",
 					10,
@@ -172,7 +183,11 @@ export class HeatpointService {
 		if (points === 0) return;
 
 		// User Heat
-		const userHeat = await this.addHeat(`user:${user.id}`, points);
+		const userHeat = await this.addHeat(
+			guild.id,
+			`user:${user.id}`,
+			points,
+		);
 
 		const userSanctioned = await this.handleUserSanction(
 			guild,
@@ -191,11 +206,13 @@ export class HeatpointService {
 		// Channel Heat
 		if (channel) {
 			const channelHeat = await this.addHeat(
+				guild.id,
 				`channel:${channel.id}`,
 				points,
 			);
 			const channelThreshold = parseInt(
 				(await ConfigService.get(
+					guild.id,
 					SecurityConfigKeys.heatpointChannelThreshold,
 				)) || "100",
 				10,
@@ -203,7 +220,7 @@ export class HeatpointService {
 
 			// Track unique users in channel
 			const redis = RedisService.getInstance();
-			const channelUsersKey = `channel_users:${channel.id}`;
+			const channelUsersKey = `channel_users:${guild.id}:${channel.id}`;
 			await redis.sadd(channelUsersKey, user.id);
 			await redis.expire(channelUsersKey, 60); // Expire after 60 seconds (sliding window)
 			const uniqueUsers = await redis.scard(channelUsersKey);
@@ -214,9 +231,14 @@ export class HeatpointService {
 		}
 
 		// Global Heat
-		const globalHeat = await this.addHeat(`global:${guild.id}`, points);
+		const globalHeat = await this.addHeat(
+			guild.id,
+			`global:${guild.id}`,
+			points,
+		);
 		const globalThreshold = parseInt(
 			(await ConfigService.get(
+				guild.id,
 				SecurityConfigKeys.heatpointGlobalThreshold,
 			)) || "500",
 			10,
@@ -235,24 +257,28 @@ export class HeatpointService {
 	): Promise<boolean> {
 		const warnThreshold = parseInt(
 			(await ConfigService.get(
+				guild.id,
 				SecurityConfigKeys.heatpointUserWarnThreshold,
 			)) || "50",
 			10,
 		);
 		const muteThreshold = parseInt(
 			(await ConfigService.get(
+				guild.id,
 				SecurityConfigKeys.heatpointUserMuteThreshold,
 			)) || "80",
 			10,
 		);
 		const configMuteDuration = parseInt(
 			(await ConfigService.get(
+				guild.id,
 				SecurityConfigKeys.heatpointMuteDuration,
 			)) || "3600",
 			10,
 		);
 		const deleteMessagesLimit = parseInt(
 			(await ConfigService.get(
+				guild.id,
 				SecurityConfigKeys.heatpointDeleteMessagesLimit,
 			)) || "50",
 			10,
@@ -274,6 +300,7 @@ export class HeatpointService {
 				if (moderator) {
 					const reasonObj =
 						await SanctionReasonService.getOrCreateSystemReason(
+							guild.id,
 							"HEATPOINT_MUTE",
 							"Excessive activity (Heatpoint threshold exceeded)",
 							SanctionType.MUTE,
@@ -341,6 +368,7 @@ export class HeatpointService {
 					if (moderator) {
 						const reasonObj =
 							await SanctionReasonService.getOrCreateSystemReason(
+								guild.id,
 								"HEATPOINT_WARN",
 								"You are generating too much activity. Please slow down or you will be muted.",
 								SanctionType.WARN,
@@ -381,11 +409,13 @@ export class HeatpointService {
 
 		const duration = parseInt(
 			(await ConfigService.get(
+				channel.guild.id,
 				SecurityConfigKeys.heatpointLockDuration,
 			)) || "60",
 			10,
 		);
 		const bypassRoleId = await ConfigService.get(
+			channel.guild.id,
 			SecurityConfigKeys.bypassRoleId,
 		);
 
@@ -452,11 +482,13 @@ export class HeatpointService {
 
 		const duration = parseInt(
 			(await ConfigService.get(
+				guild.id,
 				SecurityConfigKeys.heatpointLockDuration,
 			)) || "60",
 			10,
 		);
 		const bypassRoleId = await ConfigService.get(
+			guild.id,
 			SecurityConfigKeys.bypassRoleId,
 		);
 
@@ -544,6 +576,7 @@ export class HeatpointService {
 		message: string,
 	): Promise<void> {
 		const alertChannelId = await ConfigService.get(
+			guild.id,
 			SecurityConfigKeys.alertChannelId,
 		);
 		if (alertChannelId) {

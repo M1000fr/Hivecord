@@ -13,6 +13,7 @@ import { I18nService } from "@services/I18nService";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
+	InteractionContextType,
 	MessageFlags,
 } from "discord.js";
 import { warnOptions } from "./options";
@@ -27,6 +28,7 @@ import { warnOptions } from "./options";
 		fr: "Avertir un utilisateur",
 	},
 	options: warnOptions,
+	contexts: [InteractionContextType.Guild],
 })
 export default class WarnCommand extends BaseCommand {
 	@Autocomplete({ optionName: "reason" })
@@ -36,6 +38,7 @@ export default class WarnCommand extends BaseCommand {
 	) {
 		const focusedOption = interaction.options.getFocused(true);
 		const reasons = await SanctionReasonService.getByType(
+			interaction.guildId!,
 			SanctionType.WARN,
 			false,
 		);
@@ -56,7 +59,10 @@ export default class WarnCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 		const reason = interaction.options.getString("reason", true);

@@ -60,6 +60,7 @@ export class ConfigHelper {
 	}
 
 	static async fetchValue(
+		guildId: string,
 		key: string,
 		type: EConfigType,
 		defaultValue?: any,
@@ -68,12 +69,12 @@ export class ConfigHelper {
 		let value: string | string[] | null = null;
 
 		if (type === EConfigType.Role)
-			value = await ConfigService.getRole(snakeKey);
+			value = await ConfigService.getRole(guildId, snakeKey);
 		else if (type === EConfigType.RoleArray)
-			value = await ConfigService.getRoles(snakeKey);
+			value = await ConfigService.getRoles(guildId, snakeKey);
 		else if (type === EConfigType.Channel)
-			value = await ConfigService.getChannel(snakeKey);
-		else value = await ConfigService.get(snakeKey);
+			value = await ConfigService.getChannel(guildId, snakeKey);
+		else value = await ConfigService.get(guildId, snakeKey);
 
 		if (value === null && defaultValue !== undefined) {
 			return defaultValue;
@@ -82,27 +83,32 @@ export class ConfigHelper {
 	}
 
 	static async saveValue(
+		guildId: string,
 		key: string,
 		value: string | string[],
 		type: EConfigType,
 	): Promise<void> {
 		const snakeKey = this.toSnakeCase(key);
 		if (type === EConfigType.Role)
-			return ConfigService.setRole(snakeKey, value as string);
+			return ConfigService.setRole(guildId, snakeKey, value as string);
 		if (type === EConfigType.RoleArray)
-			return ConfigService.setRoles(snakeKey, value as string[]);
+			return ConfigService.setRoles(guildId, snakeKey, value as string[]);
 		if (type === EConfigType.Channel)
-			return ConfigService.setChannel(snakeKey, value as string);
-		return ConfigService.set(snakeKey, value as string);
+			return ConfigService.setChannel(guildId, snakeKey, value as string);
+		return ConfigService.set(guildId, snakeKey, value as string);
 	}
 
-	static async deleteValue(key: string, type: EConfigType): Promise<void> {
+	static async deleteValue(
+		guildId: string,
+		key: string,
+		type: EConfigType,
+	): Promise<void> {
 		const snakeKey = this.toSnakeCase(key);
-		if (type === EConfigType.Role || type === EConfigType.RoleArray)
-			return ConfigService.deleteRole(snakeKey);
+		if (type === EConfigType.Role)
+			return ConfigService.deleteRole(guildId, snakeKey);
 		if (type === EConfigType.Channel)
-			return ConfigService.deleteChannel(snakeKey);
-		return ConfigService.delete(snakeKey);
+			return ConfigService.deleteChannel(guildId, snakeKey);
+		return ConfigService.delete(guildId, snakeKey);
 	}
 
 	static buildCustomId(parts: string[]): string {
@@ -114,6 +120,7 @@ export class ConfigHelper {
 	}
 
 	static async getCurrentValue(
+		guildId: string,
 		key: string,
 		type: EConfigType,
 		t: TFunction,
@@ -122,7 +129,12 @@ export class ConfigHelper {
 		locale?: string,
 	): Promise<string> {
 		try {
-			const value = await this.fetchValue(key, type, defaultValue);
+			const value = await this.fetchValue(
+				guildId,
+				key,
+				type,
+				defaultValue,
+			);
 			return value
 				? this.formatValue(value, type, t, options, locale)
 				: t("utils.config_helper.not_set");
@@ -133,6 +145,7 @@ export class ConfigHelper {
 
 	static async buildModuleConfigEmbed(
 		client: LeBotClient<true>,
+		guildId: string,
 		moduleName: string,
 		userId: string,
 		locale: string,
@@ -170,6 +183,7 @@ export class ConfigHelper {
 				opt.descriptionLocalizations?.[locale] || opt.description;
 
 			const currentValue = await this.getCurrentValue(
+				guildId,
 				key,
 				opt.type,
 				t,

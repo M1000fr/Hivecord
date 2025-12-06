@@ -9,13 +9,11 @@ export class PermissionService {
 
 	static async hasPermission(
 		userId: string,
+		guildOwnerId: string | undefined,
 		userRoleIds: string[],
 		requiredPermission: string,
 	): Promise<boolean> {
-		if (
-			process.env.DISCORD_OWNER_ID &&
-			userId === process.env.DISCORD_OWNER_ID
-		) {
+		if (guildOwnerId && userId === guildOwnerId) {
 			return true;
 		}
 

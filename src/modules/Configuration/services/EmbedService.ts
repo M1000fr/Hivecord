@@ -1,4 +1,5 @@
 import { MessageTemplate } from "@class/MessageTemplate";
+import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 import { EmbedBuilder, type APIEmbed } from "discord.js";
@@ -9,9 +10,9 @@ export class EmbedService {
 	/**
 	 * Get a raw embed JSON by name
 	 */
-	static async get(name: string): Promise<APIEmbed | null> {
+	static async get(guildId: string, name: string): Promise<APIEmbed | null> {
 		const embed = await prismaClient.customEmbed.findUnique({
-			where: { name },
+			where: { guildId_name: { guildId, name } },
 		});
 		if (!embed) return null;
 		return JSON.parse(embed.data);
@@ -20,28 +21,34 @@ export class EmbedService {
 	/**
 	 * Save an embed
 	 */
-	static async save(name: string, data: APIEmbed): Promise<void> {
+	static async save(
+		guildId: string,
+		name: string,
+		data: APIEmbed,
+	): Promise<void> {
+		await EntityService.ensureGuildById(guildId);
 		await prismaClient.customEmbed.upsert({
-			where: { name },
+			where: { guildId_name: { guildId, name } },
 			update: { data: JSON.stringify(data) },
-			create: { name, data: JSON.stringify(data) },
+			create: { guildId, name, data: JSON.stringify(data) },
 		});
 	}
 
 	/**
 	 * Delete an embed
 	 */
-	static async delete(name: string): Promise<void> {
+	static async delete(guildId: string, name: string): Promise<void> {
 		await prismaClient.customEmbed.delete({
-			where: { name },
+			where: { guildId_name: { guildId, name } },
 		});
 	}
 
 	/**
 	 * List all embeds
 	 */
-	static async list(): Promise<string[]> {
+	static async list(guildId: string): Promise<string[]> {
 		const embeds = await prismaClient.customEmbed.findMany({
+			where: { guildId },
 			select: { name: true },
 		});
 		return embeds.map((e) => e.name);
@@ -51,10 +58,11 @@ export class EmbedService {
 	 * Render an embed with context
 	 */
 	static async render(
+		guildId: string,
 		name: string,
 		context: Record<string, any>,
 	): Promise<EmbedBuilder | null> {
-		const data = await this.get(name);
+		const data = await this.get(guildId, name);
 		if (!data) return null;
 
 		const template = new MessageTemplate("");
@@ -72,6 +80,7 @@ export class EmbedService {
 	// --- Editor Session Management (Redis) ---
 
 	static async getEditorSession(sessionId: string): Promise<{
+		guildId: string;
 		name: string;
 		data: APIEmbed;
 		userId?: string;
@@ -85,6 +94,7 @@ export class EmbedService {
 
 	static async setEditorSession(
 		sessionId: string,
+		guildId: string,
 		name: string,
 		data: APIEmbed,
 		meta?: any,
@@ -94,7 +104,7 @@ export class EmbedService {
 		const key = `embed:editor:${sessionId}`;
 		await redis.set(
 			key,
-			JSON.stringify({ name, data, meta, userId }),
+			JSON.stringify({ guildId, name, data, meta, userId }),
 			"EX",
 			EDITOR_TTL,
 		);

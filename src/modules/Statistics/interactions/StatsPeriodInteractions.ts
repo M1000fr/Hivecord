@@ -21,7 +21,10 @@ export class StatsPeriodInteractions {
 		interaction: ButtonInteraction,
 	): Promise<void> {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const customId = interaction.customId;
 

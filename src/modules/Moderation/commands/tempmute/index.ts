@@ -29,6 +29,7 @@ export default class TempMuteCommand extends BaseCommand {
 	) {
 		const focusedOption = interaction.options.getFocused(true);
 		const reasons = await SanctionReasonService.getByType(
+			interaction.guildId!,
 			SanctionType.MUTE,
 			false,
 		);
@@ -51,7 +52,10 @@ export default class TempMuteCommand extends BaseCommand {
 	@BotPermission(PermissionsBitField.Flags.ManageRoles)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 		const reason = interaction.options.getString("reason", true);
@@ -59,6 +63,7 @@ export default class TempMuteCommand extends BaseCommand {
 		let finalDurationString: string | undefined;
 
 		const reasons = await SanctionReasonService.getByType(
+			interaction.guildId!,
 			SanctionType.MUTE,
 		);
 		const reasonObj = reasons.find((r) => r.text === reason);

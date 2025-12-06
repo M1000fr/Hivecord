@@ -42,9 +42,13 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 		moduleName: string,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const currentValue = await ConfigHelper.getCurrentValue(
+			interaction.guildId,
 			selectedProperty,
 			propertyOptions.type,
 			t,

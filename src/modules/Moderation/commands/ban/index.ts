@@ -28,6 +28,7 @@ export default class BanCommand extends BaseCommand {
 	) {
 		const focusedOption = interaction.options.getFocused(true);
 		const reasons = await SanctionReasonService.getByType(
+			interaction.guildId!,
 			SanctionType.BAN,
 			false,
 		);
@@ -46,7 +47,10 @@ export default class BanCommand extends BaseCommand {
 	@BotPermission(PermissionsBitField.Flags.BanMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 		const reason =

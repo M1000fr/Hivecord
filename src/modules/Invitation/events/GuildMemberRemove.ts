@@ -13,6 +13,6 @@ export class GuildMemberRemove extends BaseEvent<
 		client: LeBotClient<true>,
 		member: GuildMember | PartialGuildMember,
 	) {
-		await InvitationService.removeInvitation(member.id);
+		await InvitationService.removeInvitation(member.guild.id, member.id);
 	}
 }

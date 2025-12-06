@@ -20,14 +20,20 @@ export default class ConfigCommand extends BaseCommand {
 	@Subcommand({ name: "backup", permission: EPermission.ConfigureModules })
 	async backup(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const lebot = client as LeBotClient<true>;
 
 		await InteractionHelper.defer(interaction, true);
 
 		try {
-			const buffer = await BackupService.createBackup(lebot);
+			const buffer = await BackupService.createBackup(
+				lebot,
+				interaction.guildId!,
+			);
 			const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
 			const filename = `config-backup-${timestamp}.enc`;
 
@@ -53,7 +59,10 @@ export default class ConfigCommand extends BaseCommand {
 	@Subcommand({ name: "restore", permission: EPermission.ConfigureModules })
 	async restore(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		await InteractionHelper.defer(interaction, true);
 
@@ -78,7 +87,7 @@ export default class ConfigCommand extends BaseCommand {
 			const buffer = Buffer.from(arrayBuffer);
 
 			// Restore the backup
-			await BackupService.restoreBackup(buffer);
+			await BackupService.restoreBackup(buffer, interaction.guildId!);
 
 			await InteractionHelper.respondSuccess(
 				interaction,

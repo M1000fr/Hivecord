@@ -1,9 +1,13 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+} from "discord.js";
 
 export const tempMuteOptions: CommandOptions = {
 	name: "tempmute",
 	description: "Temporarily mute a user",
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "user",

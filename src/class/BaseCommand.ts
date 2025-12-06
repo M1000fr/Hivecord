@@ -135,6 +135,7 @@ export abstract class BaseCommand {
 
 		const hasPermission = await PermissionService.hasPermission(
 			interaction.user.id,
+			interaction.guild?.ownerId,
 			roleIds,
 			permission,
 		);

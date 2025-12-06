@@ -1,5 +1,8 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+} from "discord.js";
 
 export const banOptions: CommandOptions = {
 	name: "ban",
@@ -10,6 +13,7 @@ export const banOptions: CommandOptions = {
 	descriptionLocalizations: {
 		fr: "Bannir un utilisateur",
 	},
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "user",

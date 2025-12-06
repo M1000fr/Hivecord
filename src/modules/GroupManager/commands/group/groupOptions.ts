@@ -1,9 +1,14 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType, PermissionFlagsBits } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+	PermissionFlagsBits,
+} from "discord.js";
 
 export const groupOptions: CommandOptions = {
 	name: "group",
 	description: "Manage groups and permissions",
+	contexts: [InteractionContextType.Guild],
 	defaultMemberPermissions: PermissionFlagsBits.Administrator,
 	options: [
 		{
@@ -42,49 +47,14 @@ export const groupOptions: CommandOptions = {
 		{
 			name: "permissions",
 			description: "Manage permissions for a group",
-			type: ApplicationCommandOptionType.SubcommandGroup,
+			type: ApplicationCommandOptionType.Subcommand,
 			options: [
 				{
-					name: "add",
-					description: "Add a permission to a group",
-					type: ApplicationCommandOptionType.Subcommand,
-					options: [
-						{
-							name: "group",
-							description: "The name of the group",
-							type: ApplicationCommandOptionType.String,
-							required: true,
-							autocomplete: true,
-						},
-						{
-							name: "permission",
-							description: "The permission to add",
-							type: ApplicationCommandOptionType.String,
-							required: true,
-							autocomplete: true,
-						},
-					],
-				},
-				{
-					name: "remove",
-					description: "Remove a permission from a group",
-					type: ApplicationCommandOptionType.Subcommand,
-					options: [
-						{
-							name: "group",
-							description: "The name of the group",
-							type: ApplicationCommandOptionType.String,
-							required: true,
-							autocomplete: true,
-						},
-						{
-							name: "permission",
-							description: "The permission to remove",
-							type: ApplicationCommandOptionType.String,
-							required: true,
-							autocomplete: true,
-						},
-					],
+					name: "group",
+					description: "The name of the group",
+					type: ApplicationCommandOptionType.String,
+					required: true,
+					autocomplete: true,
 				},
 			],
 		},

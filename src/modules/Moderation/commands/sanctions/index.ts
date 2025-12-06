@@ -26,12 +26,15 @@ export default class SanctionsCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const targetUser = interaction.options.getUser("user", true);
 
 		const sanctions = await prismaClient.sanction.findMany({
-			where: { userId: targetUser.id },
+			where: { userId: targetUser.id, guildId: interaction.guildId! },
 			orderBy: { createdAt: "desc" },
 			include: { Moderator: true },
 		});
@@ -136,7 +139,10 @@ export default class SanctionsCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const text = interaction.options.getString("text", true);
 		const typeStr = interaction.options.getString("type", true);
@@ -145,11 +151,14 @@ export default class SanctionsCommand extends BaseCommand {
 		const type = typeStr as SanctionType;
 
 		try {
-			const reason = await SanctionReasonService.create({
-				text,
-				type,
-				duration: duration || undefined,
-			});
+			const reason = await SanctionReasonService.create(
+				interaction.guildId!,
+				{
+					text,
+					type,
+					duration: duration || undefined,
+				},
+			);
 
 			const embed = new EmbedBuilder()
 				.setTitle(
@@ -200,7 +209,10 @@ export default class SanctionsCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const id = interaction.options.getInteger("id", true);
 		const text = interaction.options.getString("text");
@@ -272,7 +284,10 @@ export default class SanctionsCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const id = interaction.options.getInteger("id", true);
 
@@ -306,14 +321,21 @@ export default class SanctionsCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const typeStr = interaction.options.getString("type");
 		const type = typeStr ? (typeStr as SanctionType) : undefined;
 
 		const reasons = type
-			? await SanctionReasonService.getByType(type, true)
-			: await SanctionReasonService.getAll();
+			? await SanctionReasonService.getByType(
+					interaction.guildId!,
+					type,
+					true,
+				)
+			: await SanctionReasonService.getAll(interaction.guildId!);
 
 		if (reasons.length === 0) {
 			await interaction.reply({

@@ -19,7 +19,10 @@ export default class PurgeCommand extends BaseCommand {
 	@DefaultCommand(EPermission.ChannelPurge)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const channel = interaction.channel;
 
@@ -60,6 +63,7 @@ export default class PurgeCommand extends BaseCommand {
 						create: {
 							id: newChannel.id,
 							type: oldChannelRecord.type,
+							guildId: interaction.guildId!,
 						},
 						update: {
 							type: oldChannelRecord.type,

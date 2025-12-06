@@ -26,52 +26,52 @@ export class SanctionScheduler {
 	}
 
 	private async checkMuteConsistency() {
-		const guildId = process.env.DISCORD_GUILD_ID;
-		if (!guildId) return;
+		for (const guild of this.client.guilds.cache.values()) {
+			const muteRoleId = await ConfigService.getRole(
+				guild.id,
+				ModerationConfigKeys.muteRoleId,
+			);
+			if (!muteRoleId) continue;
 
-		const guild = await this.client.guilds.fetch(guildId).catch(() => null);
-		if (!guild) return;
+			const muteRole = guild.roles.cache.get(muteRoleId);
+			if (!muteRole) continue;
 
-		const muteRoleId = await ConfigService.getRole(
-			ModerationConfigKeys.muteRoleId,
-		);
-		if (!muteRoleId) return;
+			// Fetch active mutes for this guild
+			const activeMutes = await prismaClient.sanction.findMany({
+				where: {
+					guildId: guild.id,
+					type: SanctionType.MUTE,
+					active: true,
+				},
+				select: {
+					userId: true,
+				},
+			});
 
-		const muteRole = guild.roles.cache.get(muteRoleId);
-		if (!muteRole) return;
+			const activeMuteUserIds = new Set(activeMutes.map((s) => s.userId));
 
-		// Fetch active mutes
-		const activeMutes = await prismaClient.sanction.findMany({
-			where: {
-				type: SanctionType.MUTE,
-				active: true,
-			},
-			select: {
-				userId: true,
-			},
-		});
-
-		const activeMuteUserIds = new Set(activeMutes.map((s) => s.userId));
-
-		for (const [memberId, member] of muteRole.members) {
-			if (!activeMuteUserIds.has(memberId)) {
-				try {
+			for (const [memberId, member] of muteRole.members) {
+				if (!activeMuteUserIds.has(memberId)) {
 					try {
-						await member.send(
-							`You have been \`unmuted\` in \`${guild.name}\`.`,
+						try {
+							await member.send(
+								`You have been \`unmuted\` in \`${guild.name}\`.`,
+							);
+						} catch (e) {
+							// Could not send DM
+						}
+						await member.roles.remove(
+							muteRole,
+							"Sanction consistency check: No active mute found",
 						);
-					} catch (e) {
-						// Could not send DM
+					} catch (error: any) {
+						this.logger.error(
+							`Error removing mute role from ${memberId} during consistency check in guild ${guild.name}:`,
+							error instanceof Error
+								? error.stack
+								: String(error),
+						);
 					}
-					await member.roles.remove(
-						muteRole,
-						"Sanction consistency check: No active mute found",
-					);
-				} catch (error: any) {
-					this.logger.error(
-						`Error removing mute role from ${memberId} during consistency check:`,
-						error instanceof Error ? error.stack : String(error),
-					);
 				}
 			}
 		}
@@ -79,14 +79,6 @@ export class SanctionScheduler {
 
 	private async checkExpiredSanctions() {
 		const now = new Date();
-		const guildId = process.env.DISCORD_GUILD_ID;
-
-		if (!guildId) {
-			this.logger.error(
-				"DISCORD_GUILD_ID is not defined in environment variables.",
-			);
-			return;
-		}
 
 		// Fetch active sanctions that have expired
 		const expiredSanctions = await prismaClient.sanction.findMany({
@@ -100,50 +92,52 @@ export class SanctionScheduler {
 
 		for (const sanction of expiredSanctions) {
 			try {
-				const guild = await this.client.guilds.fetch(guildId);
-				if (!guild) continue;
+				const guild = await this.client.guilds
+					.fetch(sanction.guildId)
+					.catch(() => null);
+				if (!guild) {
+					// Guild not found, maybe bot left?
+					// Deactivate sanction
+					await prismaClient.sanction.update({
+						where: { id: sanction.id },
+						data: { active: false },
+					});
+					continue;
+				}
+
+				const member = await guild.members
+					.fetch(sanction.userId)
+					.catch(() => null);
 
 				if (sanction.type === SanctionType.MUTE) {
 					const muteRoleId = await ConfigService.getRole(
+						guild.id,
 						ModerationConfigKeys.muteRoleId,
 					);
-					if (muteRoleId) {
-						const member = await guild.members
-							.fetch(sanction.userId)
-							.catch(() => null);
-
-						// If member is still in guild, remove role
-						if (member) {
-							const muteRole = guild.roles.cache.get(muteRoleId);
-							if (
-								muteRole &&
-								member.roles.cache.has(muteRoleId)
-							) {
-								try {
-									await member.send(
-										`Your mute in ${guild.name} has expired.`,
-									);
-								} catch (e) {
-									// Could not send DM
-								}
-								await member.roles.remove(
-									muteRole,
-									"TempMute expired",
-								);
-							}
+					if (muteRoleId && member) {
+						await member.roles.remove(muteRoleId, "Mute expired");
+						try {
+							await member.send(
+								`Your mute in \`${guild.name}\` has expired.`,
+							);
+						} catch {
+							// Ignore
 						}
 					}
 				} else if (sanction.type === SanctionType.BAN) {
-					await guild.members
-						.unban(sanction.userId, "Ban expired")
-						.catch(() => {});
+					// Unban? Usually bans are permanent unless specified.
+					// If it has expiresAt, it's a tempban.
+					await guild.members.unban(sanction.userId, "Ban expired");
 				}
 
-				// Mark sanction as inactive
 				await prismaClient.sanction.update({
 					where: { id: sanction.id },
 					data: { active: false },
 				});
+
+				this.logger.log(
+					`Sanction ${sanction.id} expired for user ${sanction.userId} in guild ${guild.name}`,
+				);
 			} catch (error: any) {
 				this.logger.error(
 					`Error processing expired sanction ${sanction.id}:`,

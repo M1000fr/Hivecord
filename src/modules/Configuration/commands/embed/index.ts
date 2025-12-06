@@ -25,7 +25,7 @@ export default class EmbedCommand extends BaseCommand {
 		interaction: AutocompleteInteraction,
 	) {
 		const focusedValue = interaction.options.getFocused();
-		const embeds = await EmbedService.list();
+		const embeds = await EmbedService.list(interaction.guildId!);
 		const filtered = embeds.filter((choice) =>
 			choice.toLowerCase().includes(focusedValue.toLowerCase()),
 		);
@@ -39,10 +39,13 @@ export default class EmbedCommand extends BaseCommand {
 	@Subcommand({ name: "builder", permission: EPermission.ConfigureModules })
 	async builder(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
-		let data = await EmbedService.get(name);
+		let data = await EmbedService.get(interaction.guildId!, name);
 
 		if (!data) {
 			// Default template for new embed
@@ -73,6 +76,7 @@ export default class EmbedCommand extends BaseCommand {
 		// Save to session
 		await EmbedService.setEditorSession(
 			response.id,
+			interaction.guildId!,
 			name,
 			data,
 			undefined,
@@ -83,10 +87,13 @@ export default class EmbedCommand extends BaseCommand {
 	@Subcommand({ name: "edit", permission: EPermission.ConfigureModules })
 	async edit(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
-		const data = await EmbedService.get(name);
+		const data = await EmbedService.get(interaction.guildId!, name);
 
 		if (!data) {
 			await interaction.reply({
@@ -114,6 +121,7 @@ export default class EmbedCommand extends BaseCommand {
 		// Save to session
 		await EmbedService.setEditorSession(
 			response.id,
+			interaction.guildId!,
 			name,
 			data,
 			undefined,
@@ -124,10 +132,13 @@ export default class EmbedCommand extends BaseCommand {
 	@Subcommand({ name: "delete", permission: EPermission.ConfigureModules })
 	async delete(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
-		await EmbedService.delete(name);
+		await EmbedService.delete(interaction.guildId!, name);
 		await interaction.reply({
 			content: t("modules.configuration.commands.embed.deleted", {
 				name,
@@ -139,9 +150,12 @@ export default class EmbedCommand extends BaseCommand {
 	@Subcommand({ name: "list", permission: EPermission.ConfigureModules })
 	async list(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
-		const embeds = await EmbedService.list();
+		const embeds = await EmbedService.list(interaction.guildId!);
 		await interaction.reply({
 			content: t("modules.configuration.commands.embed.list", {
 				embeds: embeds.map((e) => `- \`${e}\``).join("\n") || "None",
@@ -153,14 +167,21 @@ export default class EmbedCommand extends BaseCommand {
 	@Subcommand({ name: "preview", permission: EPermission.ConfigureModules })
 	async preview(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 
 		// Dummy context
 		const context = {};
 
-		const embed = await EmbedService.render(name, context);
+		const embed = await EmbedService.render(
+			interaction.guildId!,
+			name,
+			context,
+		);
 		if (!embed) {
 			await interaction.reply({
 				content: t("modules.configuration.commands.embed.not_found", {

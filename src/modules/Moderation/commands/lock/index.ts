@@ -21,7 +21,10 @@ export default class LockCommand extends BaseCommand {
 	@BotPermission(PermissionsBitField.Flags.ManageChannels)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const target = interaction.options.getString("target") || "channel";
 		const reason =

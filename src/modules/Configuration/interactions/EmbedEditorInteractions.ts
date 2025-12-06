@@ -47,7 +47,10 @@ export class EmbedEditorInteractions {
 
 	private async updateEditorMessage(interaction: any, session: any) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				session.guildId,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const embed = new EmbedBuilder(session.data);
 		await interaction.update({
 			content: `**Embed Editor**: Editing \`${session.name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
@@ -65,7 +68,10 @@ export class EmbedEditorInteractions {
 		if (!session) return;
 
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				session.guildId,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const value = interaction.values[0];
 		if (!value) return;
 
@@ -101,7 +107,10 @@ export class EmbedEditorInteractions {
 		if (!session) return;
 
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				session.guildId,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const value = interaction.values[0];
 		if (!value) return;
 
@@ -122,6 +131,7 @@ export class EmbedEditorInteractions {
 			// Clear editing index in session
 			await EmbedService.setEditorSession(
 				interaction.message.id,
+				session.guildId,
 				session.name,
 				session.data,
 				{ ...session.meta, editingFieldIndex: undefined },
@@ -145,6 +155,7 @@ export class EmbedEditorInteractions {
 				// Set editing index in session
 				await EmbedService.setEditorSession(
 					interaction.message.id,
+					session.guildId,
 					session.name,
 					session.data,
 					{ ...session.meta, editingFieldIndex: index },
@@ -163,6 +174,7 @@ export class EmbedEditorInteractions {
 				session.data.fields.splice(index, 1);
 				await EmbedService.setEditorSession(
 					interaction.message.id,
+					session.guildId,
 					session.name,
 					session.data,
 					session.meta,
@@ -179,7 +191,7 @@ export class EmbedEditorInteractions {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
-		await EmbedService.save(session.name, session.data);
+		await EmbedService.save(session.guildId, session.name, session.data);
 		await EmbedService.clearEditorSession(interaction.message.id);
 		await interaction.update({
 			content: `✅ Embed \`${session.name}\` saved successfully!`,
@@ -213,6 +225,7 @@ export class EmbedEditorInteractions {
 
 		await EmbedService.setEditorSession(
 			interaction.message!.id,
+			session.guildId,
 			session.name,
 			session.data,
 			session.meta,
@@ -231,6 +244,7 @@ export class EmbedEditorInteractions {
 
 		await EmbedService.setEditorSession(
 			interaction.message!.id,
+			session.guildId,
 			session.name,
 			session.data,
 			session.meta,
@@ -256,6 +270,7 @@ export class EmbedEditorInteractions {
 
 		await EmbedService.setEditorSession(
 			interaction.message!.id,
+			session.guildId,
 			session.name,
 			session.data,
 			session.meta,
@@ -281,6 +296,7 @@ export class EmbedEditorInteractions {
 
 		await EmbedService.setEditorSession(
 			interaction.message!.id,
+			session.guildId,
 			session.name,
 			session.data,
 			session.meta,
@@ -311,6 +327,7 @@ export class EmbedEditorInteractions {
 
 		await EmbedService.setEditorSession(
 			interaction.message!.id,
+			session.guildId,
 			session.name,
 			session.data,
 			session.meta,
@@ -337,6 +354,7 @@ export class EmbedEditorInteractions {
 
 		await EmbedService.setEditorSession(
 			interaction.message!.id,
+			session.guildId,
 			session.name,
 			session.data,
 			session.meta,
@@ -375,6 +393,7 @@ export class EmbedEditorInteractions {
 		// Clear editing index
 		await EmbedService.setEditorSession(
 			interaction.message!.id,
+			session.guildId,
 			session.name,
 			session.data,
 			{ ...session.meta, editingFieldIndex: undefined },

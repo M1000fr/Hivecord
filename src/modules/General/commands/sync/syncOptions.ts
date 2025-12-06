@@ -1,5 +1,9 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType, PermissionFlagsBits } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+	PermissionFlagsBits,
+} from "discord.js";
 
 export const syncOptions: CommandOptions = {
 	name: "sync",
@@ -10,7 +14,8 @@ export const syncOptions: CommandOptions = {
 	descriptionLocalizations: {
 		fr: "Actions de synchronisation",
 	},
-	defaultMemberPermissions: PermissionFlagsBits.ManageRoles,
+	contexts: [InteractionContextType.Guild],
+	defaultMemberPermissions: PermissionFlagsBits.Administrator,
 	options: [
 		{
 			name: "target",
