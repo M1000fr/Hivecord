@@ -83,14 +83,7 @@ export class LeBotClient<ready = false> extends Client {
 			return;
 		}
 
-		const guildId = process.env.DISCORD_GUILD_ID;
-		if (!guildId) {
-			this.logger.error(
-				"DISCORD_GUILD_ID is missing in environment variables.",
-			);
-			return;
-		}
-
+		const debugGuildId = process.env.DEBUG_DISCORD_GUILD_ID;
 		const rest = new REST().setToken(this.token);
 
 		const commandsData = this.commands.map((c) => {
@@ -105,18 +98,26 @@ export class LeBotClient<ready = false> extends Client {
 		const permissions = Object.values(EPermission);
 
 		try {
-			this.logger.log(
-				`Started refreshing ${commandsData.length} application (/) commands for guild ${guildId}.`,
-			);
-
 			await PermissionService.registerPermissions(permissions);
 
-			await rest.put(
-				Routes.applicationGuildCommands(this.user.id, guildId),
-				{
+			if (debugGuildId) {
+				this.logger.log(
+					`Started refreshing ${commandsData.length} application (/) commands for DEBUG guild ${debugGuildId}.`,
+				);
+				await rest.put(
+					Routes.applicationGuildCommands(this.user.id, debugGuildId),
+					{
+						body: commandsData,
+					},
+				);
+			} else {
+				this.logger.log(
+					`Started refreshing ${commandsData.length} application (/) commands GLOBALLY.`,
+				);
+				await rest.put(Routes.applicationCommands(this.user.id), {
 					body: commandsData,
-				},
-			);
+				});
+			}
 
 			this.logger.log(
 				`Successfully reloaded ${commandsData.length} application (/) commands.`,
