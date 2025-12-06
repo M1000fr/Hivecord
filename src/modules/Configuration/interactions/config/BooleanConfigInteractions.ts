@@ -58,6 +58,7 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 			selectedProperty,
 			currentValue,
 			t,
+			lng,
 		);
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(

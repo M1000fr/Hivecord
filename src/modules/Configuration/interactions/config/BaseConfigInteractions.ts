@@ -1,5 +1,9 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { EConfigType } from "@decorators/ConfigProperty";
+import {
+	ConfigContextData,
+	ConfigContextVariable,
+} from "@enums/ConfigContextVariable";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -174,8 +178,10 @@ export abstract class BaseConfigInteractions {
 		selectedProperty: string,
 		currentValue: string,
 		t: TFunction,
+		lng: string,
+		configContexts?: Record<string, ConfigContextVariable[]>,
 	) {
-		return new EmbedBuilder()
+		const embed = new EmbedBuilder()
 			.setTitle(
 				t("utils.config_helper.configure_property", {
 					property: propertyOptions.displayName || selectedProperty,
@@ -186,5 +192,28 @@ export abstract class BaseConfigInteractions {
 			)
 			.setColor("#5865F2")
 			.setTimestamp();
+
+		if (configContexts && configContexts[selectedProperty]) {
+			const variables = configContexts[selectedProperty];
+			const variablesDescription = variables
+				.map((v) => {
+					const data = ConfigContextData[v];
+					const desc =
+						(data.descriptionLocalizations as any)?.[lng] ||
+						data.description;
+					return `- \`{${v}}\`: ${desc}`;
+				})
+				.join("\n");
+
+			embed.addFields({
+				name: t(
+					"utils.config_helper.available_variables",
+					"Available Variables",
+				),
+				value: variablesDescription,
+			});
+		}
+
+		return embed;
 	}
 }

@@ -37,6 +37,7 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 			selectedProperty,
 			currentValue,
 			t,
+			lng,
 		);
 
 		embed.setDescription(
@@ -115,6 +116,7 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 					selectedProperty,
 					formattedValue,
 					t,
+					lng,
 				);
 				newEmbed.setDescription(
 					`${propertyOptions.description}\n\n**Current value:** ${formattedValue}\n\n✅ **File uploaded successfully!**`,

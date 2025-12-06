@@ -59,6 +59,7 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 			selectedProperty,
 			currentValue,
 			t,
+			lng,
 		);
 
 		const choices = propertyOptions.choices || [];
