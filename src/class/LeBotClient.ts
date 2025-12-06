@@ -4,16 +4,6 @@ import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "@interfaces/CommandOptions";
 import type { EventOptions } from "@interfaces/EventOptions";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
-import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
-import { DebugModule } from "@modules/Debug/DebugModule";
-import { GeneralModule } from "@modules/General/GeneralModule";
-import { GroupManagerModule } from "@modules/GroupManager/GroupManagerModule";
-import { InvitationModule } from "@modules/Invitation/InvitationModule";
-import { LogModule } from "@modules/Log/LogModule";
-import { ModerationModule } from "@modules/Moderation/ModerationModule";
-import { SecurityModule } from "@modules/Security/SecurityModule";
-import { StatisticsModule } from "@modules/Statistics/StatisticsModule";
-import { VoiceModule } from "@modules/Voice/VoiceModule";
 import { PermissionService } from "@services/PermissionService";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
@@ -25,8 +15,9 @@ import {
 	IntentsBitField,
 	PermissionsBitField,
 } from "discord.js";
+import { promises as fs } from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -220,32 +211,64 @@ export class LeBotClient<ready = false> extends Client {
 	}
 
 	private async loadModules() {
-		const modules = [
-			ModerationModule,
-			ConfigurationModule,
-			GeneralModule,
-			VoiceModule,
-			LogModule,
-			DebugModule,
-			SecurityModule,
-			StatisticsModule,
-			InvitationModule,
-			GroupManagerModule,
-		];
+		const modulesPath = path.join(__dirname, "../modules");
+		const folders = await fs.readdir(modulesPath);
 
-		for (const ModuleClass of modules) {
-			const moduleInstance = new ModuleClass();
-			const options = (moduleInstance as any)
-				.moduleOptions as ModuleOptions;
+		for (const folder of folders) {
+			const folderPath = path.join(modulesPath, folder);
+			const stat = await fs.stat(folderPath);
+			if (!stat.isDirectory()) continue;
 
-			this.modules.set(options.name.toLowerCase(), {
-				instance: moduleInstance,
-				options,
-			});
-			this.logger.log(`Loading module: ${options.name}`);
+			const filesInFolder = await fs.readdir(folderPath);
+			const candidateFiles = filesInFolder.filter(
+				(f) =>
+					f.startsWith(folder) &&
+					(f.endsWith(".ts") || f.endsWith(".js")),
+			);
 
-			this.loadCommands(options);
-			this.loadEvents(options);
+			let moduleLoaded = false;
+
+			for (const moduleFile of candidateFiles) {
+				if (moduleLoaded) break;
+
+				const moduleFilePath = path.join(folderPath, moduleFile);
+				try {
+					const imported = await import(
+						pathToFileURL(moduleFilePath).href
+					);
+
+					for (const exportedKey in imported) {
+						const ExportedClass = imported[exportedKey];
+
+						if (typeof ExportedClass !== "function") continue;
+
+						try {
+							const instance = new ExportedClass();
+							if ("moduleOptions" in instance) {
+								const options = (instance as any)
+									.moduleOptions as ModuleOptions;
+
+								this.modules.set(options.name.toLowerCase(), {
+									instance,
+									options,
+								});
+								this.logger.log(
+									`Loading module: ${options.name}`,
+								);
+
+								this.loadCommands(options);
+								this.loadEvents(options);
+								moduleLoaded = true;
+								break;
+							}
+						} catch (e) {
+							// Ignore instantiation errors
+						}
+					}
+				} catch (e) {
+					// Ignore import errors
+				}
+			}
 		}
 
 		for (const [_, module] of this.modules) {
