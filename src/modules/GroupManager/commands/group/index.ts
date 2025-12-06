@@ -6,8 +6,7 @@ import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { GroupService } from "@modules/GroupManager/services/GroupService";
-import { ConfigService } from "@services/ConfigService";
-import { I18nService } from "@services/I18nService";
+import { PermissionService } from "@services/PermissionService";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
 	ActionRowBuilder,
@@ -140,7 +139,7 @@ export default class GroupCommand extends BaseCommand {
 			const groupPermissions = group.Permissions.map(
 				(p) => p.Permissions.name,
 			);
-			const allPermissions = Object.values(EPermission);
+			const allPermissions = await PermissionService.getAllPermissions();
 			const rows: ActionRowBuilder<StringSelectMenuBuilder>[] = [];
 
 			// Split permissions into chunks of 25

@@ -117,4 +117,12 @@ export class PermissionService {
 			);
 		}
 	}
+
+	static async getAllPermissions(): Promise<string[]> {
+		const permissions = await prismaClient.permission.findMany({
+			select: { name: true },
+			orderBy: { name: "asc" },
+		});
+		return permissions.map((p) => p.name);
+	}
 }
