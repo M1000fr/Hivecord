@@ -1,9 +1,13 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+} from "discord.js";
 
 export const unbanOptions: CommandOptions = {
 	name: "unban",
 	description: "Unban a user",
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "user",

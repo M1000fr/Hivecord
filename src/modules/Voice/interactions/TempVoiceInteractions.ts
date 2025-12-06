@@ -19,7 +19,10 @@ export class TempVoiceInteractions {
 	@Button("temp_voice_rename")
 	async handleRename(interaction: ButtonInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		if (!(await TempVoiceService.validateOwner(interaction))) return;
 
@@ -93,7 +96,10 @@ export class TempVoiceInteractions {
 	@Modal("temp_voice_rename_modal")
 	async handleRenameModal(interaction: ModalSubmitInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		if (!(await TempVoiceService.validateOwner(interaction))) return;
 		const channel = interaction.channel as VoiceChannel;

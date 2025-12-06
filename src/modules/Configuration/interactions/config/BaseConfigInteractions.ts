@@ -54,15 +54,23 @@ export abstract class BaseConfigInteractions {
 		silent = false,
 	) {
 		try {
-			await ConfigHelper.saveValue(propertyKey, value, type);
+			await ConfigHelper.saveValue(
+				interaction.guildId,
+				propertyKey,
+				value,
+				type,
+			);
 
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
 				const lng =
-					(await ConfigService.get(GeneralConfigKeys.language)) ??
-					"en";
+					(await ConfigService.get(
+						interaction.guildId,
+						GeneralConfigKeys.language,
+					)) ?? "en";
 				const config = await ConfigHelper.buildModuleConfigEmbed(
 					client,
+					interaction.guildId,
 					moduleName,
 					interaction.user.id,
 					lng,

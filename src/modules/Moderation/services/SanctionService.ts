@@ -3,6 +3,7 @@ import { LogService } from "@modules/Log/services/LogService";
 import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
 import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
+import { EntityService } from "@services/EntityService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
@@ -11,8 +12,11 @@ import { Guild, GuildMember, User } from "discord.js";
 export class SanctionService {
 	private static logger = new Logger("SanctionService");
 
-	private static async getLanguage(): Promise<string> {
-		return (await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+	private static async getLanguage(guildId: string): Promise<string> {
+		return (
+			(await ConfigService.get(guildId, GeneralConfigKeys.language)) ??
+			"en"
+		);
 	}
 
 	private static async fetchMember(
@@ -38,10 +42,11 @@ export class SanctionService {
 
 	private static async getMuteRole(guild: Guild) {
 		const muteRoleId = await ConfigService.getRole(
+			guild.id,
 			ModerationConfigKeys.muteRoleId,
 		);
 		if (!muteRoleId) {
-			const lng = await this.getLanguage();
+			const lng = await this.getLanguage(guild.id);
 			throw new Error(
 				I18nService.t(
 					"modules.moderation.services.sanction.mute_role_not_configured",
@@ -52,7 +57,7 @@ export class SanctionService {
 
 		const muteRole = guild.roles.cache.get(muteRoleId);
 		if (!muteRole) {
-			const lng = await this.getLanguage();
+			const lng = await this.getLanguage(guild.id);
 			throw new Error(
 				I18nService.t(
 					"modules.moderation.services.sanction.mute_role_not_found",
@@ -64,33 +69,33 @@ export class SanctionService {
 	}
 
 	private static async ensureUserExists(userId: string): Promise<void> {
-		await prismaClient.user.upsert({
-			where: { id: userId },
-			update: {},
-			create: { id: userId },
-		});
+		await EntityService.ensureUserById(userId);
 	}
 
 	private static async deactivateSanction(
+		guildId: string,
 		userId: string,
 		type: SanctionType,
 		expiresAt?: Date,
 	): Promise<void> {
 		await prismaClient.sanction.updateMany({
-			where: { userId, type, active: true },
+			where: { guildId, userId, type, active: true },
 			data: { active: false, expiresAt },
 		});
 	}
 
-	private static async deleteSanctionById(id: number): Promise<void> {
-		await prismaClient.sanction.delete({
-			where: { id },
+	private static async deleteSanctionById(
+		guildId: string,
+		id: number,
+	): Promise<void> {
+		await prismaClient.sanction.deleteMany({
+			where: { id, guildId },
 		});
 	}
 
-	static async getActiveWarns(userId: string) {
+	static async getActiveWarns(guildId: string, userId: string) {
 		return await prismaClient.sanction.findMany({
-			where: { userId, type: SanctionType.WARN, active: true },
+			where: { guildId, userId, type: SanctionType.WARN, active: true },
 			orderBy: { createdAt: "desc" },
 		});
 	}
@@ -103,7 +108,7 @@ export class SanctionService {
 		reason: string,
 	): Promise<void> {
 		const member = await this.fetchMember(guild, targetUser.id);
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 		if (!member)
 			throw new Error(
 				I18nService.t(
@@ -136,6 +141,7 @@ export class SanctionService {
 
 		const activeMute = await prismaClient.sanction.findFirst({
 			where: {
+				guildId: guild.id,
 				userId: targetUser.id,
 				type: SanctionType.MUTE,
 				active: true,
@@ -144,7 +150,11 @@ export class SanctionService {
 
 		if (activeMute) {
 			// Stale record (User has no role but DB says active). Deactivate it.
-			await this.deactivateSanction(targetUser.id, SanctionType.MUTE);
+			await this.deactivateSanction(
+				guild.id,
+				targetUser.id,
+				SanctionType.MUTE,
+			);
 		}
 
 		await this.sendDM(
@@ -159,6 +169,7 @@ export class SanctionService {
 
 		await member.roles.add(muteRole);
 		await this.logSanction(
+			guild,
 			targetUser,
 			moderator,
 			SanctionType.MUTE,
@@ -184,13 +195,14 @@ export class SanctionService {
 	): Promise<void> {
 		const activeBan = await prismaClient.sanction.findFirst({
 			where: {
+				guildId: guild.id,
 				userId: targetUser.id,
 				type: SanctionType.BAN,
 				active: true,
 			},
 		});
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 
 		if (activeBan)
 			throw new Error(
@@ -218,7 +230,13 @@ export class SanctionService {
 			}),
 		);
 		await guild.members.ban(targetUser, { reason, deleteMessageSeconds });
-		await this.logSanction(targetUser, moderator, SanctionType.BAN, reason);
+		await this.logSanction(
+			guild,
+			targetUser,
+			moderator,
+			SanctionType.BAN,
+			reason,
+		);
 		await LogService.logSanction(
 			guild,
 			targetUser,
@@ -234,7 +252,7 @@ export class SanctionService {
 		moderator: User,
 		reason: string,
 	): Promise<void> {
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 		await this.sendDM(
 			targetUser,
 			I18nService.t("modules.moderation.services.sanction.dm.warn", {
@@ -244,6 +262,7 @@ export class SanctionService {
 			}),
 		);
 		await this.logSanction(
+			guild,
 			targetUser,
 			moderator,
 			SanctionType.WARN,
@@ -267,11 +286,12 @@ export class SanctionService {
 		const sanction = await prismaClient.sanction.findUnique({
 			where: { id: warnId },
 		});
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 		if (
 			!sanction ||
 			sanction.userId !== targetUser.id ||
-			sanction.type !== SanctionType.WARN
+			sanction.type !== SanctionType.WARN ||
+			sanction.guildId !== guild.id
 		) {
 			throw new Error(
 				I18nService.t(
@@ -281,7 +301,7 @@ export class SanctionService {
 			);
 		}
 
-		await this.deleteSanctionById(warnId);
+		await this.deleteSanctionById(guild.id, warnId);
 		await this.sendDM(
 			targetUser,
 			I18nService.t("modules.moderation.services.sanction.dm.unwarn", {
@@ -302,7 +322,7 @@ export class SanctionService {
 
 	static async unmute(guild: Guild, targetUser: User): Promise<void> {
 		const member = await this.fetchMember(guild, targetUser.id);
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 		if (!member)
 			throw new Error(
 				I18nService.t(
@@ -328,11 +348,15 @@ export class SanctionService {
 			}),
 		);
 		await member.roles.remove(muteRole);
-		await this.deactivateSanction(targetUser.id, SanctionType.MUTE);
+		await this.deactivateSanction(
+			guild.id,
+			targetUser.id,
+			SanctionType.MUTE,
+		);
 	}
 
 	static async unban(guild: Guild, targetUser: User): Promise<void> {
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 		try {
 			await guild.bans.fetch(targetUser.id);
 		} catch {
@@ -346,6 +370,7 @@ export class SanctionService {
 
 		await guild.members.unban(targetUser);
 		await this.deactivateSanction(
+			guild.id,
 			targetUser.id,
 			SanctionType.BAN,
 			new Date(),
@@ -353,17 +378,20 @@ export class SanctionService {
 	}
 
 	private static async logSanction(
+		guild: Guild,
 		user: User,
 		moderator: User,
 		type: SanctionType,
 		reason: string,
 		expiresAt?: Date,
 	) {
+		await EntityService.ensureGuild(guild);
 		await this.ensureUserExists(user.id);
 		await this.ensureUserExists(moderator.id);
 
 		await prismaClient.sanction.create({
 			data: {
+				guildId: guild.id,
 				userId: user.id,
 				moderatorId: moderator.id,
 				type,

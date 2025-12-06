@@ -21,7 +21,10 @@ export default class SecurityCommand extends BaseCommand {
 	@BotPermission(PermissionsBitField.Flags.ModerateMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const subcommandGroup = interaction.options.getSubcommandGroup();
 		const subcommand = interaction.options.getSubcommand();
@@ -29,7 +32,10 @@ export default class SecurityCommand extends BaseCommand {
 		if (subcommandGroup === "heatpoint") {
 			if (subcommand === "user") {
 				const user = interaction.options.getUser("user", true);
-				const heat = await HeatpointService.getHeat(`user:${user.id}`);
+				const heat = await HeatpointService.getHeat(
+					interaction.guildId!,
+					`user:${user.id}`,
+				);
 
 				await interaction.reply({
 					content: t(
@@ -47,7 +53,9 @@ export default class SecurityCommand extends BaseCommand {
 				if (!guild) return;
 
 				if (target === "all_users") {
-					await HeatpointService.resetAllUserHeat();
+					await HeatpointService.resetAllUserHeat(
+						interaction.guildId!,
+					);
 					await interaction.reply({
 						content: t(
 							"modules.security.commands.security.reset_all_users",
@@ -60,6 +68,7 @@ export default class SecurityCommand extends BaseCommand {
 						interaction.channel;
 					if (channel) {
 						await HeatpointService.resetHeat(
+							interaction.guildId!,
 							`channel:${channel.id}`,
 						);
 						await interaction.reply({
@@ -78,7 +87,10 @@ export default class SecurityCommand extends BaseCommand {
 						});
 					}
 				} else if (target === "server") {
-					await HeatpointService.resetHeat(`global:${guild.id}`);
+					await HeatpointService.resetHeat(
+						interaction.guildId!,
+						`global:${guild.id}`,
+					);
 					await interaction.reply({
 						content: t(
 							"modules.security.commands.security.reset_server",

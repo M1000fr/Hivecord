@@ -35,6 +35,7 @@ export default class WelcomeEvent extends BaseEvent<
 	) {
 		try {
 			const welcomeChannelId = await ConfigService.getChannel(
+				member.guild.id,
 				GeneralConfigKeys.welcomeChannelId,
 			);
 			if (!welcomeChannelId) {
@@ -65,6 +66,7 @@ export default class WelcomeEvent extends BaseEvent<
 			if (invite) {
 				const inviterTotalInvitesCount = invite
 					? await InvitationService.getInviteCounts(
+							member.guild.id,
 							invite.inviter?.id || "",
 						)
 					: {
@@ -80,11 +82,13 @@ export default class WelcomeEvent extends BaseEvent<
 
 			// Check for custom embed
 			const welcomeEmbedName = await ConfigService.get(
+				member.guild.id,
 				GeneralConfigKeys.welcomeEmbedName,
 			);
 
 			// Get configured background
 			const configuredBackground = await ConfigService.get(
+				member.guild.id,
 				GeneralConfigKeys.welcomeBackground,
 			);
 
@@ -99,6 +103,7 @@ export default class WelcomeEvent extends BaseEvent<
 			const isAnimated = dynamicAvatarUrl.includes(".gif");
 
 			const welcomeMessageImageConfig = await ConfigService.get(
+				member.guild.id,
 				GeneralConfigKeys.welcomeMessageImage,
 			);
 
@@ -219,6 +224,7 @@ export default class WelcomeEvent extends BaseEvent<
 			}
 
 			const welcomeMessageConfig = await ConfigService.get(
+				member.guild.id,
 				GeneralConfigKeys.welcomeMessage,
 			);
 
@@ -242,6 +248,7 @@ export default class WelcomeEvent extends BaseEvent<
 			if (welcomeEmbedName) {
 				const customEmbed = await EmbedService.render(
 					welcomeEmbedName,
+					member.guild.id,
 					commonContext,
 				);
 

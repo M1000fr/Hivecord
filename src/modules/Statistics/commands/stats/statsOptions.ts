@@ -1,10 +1,14 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+} from "discord.js";
 
 // Subcommand-based definition without period option (handled by buttons)
 export const statsOptions: CommandOptions = {
 	name: "stats",
 	description: "Afficher les statistiques d'activité",
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "server",

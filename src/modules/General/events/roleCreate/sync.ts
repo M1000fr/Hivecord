@@ -2,7 +2,7 @@ import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
-import { prismaClient } from "@src/services/prismaService";
+import { EntityService } from "@services/EntityService";
 import { Logger } from "@utils/Logger";
 import { Role } from "discord.js";
 
@@ -16,11 +16,7 @@ export default class RoleCreateEvent extends BaseEvent<
 
 	async run(client: LeBotClient<true>, role: Role) {
 		try {
-			await prismaClient.role.upsert({
-				where: { id: role.id },
-				update: { deletedAt: null },
-				create: { id: role.id },
-			});
+			await EntityService.ensureRole(role);
 			this.logger.log(`Synced created role ${role.name} (${role.id})`);
 		} catch (error) {
 			this.logger.error(

@@ -27,7 +27,10 @@ export default class StatsCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -54,7 +57,10 @@ export default class StatsCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -87,7 +93,10 @@ export default class StatsCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -162,7 +171,10 @@ export default class StatsCommand extends BaseCommand {
 		period: string,
 	): Promise<void> {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const guildId = interaction.guild!.id;
 
@@ -272,7 +284,10 @@ export default class StatsCommand extends BaseCommand {
 		period: string,
 	): Promise<void> {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const guildId = interaction.guild!.id;
 

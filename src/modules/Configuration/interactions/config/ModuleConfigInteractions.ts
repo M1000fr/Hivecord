@@ -63,10 +63,13 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 
 			try {
 				const lng =
-					(await ConfigService.get(GeneralConfigKeys.language)) ??
-					"en";
+					(await ConfigService.get(
+						interaction.guildId!,
+						GeneralConfigKeys.language,
+					)) ?? "en";
 				const config = await ConfigHelper.buildModuleConfigEmbed(
 					client,
+					interaction.guildId!,
 					moduleName,
 					userId,
 					lng,
@@ -145,6 +148,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 		if (propertyOptions) {
 			try {
 				await ConfigHelper.deleteValue(
+					interaction.guildId!,
 					propertyKey,
 					propertyOptions.type,
 				);
@@ -152,10 +156,13 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 				const mainMessage = await this.getMainMessage(interaction);
 				if (mainMessage) {
 					const lng =
-						(await ConfigService.get(GeneralConfigKeys.language)) ??
-						"en";
+						(await ConfigService.get(
+							interaction.guildId!,
+							GeneralConfigKeys.language,
+						)) ?? "en";
 					const config = await ConfigHelper.buildModuleConfigEmbed(
 						client,
+						interaction.guildId!,
 						moduleName,
 						userId,
 						lng,

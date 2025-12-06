@@ -25,7 +25,10 @@ export default class SyncCommand extends BaseCommand {
 		interaction: AutocompleteInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const focusedValue = interaction.options.getFocused().toLowerCase();
 		const targets = [
@@ -55,12 +58,17 @@ export default class SyncCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		await InteractionHelper.defer(interaction);
 
 		try {
-			const state = await WelcomeRoleSyncService.getState();
+			const state = await WelcomeRoleSyncService.getState(
+				interaction.guildId!,
+			);
 			if (state.isRunning) {
 				await InteractionHelper.respondError(
 					interaction,
@@ -69,7 +77,7 @@ export default class SyncCommand extends BaseCommand {
 				return;
 			}
 
-			await WelcomeRoleSyncService.start(client as LeBotClient<true>);
+			await WelcomeRoleSyncService.start(interaction.guild!);
 			await InteractionHelper.respondSuccess(
 				interaction,
 				t("modules.general.commands.sync.started"),

@@ -65,6 +65,7 @@ class ConfigExtractor {
 	static async extractModuleConfig(
 		moduleName: string,
 		configClass: any,
+		guildId: string,
 	): Promise<ModuleConfig> {
 		const configProperties = configClass?.configProperties || {};
 		const configurations: Record<string, ConfigValue> = {};
@@ -73,7 +74,11 @@ class ConfigExtractor {
 			const opt = options as any;
 			const snakeCaseKey = this.toSnakeCase(propertyKey);
 
-			const value = await this.getConfigValue(snakeCaseKey, opt.type);
+			const value = await this.getConfigValue(
+				guildId,
+				snakeCaseKey,
+				opt.type,
+			);
 			if (value !== null) {
 				configurations[snakeCaseKey] = { value, type: opt.type };
 			}
@@ -83,21 +88,22 @@ class ConfigExtractor {
 	}
 
 	private static async getConfigValue(
+		guildId: string,
 		key: string,
 		type: EConfigType,
 	): Promise<string | string[] | null> {
 		if (type === EConfigType.Role) {
 			// Check if it's a multi-role configuration
-			const roles = await ConfigService.getRoles(key);
+			const roles = await ConfigService.getRoles(guildId, key);
 			if (roles.length > 0) return roles;
 
-			const role = await ConfigService.getRole(key);
+			const role = await ConfigService.getRole(guildId, key);
 			return role ? [role] : null;
 		}
 		if (type === EConfigType.Channel) {
-			return await ConfigService.getChannel(key);
+			return await ConfigService.getChannel(guildId, key);
 		}
-		return await ConfigService.get(key);
+		return await ConfigService.get(guildId, key);
 	}
 
 	private static toSnakeCase(str: string): string {
@@ -108,6 +114,7 @@ class ConfigExtractor {
 class ConfigRestorer {
 	static async restoreModuleConfig(
 		moduleConfig: ModuleConfig,
+		guildId: string,
 	): Promise<void> {
 		for (const [key, configValue] of Object.entries(
 			moduleConfig.configurations,
@@ -117,18 +124,18 @@ class ConfigRestorer {
 			if (type === EConfigType.Role) {
 				if (Array.isArray(value)) {
 					if (value.length === 1 && value[0]) {
-						await ConfigService.setRole(key, value[0]);
+						await ConfigService.setRole(guildId, key, value[0]);
 					} else if (value.length > 1) {
-						await ConfigService.setRoles(key, value);
+						await ConfigService.setRoles(guildId, key, value);
 					}
 				}
 			} else if (type === EConfigType.Channel) {
 				if (typeof value === "string") {
-					await ConfigService.setChannel(key, value);
+					await ConfigService.setChannel(guildId, key, value);
 				}
 			} else {
 				if (typeof value === "string") {
-					await ConfigService.set(key, value);
+					await ConfigService.set(guildId, key, value);
 				}
 			}
 		}
@@ -139,7 +146,10 @@ export class BackupService {
 	private static logger = new Logger("BackupService");
 	private static readonly BACKUP_VERSION = 3;
 
-	static async createBackup(client: LeBotClient<true>): Promise<Buffer> {
+	static async createBackup(
+		client: LeBotClient<true>,
+		guildId: string,
+	): Promise<Buffer> {
 		this.logger.log("Creating modular configuration backup...");
 
 		const modules: ModuleConfig[] = [];
@@ -150,6 +160,7 @@ export class BackupService {
 				const moduleConfig = await ConfigExtractor.extractModuleConfig(
 					moduleName,
 					configClass,
+					guildId,
 				);
 
 				if (Object.keys(moduleConfig.configurations).length > 0) {
@@ -173,7 +184,7 @@ export class BackupService {
 		return Buffer.from(encrypted, "utf-8");
 	}
 
-	static async restoreBackup(buffer: Buffer): Promise<void> {
+	static async restoreBackup(buffer: Buffer, guildId: string): Promise<void> {
 		this.logger.log("Restoring modular configuration backup...");
 
 		try {
@@ -193,7 +204,7 @@ export class BackupService {
 
 			for (const moduleConfig of backup.modules) {
 				this.logger.log(`Restoring ${moduleConfig.moduleName}...`);
-				await ConfigRestorer.restoreModuleConfig(moduleConfig);
+				await ConfigRestorer.restoreModuleConfig(moduleConfig, guildId);
 				this.logger.log(
 					`Restored ${Object.keys(moduleConfig.configurations).length} configs for ${moduleConfig.moduleName}`,
 				);

@@ -1,9 +1,13 @@
 import type { CommandOptions } from "@interfaces/CommandOptions";
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+	ApplicationCommandOptionType,
+	InteractionContextType,
+} from "discord.js";
 
 export const unlockOptions: CommandOptions = {
 	name: "unlock",
 	description: "Unlock a channel or the server",
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "target",

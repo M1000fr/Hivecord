@@ -21,7 +21,10 @@ export default class UnmuteCommand extends BaseCommand {
 	@BotPermission(PermissionsBitField.Flags.ManageRoles)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 

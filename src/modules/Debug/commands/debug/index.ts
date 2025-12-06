@@ -14,6 +14,7 @@ import {
 	AutocompleteInteraction,
 	CommandInteraction,
 	GuildMember,
+	InteractionContextType,
 	MessageFlags,
 	VoiceState,
 } from "discord.js";
@@ -29,6 +30,7 @@ const DEBUG_ACTIONS = [
 @Command({
 	name: "debug",
 	description: "Debug commands",
+	contexts: [InteractionContextType.Guild],
 	options: [
 		{
 			name: "action",
@@ -56,7 +58,10 @@ export default class DebugCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Debug)
 	async run(client: LeBotClient<true>, interaction: CommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		if (!interaction.isChatInputCommand()) return;
 
@@ -76,7 +81,10 @@ export default class DebugCommand extends BaseCommand {
 		interaction: CommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
@@ -133,7 +141,10 @@ export default class DebugCommand extends BaseCommand {
 		interaction: CommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
@@ -177,7 +188,10 @@ export default class DebugCommand extends BaseCommand {
 		interaction: CommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
@@ -221,7 +235,10 @@ export default class DebugCommand extends BaseCommand {
 		interaction: CommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
@@ -267,7 +284,10 @@ export default class DebugCommand extends BaseCommand {
 		interaction: CommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
