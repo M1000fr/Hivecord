@@ -33,6 +33,7 @@ export default class ChannelCreateEvent extends BaseEvent<
 			await prismaClient.channel.create({
 				data: {
 					id: channel.id,
+					guildId: channel.guild.id,
 					type,
 				},
 			});

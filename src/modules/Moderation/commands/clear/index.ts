@@ -13,7 +13,10 @@ export default class ClearCommand extends BaseCommand {
 	@DefaultCommand(EPermission.ChannelClear)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const amount = interaction.options.getString("amount", true);
 		const user = interaction.options.getUser("user");

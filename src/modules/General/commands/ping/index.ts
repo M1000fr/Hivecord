@@ -19,7 +19,10 @@ export default class PingCommand extends BaseCommand {
 	})
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 
 		await interaction.reply(t("modules.general.commands.ping.response"));

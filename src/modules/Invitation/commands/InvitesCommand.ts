@@ -41,12 +41,18 @@ export default class InvitesCommand extends BaseCommand {
 	@Subcommand({ name: "view", permission: EPermission.Invites })
 	async view(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const targetUser =
 			interaction.options.getUser("user") || interaction.user;
 
-		const counts = await InvitationService.getInviteCounts(targetUser.id);
+		const counts = await InvitationService.getInviteCounts(
+			interaction.guildId!,
+			targetUser.id,
+		);
 
 		const embed = new EmbedBuilder()
 			.setTitle(
@@ -80,9 +86,15 @@ export default class InvitesCommand extends BaseCommand {
 	@Subcommand({ name: "top", permission: EPermission.Invites })
 	async top(client: Client, interaction: ChatInputCommandInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
-		const leaderboard = await InvitationService.getLeaderboard(10);
+		const leaderboard = await InvitationService.getLeaderboard(
+			interaction.guildId!,
+			10,
+		);
 
 		if (leaderboard.length === 0) {
 			await interaction.reply({

@@ -22,6 +22,7 @@ export class LogService {
 		guild: Guild,
 	): Promise<TextChannel | null> {
 		const channelId = await ConfigService.getChannel(
+			guild.id,
 			LogConfigKeys.logChannelId,
 		);
 		if (!channelId) return null;
@@ -30,13 +31,19 @@ export class LogService {
 		return channel as TextChannel;
 	}
 
-	private static async isEnabled(key: string): Promise<boolean> {
-		const value = await ConfigService.get(key);
+	private static async isEnabled(
+		guildId: string,
+		key: string,
+	): Promise<boolean> {
+		const value = await ConfigService.get(guildId, key);
 		return value === "true";
 	}
 
-	private static async getLanguage(): Promise<string> {
-		return (await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+	private static async getLanguage(guildId: string): Promise<string> {
+		return (
+			(await ConfigService.get(guildId, GeneralConfigKeys.language)) ??
+			"en"
+		);
 	}
 
 	static async logSanction(
@@ -47,11 +54,12 @@ export class LogService {
 		reason: string,
 		duration?: string,
 	) {
-		if (!(await this.isEnabled(LogConfigKeys.enableSanctionLogs))) return;
+		if (!(await this.isEnabled(guild.id, LogConfigKeys.enableSanctionLogs)))
+			return;
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 
 		const embed = new EmbedBuilder()
 			.setTitle(
@@ -95,11 +103,12 @@ export class LogService {
 		action: string,
 		details: string,
 	) {
-		if (!(await this.isEnabled(LogConfigKeys.enableVoiceLogs))) return;
+		if (!(await this.isEnabled(guild.id, LogConfigKeys.enableVoiceLogs)))
+			return;
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 
 		const embed = new EmbedBuilder()
 			.setTitle(
@@ -114,11 +123,17 @@ export class LogService {
 	}
 
 	static async logMemberJoin(member: GuildMember) {
-		if (!(await this.isEnabled(LogConfigKeys.enableMemberLogs))) return;
+		if (
+			!(await this.isEnabled(
+				member.guild.id,
+				LogConfigKeys.enableMemberLogs,
+			))
+		)
+			return;
 		const channel = await this.getLogChannel(member.guild);
 		if (!channel) return;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(member.guild.id);
 
 		const embed = new EmbedBuilder()
 			.setTitle(I18nService.t("modules.log.member.join.title", { lng }))
@@ -144,11 +159,17 @@ export class LogService {
 	}
 
 	static async logMemberLeave(member: GuildMember | PartialGuildMember) {
-		if (!(await this.isEnabled(LogConfigKeys.enableMemberLogs))) return;
+		if (
+			!(await this.isEnabled(
+				member.guild.id,
+				LogConfigKeys.enableMemberLogs,
+			))
+		)
+			return;
 		const channel = await this.getLogChannel(member.guild);
 		if (!channel) return;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(member.guild.id);
 
 		const embed = new EmbedBuilder()
 			.setTitle(I18nService.t("modules.log.member.leave.title", { lng }))
@@ -183,11 +204,12 @@ export class LogService {
 		before: string,
 		after: string,
 	) {
-		if (!(await this.isEnabled(LogConfigKeys.enableMessageLogs))) return;
+		if (!(await this.isEnabled(guild.id, LogConfigKeys.enableMessageLogs)))
+			return;
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 
 		const embed = new EmbedBuilder()
 			.setTitle(I18nService.t("modules.log.message.edit.title", { lng }))
@@ -221,11 +243,17 @@ export class LogService {
 	}
 
 	static async logRoleCreate(guild: Guild, role: Role) {
-		if (!(await this.isEnabled(LogConfigKeys.enableRoleUpdateLogs))) return;
+		if (
+			!(await this.isEnabled(
+				guild.id,
+				LogConfigKeys.enableRoleUpdateLogs,
+			))
+		)
+			return;
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 
 		const embed = new EmbedBuilder()
 			.setTitle(I18nService.t("modules.log.role.create.title", { lng }))
@@ -254,11 +282,17 @@ export class LogService {
 		roleBefore: Role,
 		roleAfter: Role,
 	) {
-		if (!(await this.isEnabled(LogConfigKeys.enableRoleUpdateLogs))) return;
+		if (
+			!(await this.isEnabled(
+				guild.id,
+				LogConfigKeys.enableRoleUpdateLogs,
+			))
+		)
+			return;
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 		const changes: string[] = [];
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 
 		const checkChange = (fieldKey: string, before: any, after: any) => {
 			if (before !== after) {
@@ -353,11 +387,17 @@ export class LogService {
 	}
 
 	static async logRoleDelete(guild: Guild, role: Role) {
-		if (!(await this.isEnabled(LogConfigKeys.enableRoleUpdateLogs))) return;
+		if (
+			!(await this.isEnabled(
+				guild.id,
+				LogConfigKeys.enableRoleUpdateLogs,
+			))
+		)
+			return;
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(guild.id);
 
 		const embed = new EmbedBuilder()
 			.setTitle(I18nService.t("modules.log.role.delete.title", { lng }))
@@ -382,7 +422,12 @@ export class LogService {
 	}
 
 	static async logVoiceState(oldState: VoiceState, newState: VoiceState) {
-		if (!(await this.isEnabled(LogConfigKeys.enableVoiceConnectionLogs)))
+		if (
+			!(await this.isEnabled(
+				newState.guild.id,
+				LogConfigKeys.enableVoiceConnectionLogs,
+			))
+		)
 			return;
 		const channel = await this.getLogChannel(newState.guild);
 		if (!channel) return;
@@ -390,7 +435,7 @@ export class LogService {
 		const member = newState.member;
 		if (!member) return;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(newState.guild.id);
 
 		let action = "";
 		let color: ColorResolvable = Colors.Grey;
@@ -463,14 +508,20 @@ export class LogService {
 		oldMessage: Message | PartialMessage,
 		newMessage: Message | PartialMessage,
 	) {
-		if (!(await this.isEnabled(LogConfigKeys.enableMessageLogs))) return;
+		if (
+			!(await this.isEnabled(
+				newMessage.guild!.id,
+				LogConfigKeys.enableMessageLogs,
+			))
+		)
+			return;
 		if (newMessage.author?.bot) return;
 		if (oldMessage.content === newMessage.content) return;
 
 		const channel = await this.getLogChannel(newMessage.guild!);
 		if (!channel) return;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(newMessage.guild!.id);
 
 		const embed = new EmbedBuilder()
 			.setTitle(I18nService.t("modules.log.message.edit.title", { lng }))
@@ -516,13 +567,19 @@ export class LogService {
 	}
 
 	static async logMessageDelete(message: Message | PartialMessage) {
-		if (!(await this.isEnabled(LogConfigKeys.enableMessageLogs))) return;
+		if (
+			!(await this.isEnabled(
+				message.guild!.id,
+				LogConfigKeys.enableMessageLogs,
+			))
+		)
+			return;
 		if (message.author?.bot) return;
 
 		const channel = await this.getLogChannel(message.guild!);
 		if (!channel) return;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(message.guild!.id);
 
 		const embed = new EmbedBuilder()
 			.setTitle(

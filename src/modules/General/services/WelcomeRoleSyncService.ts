@@ -8,7 +8,6 @@ import { WelcomeRoleService } from "./WelcomeRoleService";
 
 interface SyncState {
 	isRunning: boolean;
-	currentGuildId: string | null;
 	lastMemberId: string | null;
 }
 
@@ -17,99 +16,72 @@ export class WelcomeRoleSyncService {
 	private static readonly REDIS_KEY = "bot:welcome_sync:state";
 	private static readonly BATCH_SIZE = 50;
 
-	static async getState(): Promise<SyncState> {
+	static async getState(guildId: string): Promise<SyncState> {
 		const redis = RedisService.getInstance();
-		const state = await redis.get(this.REDIS_KEY);
+		const state = await redis.get(`${this.REDIS_KEY}:${guildId}`);
 		return state
 			? JSON.parse(state)
-			: { isRunning: false, currentGuildId: null, lastMemberId: null };
+			: { isRunning: false, lastMemberId: null };
 	}
 
-	static async setState(state: SyncState) {
+	static async setState(guildId: string, state: SyncState) {
 		const redis = RedisService.getInstance();
-		await redis.set(this.REDIS_KEY, JSON.stringify(state));
+		await redis.set(`${this.REDIS_KEY}:${guildId}`, JSON.stringify(state));
 	}
 
-	static async start(client: LeBotClient<true>) {
-		const state = await this.getState();
+	static async start(guild: Guild) {
+		const state = await this.getState(guild.id);
 		if (state.isRunning) {
-			this.logger.warn("Sync already running.");
+			this.logger.warn(`Sync already running for guild ${guild.id}.`);
 			return;
 		}
 
-		await this.setState({
+		await this.setState(guild.id, {
 			isRunning: true,
-			currentGuildId: null,
 			lastMemberId: null,
 		});
-		this.process(client);
+		this.process(guild);
 	}
 
 	static async resume(client: LeBotClient<true>) {
-		const state = await this.getState();
-		if (state.isRunning) {
-			this.logger.log("Resuming welcome role sync...");
-			this.process(client);
+		// Check all guilds for running state
+		const guilds = client.guilds.cache;
+		for (const guild of guilds.values()) {
+			const state = await this.getState(guild.id);
+			if (state.isRunning) {
+				this.logger.log(
+					`Resuming welcome role sync for guild ${guild.name}...`,
+				);
+				this.process(guild);
+			}
 		}
 	}
 
-	static async stop() {
-		const state = await this.getState();
-		await this.setState({ ...state, isRunning: false });
-		this.logger.log("Welcome role sync stopped.");
+	static async stop(guildId: string) {
+		const state = await this.getState(guildId);
+		await this.setState(guildId, { ...state, isRunning: false });
+		this.logger.log(`Welcome role sync stopped for guild ${guildId}.`);
 	}
 
-	private static async process(client: LeBotClient<true>) {
+	private static async process(guild: Guild) {
 		try {
-			let state = await this.getState();
+			let state = await this.getState(guild.id);
 			if (!state.isRunning) return;
 
-			const guilds = client.guilds.cache;
-			const guildIds = Array.from(guilds.keys());
+			await this.processGuild(guild);
 
-			// Determine start index
-			let startIndex = 0;
-			if (state.currentGuildId) {
-				startIndex = guildIds.indexOf(state.currentGuildId);
-				if (startIndex === -1) startIndex = 0; // Guild left? Start over or next?
-			}
-
-			for (let i = startIndex; i < guildIds.length; i++) {
-				state = await this.getState();
-				if (!state.isRunning) break;
-
-				const guildId = guildIds[i];
-				if (!guildId) continue;
-
-				const guild = guilds.get(guildId);
-				if (!guild) continue;
-
-				await this.setState({
-					...state,
-					currentGuildId: guildId,
-					// If we are resuming the same guild, keep lastMemberId, else reset it
-					lastMemberId:
-						guildId === state.currentGuildId
-							? state.lastMemberId
-							: null,
-				});
-
-				await this.processGuild(guild);
-			}
-
-			// Finished
-			await this.setState({
+			await this.setState(guild.id, {
 				isRunning: false,
-				currentGuildId: null,
 				lastMemberId: null,
 			});
-			this.logger.log("Welcome role sync completed.");
+			this.logger.log(
+				`Welcome role sync completed for guild ${guild.name}.`,
+			);
 		} catch (error) {
 			this.logger.error(
-				"Error in welcome role sync process:",
+				`Error in welcome role sync process for guild ${guild.name}:`,
 				error as any,
 			);
-			// Don't reset state, so we can resume later/on restart
 		}
 	}
 
@@ -117,6 +89,7 @@ export class WelcomeRoleSyncService {
 		this.logger.log(`Processing guild ${guild.name} (${guild.id})...`);
 
 		const roleIds = await ConfigService.getRoles(
+			guild.id,
 			GeneralConfigKeys.welcomeRoles,
 		);
 		if (!roleIds || roleIds.length === 0) {
@@ -129,7 +102,8 @@ export class WelcomeRoleSyncService {
 		);
 		if (guildRoleIds.length === 0) return;
 
-		let lastMemberId = (await this.getState()).lastMemberId || undefined;
+		let lastMemberId =
+			(await this.getState(guild.id)).lastMemberId || undefined;
 
 		try {
 			// Fetch all members (no pagination supported in fetch for all members)
@@ -138,7 +112,7 @@ export class WelcomeRoleSyncService {
 			let skip = !!lastMemberId;
 
 			for (const member of members.values()) {
-				const state = await this.getState();
+				const state = await this.getState(guild.id);
 				if (!state.isRunning) return;
 
 				if (skip) {
@@ -161,12 +135,7 @@ export class WelcomeRoleSyncService {
 					await new Promise((resolve) => setTimeout(resolve, 200));
 				}
 
-				// Update state periodically or after each member?
-				// Updating after each member is safe but slow on Redis.
-				// Let's update every 10 members or so, or just keep it simple.
-				// For robustness, let's update every member for now, or maybe every 10.
-				// Given the delay of 200ms, Redis write is negligible.
-				await this.setState({
+				await this.setState(guild.id, {
 					...state,
 					lastMemberId: member.id,
 				});

@@ -19,7 +19,7 @@ export default class RoleUpdateEvent extends BaseEvent<
 			await prismaClient.role.upsert({
 				where: { id: newRole.id },
 				update: { deletedAt: null },
-				create: { id: newRole.id },
+				create: { id: newRole.id, guildId: newRole.guild.id },
 			});
 		} catch (error) {
 			this.logger.error(

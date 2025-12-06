@@ -18,7 +18,10 @@ export class GroupPermissionInteractions {
 	@SelectMenuPattern("group_permissions_*")
 	async handlePermissions(interaction: StringSelectMenuInteraction) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 
 		const parts = interaction.customId.split("_");

@@ -32,8 +32,11 @@ interface UserToggleResult {
 export class TempVoiceService {
 	private static logger = new Logger("TempVoiceService");
 
-	private static async getLanguage(): Promise<string> {
-		return (await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+	private static async getLanguage(guildId: string): Promise<string> {
+		return (
+			(await ConfigService.get(guildId, GeneralConfigKeys.language)) ??
+			"en"
+		);
 	}
 
 	private static async fetchGuildMember(
@@ -235,6 +238,7 @@ export class TempVoiceService {
 		if (!newState.channelId || !newState.guild || !newState.member) return;
 
 		const generatorId = await ConfigService.getChannel(
+			newState.guild.id,
 			VoiceConfigKeys.tempVoiceGeneratorChannelId,
 		);
 
@@ -316,6 +320,7 @@ export class TempVoiceService {
 				data: {
 					id: voiceChannel.id,
 					ownerId: member.id,
+					guildId: guild.id,
 				},
 			});
 
@@ -349,7 +354,7 @@ export class TempVoiceService {
 
 		if (!tempChannel) return null;
 
-		const lng = await this.getLanguage();
+		const lng = await this.getLanguage(channel.guild.id);
 
 		const allowedUsers =
 			tempChannel.AllowedUsers.length > 0

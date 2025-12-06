@@ -214,6 +214,7 @@ export class InvitationService {
 	 * Records a new invitation in the database.
 	 */
 	public static async addInvitation(
+		guildId: string,
 		inviterId: string,
 		invitedId: string,
 		code: string,
@@ -231,14 +232,15 @@ export class InvitationService {
 				create: { id: invitedId },
 			});
 
-			// Deactivate any previous active invitations for this user
+			// Deactivate any previous active invitations for this user in this guild
 			await prismaClient.invitation.updateMany({
-				where: { invitedId, active: true },
+				where: { invitedId, guildId, active: true },
 				data: { active: false },
 			});
 
 			await prismaClient.invitation.create({
 				data: {
+					guildId,
 					inviterId,
 					invitedId,
 					code,
@@ -256,10 +258,14 @@ export class InvitationService {
 	/**
 	 * Marks an invitation as inactive (user left).
 	 */
-	public static async removeInvitation(invitedId: string): Promise<void> {
+	public static async removeInvitation(
+		guildId: string,
+		invitedId: string,
+	): Promise<void> {
 		try {
 			const invitation = await prismaClient.invitation.findFirst({
 				where: {
+					guildId,
 					invitedId,
 					active: true,
 				},
@@ -282,7 +288,10 @@ export class InvitationService {
 	/**
 	 * Retrieves the leaderboard of inviters.
 	 */
-	public static async getLeaderboard(limit = 10): Promise<
+	public static async getLeaderboard(
+		guildId: string,
+		limit = 10,
+	): Promise<
 		{
 			inviterId: string;
 			active: number;
@@ -302,6 +311,7 @@ export class InvitationService {
                     COUNT(*) as total, 
                     SUM(CASE WHEN active = 1 THEN 1 ELSE 0 END) as active 
                 FROM Invitation 
+				WHERE guildId = ${guildId}
                 GROUP BY inviterId 
                 ORDER BY active DESC 
                 LIMIT ${limit}
@@ -321,13 +331,16 @@ export class InvitationService {
 		}
 	}
 
-	public static async getInviteCounts(userId: string): Promise<{
+	public static async getInviteCounts(
+		guildId: string,
+		userId: string,
+	): Promise<{
 		active: number;
 		fake: number;
 		total: number;
 	}> {
 		const allInvites = await prismaClient.invitation.findMany({
-			where: { inviterId: userId },
+			where: { inviterId: userId, guildId },
 			select: { invitedId: true, active: true },
 		});
 

@@ -11,13 +11,17 @@ import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 
 export class GroupService {
-	private static async getLanguage(): Promise<string> {
-		return (await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+	private static async getLanguage(guildId: string): Promise<string> {
+		return (
+			(await ConfigService.get(guildId, GeneralConfigKeys.language)) ??
+			"en"
+		);
 	}
 
 	private static logger = new Logger("GroupService");
 
 	static async createGroup(
+		guildId: string,
 		name: string,
 		roleId: string,
 	): Promise<GroupModel> {
@@ -26,21 +30,29 @@ export class GroupService {
 			where: { id: roleId },
 		});
 		if (!role) {
-			role = await prismaClient.role.create({ data: { id: roleId } });
+			role = await prismaClient.role.create({
+				data: { id: roleId, guildId },
+			});
 		}
 
 		return prismaClient.group.create({
 			data: {
+				guildId,
 				name,
 				roleId,
 			},
 		});
 	}
 
-	static async deleteGroup(name: string): Promise<GroupModel> {
-		const group = await prismaClient.group.findFirst({ where: { name } });
+	static async deleteGroup(
+		guildId: string,
+		name: string,
+	): Promise<GroupModel> {
+		const group = await prismaClient.group.findFirst({
+			where: { name, guildId },
+		});
 		if (!group) {
-			const lng = await this.getLanguage();
+			const lng = await this.getLanguage(guildId);
 			throw new Error(
 				I18nService.t(
 					"modules.configuration.services.group.not_found",
@@ -61,14 +73,15 @@ export class GroupService {
 	}
 
 	static async addPermission(
+		guildId: string,
 		groupName: string,
 		permissionName: string,
 	): Promise<void> {
 		const group = await prismaClient.group.findFirst({
-			where: { name: groupName },
+			where: { name: groupName, guildId },
 		});
 		if (!group) {
-			const lng = await this.getLanguage();
+			const lng = await this.getLanguage(guildId);
 			throw new Error(
 				I18nService.t(
 					"modules.configuration.services.group.not_found",
@@ -84,7 +97,7 @@ export class GroupService {
 			where: { name: permissionName },
 		});
 		if (!permission) {
-			const lng = await this.getLanguage();
+			const lng = await this.getLanguage(guildId);
 			throw new Error(
 				I18nService.t(
 					"modules.configuration.services.permission.not_found",
@@ -118,14 +131,15 @@ export class GroupService {
 	}
 
 	static async removePermission(
+		guildId: string,
 		groupName: string,
 		permissionName: string,
 	): Promise<void> {
 		const group = await prismaClient.group.findFirst({
-			where: { name: groupName },
+			where: { name: groupName, guildId },
 		});
 		if (!group) {
-			const lng = await this.getLanguage();
+			const lng = await this.getLanguage(guildId);
 			throw new Error(
 				I18nService.t(
 					"modules.configuration.services.group.not_found",
@@ -141,7 +155,7 @@ export class GroupService {
 			where: { name: permissionName },
 		});
 		if (!permission) {
-			const lng = await this.getLanguage();
+			const lng = await this.getLanguage(guildId);
 			throw new Error(
 				I18nService.t(
 					"modules.configuration.services.permission.not_found",
@@ -170,13 +184,14 @@ export class GroupService {
 		}
 	}
 
-	static async listGroups(): Promise<
+	static async listGroups(guildId: string): Promise<
 		(GroupModel & {
 			Role: RoleModel;
 			Permissions: { Permissions: PermissionModel }[];
 		})[]
 	> {
 		return prismaClient.group.findMany({
+			where: { guildId },
 			include: {
 				Role: true,
 				Permissions: {
@@ -188,7 +203,10 @@ export class GroupService {
 		});
 	}
 
-	static async getGroup(name: string): Promise<
+	static async getGroup(
+		guildId: string,
+		name: string,
+	): Promise<
 		| (GroupModel & {
 				Role: RoleModel;
 				Permissions: { Permissions: PermissionModel }[];
@@ -196,7 +214,7 @@ export class GroupService {
 		| null
 	> {
 		return prismaClient.group.findFirst({
-			where: { name },
+			where: { name, guildId },
 			include: {
 				Role: true,
 				Permissions: {

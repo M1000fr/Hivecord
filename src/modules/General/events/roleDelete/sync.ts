@@ -19,7 +19,11 @@ export default class RoleDeleteEvent extends BaseEvent<
 			await prismaClient.role.upsert({
 				where: { id: role.id },
 				update: { deletedAt: new Date() },
-				create: { id: role.id, deletedAt: new Date() },
+				create: {
+					id: role.id,
+					guildId: role.guild.id,
+					deletedAt: new Date(),
+				},
 			});
 			this.logger.log(`Synced deleted role ${role.name} (${role.id})`);
 		} catch (error) {

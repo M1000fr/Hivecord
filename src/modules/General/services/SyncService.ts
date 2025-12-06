@@ -8,10 +8,19 @@ export class SyncService {
 
 	static async syncGuild(guild: Guild) {
 		this.logger.log(`Syncing guild ${guild.name}...`);
+		await this.syncGuildRecord(guild);
 		await this.syncRoles(guild);
 		await this.syncMembers(guild);
 		await this.syncChannels(guild);
 		this.logger.log(`Guild ${guild.name} synced.`);
+	}
+
+	static async syncGuildRecord(guild: Guild) {
+		await prismaClient.guild.upsert({
+			where: { id: guild.id },
+			update: { name: guild.name },
+			create: { id: guild.id, name: guild.name },
+		});
 	}
 
 	static async syncRoles(guild: Guild) {
@@ -27,6 +36,7 @@ export class SyncService {
 				},
 				create: {
 					id,
+					guildId: guild.id,
 				},
 			});
 		}
@@ -106,7 +116,7 @@ export class SyncService {
 			await prismaClient.channel.upsert({
 				where: { id },
 				update: { type, deletedAt: null },
-				create: { id, type },
+				create: { id, type, guildId: guild.id },
 			});
 		}
 

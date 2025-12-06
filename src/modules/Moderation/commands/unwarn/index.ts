@@ -32,7 +32,10 @@ export default class UnwarnCommand extends BaseCommand {
 			return;
 		}
 
-		const warns = await SanctionService.getActiveWarns(userId);
+		const warns = await SanctionService.getActiveWarns(
+			interaction.guildId!,
+			userId,
+		);
 		const filtered = warns
 			.map((w) => ({
 				name: `#${w.id} - ${w.reason.substring(0, 50)}... (${w.createdAt.toLocaleDateString()})`,
@@ -49,7 +52,10 @@ export default class UnwarnCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	) {
 		const lng =
-			(await ConfigService.get(GeneralConfigKeys.language)) ?? "en";
+			(await ConfigService.get(
+				interaction.guildId!,
+				GeneralConfigKeys.language,
+			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 		const warnId = interaction.options.getInteger("warn_id", true);

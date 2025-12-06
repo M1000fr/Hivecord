@@ -5,6 +5,7 @@ import SyncCommand from "./commands/sync/index";
 import ChannelCreateEvent from "./events/channelCreate/sync";
 import ChannelDeleteEvent from "./events/channelDelete/sync";
 import ChannelUpdateEvent from "./events/channelUpdate/sync";
+import GuildCreateEvent from "./events/guildCreate/index";
 import WelcomeRoleAddEvent from "./events/guildMemberAdd/roleAdd";
 import GuildMemberRegisterEvent from "./events/guildMemberAdd/sync";
 import WelcomeEvent from "./events/guildMemberAdd/welcome";
@@ -38,6 +39,7 @@ import { PingCommandInteractions } from "./interactions/PingCommandInteractions"
 		ChannelCreateEvent,
 		ChannelDeleteEvent,
 		ChannelUpdateEvent,
+		GuildCreateEvent,
 	],
 	interactions: [PingCommandInteractions],
 	config: GeneralConfig,
