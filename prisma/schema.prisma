@@ -46,7 +46,7 @@ model Guild {
 
 model Invitation {
     id        Int      @id @default(autoincrement())
-    guildId   String   @default("default")
+    guildId   String
     inviterId String
     invitedId String
     code      String
@@ -54,8 +54,8 @@ model Invitation {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    Inviter User @relation("Inviter", fields: [inviterId], references: [id])
-    Invited User @relation("InvitedBy", fields: [invitedId], references: [id])
+    Inviter User  @relation("Inviter", fields: [inviterId], references: [id])
+    Invited User  @relation("InvitedBy", fields: [invitedId], references: [id])
     Guild   Guild @relation(fields: [guildId], references: [id])
 
     @@index([inviterId])
@@ -65,7 +65,7 @@ model Invitation {
 
 model Channel {
     id        String      @id
-    guildId   String      @default("default")
+    guildId   String
     Guild     Guild       @relation(fields: [guildId], references: [id])
     type      ChannelType
     deletedAt DateTime?
@@ -75,7 +75,7 @@ model Channel {
 
 model Role {
     id        String    @id
-    guildId   String    @default("default")
+    guildId   String
     Guild     Guild     @relation(fields: [guildId], references: [id])
     deletedAt DateTime?
 
@@ -110,7 +110,7 @@ model GroupPermission {
 
 model Group {
     id      Int    @id @default(autoincrement())
-    guildId String @default("default")
+    guildId String
     Guild   Guild  @relation(fields: [guildId], references: [id])
     name    String
 
@@ -130,7 +130,7 @@ enum SanctionType {
 
 model Sanction {
     id          Int          @id @default(autoincrement())
-    guildId     String       @default("default")
+    guildId     String
     Guild       Guild        @relation(fields: [guildId], references: [id])
     userId      String
     moderatorId String
@@ -145,7 +145,7 @@ model Sanction {
 }
 
 model Configuration {
-    guildId String @default("default")
+    guildId String
     Guild   Guild  @relation(fields: [guildId], references: [id])
     key     String
     value   String
@@ -171,7 +171,7 @@ model RoleConfiguration {
 
 model TempVoiceChannel {
     id        String   @id
-    guildId   String   @default("default")
+    guildId   String
     Guild     Guild    @relation(fields: [guildId], references: [id])
     ownerId   String
     createdAt DateTime @default(now())
@@ -202,7 +202,7 @@ model TempVoiceBlockedUser {
 
 model SanctionReason {
     id       Int          @id @default(autoincrement())
-    guildId  String       @default("default")
+    guildId  String
     Guild    Guild        @relation(fields: [guildId], references: [id])
     key      String?
     text     String
@@ -214,7 +214,7 @@ model SanctionReason {
 }
 
 model CustomEmbed {
-    guildId   String   @default("default")
+    guildId   String
     Guild     Guild    @relation(fields: [guildId], references: [id])
     name      String
     data      String   @db.Text // JSON content

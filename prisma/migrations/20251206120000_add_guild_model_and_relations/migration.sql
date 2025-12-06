@@ -1,3 +1,20 @@
+-- Delete all data to avoid migration issues
+DELETE FROM `UserGroup`;
+DELETE FROM `GroupPermission`;
+DELETE FROM `Group`;
+DELETE FROM `ChannelConfiguration`;
+DELETE FROM `Channel`;
+DELETE FROM `RoleConfiguration`;
+DELETE FROM `Role`;
+DELETE FROM `TempVoiceAllowedUser`;
+DELETE FROM `TempVoiceBlockedUser`;
+DELETE FROM `TempVoiceChannel`;
+DELETE FROM `Invitation`;
+DELETE FROM `Sanction`;
+DELETE FROM `SanctionReason`;
+DELETE FROM `Configuration`;
+DELETE FROM `CustomEmbed`;
+
 -- DropIndex
 DROP INDEX `SanctionReason_key_key` ON `SanctionReason`;
 
@@ -40,8 +57,7 @@ CREATE TABLE `Guild` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Insert Default Guild
-INSERT INTO `Guild` (`id`, `name`) VALUES ('default', 'Default Guild');
+
 
 -- CreateIndex
 CREATE INDEX `Invitation_guildId_idx` ON `Invitation`(`guildId`);
