@@ -7,6 +7,7 @@ import type { ModuleOptions } from "@interfaces/ModuleOptions";
 import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
 import { DebugModule } from "@modules/Debug/DebugModule";
 import { GeneralModule } from "@modules/General/GeneralModule";
+import { GroupManagerModule } from "@modules/GroupManager/GroupManagerModule";
 import { InvitationModule } from "@modules/Invitation/InvitationModule";
 import { LogModule } from "@modules/Log/LogModule";
 import { ModerationModule } from "@modules/Moderation/ModerationModule";
@@ -180,6 +181,7 @@ export class LeBotClient<ready = false> extends Client {
 			SecurityModule,
 			StatisticsModule,
 			InvitationModule,
+			GroupManagerModule,
 		];
 
 		for (const ModuleClass of modules) {
