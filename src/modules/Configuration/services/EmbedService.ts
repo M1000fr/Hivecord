@@ -1,4 +1,5 @@
 import { MessageTemplate } from "@class/MessageTemplate";
+import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 import { EmbedBuilder, type APIEmbed } from "discord.js";
@@ -25,6 +26,7 @@ export class EmbedService {
 		name: string,
 		data: APIEmbed,
 	): Promise<void> {
+		await EntityService.ensureGuildById(guildId);
 		await prismaClient.customEmbed.upsert({
 			where: { guildId_name: { guildId, name } },
 			update: { data: JSON.stringify(data) },

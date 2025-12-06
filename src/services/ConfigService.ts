@@ -1,4 +1,5 @@
 import { ChannelType } from "@prisma/client/enums";
+import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
@@ -12,11 +13,7 @@ export class ConfigService {
 		roleId: string,
 		guildId: string,
 	): Promise<void> {
-		await prismaClient.role.upsert({
-			where: { id: roleId },
-			update: { guildId },
-			create: { id: roleId, guildId },
-		});
+		await EntityService.ensureRoleById(guildId, roleId);
 	}
 
 	static async get(guildId: string, key: string): Promise<string | null> {
@@ -40,6 +37,7 @@ export class ConfigService {
 		key: string,
 		value: string,
 	): Promise<void> {
+		await EntityService.ensureGuildById(guildId);
 		const redis = RedisService.getInstance();
 		const cacheKey = `config:${guildId}:value:${key}`;
 		await redis.del(cacheKey);
@@ -98,17 +96,14 @@ export class ConfigService {
 		channelId: string,
 		channelType: ChannelType = ChannelType.TEXT,
 	): Promise<void> {
+		await EntityService.ensureGuildById(guildId);
 		const redis = RedisService.getInstance();
 		const cacheKey = `config:${guildId}:channel:${key}`;
 		const channelsCacheKey = `config:${guildId}:channels:${key}`;
 		await redis.del(cacheKey);
 		await redis.del(channelsCacheKey);
 
-		await prismaClient.channel.upsert({
-			where: { id: channelId },
-			update: { type: channelType, guildId },
-			create: { id: channelId, type: channelType, guildId },
-		});
+		await EntityService.ensureChannelById(guildId, channelId, channelType);
 
 		await prismaClient.$transaction([
 			prismaClient.channelConfiguration.deleteMany({
@@ -149,17 +144,14 @@ export class ConfigService {
 		channelId: string,
 		channelType: ChannelType = ChannelType.TEXT,
 	): Promise<void> {
+		await EntityService.ensureGuildById(guildId);
 		const redis = RedisService.getInstance();
 		const cacheKey = `config:${guildId}:channels:${key}`;
 		const channelCacheKey = `config:${guildId}:channel:${key}`;
 		await redis.del(cacheKey);
 		await redis.del(channelCacheKey);
 
-		await prismaClient.channel.upsert({
-			where: { id: channelId },
-			update: { type: channelType, guildId },
-			create: { id: channelId, type: channelType, guildId },
-		});
+		await EntityService.ensureChannelById(guildId, channelId, channelType);
 
 		await prismaClient.channelConfiguration.upsert({
 			where: { key_channelId: { key, channelId } },

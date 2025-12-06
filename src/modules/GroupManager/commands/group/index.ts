@@ -60,6 +60,14 @@ export default class GroupCommand extends BaseCommand {
 
 		await InteractionHelper.defer(interaction);
 
+		if (!interaction.guild) {
+			await InteractionHelper.respondError(
+				interaction,
+				t("common.errors.guild_not_found"),
+			);
+			return;
+		}
+
 		try {
 			await GroupService.createGroup(interaction.guild, name, role.id);
 			await InteractionHelper.respondSuccess(

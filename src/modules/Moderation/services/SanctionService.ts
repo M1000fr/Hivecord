@@ -3,6 +3,7 @@ import { LogService } from "@modules/Log/services/LogService";
 import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
 import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
+import { EntityService } from "@services/EntityService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
@@ -68,11 +69,7 @@ export class SanctionService {
 	}
 
 	private static async ensureUserExists(userId: string): Promise<void> {
-		await prismaClient.user.upsert({
-			where: { id: userId },
-			update: {},
-			create: { id: userId },
-		});
+		await EntityService.ensureUserById(userId);
 	}
 
 	private static async deactivateSanction(
@@ -172,7 +169,7 @@ export class SanctionService {
 
 		await member.roles.add(muteRole);
 		await this.logSanction(
-			guild.id,
+			guild,
 			targetUser,
 			moderator,
 			SanctionType.MUTE,
@@ -234,7 +231,7 @@ export class SanctionService {
 		);
 		await guild.members.ban(targetUser, { reason, deleteMessageSeconds });
 		await this.logSanction(
-			guild.id,
+			guild,
 			targetUser,
 			moderator,
 			SanctionType.BAN,
@@ -265,7 +262,7 @@ export class SanctionService {
 			}),
 		);
 		await this.logSanction(
-			guild.id,
+			guild,
 			targetUser,
 			moderator,
 			SanctionType.WARN,
@@ -381,19 +378,20 @@ export class SanctionService {
 	}
 
 	private static async logSanction(
-		guildId: string,
+		guild: Guild,
 		user: User,
 		moderator: User,
 		type: SanctionType,
 		reason: string,
 		expiresAt?: Date,
 	) {
+		await EntityService.ensureGuild(guild);
 		await this.ensureUserExists(user.id);
 		await this.ensureUserExists(moderator.id);
 
 		await prismaClient.sanction.create({
 			data: {
-				guildId,
+				guildId: guild.id,
 				userId: user.id,
 				moderatorId: moderator.id,
 				type,

@@ -2,6 +2,7 @@ import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { LogService } from "@modules/Log/services/LogService";
 import { VoiceConfigKeys } from "@modules/Voice/VoiceConfig";
 import { ConfigService } from "@services/ConfigService";
+import { EntityService } from "@services/EntityService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
@@ -316,6 +317,8 @@ export class TempVoiceService {
 
 			await member.voice.setChannel(voiceChannel);
 
+			await EntityService.ensureGuild(guild);
+			await EntityService.ensureUser(member.user);
 			await prismaClient.tempVoiceChannel.create({
 				data: {
 					id: voiceChannel.id,

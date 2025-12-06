@@ -5,10 +5,12 @@ import type {
 	RoleModel,
 } from "@prisma/client/models";
 import { ConfigService } from "@services/ConfigService";
+import { EntityService } from "@services/EntityService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
+import { Guild } from "discord.js";
 
 export class GroupService {
 	private static async getLanguage(guildId: string): Promise<string> {
@@ -21,19 +23,14 @@ export class GroupService {
 	private static logger = new Logger("GroupService");
 
 	static async createGroup(
-		guildId: string,
+		guild: Guild,
 		name: string,
 		roleId: string,
 	): Promise<GroupModel> {
+		await EntityService.ensureGuild(guild);
+		const guildId = guild.id;
 		// Check if role exists
-		let role = await prismaClient.role.findUnique({
-			where: { id: roleId },
-		});
-		if (!role) {
-			role = await prismaClient.role.create({
-				data: { id: roleId, guildId },
-			});
-		}
+		await EntityService.ensureRoleById(guildId, roleId);
 
 		return prismaClient.group.create({
 			data: {

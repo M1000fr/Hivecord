@@ -1,5 +1,6 @@
-import { RedisService } from "@services/RedisService";
+import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
+import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 import { Guild, Invite } from "discord.js";
 
@@ -214,23 +215,16 @@ export class InvitationService {
 	 * Records a new invitation in the database.
 	 */
 	public static async addInvitation(
-		guildId: string,
+		guild: Guild,
 		inviterId: string,
 		invitedId: string,
 		code: string,
 	): Promise<void> {
 		try {
-			await prismaClient.user.upsert({
-				where: { id: inviterId },
-				update: {},
-				create: { id: inviterId },
-			});
-
-			await prismaClient.user.upsert({
-				where: { id: invitedId },
-				update: {},
-				create: { id: invitedId },
-			});
+			await EntityService.ensureGuild(guild);
+			const guildId = guild.id;
+			await EntityService.ensureUserById(inviterId);
+			await EntityService.ensureUserById(invitedId);
 
 			// Deactivate any previous active invitations for this user in this guild
 			await prismaClient.invitation.updateMany({
