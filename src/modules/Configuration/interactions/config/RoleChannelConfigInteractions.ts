@@ -147,6 +147,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			selectedProperty,
 			currentValue,
 			t,
+			lng,
 		);
 		const component = this.buildSelectComponent(
 			propertyOptions.type,

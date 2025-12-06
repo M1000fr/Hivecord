@@ -1,8 +1,10 @@
+import { ConfigContext } from "@decorators/ConfigContext";
 import {
 	ConfigProperty,
 	EConfigType,
 	toConfigKey,
 } from "@decorators/ConfigProperty";
+import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 
 export class GeneralConfig {
 	@ConfigProperty({
@@ -29,6 +31,12 @@ export class GeneralConfig {
 	})
 	generalLanguage: string = "en";
 
+	@ConfigContext([
+		ConfigContextVariable.User,
+		ConfigContextVariable.Guild,
+		ConfigContextVariable.Member,
+		ConfigContextVariable.Invite,
+	])
 	@ConfigProperty({
 		displayName: "Welcome Image Text",
 		displayNameLocalizations: {
@@ -43,6 +51,12 @@ export class GeneralConfig {
 	})
 	generalWelcomeMessageImage: string = "Welcome!";
 
+	@ConfigContext([
+		ConfigContextVariable.User,
+		ConfigContextVariable.Guild,
+		ConfigContextVariable.Member,
+		ConfigContextVariable.Invite,
+	])
 	@ConfigProperty({
 		displayName: "Welcome Message",
 		displayNameLocalizations: {

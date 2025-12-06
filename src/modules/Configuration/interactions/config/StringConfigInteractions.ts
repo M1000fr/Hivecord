@@ -124,11 +124,17 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			t,
 			propertyOptions.defaultValue,
 		);
+
+		const module = interaction.client.modules.get(moduleName.toLowerCase());
+		const configContexts = (module?.options.config as any)?.configContexts;
+
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,
 			selectedProperty,
 			currentValue,
 			t,
+			lng,
+			configContexts,
 		);
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
