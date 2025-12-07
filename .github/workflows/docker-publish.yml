@@ -11,6 +11,7 @@ env:
 jobs:
     test:
         runs-on: self-hosted
+
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
@@ -28,7 +29,7 @@ jobs:
             - name: Install system dependencies
               run: |
                   sudo apt-get update
-                  sudo apt-get install -y openssl fonts-dejavu-core fontconfig
+                  sudo apt-get install -y openssl fonts-dejavu-core fontconfig build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev python3 pkg-config
 
             - name: Install dependencies
               run: bun install
@@ -44,9 +45,35 @@ jobs:
             - name: Check i18n keys
               run: bun run i18n:missing
 
+    release:
+        needs: test
+        runs-on: self-hosted
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run Semantic Release (local)
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: npx semantic-release --no-ci
+
+            - name: Get version from package.json
+              id: get_version
+              run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
 
     build:
-        needs: test
+        needs: release
         runs-on: self-hosted
         permissions:
             contents: read
@@ -73,7 +100,7 @@ jobs:
                   push: true
                   tags: |
                       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
 
     deploy:
         needs: build
@@ -96,11 +123,11 @@ jobs:
               env:
                   HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
                   HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
+                  REGISTRY: ${{ env.REGISTRY }}
               with:
                   host: ${{ secrets.SSH_HOST }}
                   username: ${{ secrets.SSH_USERNAME }}
                   key: ${{ secrets.SSH_KEY }}
-                  envs: REGISTRY,HARBOR_USERNAME,HARBOR_PASSWORD
                   script: |
                       echo $HARBOR_PASSWORD | docker login $REGISTRY -u $HARBOR_USERNAME --password-stdin
                       cd /root/discord/bots/leBot
