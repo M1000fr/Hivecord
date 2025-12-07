@@ -27,7 +27,7 @@ jobs:
                   ref: ${{ github.event.workflow_run.head_branch }}
 
             - name: Fix git safe directory
-              run: git config --global --add safe.directory '*'
+              run: sudo git config --system --add safe.directory '*'
 
             - name: Get version from package.json
               id: get_version

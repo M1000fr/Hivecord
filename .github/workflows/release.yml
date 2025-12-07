@@ -25,7 +25,7 @@ jobs:
                   ref: ${{ github.event.workflow_run.head_sha }}
 
             - name: Fix git safe directory
-              run: git config --global --add safe.directory '*'
+              run: sudo git config --system --add safe.directory '*'
 
             - name: Checkout branch
               run: git checkout -B ${{ github.event.workflow_run.head_branch }}
