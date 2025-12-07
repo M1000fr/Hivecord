@@ -36,6 +36,7 @@
 					"select_permissions": "Select permissions",
 					"permissions_title": "Permissions for {{group}}",
 					"permissions_failed": "Failed to update permissions: {{error}}",
+					"create_failed": "Failed to create group.",
 					"created": "Group {{name}} created successfully.",
 					"delete_failed": "Failed to delete group: {{error}}",
 					"deleted": "Group {{name}} deleted successfully."
@@ -202,10 +203,12 @@
 					"success": "User {{userTag}} has been unmuted."
 				},
 				"unwarn": {
-					"success": "✅ Removed warning #{{id}} for {{userTag}}."
+					"success": "✅ Removed warning #{{id}} for {{userTag}}.",
+					"failed_with_error": "Failed to remove warning: {{error}}"
 				},
 				"warn": {
-					"success": "✅ Warned {{userTag}} for: {{reason}}"
+					"success": "✅ Warned {{userTag}} for: {{reason}}",
+					"failed_with_error": "Failed to warn user: {{error}}"
 				},
 				"ban": {
 					"success": "User {{userTag}} has been banned. Reason: {{reason}}",

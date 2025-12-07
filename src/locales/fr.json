@@ -36,6 +36,7 @@
 					"select_permissions": "Sélectionnez les permissions",
 					"permissions_title": "Permissions pour {{group}}",
 					"permissions_failed": "Échec de la mise à jour des permissions : {{error}}",
+					"create_failed": "Impossible de créer le groupe.",
 					"created": "Groupe {{name}} créé avec succès.",
 					"delete_failed": "Échec de la suppression du groupe : {{error}}",
 					"deleted": "Groupe {{name}} supprimé avec succès."
@@ -202,10 +203,12 @@
 					"success": "L'utilisateur {{userTag}} n'est plus muet."
 				},
 				"unwarn": {
-					"success": "✅ Avertissement #{{id}} supprimé pour {{userTag}}."
+					"success": "✅ Avertissement #{{id}} supprimé pour {{userTag}}.",
+					"failed_with_error": "Impossible de retirer l'avertissement : {{error}}"
 				},
 				"warn": {
-					"success": "✅ {{userTag}} averti pour : {{reason}}"
+					"success": "✅ {{userTag}} averti pour : {{reason}}",
+					"failed_with_error": "Impossible d'avertir l'utilisateur : {{error}}"
 				},
 				"ban": {
 					"success": "L'utilisateur {{userTag}} a été banni. Raison : {{reason}}",
