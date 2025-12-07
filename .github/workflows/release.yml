@@ -22,12 +22,13 @@ jobs:
               uses: actions/checkout@v4
               with:
                   fetch-depth: 0
-                  ref: ${{ github.event.workflow_run.head_sha }}
+                  ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
             - name: Fix git safe directory
               run: sudo git config --system --add safe.directory '*'
 
             - name: Checkout branch
+              if: github.event_name == 'workflow_run'
               run: git checkout -B ${{ github.event.workflow_run.head_branch }}
 
             - name: Setup Bun
