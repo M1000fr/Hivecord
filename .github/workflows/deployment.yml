@@ -1,55 +1,20 @@
-name: CD
+name: Deployment
 
 on:
     workflow_run:
-        workflows: ["CI"]
+        workflows: ["Release"]
         types:
             - completed
         branches:
             - main
-            - dev
 
 env:
     REGISTRY: reg.m1000.fr
     IMAGE_NAME: leserveur/lebot
 
 jobs:
-    release:
-        runs-on: self-hosted
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        outputs:
-            version: ${{ steps.get_version.outputs.VERSION }}
-
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-                  ref: ${{ github.event.workflow_run.head_sha }}
-
-            - name: Checkout branch
-              run: git checkout -B ${{ github.event.workflow_run.head_branch }}
-
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: latest
-
-            - name: Install dependencies
-              run: bun install
-
-            - name: Run Semantic Release (local)
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: bunx semantic-release --no-ci
-
-            - name: Get version from package.json
-              id: get_version
-              run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
-
     build:
-        needs: release
-        if: ${{ github.event.workflow_run.head_branch == 'main' }}
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
         runs-on: self-hosted
         permissions:
             contents: read
@@ -59,7 +24,14 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
               with:
-                  ref: ${{ github.event.workflow_run.head_sha }}
+                  ref: ${{ github.event.workflow_run.head_branch }}
+
+            - name: Fix git safe directory
+              run: git config --global --add safe.directory '*'
+
+            - name: Get version from package.json
+              id: get_version
+              run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
 
             - name: Log into registry ${{ env.REGISTRY }}
               uses: docker/login-action@v3
@@ -71,11 +43,6 @@ jobs:
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v3
 
-            - name: Update package.json version
-              run: |
-                  npm version ${{ needs.release.outputs.version }} --no-git-tag-version
-              shell: bash
-
             - name: Build and push Docker image
               uses: docker/build-push-action@v5
               with:
@@ -83,7 +50,7 @@ jobs:
                   push: true
                   tags: |
                       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.version }}
+                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
 
     deploy:
         needs: build
@@ -92,7 +59,7 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
               with:
-                  ref: ${{ github.event.workflow_run.head_sha }}
+                  ref: ${{ github.event.workflow_run.head_branch }}
 
             - name: Copy docker-compose.yml
               uses: appleboy/scp-action@v0.1.7
