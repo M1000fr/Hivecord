@@ -2,7 +2,7 @@ name: Docker Build and Push
 
 on:
     push:
-        branches: ["main"]
+        branches: ["main", "dev"]
 
 env:
     REGISTRY: reg.m1000.fr
@@ -48,6 +48,8 @@ jobs:
     release:
         needs: test
         runs-on: self-hosted
+        outputs:
+            version: ${{ steps.get_version.outputs.VERSION }}
 
         steps:
             - name: Checkout repository
@@ -70,10 +72,11 @@ jobs:
 
             - name: Get version from package.json
               id: get_version
-              run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
+              run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
 
     build:
         needs: release
+        if: github.ref == 'refs/heads/main'
         runs-on: self-hosted
         permissions:
             contents: read
@@ -100,7 +103,7 @@ jobs:
                   push: true
                   tags: |
                       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.version }}
 
     deploy:
         needs: build
