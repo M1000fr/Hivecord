@@ -13,6 +13,10 @@ env:
 jobs:
     release:
         runs-on: self-hosted
+        permissions:
+            contents: write
+            issues: write
+            pull-requests: write
         outputs:
             version: ${{ steps.get_version.outputs.VERSION }}
             released: ${{ steps.semantic_release.outputs.new_release_published }}
