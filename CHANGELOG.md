@@ -1,3 +1,10 @@
+# [1.0.0-dev.2](https://github.com/M1000fr/LeBot/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2025-12-08)
+
+### Bug Fixes
+
+- **ci:** add write permissions to release job ([ade79c2](https://github.com/M1000fr/LeBot/commit/ade79c2c0f47b4a50a5eeaaaf03d1de0dc6e8a48))
+- **ci:** set HOME env var and setup node 22 for semantic-release ([7606cb9](https://github.com/M1000fr/LeBot/commit/7606cb91dcbcf012b5a3e43b6110bb7bbe486593))
+
 # 1.0.0-dev.1 (2025-12-08)
 
 ### Bug Fixes
