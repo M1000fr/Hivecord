@@ -4,7 +4,6 @@ on:
     push:
         branches:
             - main
-            - dev
 
 env:
     REGISTRY: reg.m1000.fr
