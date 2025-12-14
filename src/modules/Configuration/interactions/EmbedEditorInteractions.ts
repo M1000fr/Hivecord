@@ -12,7 +12,8 @@ import {
 	type ModalSubmitInteraction,
 	type StringSelectMenuInteraction,
 } from "discord.js";
-import { EmbedEditorUtils } from "../commands/embed/EmbedEditorUtils";
+import { EmbedEditorMenus } from "../commands/embed/utils/EmbedEditorMenus";
+import { EmbedEditorModals } from "../commands/embed/utils/EmbedEditorModals";
 
 interface EmbedEditorSession {
 	userId?: string;
@@ -71,8 +72,8 @@ export class EmbedEditorInteractions {
 			content: `**Embed Editor**: Editing \`${session.name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
 			embeds: [embed],
 			components: [
-				EmbedEditorUtils.getMainMenu(lng),
-				EmbedEditorUtils.getControlButtons(lng),
+				EmbedEditorMenus.getMainMenu(lng),
+				EmbedEditorMenus.getControlButtons(lng),
 			],
 		});
 	}
@@ -94,8 +95,8 @@ export class EmbedEditorInteractions {
 			// Show fields submenu
 			await interaction.update({
 				components: [
-					EmbedEditorUtils.getFieldsSubMenu(lng, session.data.fields),
-					EmbedEditorUtils.getControlButtons(lng),
+					EmbedEditorMenus.getFieldsSubMenu(lng, session.data.fields),
+					EmbedEditorMenus.getControlButtons(lng),
 				],
 			});
 			return;
@@ -107,12 +108,12 @@ export class EmbedEditorInteractions {
 			content: `**Embed Editor**: Editing \`${session.name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
 			embeds: [embed],
 			components: [
-				EmbedEditorUtils.getMainMenu(lng),
-				EmbedEditorUtils.getControlButtons(lng),
+				EmbedEditorMenus.getMainMenu(lng),
+				EmbedEditorMenus.getControlButtons(lng),
 			],
 		});
 
-		const modal = EmbedEditorUtils.getModal(lng, value, session.data);
+		const modal = EmbedEditorModals.getModal(lng, value, session.data);
 		await interaction.showModal(modal);
 	}
 
@@ -138,8 +139,8 @@ export class EmbedEditorInteractions {
 			// Reset the menu selection
 			await interaction.message.edit({
 				components: [
-					EmbedEditorUtils.getFieldsSubMenu(lng, session.data.fields),
-					EmbedEditorUtils.getControlButtons(lng),
+					EmbedEditorMenus.getFieldsSubMenu(lng, session.data.fields),
+					EmbedEditorMenus.getControlButtons(lng),
 				],
 			});
 
@@ -153,14 +154,14 @@ export class EmbedEditorInteractions {
 				session.userId,
 			);
 
-			const modal = EmbedEditorUtils.getModal(lng, "field_add");
+			const modal = EmbedEditorModals.getModal(lng, "field_add");
 			await interaction.showModal(modal);
 		} else if (value.startsWith("field_edit_")) {
 			// Reset the menu selection
 			await interaction.message.edit({
 				components: [
-					EmbedEditorUtils.getFieldsSubMenu(lng, session.data.fields),
-					EmbedEditorUtils.getControlButtons(lng),
+					EmbedEditorMenus.getFieldsSubMenu(lng, session.data.fields),
+					EmbedEditorMenus.getControlButtons(lng),
 				],
 			});
 
@@ -177,7 +178,7 @@ export class EmbedEditorInteractions {
 					session.userId,
 				);
 
-				const modal = EmbedEditorUtils.getModal(lng, "field_edit", {
+				const modal = EmbedEditorModals.getModal(lng, "field_edit", {
 					index,
 					field,
 				});

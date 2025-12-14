@@ -14,8 +14,8 @@ import {
 	EmbedBuilder,
 	MessageFlags,
 } from "discord.js";
-import { EmbedEditorUtils } from "./EmbedEditorUtils";
 import { embedOptions } from "./embedOptions";
+import { EmbedEditorMenus } from "./utils/EmbedEditorMenus";
 
 @Command(embedOptions)
 export default class EmbedCommand extends BaseCommand {
@@ -67,8 +67,8 @@ export default class EmbedCommand extends BaseCommand {
 			}),
 			embeds: [embed],
 			components: [
-				EmbedEditorUtils.getMainMenu(lng),
-				EmbedEditorUtils.getControlButtons(lng),
+				EmbedEditorMenus.getMainMenu(lng),
+				EmbedEditorMenus.getControlButtons(lng),
 			],
 		});
 		const response = await interaction.fetchReply();
@@ -112,8 +112,8 @@ export default class EmbedCommand extends BaseCommand {
 			}),
 			embeds: [embed],
 			components: [
-				EmbedEditorUtils.getMainMenu(lng),
-				EmbedEditorUtils.getControlButtons(lng),
+				EmbedEditorMenus.getMainMenu(lng),
+				EmbedEditorMenus.getControlButtons(lng),
 			],
 		});
 		const response = await interaction.fetchReply();
