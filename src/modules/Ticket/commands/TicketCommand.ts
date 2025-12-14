@@ -111,26 +111,36 @@ export class TicketCommand extends BaseCommand {
 		const focusedValue = interaction.options.getFocused();
 		const guildId = interaction.guildId;
 
-		if (!guildId) return [];
+		if (!guildId) {
+			await interaction.respond([]);
+			return;
+		}
+
+		const id = parseInt(focusedValue);
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const orConditions: any[] = [
+			{
+				Creator: {
+					id: {
+						contains: focusedValue,
+					},
+				},
+			},
+		];
+
+		if (!isNaN(id)) {
+			orConditions.push({
+				id: {
+					equals: id,
+				},
+			});
+		}
 
 		const tickets = await prismaClient.ticket.findMany({
 			where: {
 				guildId: guildId,
 				active: true,
-				OR: [
-					{
-						id: {
-							equals: parseInt(focusedValue) || undefined,
-						},
-					},
-					{
-						Creator: {
-							id: {
-								contains: focusedValue,
-							},
-						},
-					},
-				],
+				OR: orConditions,
 			},
 			take: 25,
 			include: {
@@ -138,9 +148,11 @@ export class TicketCommand extends BaseCommand {
 			},
 		});
 
-		return tickets.map((ticket) => ({
-			name: `Ticket #${ticket.id} - ${ticket.Creator?.id || "Unknown"}`,
-			value: ticket.id.toString(),
-		}));
+		await interaction.respond(
+			tickets.map((ticket) => ({
+				name: `Ticket #${ticket.id} - ${ticket.Creator?.id || "Unknown"}`,
+				value: ticket.id.toString(),
+			})),
+		);
 	}
 }
