@@ -138,6 +138,17 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 		}
 	}
 
+	@ButtonPattern("module_config_cancel:*")
+	async handleCancelButton(interaction: ButtonInteraction) {
+		const ctx = await this.getInteractionContext(interaction);
+		if (!ctx) return;
+
+		await interaction.deferUpdate();
+		if (interaction.message?.deletable) {
+			await interaction.message.delete().catch(() => {});
+		}
+	}
+
 	@ButtonPattern("module_config_clear:*")
 	async handleClearButton(interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);

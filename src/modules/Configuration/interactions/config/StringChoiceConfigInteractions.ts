@@ -7,6 +7,8 @@ import { I18nService } from "@services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
 	type Locale,
@@ -95,9 +97,20 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 				selectMenu,
 			);
 
+		const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			this.createConfigButton(
+				"module_config_cancel",
+				moduleName,
+				selectedProperty,
+				interaction.user.id,
+				"Cancel",
+				ButtonStyle.Secondary,
+			),
+		);
+
 		await interaction.reply({
 			embeds: [embed],
-			components: [row],
+			components: [row, buttonRow],
 		});
 	}
 }

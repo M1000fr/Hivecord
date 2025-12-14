@@ -122,6 +122,17 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			);
 		}
 
+		row.addComponents(
+			this.createConfigButton(
+				"module_config_cancel",
+				moduleName,
+				propertyKey,
+				userId,
+				"Cancel",
+				ButtonStyle.Secondary,
+			),
+		);
+
 		return { embeds: [embed], components: [row] };
 	}
 

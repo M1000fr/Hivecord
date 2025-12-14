@@ -214,6 +214,17 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			);
 		}
 
+		row.addComponents(
+			this.createConfigButton(
+				"module_config_cancel",
+				moduleName,
+				selectedProperty,
+				interaction.user.id,
+				"Cancel",
+				ButtonStyle.Secondary,
+			),
+		);
+
 		await interaction.reply({
 			embeds: [embed],
 			components: [row],
