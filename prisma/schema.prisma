@@ -27,6 +27,8 @@ model User {
 
     InvitedBy      Invitation[] @relation("InvitedBy")
     InvitedMembers Invitation[] @relation("Inviter")
+
+    TicketsCreated Ticket[]
 }
 
 model Guild {
@@ -42,6 +44,7 @@ model Guild {
     TempVoiceChannels TempVoiceChannel[]
     SanctionReasons   SanctionReason[]
     CustomEmbeds      CustomEmbed[]
+    Tickets           Ticket[]
 }
 
 model Invitation {
@@ -71,6 +74,7 @@ model Channel {
     deletedAt DateTime?
 
     ChannelConfigurations ChannelConfiguration[]
+    Ticket                Ticket?
 }
 
 model Role {
@@ -145,12 +149,13 @@ model Sanction {
 }
 
 model Configuration {
+    id      Int    @id @default(autoincrement())
     guildId String
     Guild   Guild  @relation(fields: [guildId], references: [id])
     key     String
     value   String
 
-    @@id([guildId, key])
+    @@index([guildId, key])
 }
 
 model ChannelConfiguration {
@@ -228,4 +233,22 @@ model BotState {
     key       String   @id
     value     String
     updatedAt DateTime @updatedAt
+}
+
+model Ticket {
+    id        Int       @id @default(autoincrement())
+    guildId   String
+    Guild     Guild     @relation(fields: [guildId], references: [id], onDelete: Cascade)
+    channelId String    @unique
+    Channel   Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+    creatorId String
+    Creator   User      @relation(fields: [creatorId], references: [id])
+
+    category  String?
+    active    Boolean   @default(true)
+    createdAt DateTime  @default(now())
+    closedAt  DateTime?
+
+    @@index([guildId])
+    @@index([creatorId])
 }
