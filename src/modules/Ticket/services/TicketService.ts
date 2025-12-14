@@ -246,9 +246,13 @@ export class TicketService {
 			});
 		}
 
-		const channel = await this.client.channels.fetch(channelId);
-		if (channel) {
-			await channel.delete();
+		try {
+			const channel = await this.client.channels.fetch(channelId);
+			if (channel) {
+				await channel.delete();
+			}
+		} catch {
+			// Channel might not exist, ignore
 		}
 	}
 }
