@@ -5,6 +5,7 @@ import ModulesCommand from "./commands/modules/index";
 import { BooleanConfigInteractions } from "./interactions/config/BooleanConfigInteractions";
 import { ModuleConfigInteractions } from "./interactions/config/ModuleConfigInteractions";
 import { RoleChannelConfigInteractions } from "./interactions/config/RoleChannelConfigInteractions";
+import { StringArrayConfigInteractions } from "./interactions/config/StringArrayConfigInteractions";
 import { StringConfigInteractions } from "./interactions/config/StringConfigInteractions";
 import { EmbedEditorInteractions } from "./interactions/EmbedEditorInteractions";
 
@@ -18,6 +19,7 @@ import { EmbedEditorInteractions } from "./interactions/EmbedEditorInteractions"
 		BooleanConfigInteractions,
 		StringConfigInteractions,
 		RoleChannelConfigInteractions,
+		StringArrayConfigInteractions,
 	],
 })
 export class ConfigurationModule {}

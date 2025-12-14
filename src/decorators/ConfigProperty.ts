@@ -15,6 +15,7 @@ export enum EConfigType {
 	CustomEmbed = 100,
 	RoleArray = 101,
 	StringChoice = 102,
+	StringArray = 103,
 }
 
 export interface ConfigChoice {

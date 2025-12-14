@@ -40,6 +40,8 @@ export class ConfigHelper {
 		if (type === EConfigType.Role) return `<@&${value}>`;
 		if (type === EConfigType.RoleArray && Array.isArray(value))
 			return value.map((v) => `<@&${v}>`).join(", ");
+		if (type === EConfigType.StringArray && Array.isArray(value))
+			return value.join(", ");
 		if (type === EConfigType.Channel) return `<#${value}>`;
 		if (type === EConfigType.Boolean)
 			return String(value) === "true" ? "`✅`" : "`❌`";
@@ -78,7 +80,9 @@ export class ConfigHelper {
 			value = await ConfigService.getRole(guildId, snakeKey);
 		else if (type === EConfigType.RoleArray)
 			value = await ConfigService.getRoles(guildId, snakeKey);
-		else if (type === EConfigType.Channel)
+		else if (type === EConfigType.StringArray) {
+			value = await ConfigService.getMany(guildId, snakeKey);
+		} else if (type === EConfigType.Channel)
 			value = await ConfigService.getChannel(guildId, snakeKey);
 		else value = await ConfigService.get(guildId, snakeKey);
 
@@ -99,6 +103,8 @@ export class ConfigHelper {
 			return ConfigService.setRole(guildId, snakeKey, value as string);
 		if (type === EConfigType.RoleArray)
 			return ConfigService.setRoles(guildId, snakeKey, value as string[]);
+		if (type === EConfigType.StringArray)
+			return ConfigService.setMany(guildId, snakeKey, value as string[]);
 		if (type === EConfigType.Channel)
 			return ConfigService.setChannel(guildId, snakeKey, value as string);
 		return ConfigService.set(guildId, snakeKey, value as string);

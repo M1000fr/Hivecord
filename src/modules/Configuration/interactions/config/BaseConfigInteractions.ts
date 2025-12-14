@@ -15,6 +15,7 @@ import {
 	EmbedBuilder,
 	Locale,
 	Message,
+	MessageFlags,
 	type ButtonInteraction,
 	type ChannelSelectMenuInteraction,
 	type MentionableSelectMenuInteraction,
@@ -141,10 +142,12 @@ export abstract class BaseConfigInteractions {
 			if (
 				deleteMessage &&
 				(interaction.isMessageComponent() ||
-					interaction.isModalSubmit()) &&
-				interaction.message?.deletable
+					interaction.isModalSubmit())
 			) {
-				await interaction.message.delete().catch(() => {});
+				await interaction.deferUpdate().catch(() => {});
+				if (interaction.message?.deletable) {
+					await interaction.message.delete().catch(() => {});
+				}
 			} else if (!silent) {
 				if (
 					interaction.isRepliable() &&
@@ -179,7 +182,7 @@ export abstract class BaseConfigInteractions {
 			await interaction.reply({
 				content:
 					"❌ You are not allowed to interact with this component.",
-				ephemeral: true,
+				flags: [MessageFlags.Ephemeral],
 			});
 			return false;
 		}

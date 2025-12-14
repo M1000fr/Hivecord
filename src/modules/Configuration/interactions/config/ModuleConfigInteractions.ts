@@ -12,6 +12,7 @@ import { AttachmentConfigInteractions } from "./AttachmentConfigInteractions";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 import { BooleanConfigInteractions } from "./BooleanConfigInteractions";
 import { RoleChannelConfigInteractions } from "./RoleChannelConfigInteractions";
+import { StringArrayConfigInteractions } from "./StringArrayConfigInteractions";
 import { StringChoiceConfigInteractions } from "./StringChoiceConfigInteractions";
 import { StringConfigInteractions } from "./StringConfigInteractions";
 
@@ -21,6 +22,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 	private static stringChoiceHandler = new StringChoiceConfigInteractions();
 	private static roleChannelHandler = new RoleChannelConfigInteractions();
 	private static attachmentHandler = new AttachmentConfigInteractions();
+	private static stringArrayHandler = new StringArrayConfigInteractions();
 
 	@SelectMenuPattern("module_config:*")
 	async handlePropertySelection(interaction: StringSelectMenuInteraction) {
@@ -113,6 +115,13 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 				);
 			} else if (propertyOptions.type === EConfigType.Attachment) {
 				await ModuleConfigInteractions.attachmentHandler.show(
+					interaction,
+					propertyOptions,
+					selectedProperty,
+					moduleName,
+				);
+			} else if (propertyOptions.type === EConfigType.StringArray) {
+				await ModuleConfigInteractions.stringArrayHandler.show(
 					interaction,
 					propertyOptions,
 					selectedProperty,

@@ -39,8 +39,51 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				interaction.fields.getTextInputValue("value"),
 				EConfigType.String,
 				false,
-				true,
+				false,
 			);
+
+			// Update the view to show the new value
+			const { propertyOptions } = this.getPropertyContext(
+				client,
+				moduleName,
+				propertyKey,
+			);
+
+			if (propertyOptions && interaction.message) {
+				const lng =
+					(await ConfigService.get(
+						interaction.guildId!,
+						GeneralConfigKeys.language,
+					)) ?? "en";
+				const t = I18nService.getFixedT(lng);
+				const currentValue = await ConfigHelper.getCurrentValue(
+					interaction.guildId!,
+					propertyKey,
+					propertyOptions.type,
+					t,
+					propertyOptions.defaultValue,
+				);
+
+				const module = (interaction.client as LeBotClient).modules.get(
+					moduleName.toLowerCase(),
+				);
+				const configContexts = (
+					module?.options.config as unknown as IConfigClass
+				)?.configContexts;
+
+				const embed = this.buildPropertyEmbed(
+					propertyOptions,
+					propertyKey,
+					currentValue,
+					t,
+					lng,
+					configContexts,
+				);
+
+				await interaction.message.edit({
+					embeds: [embed],
+				});
+			}
 		}
 	}
 
