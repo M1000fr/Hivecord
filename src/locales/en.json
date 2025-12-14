@@ -458,7 +458,13 @@
 					"field_change": "**{{field}}**: `{{before}}` ➔ `{{after}}`",
 					"added_perms": "**Added Permissions**: `{{perms}}`",
 					"removed_perms": "**Removed Permissions**: `{{perms}}`",
-					"fields": {}
+					"fields": {
+						"name": "Name",
+						"color": "Color",
+						"hoist": "Hoist",
+						"mentionable": "Mentionable",
+						"position": "Position"
+					}
 				},
 				"delete": {
 					"title": "Role Deleted",
