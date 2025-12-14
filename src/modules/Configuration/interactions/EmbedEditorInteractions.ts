@@ -179,7 +179,6 @@ export class EmbedEditorInteractions {
 				);
 
 				const modal = EmbedEditorModals.getModal(lng, "field_edit", {
-					index,
 					field,
 				});
 				await interaction.showModal(modal);
