@@ -3,9 +3,9 @@ import { ButtonPattern, ModalPattern } from "@decorators/Interaction";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
-	ActionRowBuilder,
 	ButtonInteraction,
 	GuildMember,
+	LabelBuilder,
 	ModalBuilder,
 	ModalSubmitInteraction,
 	PermissionFlagsBits,
@@ -23,19 +23,18 @@ export class TicketInteractions {
 			.setCustomId(`ticket_create_modal:${category}`)
 			.setTitle(`Create Ticket - ${category}`);
 
-		const reasonInput = new TextInputBuilder()
-			.setCustomId("ticket_reason")
-			.setLabel("Reason for ticket")
-			.setStyle(TextInputStyle.Paragraph)
-			.setRequired(true)
-			.setMinLength(10)
-			.setMaxLength(1000);
-
-		const row = new ActionRowBuilder<TextInputBuilder>().addComponents(
-			reasonInput,
+		modal.addLabelComponents(
+			new LabelBuilder()
+				.setLabel("Reason for ticket")
+				.setTextInputComponent(
+					new TextInputBuilder()
+						.setCustomId("ticket_reason")
+						.setStyle(TextInputStyle.Paragraph)
+						.setRequired(true)
+						.setMinLength(10)
+						.setMaxLength(1000),
+				),
 		);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		modal.addComponents(row as any);
 
 		await interaction.showModal(modal);
 	}
