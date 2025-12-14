@@ -61,7 +61,8 @@ export class TicketInteractions {
 				interaction,
 				`Ticket created: ${channel}`,
 			);
-		} catch {
+		} catch (error) {
+			console.error("Error creating ticket:", error);
 			await InteractionHelper.respondError(
 				interaction,
 				"Failed to create ticket.",

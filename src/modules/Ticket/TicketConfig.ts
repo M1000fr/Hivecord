@@ -87,3 +87,12 @@ export class TicketConfig {
 	})
 	supportRole: string | null = null;
 }
+
+export const TicketConfigKeys = {
+	createMessageChannel: "create_message_channel",
+	creationMessageContent: "creation_message_content",
+	creationMessageEmbed: "creation_message_embed",
+	ticketTypeCategory: "ticket_type_category",
+	ticketCreationCategory: "ticket_creation_category",
+	supportRole: "support_role",
+} as const;
