@@ -1,12 +1,12 @@
 import type { LeBotClient } from "@class/LeBotClient";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { OnConfigUpdate } from "@decorators/OnConfigUpdate";
-import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { ChannelType as PrismaChannelType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
 import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
 import { Client } from "@src/decorators/Client";
+import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { Logger } from "@utils/Logger";
 import {
@@ -67,7 +67,7 @@ export class TicketService {
 		let embed = null;
 		if (embedName) {
 			try {
-				embed = await EmbedService.render(guildId, embedName, {});
+				embed = await CustomEmbedService.render(guildId, embedName, {});
 			} catch (e) {
 				this.logger.error(
 					`Failed to render embed ${embedName}`,

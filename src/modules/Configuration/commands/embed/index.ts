@@ -3,10 +3,10 @@ import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
@@ -25,7 +25,7 @@ export default class EmbedCommand extends BaseCommand {
 		interaction: AutocompleteInteraction,
 	) {
 		const focusedValue = interaction.options.getFocused();
-		const embeds = await EmbedService.list(interaction.guildId!);
+		const embeds = await CustomEmbedService.list(interaction.guildId!);
 		const filtered = embeds.filter((choice) =>
 			choice.toLowerCase().includes(focusedValue.toLowerCase()),
 		);
@@ -45,7 +45,7 @@ export default class EmbedCommand extends BaseCommand {
 			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
-		let data = await EmbedService.get(interaction.guildId!, name);
+		let data = await CustomEmbedService.get(interaction.guildId!, name);
 
 		if (!data) {
 			// Default template for new embed
@@ -74,7 +74,7 @@ export default class EmbedCommand extends BaseCommand {
 		const response = await interaction.fetchReply();
 
 		// Save to session
-		await EmbedService.setEditorSession(
+		await CustomEmbedService.setEditorSession(
 			response.id,
 			interaction.guildId!,
 			name,
@@ -93,7 +93,7 @@ export default class EmbedCommand extends BaseCommand {
 			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
-		const data = await EmbedService.get(interaction.guildId!, name);
+		const data = await CustomEmbedService.get(interaction.guildId!, name);
 
 		if (!data) {
 			await interaction.reply({
@@ -119,7 +119,7 @@ export default class EmbedCommand extends BaseCommand {
 		const response = await interaction.fetchReply();
 
 		// Save to session
-		await EmbedService.setEditorSession(
+		await CustomEmbedService.setEditorSession(
 			response.id,
 			interaction.guildId!,
 			name,
@@ -138,7 +138,7 @@ export default class EmbedCommand extends BaseCommand {
 			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
-		await EmbedService.delete(interaction.guildId!, name);
+		await CustomEmbedService.delete(interaction.guildId!, name);
 		await interaction.reply({
 			content: t("modules.configuration.commands.embed.deleted", {
 				name,
@@ -155,7 +155,7 @@ export default class EmbedCommand extends BaseCommand {
 				GeneralConfigKeys.language,
 			)) ?? "en";
 		const t = I18nService.getFixedT(lng);
-		const embeds = await EmbedService.list(interaction.guildId!);
+		const embeds = await CustomEmbedService.list(interaction.guildId!);
 
 		await interaction.reply({
 			content: t("modules.configuration.commands.embed.list", {
@@ -178,7 +178,7 @@ export default class EmbedCommand extends BaseCommand {
 		// Dummy context
 		const context = {};
 
-		const embed = await EmbedService.render(
+		const embed = await CustomEmbedService.render(
 			interaction.guildId!,
 			name,
 			context,
