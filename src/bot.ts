@@ -33,23 +33,6 @@ if (isShardZero) {
 }
 startVoiceSessionTickJob(leBotInstance);
 
-// Health check server
-if (isShardZero) {
-	Bun.serve({
-		port: 3000,
-		fetch(req) {
-			const url = new URL(req.url);
-			if (url.pathname === "/health") {
-				if (leBotInstance.isReady()) {
-					return new Response("OK");
-				}
-				return new Response("Not Ready", { status: 503 });
-			}
-			return new Response("Not Found", { status: 404 });
-		},
-	});
-}
-
 leBotInstance.start(process.env.DISCORD_TOKEN as string);
 
 export default leBotInstance;
