@@ -6,7 +6,7 @@ import { Logger } from "@utils/Logger";
 import { Client } from "discord.js";
 
 const CHECK_EXPIRED_INTERVAL = 10 * 1000; // 10 seconds
-const CHECK_MUTE_CONSISTENCY_INTERVAL = 60 * 1000; // 60 seconds
+const CHECK_MUTE_CONSISTENCY_INTERVAL = 10 * 1000; // 10 seconds
 
 export class SanctionScheduler {
 	private client: Client;
@@ -50,6 +50,7 @@ export class SanctionScheduler {
 
 			const activeMuteUserIds = new Set(activeMutes.map((s) => s.userId));
 
+			// 1. Remove role if no active sanction
 			for (const [memberId, member] of muteRole.members) {
 				if (!activeMuteUserIds.has(memberId)) {
 					try {
@@ -67,6 +68,37 @@ export class SanctionScheduler {
 					} catch (error: unknown) {
 						this.logger.error(
 							`Error removing mute role from ${memberId} during consistency check in guild ${guild.name}:`,
+							error instanceof Error
+								? error.stack
+								: String(error),
+						);
+					}
+				}
+			}
+
+			// 2. Add role if active sanction but no role
+			for (const userId of activeMuteUserIds) {
+				if (!muteRole.members.has(userId)) {
+					try {
+						let member = guild.members.cache.get(userId);
+						if (!member) {
+							member = await guild.members
+								.fetch(userId)
+								.catch(() => undefined);
+						}
+
+						if (member) {
+							await member.roles.add(
+								muteRole,
+								"Sanction consistency check: Active mute found",
+							);
+							this.logger.log(
+								`Re-applied mute role to ${member.user.tag} (${member.id}) during consistency check.`,
+							);
+						}
+					} catch (error) {
+						this.logger.error(
+							`Error applying mute role to ${userId} during consistency check in guild ${guild.name}:`,
 							error instanceof Error
 								? error.stack
 								: String(error),
@@ -105,9 +137,12 @@ export class SanctionScheduler {
 					continue;
 				}
 
-				const member = await guild.members
-					.fetch(sanction.userId)
-					.catch(() => null);
+				let member = guild.members.cache.get(sanction.userId);
+				if (!member) {
+					member = await guild.members
+						.fetch(sanction.userId)
+						.catch(() => undefined);
+				}
 
 				if (sanction.type === SanctionType.MUTE) {
 					const muteRoleId = await ConfigService.getRole(
