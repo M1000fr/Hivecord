@@ -102,6 +102,7 @@ jobs:
                   host: ${{ secrets.SSH_HOST }}
                   username: ${{ secrets.SSH_USERNAME }}
                   key: ${{ secrets.SSH_KEY }}
+                  envs: HARBOR_USERNAME,HARBOR_PASSWORD,REGISTRY
                   script: |
                       echo $HARBOR_PASSWORD | docker login $REGISTRY -u $HARBOR_USERNAME --password-stdin
                       cd /root/discord/bots/leBot
