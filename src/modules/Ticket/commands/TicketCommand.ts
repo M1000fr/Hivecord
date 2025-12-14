@@ -3,7 +3,6 @@ import { LeBotClient } from "@class/LeBotClient";
 import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { EConfigType } from "@decorators/ConfigProperty";
-import { DefaultCommand } from "@decorators/DefaultCommand";
 import { Subcommand } from "@decorators/Subcommand";
 import { prismaClient } from "@services/prismaService";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -20,10 +19,31 @@ import { TicketService } from "../services/TicketService";
 	name: "ticket",
 	description: "Manage tickets",
 	defaultMemberPermissions: PermissionFlagsBits.Administrator,
+	options: [
+		{
+			name: "panel",
+			description: "Update or send the ticket creation panel",
+			type: ApplicationCommandOptionType.Subcommand,
+		},
+		{
+			name: "close",
+			description: "Close a ticket by ID",
+			type: ApplicationCommandOptionType.Subcommand,
+			options: [
+				{
+					name: "id",
+					description: "The ID of the ticket to close",
+					type: ApplicationCommandOptionType.String,
+					required: true,
+					autocomplete: true,
+				},
+			],
+		},
+	],
 })
 export class TicketCommand extends BaseCommand {
-	@DefaultCommand()
-	async run(client: LeBotClient, interaction: ChatInputCommandInteraction) {
+	@Subcommand({ name: "panel" })
+	async panel(client: LeBotClient, interaction: ChatInputCommandInteraction) {
 		if (!interaction.guildId) return;
 
 		await InteractionHelper.defer(interaction);
@@ -48,19 +68,7 @@ export class TicketCommand extends BaseCommand {
 		);
 	}
 
-	@Subcommand({
-		name: "close",
-		description: "Close a ticket by ID",
-		options: [
-			{
-				name: "id",
-				description: "The ID of the ticket to close",
-				type: ApplicationCommandOptionType.String,
-				required: true,
-				autocomplete: true,
-			},
-		],
-	})
+	@Subcommand({ name: "close" })
 	async close(client: LeBotClient, interaction: ChatInputCommandInteraction) {
 		const ticketId = interaction.options.getString("id", true);
 
@@ -87,7 +95,7 @@ export class TicketCommand extends BaseCommand {
 				interaction,
 				`Ticket #${ticketId} closed.`,
 			);
-		} catch (error) {
+		} catch {
 			await InteractionHelper.respondError(
 				interaction,
 				"Failed to close ticket.",
