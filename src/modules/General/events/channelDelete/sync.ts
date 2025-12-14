@@ -18,7 +18,7 @@ export default class ChannelDeleteEvent extends BaseEvent<
 		if (channel.isDMBased()) return;
 
 		try {
-			await prismaClient.channel.update({
+			await prismaClient.channel.updateMany({
 				where: { id: channel.id },
 				data: { deletedAt: new Date() },
 			});

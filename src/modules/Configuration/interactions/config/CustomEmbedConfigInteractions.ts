@@ -4,6 +4,7 @@ import { SelectMenuPattern } from "@decorators/Interaction";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { prismaClient } from "@services/prismaService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
@@ -11,15 +12,14 @@ import {
 	ButtonStyle,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
-	type Locale,
 	type RepliableInteraction,
 	type StringSelectMenuInteraction,
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
-export class StringChoiceConfigInteractions extends BaseConfigInteractions {
-	@SelectMenuPattern("module_config_choice:*")
-	async handleChoiceSelection(interaction: StringSelectMenuInteraction) {
+export class CustomEmbedConfigInteractions extends BaseConfigInteractions {
+	@SelectMenuPattern("module_config_custom_embed:*")
+	async handleEmbedSelection(interaction: StringSelectMenuInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts } = ctx;
@@ -34,7 +34,7 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 				moduleName,
 				propertyKey,
 				value,
-				EConfigType.StringChoice,
+				EConfigType.CustomEmbed,
 				false,
 				true,
 			);
@@ -59,7 +59,6 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 			propertyOptions.type,
 			t,
 			propertyOptions.defaultValue,
-			propertyOptions,
 		);
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,
@@ -69,35 +68,68 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 			lng,
 		);
 
-		const choices = propertyOptions.choices || [];
+		// Fetch custom embeds for this guild
+		const customEmbeds = await prismaClient.customEmbed.findMany({
+			where: {
+				guildId: interaction.guildId!,
+			},
+			select: {
+				name: true,
+			},
+		});
+
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(
 				ConfigHelper.buildCustomId([
-					"module_config_choice",
+					"module_config_custom_embed",
 					moduleName,
 					selectedProperty,
 					interaction.user.id,
 				]),
 			)
-			.setPlaceholder(t("utils.config_helper.select_placeholder"))
-			.addOptions(
-				choices.map((choice) => {
-					const label =
-						choice.nameLocalizations?.[lng as Locale] ||
-						choice.name;
+			.setPlaceholder(t("utils.config_helper.select_placeholder"));
+
+		if (customEmbeds.length === 0) {
+			selectMenu
+				.setPlaceholder("No custom embeds found")
+				.setDisabled(true);
+			selectMenu.addOptions(
+				new StringSelectMenuOptionBuilder()
+					.setLabel("None")
+					.setValue("none"),
+			);
+		} else {
+			selectMenu.addOptions(
+				customEmbeds.map((ce) => {
 					return new StringSelectMenuOptionBuilder()
-						.setLabel(label)
-						.setValue(choice.value)
-						.setDefault(currentValue === choice.value); // This might not work if currentValue is formatted
+						.setLabel(ce.name)
+						.setValue(ce.name)
+						.setDefault(currentValue === ce.name);
 				}),
 			);
+		}
 
 		const row =
 			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
 				selectMenu,
 			);
 
-		const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		const buttonRow = new ActionRowBuilder<ButtonBuilder>();
+
+		if (!propertyOptions.nonNull) {
+			buttonRow.addComponents(
+				this.createConfigButton(
+					"module_config_clear",
+					moduleName,
+					selectedProperty,
+					interaction.user.id,
+					"Clear Selection",
+					ButtonStyle.Danger,
+				),
+			);
+		}
+
+		buttonRow.addComponents(
 			this.createConfigButton(
 				"module_config_cancel",
 				moduleName,

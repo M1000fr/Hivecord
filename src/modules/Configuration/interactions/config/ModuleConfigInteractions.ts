@@ -11,7 +11,9 @@ import {
 import { AttachmentConfigInteractions } from "./AttachmentConfigInteractions";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 import { BooleanConfigInteractions } from "./BooleanConfigInteractions";
+import { CustomEmbedConfigInteractions } from "./CustomEmbedConfigInteractions";
 import { RoleChannelConfigInteractions } from "./RoleChannelConfigInteractions";
+import { StringArrayConfigInteractions } from "./StringArrayConfigInteractions";
 import { StringChoiceConfigInteractions } from "./StringChoiceConfigInteractions";
 import { StringConfigInteractions } from "./StringConfigInteractions";
 
@@ -21,6 +23,8 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 	private static stringChoiceHandler = new StringChoiceConfigInteractions();
 	private static roleChannelHandler = new RoleChannelConfigInteractions();
 	private static attachmentHandler = new AttachmentConfigInteractions();
+	private static stringArrayHandler = new StringArrayConfigInteractions();
+	private static customEmbedHandler = new CustomEmbedConfigInteractions();
 
 	@SelectMenuPattern("module_config:*")
 	async handlePropertySelection(interaction: StringSelectMenuInteraction) {
@@ -118,6 +122,20 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 					selectedProperty,
 					moduleName,
 				);
+			} else if (propertyOptions.type === EConfigType.StringArray) {
+				await ModuleConfigInteractions.stringArrayHandler.show(
+					interaction,
+					propertyOptions,
+					selectedProperty,
+					moduleName,
+				);
+			} else if (propertyOptions.type === EConfigType.CustomEmbed) {
+				await ModuleConfigInteractions.customEmbedHandler.show(
+					interaction,
+					propertyOptions,
+					selectedProperty,
+					moduleName,
+				);
 			} else {
 				await ModuleConfigInteractions.stringHandler.show(
 					interaction,
@@ -126,6 +144,17 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 					moduleName,
 				);
 			}
+		}
+	}
+
+	@ButtonPattern("module_config_cancel:*")
+	async handleCancelButton(interaction: ButtonInteraction) {
+		const ctx = await this.getInteractionContext(interaction);
+		if (!ctx) return;
+
+		await interaction.deferUpdate();
+		if (interaction.message?.deletable) {
+			await interaction.message.delete().catch(() => {});
 		}
 	}
 

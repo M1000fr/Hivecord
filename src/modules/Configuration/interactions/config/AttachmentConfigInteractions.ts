@@ -51,8 +51,11 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 
 		const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] =
 			[];
+
+		const buttonRow = new ActionRowBuilder<ButtonBuilder>();
+
 		if (!propertyOptions.nonNull) {
-			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			buttonRow.addComponents(
 				this.createConfigButton(
 					"module_config_clear",
 					moduleName,
@@ -62,8 +65,20 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 					ButtonStyle.Danger,
 				),
 			);
-			components.push(row);
 		}
+
+		buttonRow.addComponents(
+			this.createConfigButton(
+				"module_config_cancel",
+				moduleName,
+				selectedProperty,
+				interaction.user.id,
+				"Cancel",
+				ButtonStyle.Secondary,
+			),
+		);
+
+		components.push(buttonRow);
 
 		await interaction.reply({
 			embeds: [embed],

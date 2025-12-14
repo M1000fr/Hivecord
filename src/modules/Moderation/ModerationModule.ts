@@ -11,6 +11,7 @@ import UnlockCommand from "./commands/unlock/index";
 import UnmuteCommand from "./commands/unmute/index";
 import UnwarnCommand from "./commands/unwarn/index";
 import WarnCommand from "./commands/warn/index";
+import { GuildMemberAddEvent } from "./events/GuildMemberAddEvent";
 
 @Module({
 	name: "Moderation",
@@ -27,7 +28,7 @@ import WarnCommand from "./commands/warn/index";
 		LockCommand,
 		UnlockCommand,
 	],
-	events: [],
+	events: [GuildMemberAddEvent],
 	config: ModerationConfig,
 })
 export class ModerationModule {}

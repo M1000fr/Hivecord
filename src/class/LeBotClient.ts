@@ -36,6 +36,7 @@ export class LeBotClient<
 		string,
 		{ instance: IModuleInstance; options: ModuleOptions }
 	>();
+	private static instance: LeBotClient;
 	private logger = new Logger("LeBotClient");
 	private scheduler: SanctionScheduler;
 
@@ -52,8 +53,13 @@ export class LeBotClient<
 				IntentsBitField.Flags.GuildInvites,
 			],
 		});
+		LeBotClient.instance = this;
 		this.scheduler = new SanctionScheduler(this);
 		this.handleProcessEvents();
+	}
+
+	static getInstance(): LeBotClient {
+		return this.instance;
 	}
 
 	private handleProcessEvents() {

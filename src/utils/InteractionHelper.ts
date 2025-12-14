@@ -1,4 +1,5 @@
 import {
+	MessageFlags,
 	type CommandInteraction,
 	type MessageComponentInteraction,
 	type ModalSubmitInteraction,
@@ -74,7 +75,9 @@ export class InteractionHelper {
 		if (interaction.isMessageComponent() || interaction.isModalSubmit()) {
 			await interaction.deferUpdate();
 		} else {
-			await interaction.deferReply({ ephemeral });
+			await interaction.deferReply({
+				flags: ephemeral ? MessageFlags.Ephemeral : undefined,
+			});
 		}
 	}
 }

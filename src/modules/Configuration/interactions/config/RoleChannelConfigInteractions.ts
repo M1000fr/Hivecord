@@ -173,6 +173,9 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 				),
 			];
 
+		const buttonRow =
+			new ActionRowBuilder<MessageActionRowComponentBuilder>();
+
 		if (
 			(propertyOptions.type === EConfigType.Role ||
 				propertyOptions.type === EConfigType.Channel) &&
@@ -186,13 +189,21 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 				"Clear Selection",
 				ButtonStyle.Danger,
 			);
-
-			components.push(
-				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-					clearButton,
-				),
-			);
+			buttonRow.addComponents(clearButton);
 		}
+
+		buttonRow.addComponents(
+			this.createConfigButton(
+				"module_config_cancel",
+				moduleName,
+				selectedProperty,
+				interaction.user.id,
+				"Cancel",
+				ButtonStyle.Secondary,
+			),
+		);
+
+		components.push(buttonRow);
 
 		await interaction.reply({
 			embeds: [embed],

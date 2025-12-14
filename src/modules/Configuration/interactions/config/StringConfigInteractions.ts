@@ -51,6 +51,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		const { client, parts, userId } = ctx;
 		const moduleName = parts[1];
 		const propertyKey = parts[2];
+		const messageId = parts[3] || "";
 
 		if (!moduleName || !propertyKey) return;
 
@@ -95,6 +96,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				"module_config_modal",
 				moduleName,
 				propertyKey,
+				messageId,
 				userId,
 			]),
 			title: ConfigHelper.truncate(
@@ -147,6 +149,10 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			configContexts,
 		);
 
+		const messageId = interaction.isMessageComponent()
+			? interaction.message.id
+			: "";
+
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			this.createConfigButton(
 				"module_config_edit_text",
@@ -155,6 +161,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				interaction.user.id,
 				"Edit Value",
 				ButtonStyle.Primary,
+				[messageId],
 			),
 		);
 
@@ -170,6 +177,17 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				),
 			);
 		}
+
+		row.addComponents(
+			this.createConfigButton(
+				"module_config_cancel",
+				moduleName,
+				selectedProperty,
+				interaction.user.id,
+				"Cancel",
+				ButtonStyle.Secondary,
+			),
+		);
 
 		await interaction.reply({
 			embeds: [embed],

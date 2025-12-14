@@ -1,4 +1,7 @@
 import type { ICommandClass } from "@interfaces/ICommandClass";
+import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { PermissionService } from "@services/PermissionService";
 import { Logger } from "@utils/Logger";
 import {
@@ -7,6 +10,7 @@ import {
 	Client,
 	MessageFlags,
 } from "discord.js";
+import type { TFunction } from "i18next";
 
 export abstract class BaseCommand {
 	protected logger = new Logger(this.constructor.name);
@@ -38,6 +42,14 @@ export abstract class BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
+		const lng = interaction.guildId
+			? ((await ConfigService.get(
+					interaction.guildId,
+					GeneralConfigKeys.language,
+				)) ?? "en")
+			: "en";
+		const t = I18nService.getFixedT(lng);
+
 		const subcommand = interaction.options.getSubcommand(false);
 		const subcommandGroup = interaction.options.getSubcommandGroup(false);
 		let executed = false;
@@ -66,9 +78,10 @@ export abstract class BaseCommand {
 							(
 								client: Client,
 								interaction: ChatInputCommandInteraction,
+								t: TFunction<"translation", undefined>,
 							) => Promise<void>
 						>
-					)[method]!(client, interaction);
+					)[method]!(client, interaction, t);
 					this.logger.log(
 						`Command ${this.constructor.name} (subcommand: ${key}) executed successfully`,
 					);
@@ -108,9 +121,10 @@ export abstract class BaseCommand {
 									(
 										client: Client,
 										interaction: ChatInputCommandInteraction,
+										t: TFunction<"translation", undefined>,
 									) => Promise<void>
 								>
-							)[method]!(client, interaction);
+							)[method]!(client, interaction, t);
 							this.logger.log(
 								`Command ${this.constructor.name} (option: ${optionName}) executed successfully`,
 							);
@@ -142,9 +156,10 @@ export abstract class BaseCommand {
 						(
 							client: Client,
 							interaction: ChatInputCommandInteraction,
+							t: TFunction<"translation", undefined>,
 						) => Promise<void>
 					>
-				)[defaultCommand]!(client, interaction);
+				)[defaultCommand]!(client, interaction, t);
 				this.logger.log(
 					`Command ${this.constructor.name} executed successfully`,
 				);

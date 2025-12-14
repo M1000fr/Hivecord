@@ -377,6 +377,43 @@ export class SanctionService {
 		);
 	}
 
+	static async checkAndReapplyMute(member: GuildMember): Promise<void> {
+		const activeMute = await prismaClient.sanction.findFirst({
+			where: {
+				guildId: member.guild.id,
+				userId: member.id,
+				type: SanctionType.MUTE,
+				active: true,
+			},
+		});
+
+		if (activeMute) {
+			if (activeMute.expiresAt && activeMute.expiresAt < new Date()) {
+				await this.deactivateSanction(
+					member.guild.id,
+					member.id,
+					SanctionType.MUTE,
+				);
+				return;
+			}
+
+			try {
+				const muteRole = await this.getMuteRole(member.guild);
+				if (muteRole && !member.roles.cache.has(muteRole.id)) {
+					await member.roles.add(muteRole);
+					this.logger.log(
+						`Re-applied mute role to ${member.user.tag} (${member.id}) on join.`,
+					);
+				}
+			} catch (error) {
+				this.logger.error(
+					`Failed to re-apply mute role to ${member.user.tag}:`,
+					error instanceof Error ? error.stack : String(error),
+				);
+			}
+		}
+	}
+
 	private static async logSanction(
 		guild: Guild,
 		user: User,
