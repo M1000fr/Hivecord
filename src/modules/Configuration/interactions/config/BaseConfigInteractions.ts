@@ -69,6 +69,16 @@ export abstract class BaseConfigInteractions {
 		}
 
 		if (interaction.isModalSubmit()) {
+			if (parts[0] === "module_config_modal" && parts[3]) {
+				try {
+					return (
+						(await interaction.channel?.messages.fetch(parts[3])) ??
+						null
+					);
+				} catch {
+					// Ignore
+				}
+			}
 			if (interaction.message instanceof Message)
 				return interaction.message;
 			return null;

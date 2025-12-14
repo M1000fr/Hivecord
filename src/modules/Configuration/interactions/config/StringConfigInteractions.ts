@@ -39,51 +39,8 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				interaction.fields.getTextInputValue("value"),
 				EConfigType.String,
 				false,
-				false,
+				true,
 			);
-
-			// Update the view to show the new value
-			const { propertyOptions } = this.getPropertyContext(
-				client,
-				moduleName,
-				propertyKey,
-			);
-
-			if (propertyOptions && interaction.message) {
-				const lng =
-					(await ConfigService.get(
-						interaction.guildId!,
-						GeneralConfigKeys.language,
-					)) ?? "en";
-				const t = I18nService.getFixedT(lng);
-				const currentValue = await ConfigHelper.getCurrentValue(
-					interaction.guildId!,
-					propertyKey,
-					propertyOptions.type,
-					t,
-					propertyOptions.defaultValue,
-				);
-
-				const module = (interaction.client as LeBotClient).modules.get(
-					moduleName.toLowerCase(),
-				);
-				const configContexts = (
-					module?.options.config as unknown as IConfigClass
-				)?.configContexts;
-
-				const embed = this.buildPropertyEmbed(
-					propertyOptions,
-					propertyKey,
-					currentValue,
-					t,
-					lng,
-					configContexts,
-				);
-
-				await interaction.message.edit({
-					embeds: [embed],
-				});
-			}
 		}
 	}
 
@@ -94,6 +51,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		const { client, parts, userId } = ctx;
 		const moduleName = parts[1];
 		const propertyKey = parts[2];
+		const messageId = parts[3] || "";
 
 		if (!moduleName || !propertyKey) return;
 
@@ -138,6 +96,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				"module_config_modal",
 				moduleName,
 				propertyKey,
+				messageId,
 				userId,
 			]),
 			title: ConfigHelper.truncate(
@@ -190,6 +149,10 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			configContexts,
 		);
 
+		const messageId = interaction.isMessageComponent()
+			? interaction.message.id
+			: "";
+
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			this.createConfigButton(
 				"module_config_edit_text",
@@ -198,6 +161,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				interaction.user.id,
 				"Edit Value",
 				ButtonStyle.Primary,
+				[messageId],
 			),
 		);
 
