@@ -148,11 +148,24 @@ export class TicketCommand extends BaseCommand {
 			},
 		});
 
-		await interaction.respond(
-			tickets.map((ticket) => ({
-				name: `Ticket #${ticket.id} - ${ticket.Creator?.id || "Unknown"}`,
-				value: ticket.id.toString(),
-			})),
+		const choices = await Promise.all(
+			tickets.map(async (ticket) => {
+				let username = "Unknown";
+				try {
+					const user =
+						client.users.cache.get(ticket.creatorId) ||
+						(await client.users.fetch(ticket.creatorId));
+					username = user.username;
+				} catch {
+					// Ignore fetch errors
+				}
+				return {
+					name: `Ticket #${ticket.id} - ${username}`,
+					value: ticket.id.toString(),
+				};
+			}),
 		);
+
+		await interaction.respond(choices);
 	}
 }
