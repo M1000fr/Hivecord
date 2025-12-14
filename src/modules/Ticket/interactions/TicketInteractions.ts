@@ -1,10 +1,14 @@
+import { EConfigType } from "@decorators/ConfigProperty";
 import { ButtonPattern, ModalPattern } from "@decorators/Interaction";
+import { ConfigHelper } from "@utils/ConfigHelper";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
 	ActionRowBuilder,
 	ButtonInteraction,
+	GuildMember,
 	ModalBuilder,
 	ModalSubmitInteraction,
+	PermissionFlagsBits,
 	TextInputBuilder,
 	TextInputStyle,
 } from "discord.js";
@@ -63,5 +67,33 @@ export class TicketInteractions {
 				"Failed to create ticket.",
 			);
 		}
+	}
+
+	@ButtonPattern("ticket_close")
+	async handleCloseButton(interaction: ButtonInteraction) {
+		if (!interaction.guild) return;
+
+		await InteractionHelper.defer(interaction, true);
+
+		const member = interaction.member as GuildMember;
+		const supportRole = await ConfigHelper.fetchValue(
+			interaction.guild.id,
+			"supportRole",
+			EConfigType.Role,
+		);
+
+		const hasPermission =
+			member.permissions.has(PermissionFlagsBits.Administrator) ||
+			(supportRole && member.roles.cache.has(supportRole as string));
+
+		if (!hasPermission) {
+			await InteractionHelper.respondError(
+				interaction,
+				"You do not have permission to close this ticket.",
+			);
+			return;
+		}
+
+		await interaction.channel?.delete();
 	}
 }

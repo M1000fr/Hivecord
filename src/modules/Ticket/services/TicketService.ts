@@ -215,8 +215,17 @@ export class TicketService {
 			},
 		});
 
+		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder()
+				.setCustomId("ticket_close")
+				.setLabel("Close Ticket")
+				.setStyle(ButtonStyle.Danger)
+				.setEmoji("🔒"),
+		);
+
 		await ticketChannel.send({
 			content: `Ticket created by ${member} for category: **${category}**\nReason: ${reason}`,
+			components: [row],
 		});
 
 		return ticketChannel;
