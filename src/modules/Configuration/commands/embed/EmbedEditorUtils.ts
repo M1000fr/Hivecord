@@ -3,6 +3,7 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
+	LabelBuilder,
 	ModalBuilder,
 	StringSelectMenuBuilder,
 	TextInputBuilder,
@@ -201,31 +202,33 @@ export class EmbedEditorUtils {
 							"modules.configuration.utils.embed_editor.modals.title.title",
 						),
 					);
-				modal.addComponents(
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("title")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.title.label",
-								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(false)
-							.setValue(data?.title || ""),
-					),
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("url")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.title.url_label",
-								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(false)
-							.setValue(data?.url || ""),
-					),
+				modal.addLabelComponents(
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.title.label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("title")
+								.setStyle(TextInputStyle.Short)
+								.setRequired(false)
+								.setValue(data?.title || ""),
+						),
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.title.url_label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("url")
+								.setStyle(TextInputStyle.Short)
+								.setRequired(false)
+								.setValue(data?.url || ""),
+						),
 				);
 				break;
 
@@ -237,19 +240,20 @@ export class EmbedEditorUtils {
 							"modules.configuration.utils.embed_editor.modals.description.title",
 						),
 					);
-				modal.addComponents(
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("description")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.description.label",
-								),
-							)
-							.setStyle(TextInputStyle.Paragraph)
-							.setRequired(false)
-							.setValue(data?.description || ""),
-					),
+				modal.addLabelComponents(
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.description.label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("description")
+								.setStyle(TextInputStyle.Paragraph)
+								.setRequired(false)
+								.setValue(data?.description || ""),
+						),
 				);
 				break;
 
@@ -261,31 +265,33 @@ export class EmbedEditorUtils {
 							"modules.configuration.utils.embed_editor.modals.author.title",
 						),
 					);
-				modal.addComponents(
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("name")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.author.name_label",
-								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(false)
-							.setValue(data?.author?.name || ""),
-					),
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("icon_url")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.author.icon_label",
-								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(false)
-							.setValue(data?.author?.icon_url || ""),
-					),
+				modal.addLabelComponents(
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.author.name_label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("name")
+								.setStyle(TextInputStyle.Short)
+								.setRequired(false)
+								.setValue(data?.author?.name || ""),
+						),
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.author.icon_label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("icon_url")
+								.setStyle(TextInputStyle.Short)
+								.setRequired(false)
+								.setValue(data?.author?.icon_url || ""),
+						),
 				);
 				break;
 
@@ -297,31 +303,33 @@ export class EmbedEditorUtils {
 							"modules.configuration.utils.embed_editor.modals.footer.title",
 						),
 					);
-				modal.addComponents(
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("text")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.footer.text_label",
-								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(false)
-							.setValue(data?.footer?.text || ""),
-					),
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("icon_url")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.footer.icon_label",
-								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(false)
-							.setValue(data?.footer?.icon_url || ""),
-					),
+				modal.addLabelComponents(
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.footer.text_label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("text")
+								.setStyle(TextInputStyle.Short)
+								.setRequired(false)
+								.setValue(data?.footer?.text || ""),
+						),
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.footer.icon_label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("icon_url")
+								.setStyle(TextInputStyle.Short)
+								.setRequired(false)
+								.setValue(data?.footer?.icon_url || ""),
+						),
 				);
 				break;
 
@@ -333,36 +341,38 @@ export class EmbedEditorUtils {
 							"modules.configuration.utils.embed_editor.modals.images.title",
 						),
 					);
-				modal.addComponents(
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("image")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.images.image_label",
-								),
-							)
-							.setPlaceholder(
-								t(
-									"modules.configuration.utils.embed_editor.modals.images.image_placeholder",
-								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(false)
-							.setValue(data?.image?.url || ""),
-					),
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("thumbnail")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.images.thumbnail_label",
-								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(false)
-							.setValue(data?.thumbnail?.url || ""),
-					),
+				modal.addLabelComponents(
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.images.image_label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("image")
+								.setPlaceholder(
+									t(
+										"modules.configuration.utils.embed_editor.modals.images.image_placeholder",
+									),
+								)
+								.setStyle(TextInputStyle.Short)
+								.setRequired(false)
+								.setValue(data?.image?.url || ""),
+						),
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.images.thumbnail_label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("thumbnail")
+								.setStyle(TextInputStyle.Short)
+								.setRequired(false)
+								.setValue(data?.thumbnail?.url || ""),
+						),
 				);
 				break;
 
@@ -374,28 +384,29 @@ export class EmbedEditorUtils {
 							"modules.configuration.utils.embed_editor.modals.color.title",
 						),
 					);
-				modal.addComponents(
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("color")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.color.label",
-								),
-							)
-							.setPlaceholder(
-								t(
-									"modules.configuration.utils.embed_editor.modals.color.placeholder",
-								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(false)
-							.setValue(
-								data?.color
-									? `#${data.color.toString(16)}`
-									: "",
+				modal.addLabelComponents(
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.color.label",
 							),
-					),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("color")
+								.setPlaceholder(
+									t(
+										"modules.configuration.utils.embed_editor.modals.color.placeholder",
+									),
+								)
+								.setStyle(TextInputStyle.Short)
+								.setRequired(false)
+								.setValue(
+									data?.color
+										? `#${data.color.toString(16)}`
+										: "",
+								),
+						),
 				);
 				break;
 
@@ -409,43 +420,48 @@ export class EmbedEditorUtils {
 						),
 					);
 
-				modal.addComponents(
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("name")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.field.name_label",
+				modal.addLabelComponents(
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.field.name_label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("name")
+								.setStyle(TextInputStyle.Short)
+								.setRequired(true)
+								.setValue(data?.field?.name || ""),
+						),
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.field.value_label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("value")
+								.setStyle(TextInputStyle.Paragraph)
+								.setRequired(true)
+								.setValue(data?.field?.value || ""),
+						),
+					new LabelBuilder()
+						.setLabel(
+							t(
+								"modules.configuration.utils.embed_editor.modals.field.inline_label",
+							),
+						)
+						.setTextInputComponent(
+							new TextInputBuilder()
+								.setCustomId("inline")
+								.setStyle(TextInputStyle.Short)
+								.setRequired(false)
+								.setValue(
+									data?.field?.inline ? "true" : "false",
 								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(true)
-							.setValue(data?.field?.name || ""),
-					),
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("value")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.field.value_label",
-								),
-							)
-							.setStyle(TextInputStyle.Paragraph)
-							.setRequired(true)
-							.setValue(data?.field?.value || ""),
-					),
-					new ActionRowBuilder<TextInputBuilder>().addComponents(
-						new TextInputBuilder()
-							.setCustomId("inline")
-							.setLabel(
-								t(
-									"modules.configuration.utils.embed_editor.modals.field.inline_label",
-								),
-							)
-							.setStyle(TextInputStyle.Short)
-							.setRequired(false)
-							.setValue(data?.field?.inline ? "true" : "false"),
-					),
+						),
 				);
 				break;
 		}
