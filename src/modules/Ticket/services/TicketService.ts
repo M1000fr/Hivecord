@@ -230,4 +230,25 @@ export class TicketService {
 
 		return ticketChannel;
 	}
+
+	static async closeTicket(channelId: string) {
+		const ticket = await prismaClient.ticket.findUnique({
+			where: { channelId },
+		});
+
+		if (ticket) {
+			await prismaClient.ticket.update({
+				where: { channelId },
+				data: {
+					active: false,
+					closedAt: new Date(),
+				},
+			});
+		}
+
+		const channel = await this.client.channels.fetch(channelId);
+		if (channel) {
+			await channel.delete();
+		}
+	}
 }

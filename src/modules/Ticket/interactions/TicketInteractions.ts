@@ -94,6 +94,6 @@ export class TicketInteractions {
 			return;
 		}
 
-		await interaction.channel?.delete();
+		await TicketService.closeTicket(interaction.channelId);
 	}
 }
