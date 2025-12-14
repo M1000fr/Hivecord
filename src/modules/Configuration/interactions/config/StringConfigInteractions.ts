@@ -172,7 +172,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 					moduleName,
 					selectedProperty,
 					interaction.user.id,
-					"Clear Value",
+					"Default Value",
 					ButtonStyle.Danger,
 				),
 			);

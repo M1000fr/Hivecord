@@ -104,8 +104,19 @@ export class TicketService {
 			(m) => m.author.id === this.client.user?.id,
 		);
 
+		// Check if content or embed exist to avoid sending empty message
+		if (
+			(!content || content.length === 0) &&
+			(!embed || (Array.isArray(embed) && embed.length === 0))
+		) {
+			this.logger.warn(
+				`Ticket creation message in guild ${guildId} has no content or embed. Skipping message update.`,
+			);
+			return;
+		}
+
 		const payload = {
-			content: content || undefined,
+			content: content?.length ? content : "",
 			embeds: embed ? [embed] : [],
 			components: rows,
 		};
@@ -204,10 +215,44 @@ export class TicketService {
 			},
 		});
 
+		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder()
+				.setCustomId("ticket_close")
+				.setLabel("Close Ticket")
+				.setStyle(ButtonStyle.Danger)
+				.setEmoji("🔒"),
+		);
+
 		await ticketChannel.send({
 			content: `Ticket created by ${member} for category: **${category}**\nReason: ${reason}`,
+			components: [row],
 		});
 
 		return ticketChannel;
+	}
+
+	static async closeTicket(channelId: string) {
+		const ticket = await prismaClient.ticket.findUnique({
+			where: { channelId },
+		});
+
+		if (ticket) {
+			await prismaClient.ticket.update({
+				where: { channelId },
+				data: {
+					active: false,
+					closedAt: new Date(),
+				},
+			});
+		}
+
+		try {
+			const channel = await this.client.channels.fetch(channelId);
+			if (channel) {
+				await channel.delete();
+			}
+		} catch {
+			// Channel might not exist, ignore
+		}
 	}
 }

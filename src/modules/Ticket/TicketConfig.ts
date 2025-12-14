@@ -72,4 +72,18 @@ export class TicketConfig {
 		type: EConfigType.Channel,
 	})
 	ticketCreationCategory: string | null = null;
+
+	@ConfigProperty({
+		description: "Role that can manage tickets",
+		descriptionLocalizations: {
+			fr: "Rôle qui peut gérer les tickets",
+			"en-US": "Role that can manage tickets",
+		},
+		displayNameLocalizations: {
+			fr: "Rôle de support",
+			"en-US": "Support Role",
+		},
+		type: EConfigType.Role,
+	})
+	supportRole: string | null = null;
 }

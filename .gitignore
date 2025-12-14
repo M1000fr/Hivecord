@@ -38,3 +38,4 @@ src/prisma/client
 
 # Data
 data/
+.github/instructions/leBot.instructions.md
