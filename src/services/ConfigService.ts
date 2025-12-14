@@ -49,7 +49,6 @@ export class ConfigService {
 		await EntityService.ensureGuildById(guildId);
 		const redis = RedisService.getInstance();
 		const cacheKey = `config:${guildId}:value:${key}`;
-		await redis.del(cacheKey);
 
 		this.logger.log(`Config updated [${guildId}]: ${key} = ${value}`);
 
@@ -61,7 +60,7 @@ export class ConfigService {
 			data: { guildId, key, value },
 		});
 
-		await redis.set(cacheKey, value, "EX", CACHE_TTL);
+		await redis.del(cacheKey);
 		await ConfigUpdateRegistry.execute(guildId, key, value);
 	}
 
