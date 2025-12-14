@@ -6,7 +6,7 @@ import { EmbedBuilder, type APIEmbed } from "discord.js";
 
 const EDITOR_TTL = 3600; // 1 hour
 
-export class EmbedService {
+export class CustomEmbedService {
 	/**
 	 * Get a raw embed JSON by name
 	 */

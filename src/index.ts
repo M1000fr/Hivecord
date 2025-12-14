@@ -16,3 +16,29 @@ manager.on("shardCreate", (shard) => {
 manager.spawn().catch((error) => {
 	logger.error("Failed to spawn shards:", error);
 });
+
+// Health check server
+Bun.serve({
+	port: 3000,
+	async fetch(req) {
+		const url = new URL(req.url);
+		if (url.pathname === "/health") {
+			try {
+				// Check if all shards are ready
+				const results = await manager.broadcastEval((client) =>
+					client.isReady(),
+				);
+				const allReady = results.every((ready) => ready === true);
+
+				if (allReady && results.length > 0) {
+					return new Response("OK");
+				}
+				return new Response("Not Ready", { status: 503 });
+			} catch {
+				// If shards are not ready or communication fails
+				return new Response("Not Ready", { status: 503 });
+			}
+		}
+		return new Response("Not Found", { status: 404 });
+	},
+});

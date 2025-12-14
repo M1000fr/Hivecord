@@ -1,12 +1,12 @@
 import type { LeBotClient } from "@class/LeBotClient";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { OnConfigUpdate } from "@decorators/OnConfigUpdate";
-import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { ChannelType as PrismaChannelType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
 import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
 import { Client } from "@src/decorators/Client";
+import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { Logger } from "@utils/Logger";
 import {
@@ -17,6 +17,7 @@ import {
 	Guild,
 	PermissionFlagsBits,
 } from "discord.js";
+import { TicketConfigKeys } from "../TicketConfig";
 
 export class TicketService {
 	private static logger = new Logger("TicketService");
@@ -38,7 +39,7 @@ export class TicketService {
 
 		const channelId = (await ConfigHelper.fetchValue(
 			guildId,
-			"createMessageChannel",
+			TicketConfigKeys.createMessageChannel,
 			EConfigType.Channel,
 		)) as string | null;
 		if (!channelId) return;
@@ -48,17 +49,17 @@ export class TicketService {
 
 		const content = (await ConfigHelper.fetchValue(
 			guildId,
-			"creationMessageContent",
+			TicketConfigKeys.creationMessageContent,
 			EConfigType.String,
 		)) as string | null;
 		const embedName = (await ConfigHelper.fetchValue(
 			guildId,
-			"creationMessageEmbed",
+			TicketConfigKeys.creationMessageEmbed,
 			EConfigType.CustomEmbed,
 		)) as string | null;
 		const categories = (await ConfigHelper.fetchValue(
 			guildId,
-			"ticketTypeCategory",
+			TicketConfigKeys.ticketTypeCategory,
 			EConfigType.StringArray,
 			["Support"],
 		)) as string[];
@@ -66,7 +67,7 @@ export class TicketService {
 		let embed = null;
 		if (embedName) {
 			try {
-				embed = await EmbedService.render(guildId, embedName, {});
+				embed = await CustomEmbedService.render(guildId, embedName, {});
 			} catch (e) {
 				this.logger.error(
 					`Failed to render embed ${embedName}`,
@@ -143,7 +144,7 @@ export class TicketService {
 	) {
 		let categoryId = await ConfigService.getChannel(
 			guild.id,
-			"ticketCreationCategory",
+			TicketConfigKeys.ticketCreationCategory,
 		);
 
 		if (!categoryId) {
@@ -155,7 +156,7 @@ export class TicketService {
 			categoryId = newCategory.id;
 			await ConfigService.setChannel(
 				guild.id,
-				"ticketCreationCategory",
+				TicketConfigKeys.ticketCreationCategory,
 				categoryId,
 				PrismaChannelType.CATEGORY,
 			);
@@ -172,7 +173,7 @@ export class TicketService {
 			categoryId = newCategory.id;
 			await ConfigService.setChannel(
 				guild.id,
-				"ticketCreationCategory",
+				TicketConfigKeys.ticketCreationCategory,
 				categoryId,
 				PrismaChannelType.CATEGORY,
 			);

@@ -3,11 +3,11 @@ import { LeBotClient } from "@class/LeBotClient";
 import { MessageTemplate } from "@class/MessageTemplate";
 import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
-import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { WelcomeImageService } from "@modules/General/services/WelcomeImageService";
 import { InvitationService } from "@modules/Invitation/services/InvitationService";
 import { ConfigService } from "@services/ConfigService";
+import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import { Logger } from "@utils/Logger";
 import {
 	AttachmentBuilder,
@@ -135,7 +135,7 @@ export default class WelcomeEvent extends BaseEvent<
 			};
 
 			if (welcomeEmbedName) {
-				const customEmbed = await EmbedService.render(
+				const customEmbed = await CustomEmbedService.render(
 					member.guild.id,
 					welcomeEmbedName,
 					commonContext,

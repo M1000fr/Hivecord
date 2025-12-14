@@ -1,7 +1,7 @@
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
-import { EmbedService } from "@modules/Configuration/services/EmbedService";
 import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
+import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import {
 	type APIEmbed,
 	type ButtonInteraction,
@@ -31,7 +31,7 @@ export class EmbedEditorInteractions {
 				? interaction.message?.id || interaction.user.id
 				: interaction.user.id;
 
-		const session = await EmbedService.getEditorSession(sessionId);
+		const session = await CustomEmbedService.getEditorSession(sessionId);
 		if (!session) {
 			if (interaction.isRepliable()) {
 				await interaction.reply({
@@ -144,7 +144,7 @@ export class EmbedEditorInteractions {
 			});
 
 			// Clear editing index in session
-			await EmbedService.setEditorSession(
+			await CustomEmbedService.setEditorSession(
 				interaction.message.id,
 				session.guildId,
 				session.name,
@@ -168,7 +168,7 @@ export class EmbedEditorInteractions {
 			const field = session.data.fields?.[index];
 			if (field) {
 				// Set editing index in session
-				await EmbedService.setEditorSession(
+				await CustomEmbedService.setEditorSession(
 					interaction.message.id,
 					session.guildId,
 					session.name,
@@ -187,7 +187,7 @@ export class EmbedEditorInteractions {
 			const index = parseInt(value.split("_")[2] || "0");
 			if (session.data.fields) {
 				session.data.fields.splice(index, 1);
-				await EmbedService.setEditorSession(
+				await CustomEmbedService.setEditorSession(
 					interaction.message.id,
 					session.guildId,
 					session.name,
@@ -206,8 +206,12 @@ export class EmbedEditorInteractions {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
-		await EmbedService.save(session.guildId, session.name, session.data);
-		await EmbedService.clearEditorSession(interaction.message.id);
+		await CustomEmbedService.save(
+			session.guildId,
+			session.name,
+			session.data,
+		);
+		await CustomEmbedService.clearEditorSession(interaction.message.id);
 		await interaction.update({
 			content: `✅ Embed \`${session.name}\` saved successfully!`,
 			components: [],
@@ -220,7 +224,7 @@ export class EmbedEditorInteractions {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
-		await EmbedService.clearEditorSession(interaction.message.id);
+		await CustomEmbedService.clearEditorSession(interaction.message.id);
 		await interaction.update({
 			content: "❌ Editor cancelled.",
 			components: [],
@@ -238,7 +242,7 @@ export class EmbedEditorInteractions {
 		session.data.url =
 			interaction.fields.getTextInputValue("url") || undefined;
 
-		await EmbedService.setEditorSession(
+		await CustomEmbedService.setEditorSession(
 			interaction.message!.id,
 			session.guildId,
 			session.name,
@@ -257,7 +261,7 @@ export class EmbedEditorInteractions {
 		session.data.description =
 			interaction.fields.getTextInputValue("description") || undefined;
 
-		await EmbedService.setEditorSession(
+		await CustomEmbedService.setEditorSession(
 			interaction.message!.id,
 			session.guildId,
 			session.name,
@@ -283,7 +287,7 @@ export class EmbedEditorInteractions {
 			delete session.data.author;
 		}
 
-		await EmbedService.setEditorSession(
+		await CustomEmbedService.setEditorSession(
 			interaction.message!.id,
 			session.guildId,
 			session.name,
@@ -309,7 +313,7 @@ export class EmbedEditorInteractions {
 			delete session.data.footer;
 		}
 
-		await EmbedService.setEditorSession(
+		await CustomEmbedService.setEditorSession(
 			interaction.message!.id,
 			session.guildId,
 			session.name,
@@ -340,7 +344,7 @@ export class EmbedEditorInteractions {
 			delete session.data.thumbnail;
 		}
 
-		await EmbedService.setEditorSession(
+		await CustomEmbedService.setEditorSession(
 			interaction.message!.id,
 			session.guildId,
 			session.name,
@@ -367,7 +371,7 @@ export class EmbedEditorInteractions {
 			delete session.data.color;
 		}
 
-		await EmbedService.setEditorSession(
+		await CustomEmbedService.setEditorSession(
 			interaction.message!.id,
 			session.guildId,
 			session.name,
@@ -406,7 +410,7 @@ export class EmbedEditorInteractions {
 		}
 
 		// Clear editing index
-		await EmbedService.setEditorSession(
+		await CustomEmbedService.setEditorSession(
 			interaction.message!.id,
 			session.guildId,
 			session.name,
