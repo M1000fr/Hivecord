@@ -1,16 +1,15 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { MessageTemplate } from "@class/MessageTemplate";
+import { StatsReader } from "@modules/Statistics/services/StatsReader";
 import { AchievementCategory, AchievementType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
 import { ChannelType, TextChannel } from "discord.js";
-import { StatsService } from "./StatsService";
 
 export class AchievementService {
 	private static instance: AchievementService;
 	private logger = new Logger("AchievementService");
-	private statsService = StatsService.getInstance();
 
 	public static getInstance(): AchievementService {
 		if (!AchievementService.instance) {
@@ -37,7 +36,7 @@ export class AchievementService {
 		if (achievements.length === 0) return;
 
 		// Get user stats
-		const stats = await this.statsService.getStats(userId, guildId);
+		const stats = await StatsReader.getUserStats(userId, guildId);
 		// Note: stats might be null if user has no stats yet, but we might still need to check MESSAGE_RATE
 
 		// Get already unlocked achievements
@@ -62,7 +61,7 @@ export class AchievementService {
 				if (stats.inviteCount >= achievement.threshold)
 					qualified = true;
 			} else if (type === AchievementType.MESSAGE_RATE) {
-				const rate = await this.statsService.getMessageCountInLastHour(
+				const rate = await StatsReader.getMessageCountInLastHour(
 					userId,
 					guildId,
 				);

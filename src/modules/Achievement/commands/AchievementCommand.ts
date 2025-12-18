@@ -3,6 +3,7 @@ import { LeBotClient } from "@class/LeBotClient";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
+import { StatsReader } from "@modules/Statistics/services/StatsReader";
 import type { Achievement } from "@prisma/client/client";
 import { AchievementCategory, AchievementType } from "@prisma/client/enums";
 import { prismaClient } from "@services/prismaService";
@@ -12,7 +13,6 @@ import {
 	ChatInputCommandInteraction,
 	EmbedBuilder,
 } from "discord.js";
-import { StatsService } from "../services/StatsService";
 
 @Command({
 	name: "achievement",
@@ -36,8 +36,6 @@ import { StatsService } from "../services/StatsService";
 	],
 })
 export class AchievementCommand extends BaseCommand {
-	private statsService = StatsService.getInstance();
-
 	@Subcommand({
 		name: "list",
 	})
@@ -103,8 +101,8 @@ export class AchievementCommand extends BaseCommand {
 		const userId = interaction.user.id;
 		const guildId = interaction.guildId!;
 
-		const stats = await this.statsService.getStats(userId, guildId);
-		const msgRate = await this.statsService.getMessageCountInLastHour(
+		const stats = await StatsReader.getUserStats(userId, guildId);
+		const msgRate = await StatsReader.getMessageCountInLastHour(
 			userId,
 			guildId,
 		);

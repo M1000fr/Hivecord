@@ -4,14 +4,13 @@ import type { IModuleInstance } from "@interfaces/IModuleInstance";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
 import { AchievementConfig } from "./AchievementConfig";
 import { AchievementCommand } from "./commands/AchievementCommand";
-import { MessageStatsEvent } from "./events/MessageStatsEvent";
-import { VoiceStatsEvent } from "./events/VoiceStatsEvent";
+import { StatsUpdatedEvent } from "./events/StatsUpdatedEvent";
 import { AchievementService } from "./services/AchievementService";
 
 @Module({
 	name: "Achievement",
 	config: AchievementConfig,
-	events: [MessageStatsEvent, VoiceStatsEvent],
+	events: [StatsUpdatedEvent],
 	commands: [AchievementCommand],
 })
 export class AchievementModule implements IModuleInstance {
