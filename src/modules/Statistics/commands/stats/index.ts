@@ -2,11 +2,11 @@ import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
-import type { TimeRange } from "@modules/Statistics/services/StatsService";
-import { StatsService } from "@modules/Statistics/services/StatsService";
+import { StatsReader } from "@modules/Statistics/services/StatsReader";
+import type { TimeRange } from "@modules/Statistics/types";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { ChartGenerator } from "@utils/ChartGenerator";
 import {
 	ActionRowBuilder,
@@ -26,11 +26,8 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -56,11 +53,8 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -92,11 +86,8 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -170,17 +161,14 @@ export default class StatsCommand extends BaseCommand {
 		username: string,
 		period: string,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const guildId = interaction.guild!.id;
 
 		const [voiceStats, messageStats] = await Promise.all([
-			StatsService.getUserVoiceStats(userId, guildId, timeRange),
-			StatsService.getUserMessageStats(userId, guildId, timeRange),
+			StatsReader.getUserVoiceStats(userId, guildId, timeRange),
+			StatsReader.getUserMessageStats(userId, guildId, timeRange),
 		]);
 
 		// Generate chart
@@ -239,9 +227,15 @@ export default class StatsCommand extends BaseCommand {
 		// Top channels
 		if (messageStats.channelBreakdown.length > 0) {
 			const topChannels = messageStats.channelBreakdown
-				.sort((a, b) => b.count - a.count)
+				.sort(
+					(a: { count: number }, b: { count: number }) =>
+						b.count - a.count,
+				)
 				.slice(0, 3)
-				.map((c) => `<#${c.channelId}>: ${c.count} messages`)
+				.map(
+					(c: { channelId: string; count: number }) =>
+						`<#${c.channelId}>: ${c.count} messages`,
+				)
 				.join("\n");
 			embed.addFields({
 				name: t("modules.statistics.commands.stats.top_channels_msg"),
@@ -251,10 +245,13 @@ export default class StatsCommand extends BaseCommand {
 
 		if (voiceStats.channelBreakdown.length > 0) {
 			const topVoiceChannels = voiceStats.channelBreakdown
-				.sort((a, b) => b.duration - a.duration)
+				.sort(
+					(a: { duration: number }, b: { duration: number }) =>
+						b.duration - a.duration,
+				)
 				.slice(0, 3)
 				.map(
-					(c) =>
+					(c: { channelId: string; duration: number }) =>
 						`<#${c.channelId}>: ${ChartGenerator.formatDuration(c.duration)}`,
 				)
 				.join("\n");
@@ -283,20 +280,17 @@ export default class StatsCommand extends BaseCommand {
 		timeRange: TimeRange,
 		period: string,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const guildId = interaction.guild!.id;
 
 		const [serverStats, topVoiceUsers, topMessageUsers, topChannels] =
 			await Promise.all([
-				StatsService.getServerStats(guildId, timeRange),
-				StatsService.getMostActiveVoiceUsers(guildId, timeRange, 5),
-				StatsService.getMostActiveMessageUsers(guildId, timeRange, 5),
-				StatsService.getMostActiveChannels(guildId, timeRange, 5),
+				StatsReader.getServerStats(guildId, timeRange),
+				StatsReader.getMostActiveVoiceUsers(guildId, timeRange, 5),
+				StatsReader.getMostActiveMessageUsers(guildId, timeRange, 5),
+				StatsReader.getMostActiveChannels(guildId, timeRange, 5),
 			]);
 
 		// Generate stats card
@@ -361,7 +355,7 @@ export default class StatsCommand extends BaseCommand {
 		if (topVoiceUsers.length > 0) {
 			const voiceLeaderboard = topVoiceUsers
 				.map(
-					(u, i) =>
+					(u: { userId: string; totalDuration: number }, i: number) =>
 						`${i + 1}. <@${u.userId}>: ${ChartGenerator.formatDuration(u.totalDuration)}`,
 				)
 				.join("\n");
@@ -376,7 +370,7 @@ export default class StatsCommand extends BaseCommand {
 		if (topMessageUsers.length > 0) {
 			const messageLeaderboard = topMessageUsers
 				.map(
-					(u, i) =>
+					(u: { userId: string; totalMessages: number }, i: number) =>
 						`${i + 1}. <@${u.userId}>: ${ChartGenerator.formatNumber(u.totalMessages)} msg`,
 				)
 				.join("\n");
@@ -390,13 +384,24 @@ export default class StatsCommand extends BaseCommand {
 		// Top channels
 		if (topChannels.length > 0) {
 			const channelLeaderboard = topChannels
-				.map((c, i) => {
-					const msgs = ChartGenerator.formatNumber(c.messageCount);
-					const voice = ChartGenerator.formatDuration(
-						c.voiceDuration,
-					);
-					return `${i + 1}. <#${c.channelId}>: ${msgs} msg, ${voice}`;
-				})
+				.map(
+					(
+						c: {
+							channelId: string;
+							messageCount: number;
+							voiceDuration: number;
+						},
+						i: number,
+					) => {
+						const msgs = ChartGenerator.formatNumber(
+							c.messageCount,
+						);
+						const voice = ChartGenerator.formatDuration(
+							c.voiceDuration,
+						);
+						return `${i + 1}. <#${c.channelId}>: ${msgs} msg, ${voice}`;
+					},
+				)
 				.join("\n");
 			embed.addFields({
 				name: t("modules.statistics.commands.stats.top_channels"),

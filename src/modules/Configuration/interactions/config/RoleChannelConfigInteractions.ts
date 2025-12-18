@@ -3,9 +3,9 @@ import {
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
 import { SelectMenuPattern } from "@decorators/Interaction";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
@@ -130,11 +130,8 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const currentValue = await ConfigHelper.getCurrentValue(
 			interaction.guildId!,

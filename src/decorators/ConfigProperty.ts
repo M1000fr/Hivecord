@@ -36,7 +36,7 @@ export interface ConfigPropertyOptions {
 	nonNull?: boolean;
 }
 
-interface IConfigClass {
+export interface IConfigClass {
 	configProperties?: Record<string, ConfigPropertyOptions>;
 }
 
@@ -61,3 +61,5 @@ export function ConfigProperty(options: ConfigPropertyOptions) {
 export function toConfigKey(key: string): string {
 	return key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 }
+
+export type ConfigKey<T> = string & { __type: T };

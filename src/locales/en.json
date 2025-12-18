@@ -159,6 +159,23 @@
 			},
 			"helper": {}
 		},
+		"achievement": {
+			"commands": {
+				"achievement": {
+					"description": "Achievement system",
+					"list": {
+						"description": "List your achievements"
+					},
+					"stats": {
+						"description": "View your stats"
+					}
+				}
+			},
+			"unlocked": "🏆 **Achievement Unlocked!**\n{{user}} has unlocked **{{name}}**!\n*{{description}}*",
+			"global_title": "🌍 Global Achievements",
+			"rotated_title": "🔄 Seasonal Achievements",
+			"stats_title": "📊 Your Stats"
+		},
 		"debug": {
 			"commands": {
 				"debug": {

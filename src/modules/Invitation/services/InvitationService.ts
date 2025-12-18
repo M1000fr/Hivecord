@@ -1,4 +1,6 @@
+import type { LeBotClient } from "@class/LeBotClient";
 import { BotPermission } from "@decorators/BotPermission";
+import { StatsWriter } from "@modules/Statistics/services/StatsWriter";
 import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
@@ -243,6 +245,12 @@ export class InvitationService {
 					active: true,
 				},
 			});
+
+			await StatsWriter.incrementInviteCount(
+				guild.client as LeBotClient,
+				inviterId,
+				guildId,
+			);
 		} catch (error) {
 			this.logger.error(
 				`Failed to add invitation for ${invitedId}`,

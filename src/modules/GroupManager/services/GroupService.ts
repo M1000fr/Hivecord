@@ -1,4 +1,3 @@
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import type {
 	GroupModel,
 	PermissionModel,
@@ -9,13 +8,14 @@ import { EntityService } from "@services/EntityService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { Logger } from "@utils/Logger";
 import { Guild } from "discord.js";
 
 export class GroupService {
 	private static async getLanguage(guildId: string): Promise<string> {
 		return (
-			(await ConfigService.get(guildId, GeneralConfigKeys.language)) ??
+			(await ConfigService.of(guildId, GeneralConfig).generalLanguage) ||
 			"en"
 		);
 	}

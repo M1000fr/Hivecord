@@ -1,8 +1,4 @@
-import {
-	ConfigProperty,
-	EConfigType,
-	toConfigKey,
-} from "@decorators/ConfigProperty";
+import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
 
 export class VoiceConfig {
 	@ConfigProperty({
@@ -20,9 +16,3 @@ export class VoiceConfig {
 	})
 	voiceTempVoiceGeneratorChannelId: string = "";
 }
-
-export const VoiceConfigKeys = {
-	get tempVoiceGeneratorChannelId() {
-		return toConfigKey("voiceTempVoiceGeneratorChannelId");
-	},
-} as const;

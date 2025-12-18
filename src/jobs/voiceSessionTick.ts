@@ -1,5 +1,5 @@
 import type { LeBotClient } from "@class/LeBotClient";
-import { StatsService } from "@modules/Statistics/services/StatsService";
+import { StatsWriter } from "@modules/Statistics/services/StatsWriter";
 import { Logger } from "@utils/Logger";
 
 const logger = new Logger("VoiceSessionTickJob");
@@ -13,7 +13,8 @@ export function startVoiceSessionTickJob(client: LeBotClient<boolean>): void {
 		async () => {
 			if (!client.isReady()) return;
 			try {
-				await StatsService.tickActiveVoiceSessions(client);
+				await StatsWriter.tickActiveVoiceSessions(client);
+				await StatsWriter.tickActiveStreamSessions(client);
 			} catch (err) {
 				logger.error(
 					"Voice session tick job error",

@@ -5,7 +5,7 @@ import {
 	ConfigContextData,
 	ConfigContextVariable,
 } from "@enums/ConfigContextVariable";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { InteractionHelper } from "@utils/InteractionHelper";
@@ -123,10 +123,8 @@ export abstract class BaseConfigInteractions {
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
 				const lng =
-					(await ConfigService.get(
-						interaction.guildId,
-						GeneralConfigKeys.language,
-					)) ?? "en";
+					(await ConfigService.of(interaction.guildId, GeneralConfig)
+						.generalLanguage) ?? "en";
 				const config = await ConfigHelper.buildModuleConfigEmbed(
 					client,
 					interaction.guildId,

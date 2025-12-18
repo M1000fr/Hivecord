@@ -1,6 +1,5 @@
 import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
 import { SanctionService } from "@modules/Moderation/services/SanctionService";
-import { SecurityConfigKeys } from "@modules/Security/SecurityConfig";
 import { SanctionType } from "@prisma/client/client";
 import { ConfigService } from "@services/ConfigService";
 import { RedisService } from "@services/RedisService";
@@ -14,6 +13,7 @@ import {
 	User,
 	VoiceChannel,
 } from "discord.js";
+import { SecurityConfig } from "../SecurityConfig";
 
 export class HeatpointService {
 	private static logger = new Logger("HeatpointService");
@@ -51,11 +51,9 @@ export class HeatpointService {
 		points: number,
 	): Promise<number> {
 		const redis = RedisService.getInstance();
-		const decayRateStr = await ConfigService.get(
-			guildId,
-			SecurityConfigKeys.heatpointDecayRate,
-		);
-		const decayRate = parseInt(decayRateStr || "1", 10);
+		const decayRateStr = await ConfigService.of(guildId, SecurityConfig)
+			.securityHeatpointDecayRate;
+		const decayRate = parseInt(String(decayRateStr) || "1", 10);
 		const now = Math.floor(Date.now() / 1000);
 
 		const result = await redis.eval(
@@ -73,11 +71,9 @@ export class HeatpointService {
 
 	static async getHeat(guildId: string, id: string): Promise<number> {
 		const redis = RedisService.getInstance();
-		const decayRateStr = await ConfigService.get(
-			guildId,
-			SecurityConfigKeys.heatpointDecayRate,
-		);
-		const decayRate = parseInt(decayRateStr || "1", 10);
+		const decayRateStr = await ConfigService.of(guildId, SecurityConfig)
+			.securityHeatpointDecayRate;
+		const decayRate = parseInt(String(decayRateStr) || "1", 10);
 		const now = Math.floor(Date.now() / 1000);
 
 		const key_value = `heat:${guildId}:${id}`;
@@ -134,49 +130,24 @@ export class HeatpointService {
 
 		switch (actionType) {
 			case "join_voice":
-				points = parseInt(
-					(await ConfigService.get(
-						guild.id,
-						SecurityConfigKeys.heatpointJoinVoice,
-					)) || "10",
-					10,
-				);
+				points = await ConfigService.of(guild.id, SecurityConfig)
+					.securityHeatpointJoinVoice;
 				break;
 			case "switch_voice":
-				points = parseInt(
-					(await ConfigService.get(
-						guild.id,
-						SecurityConfigKeys.heatpointSwitchVoice,
-					)) || "5",
-					10,
-				);
+				points = await ConfigService.of(guild.id, SecurityConfig)
+					.securityHeatpointSwitchVoice;
 				break;
 			case "stream":
-				points = parseInt(
-					(await ConfigService.get(
-						guild.id,
-						SecurityConfigKeys.heatpointStream,
-					)) || "20",
-					10,
-				);
+				points = await ConfigService.of(guild.id, SecurityConfig)
+					.securityHeatpointStream;
 				break;
 			case "message":
-				points = parseInt(
-					(await ConfigService.get(
-						guild.id,
-						SecurityConfigKeys.heatpointMessage,
-					)) || "5",
-					10,
-				);
+				points = await ConfigService.of(guild.id, SecurityConfig)
+					.securityHeatpointMessage;
 				break;
 			case "reaction":
-				points = parseInt(
-					(await ConfigService.get(
-						guild.id,
-						SecurityConfigKeys.heatpointReaction,
-					)) || "2",
-					10,
-				);
+				points = await ConfigService.of(guild.id, SecurityConfig)
+					.securityHeatpointReaction;
 				break;
 		}
 
@@ -210,13 +181,10 @@ export class HeatpointService {
 				`channel:${channel.id}`,
 				points,
 			);
-			const channelThreshold = parseInt(
-				(await ConfigService.get(
-					guild.id,
-					SecurityConfigKeys.heatpointChannelThreshold,
-				)) || "100",
-				10,
-			);
+			const channelThreshold = await ConfigService.of(
+				guild.id,
+				SecurityConfig,
+			).securityHeatpointChannelThreshold;
 
 			// Track unique users in channel
 			const redis = RedisService.getInstance();
@@ -236,13 +204,8 @@ export class HeatpointService {
 			`global:${guild.id}`,
 			points,
 		);
-		const globalThreshold = parseInt(
-			(await ConfigService.get(
-				guild.id,
-				SecurityConfigKeys.heatpointGlobalThreshold,
-			)) || "500",
-			10,
-		);
+		const globalThreshold = await ConfigService.of(guild.id, SecurityConfig)
+			.securityHeatpointGlobalThreshold;
 
 		if (globalHeat > globalThreshold) {
 			await this.lockServer(guild);
@@ -255,34 +218,18 @@ export class HeatpointService {
 		heat: number,
 		channel: GuildChannel | null,
 	): Promise<boolean> {
-		const warnThreshold = parseInt(
-			(await ConfigService.get(
-				guild.id,
-				SecurityConfigKeys.heatpointUserWarnThreshold,
-			)) || "50",
-			10,
-		);
-		const muteThreshold = parseInt(
-			(await ConfigService.get(
-				guild.id,
-				SecurityConfigKeys.heatpointUserMuteThreshold,
-			)) || "80",
-			10,
-		);
-		const configMuteDuration = parseInt(
-			(await ConfigService.get(
-				guild.id,
-				SecurityConfigKeys.heatpointMuteDuration,
-			)) || "3600",
-			10,
-		);
-		const deleteMessagesLimit = parseInt(
-			(await ConfigService.get(
-				guild.id,
-				SecurityConfigKeys.heatpointDeleteMessagesLimit,
-			)) || "50",
-			10,
-		);
+		const warnThreshold = await ConfigService.of(guild.id, SecurityConfig)
+			.securityHeatpointUserWarnThreshold;
+		const muteThreshold = await ConfigService.of(guild.id, SecurityConfig)
+			.securityHeatpointUserMuteThreshold;
+		const configMuteDuration = await ConfigService.of(
+			guild.id,
+			SecurityConfig,
+		).securityHeatpointMuteDuration;
+		const deleteMessagesLimit = await ConfigService.of(
+			guild.id,
+			SecurityConfig,
+		).securityHeatpointDeleteMessagesLimit;
 
 		const redis = RedisService.getInstance();
 		const warnedKey = `warned:${guild.id}:${user.id}`;
@@ -410,17 +357,14 @@ export class HeatpointService {
 	static async lockChannel(channel: GuildChannel): Promise<void> {
 		if (await this.isLocked(`channel:${channel.id}`)) return;
 
-		const duration = parseInt(
-			(await ConfigService.get(
-				channel.guild.id,
-				SecurityConfigKeys.heatpointLockDuration,
-			)) || "60",
-			10,
-		);
-		const bypassRoleId = await ConfigService.get(
+		const duration = await ConfigService.of(
 			channel.guild.id,
-			SecurityConfigKeys.bypassRoleId,
-		);
+			SecurityConfig,
+		).securityHeatpointLockDuration;
+		const bypassRoleId = await ConfigService.of(
+			channel.guild.id,
+			SecurityConfig,
+		).securityBypassRoleId;
 
 		this.logger.log(
 			`Locking channel ${channel.name} (${channel.id}) for ${duration}s due to high heat.`,
@@ -483,18 +427,10 @@ export class HeatpointService {
 	static async lockServer(guild: Guild): Promise<void> {
 		if (await this.isLocked(`global:${guild.id}`)) return;
 
-		const duration = parseInt(
-			(await ConfigService.get(
-				guild.id,
-				SecurityConfigKeys.heatpointLockDuration,
-			)) || "60",
-			10,
-		);
-		const bypassRoleId = await ConfigService.get(
-			guild.id,
-			SecurityConfigKeys.bypassRoleId,
-		);
-
+		const duration = await ConfigService.of(guild.id, SecurityConfig)
+			.securityHeatpointLockDuration;
+		const bypassRoleId = await ConfigService.of(guild.id, SecurityConfig)
+			.securityBypassRoleId;
 		this.logger.log(
 			`Locking server ${guild.name} (${guild.id}) for ${duration}s due to high global heat.`,
 		);
@@ -578,10 +514,8 @@ export class HeatpointService {
 		guild: Guild,
 		message: string,
 	): Promise<void> {
-		const alertChannelId = await ConfigService.get(
-			guild.id,
-			SecurityConfigKeys.alertChannelId,
-		);
+		const alertChannelId = await ConfigService.of(guild.id, SecurityConfig)
+			.securityAlertChannelId;
 		if (alertChannelId) {
 			const channel = guild.channels.cache.get(
 				alertChannelId,

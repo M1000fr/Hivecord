@@ -159,6 +159,23 @@
 			},
 			"helper": {}
 		},
+		"achievement": {
+			"commands": {
+				"achievement": {
+					"description": "Système de succès",
+					"list": {
+						"description": "Liste vos succès"
+					},
+					"stats": {
+						"description": "Voir vos statistiques"
+					}
+				}
+			},
+			"unlocked": "🏆 **Succès débloqué !**\n{{user}} a débloqué **{{name}}** !\n*{{description}}*",
+			"global_title": "🌍 Succès Globaux",
+			"rotated_title": "🔄 Succès Saisonniers",
+			"stats_title": "📊 Vos Statistiques"
+		},
 		"debug": {
 			"commands": {
 				"debug": {

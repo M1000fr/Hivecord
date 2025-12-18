@@ -8,8 +8,8 @@ import {
 	ModalPattern,
 	SelectMenuPattern,
 } from "@decorators/Interaction";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
@@ -64,7 +64,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		)) as string[];
 
 		const lng =
-			(await ConfigService.get(guildId, GeneralConfigKeys.language)) ??
+			(await ConfigService.of(guildId, GeneralConfig).generalLanguage) ??
 			"en";
 		const t = i18next.getFixedT(lng);
 

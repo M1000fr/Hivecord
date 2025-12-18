@@ -4,11 +4,11 @@ import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { GroupService } from "@modules/GroupManager/services/GroupService";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { PermissionService } from "@services/PermissionService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
 	ActionRowBuilder,
@@ -50,11 +50,8 @@ export default class GroupCommand extends BaseCommand {
 
 	@Subcommand({ name: "create", permission: EPermission.GroupsCreate })
 	async create(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		const role = interaction.options.getRole("role", true);
@@ -82,11 +79,8 @@ export default class GroupCommand extends BaseCommand {
 
 	@Subcommand({ name: "delete", permission: EPermission.GroupsDelete })
 	async delete(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 
@@ -114,11 +108,8 @@ export default class GroupCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const groupName = interaction.options.getString("group", true);
 
@@ -211,11 +202,8 @@ export default class GroupCommand extends BaseCommand {
 
 	@Subcommand({ name: "list", permission: EPermission.GroupsList })
 	async list(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		await InteractionHelper.defer(interaction, false);
 

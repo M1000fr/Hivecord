@@ -1,7 +1,7 @@
 import { ConfigService } from "@services/ConfigService";
 import { Logger } from "@utils/Logger";
 import { DiscordAPIError, type GuildMember } from "discord.js";
-import { GeneralConfigKeys } from "../GeneralConfig";
+import { GeneralConfig } from "../GeneralConfig";
 
 export class WelcomeRoleService {
 	private static logger = new Logger("WelcomeRoleService");
@@ -36,10 +36,10 @@ export class WelcomeRoleService {
 
 	static async addWelcomeRoles(member: GuildMember) {
 		try {
-			const roleIds = await ConfigService.getRoles(
+			const roleIds = await ConfigService.of(
 				member.guild.id,
-				GeneralConfigKeys.welcomeRoles,
-			);
+				GeneralConfig,
+			).generalWelcomeRoles;
 			if (!roleIds || roleIds.length === 0) return;
 
 			const rolesToAdd = roleIds.filter(

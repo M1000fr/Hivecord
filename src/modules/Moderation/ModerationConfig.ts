@@ -1,8 +1,4 @@
-import {
-	ConfigProperty,
-	EConfigType,
-	toConfigKey,
-} from "@decorators/ConfigProperty";
+import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
 
 export class ModerationConfig {
 	@ConfigProperty({
@@ -18,9 +14,3 @@ export class ModerationConfig {
 	})
 	moderationMuteRoleId: string = "";
 }
-
-export const ModerationConfigKeys = {
-	get muteRoleId() {
-		return toConfigKey("moderationMuteRoleId");
-	},
-} as const;

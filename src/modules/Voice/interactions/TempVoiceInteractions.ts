@@ -1,9 +1,9 @@
 import { Button, Modal } from "@decorators/Interaction";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { LogService } from "@modules/Log/services/LogService";
 import { TempVoiceService } from "@modules/Voice/services/TempVoiceService";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	ActionRowBuilder,
 	MessageFlags,
@@ -18,11 +18,8 @@ import {
 export class TempVoiceInteractions {
 	@Button("temp_voice_rename")
 	async handleRename(interaction: ButtonInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		if (!(await TempVoiceService.validateOwner(interaction))) return;
 
@@ -95,11 +92,8 @@ export class TempVoiceInteractions {
 
 	@Modal("temp_voice_rename_modal")
 	async handleRenameModal(interaction: ModalSubmitInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		if (!(await TempVoiceService.validateOwner(interaction))) return;
 		const channel = interaction.channel as VoiceChannel;

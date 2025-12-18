@@ -1,9 +1,5 @@
 import { ConfigContext } from "@decorators/ConfigContext";
-import {
-	ConfigProperty,
-	EConfigType,
-	toConfigKey,
-} from "@decorators/ConfigProperty";
+import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 
 export class GeneralConfig {
@@ -125,27 +121,3 @@ export class GeneralConfig {
 	})
 	generalWelcomeBackground: string = "";
 }
-
-export const GeneralConfigKeys = {
-	get language() {
-		return toConfigKey("generalLanguage");
-	},
-	get welcomeMessageImage() {
-		return toConfigKey("generalWelcomeMessageImage");
-	},
-	get welcomeMessage() {
-		return toConfigKey("generalWelcomeMessage");
-	},
-	get welcomeChannelId() {
-		return toConfigKey("generalWelcomeChannelId");
-	},
-	get welcomeEmbedName() {
-		return toConfigKey("generalWelcomeEmbedName");
-	},
-	get welcomeRoles() {
-		return toConfigKey("generalWelcomeRoles");
-	},
-	get welcomeBackground() {
-		return toConfigKey("generalWelcomeBackground");
-	},
-};

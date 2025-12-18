@@ -1,6 +1,6 @@
 import { ButtonPattern } from "@decorators/Interaction";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
-import { StatsService } from "@modules/Statistics/services/StatsService";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
+import { StatsReader } from "@modules/Statistics/services/StatsReader";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { ChartGenerator } from "@utils/ChartGenerator";
@@ -20,11 +20,8 @@ export class StatsPeriodInteractions {
 	async handleStatsPeriodButton(
 		interaction: ButtonInteraction,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const customId = interaction.customId;
 
@@ -79,14 +76,14 @@ export class StatsPeriodInteractions {
 					topMessageUsers,
 					topChannels,
 				] = await Promise.all([
-					StatsService.getServerStats(guildId, timeRange),
-					StatsService.getMostActiveVoiceUsers(guildId, timeRange, 5),
-					StatsService.getMostActiveMessageUsers(
+					StatsReader.getServerStats(guildId, timeRange),
+					StatsReader.getMostActiveVoiceUsers(guildId, timeRange, 5),
+					StatsReader.getMostActiveMessageUsers(
 						guildId,
 						timeRange,
 						5,
 					),
-					StatsService.getMostActiveChannels(guildId, timeRange, 5),
+					StatsReader.getMostActiveChannels(guildId, timeRange, 5),
 				]);
 
 				const statsCardBuffer = ChartGenerator.generateStatsCard(
@@ -155,7 +152,10 @@ export class StatsPeriodInteractions {
 				if (topVoiceUsers.length > 0) {
 					const voiceLeaderboard = topVoiceUsers
 						.map(
-							(u, i) =>
+							(
+								u: { userId: string; totalDuration: number },
+								i: number,
+							) =>
 								`${i + 1}. <@${u.userId}>: ${ChartGenerator.formatDuration(u.totalDuration)}`,
 						)
 						.join("\n");
@@ -170,7 +170,10 @@ export class StatsPeriodInteractions {
 				if (topMessageUsers.length > 0) {
 					const messageLeaderboard = topMessageUsers
 						.map(
-							(u, i) =>
+							(
+								u: { userId: string; totalMessages: number },
+								i: number,
+							) =>
 								`${i + 1}. <@${u.userId}>: ${ChartGenerator.formatNumber(u.totalMessages, lng)} msg`,
 						)
 						.join("\n");
@@ -184,16 +187,25 @@ export class StatsPeriodInteractions {
 				}
 				if (topChannels.length > 0) {
 					const channelLeaderboard = topChannels
-						.map((c, i) => {
-							const msgs = ChartGenerator.formatNumber(
-								c.messageCount,
-								lng,
-							);
-							const voice = ChartGenerator.formatDuration(
-								c.voiceDuration,
-							);
-							return `${i + 1}. <#${c.channelId}>: ${msgs} msg, ${voice}`;
-						})
+						.map(
+							(
+								c: {
+									channelId: string;
+									messageCount: number;
+									voiceDuration: number;
+								},
+								i: number,
+							) => {
+								const msgs = ChartGenerator.formatNumber(
+									c.messageCount,
+									lng,
+								);
+								const voice = ChartGenerator.formatDuration(
+									c.voiceDuration,
+								);
+								return `${i + 1}. <#${c.channelId}>: ${msgs} msg, ${voice}`;
+							},
+						)
 						.join("\n");
 					embed.addFields({
 						name: t(
@@ -218,12 +230,12 @@ export class StatsPeriodInteractions {
 			} else if (scope === "user") {
 				const userId = targetId;
 				const [voiceStats, messageStats] = await Promise.all([
-					StatsService.getUserVoiceStats(
+					StatsReader.getUserVoiceStats(
 						userId,
 						interaction.guild.id,
 						timeRange,
 					),
-					StatsService.getUserMessageStats(
+					StatsReader.getUserMessageStats(
 						userId,
 						interaction.guild.id,
 						timeRange,
@@ -287,9 +299,15 @@ export class StatsPeriodInteractions {
 
 				if (messageStats.channelBreakdown.length > 0) {
 					const topChannels = messageStats.channelBreakdown
-						.sort((a, b) => b.count - a.count)
+						.sort(
+							(a: { count: number }, b: { count: number }) =>
+								b.count - a.count,
+						)
 						.slice(0, 3)
-						.map((c) => `<#${c.channelId}>: ${c.count} messages`)
+						.map(
+							(c: { channelId: string; count: number }) =>
+								`<#${c.channelId}>: ${c.count} messages`,
+						)
 						.join("\n");
 					embed.addFields({
 						name: t(
@@ -301,10 +319,15 @@ export class StatsPeriodInteractions {
 
 				if (voiceStats.channelBreakdown.length > 0) {
 					const topVoiceChannels = voiceStats.channelBreakdown
-						.sort((a, b) => b.duration - a.duration)
+						.sort(
+							(
+								a: { duration: number },
+								b: { duration: number },
+							) => b.duration - a.duration,
+						)
 						.slice(0, 3)
 						.map(
-							(c) =>
+							(c: { channelId: string; duration: number }) =>
 								`<#${c.channelId}>: ${ChartGenerator.formatDuration(c.duration)}`,
 						)
 						.join("\n");

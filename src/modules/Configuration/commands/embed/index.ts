@@ -3,10 +3,10 @@ import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
@@ -38,11 +38,8 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "builder", permission: EPermission.ConfigureModules })
 	async builder(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		let data = await CustomEmbedService.get(interaction.guildId!, name);
@@ -86,11 +83,8 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "edit", permission: EPermission.ConfigureModules })
 	async edit(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		const data = await CustomEmbedService.get(interaction.guildId!, name);
@@ -131,11 +125,8 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "delete", permission: EPermission.ConfigureModules })
 	async delete(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		await CustomEmbedService.delete(interaction.guildId!, name);
@@ -149,11 +140,8 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "list", permission: EPermission.ConfigureModules })
 	async list(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const embeds = await CustomEmbedService.list(interaction.guildId!);
 
@@ -167,11 +155,8 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "preview", permission: EPermission.ConfigureModules })
 	async preview(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 

@@ -1,4 +1,4 @@
-import { StatsService } from "@modules/Statistics/services/StatsService";
+import { StatsWriter } from "@modules/Statistics/services/StatsWriter";
 import { InfluxService } from "@services/InfluxService";
 import { Logger } from "@utils/Logger";
 
@@ -12,7 +12,7 @@ async function runCleanup() {
 		logger.log("Running stats cleanup job...");
 
 		// Clean up abandoned voice sessions
-		await StatsService.cleanupAbandonedSessions();
+		await StatsWriter.cleanupAbandonedSessions();
 
 		// Flush any pending writes to InfluxDB
 		await InfluxService.flush();

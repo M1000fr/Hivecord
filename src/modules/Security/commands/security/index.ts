@@ -3,10 +3,10 @@ import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { HeatpointService } from "@modules/Security/services/HeatpointService";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	ChatInputCommandInteraction,
 	Client,
@@ -20,11 +20,8 @@ export default class SecurityCommand extends BaseCommand {
 	@DefaultCommand(EPermission.SecurityHeatpoint)
 	@BotPermission(PermissionsBitField.Flags.ModerateMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const subcommandGroup = interaction.options.getSubcommandGroup();
 		const subcommand = interaction.options.getSubcommand();

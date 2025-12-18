@@ -1,8 +1,4 @@
-import {
-	ConfigProperty,
-	EConfigType,
-	toConfigKey,
-} from "@decorators/ConfigProperty";
+import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
 
 export class TicketConfig {
 	@ConfigProperty({
@@ -93,22 +89,10 @@ export class TicketConfig {
 }
 
 export const TicketConfigKeys = {
-	get createMessageChannel() {
-		return toConfigKey("createMessageChannel");
-	},
-	get creationMessageContent() {
-		return toConfigKey("creationMessageContent");
-	},
-	get creationMessageEmbed() {
-		return toConfigKey("creationMessageEmbed");
-	},
-	get ticketTypeCategory() {
-		return toConfigKey("ticketTypeCategory");
-	},
-	get ticketCreationCategory() {
-		return toConfigKey("ticketCreationCategory");
-	},
-	get supportRole() {
-		return toConfigKey("supportRole");
-	},
-} as const;
+	createMessageChannel: "createMessageChannel",
+	creationMessageContent: "creationMessageContent",
+	creationMessageEmbed: "creationMessageEmbed",
+	ticketTypeCategory: "ticketTypeCategory",
+	ticketCreationCategory: "ticketCreationCategory",
+	supportRole: "supportRole",
+};

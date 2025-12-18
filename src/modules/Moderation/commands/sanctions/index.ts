@@ -3,12 +3,12 @@ import { Pager } from "@class/Pager";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
 import { SanctionType } from "@prisma/client/client";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	ChatInputCommandInteraction,
 	Client,
@@ -25,11 +25,8 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const targetUser = interaction.options.getUser("user", true);
 
@@ -138,11 +135,8 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const text = interaction.options.getString("text", true);
 		const typeStr = interaction.options.getString("type", true);
@@ -208,11 +202,8 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const id = interaction.options.getInteger("id", true);
 		const text = interaction.options.getString("text");
@@ -283,11 +274,8 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const id = interaction.options.getInteger("id", true);
 
@@ -320,11 +308,8 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const typeStr = interaction.options.getString("type");
 		const type = typeStr ? (typeStr as SanctionType) : undefined;
