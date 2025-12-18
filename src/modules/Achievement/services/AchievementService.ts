@@ -159,8 +159,13 @@ export class AchievementService {
 						channel.type === ChannelType.GuildAnnouncement)
 				) {
 					const user = await client.users.fetch(userId);
+					const announcementMessage = await ConfigService.get(
+						guildId,
+						AchievementConfigKeys.announcementMessage,
+					);
 					const message = new MessageTemplate(
-						"🏆 **Achievement Unlocked!**\n{user} has unlocked **{achievement.name}**!\n*{achievement.description}*",
+						announcementMessage ||
+							"🏆 **Achievement Unlocked!**\n{user} has unlocked **{achievement.name}**!\n*{achievement.description}*",
 					)
 						.addContext("user", user)
 						.addContext("achievement", achievement)

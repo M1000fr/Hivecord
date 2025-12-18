@@ -38,6 +38,17 @@ export class AchievementConfig {
 		required: true,
 	})
 	rotationIntervalDays: number = 7;
+
+	@ConfigProperty({
+		displayName: "Announcement Message",
+		description: "Message template for achievement announcements",
+		type: EConfigType.String,
+		defaultValue:
+			"🏆 **Achievement Unlocked!**\n{user} has unlocked **{achievement.name}**!\n*{achievement.description}*",
+		required: true,
+	})
+	announcementMessage: string =
+		"🏆 **Achievement Unlocked!**\n{user} has unlocked **{achievement.name}**!\n*{achievement.description}*";
 }
 
 export const AchievementConfigKeys = {
@@ -52,5 +63,8 @@ export const AchievementConfigKeys = {
 	},
 	get rotationIntervalDays() {
 		return toConfigKey("rotationIntervalDays");
+	},
+	get announcementMessage() {
+		return toConfigKey("announcementMessage");
 	},
 };
