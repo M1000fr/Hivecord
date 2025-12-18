@@ -1,7 +1,7 @@
 import {
 	ConfigProperty,
 	EConfigType,
-	toConfigKey,
+	getConfigKey,
 } from "@decorators/ConfigProperty";
 
 export class AchievementConfig {
@@ -53,18 +53,18 @@ export class AchievementConfig {
 
 export const AchievementConfigKeys = {
 	get globalCompletionRoleId() {
-		return toConfigKey("globalCompletionRoleId");
+		return getConfigKey<string | null>("globalCompletionRoleId");
 	},
 	get rotatedCompletionRoleId() {
-		return toConfigKey("rotatedCompletionRoleId");
+		return getConfigKey<string | null>("rotatedCompletionRoleId");
 	},
 	get announcementChannelId() {
-		return toConfigKey("announcementChannelId");
+		return getConfigKey<string | null>("announcementChannelId");
 	},
 	get rotationIntervalDays() {
-		return toConfigKey("rotationIntervalDays");
+		return getConfigKey<string>("rotationIntervalDays");
 	},
 	get announcementMessage() {
-		return toConfigKey("announcementMessage");
+		return getConfigKey<string>("announcementMessage");
 	},
 };

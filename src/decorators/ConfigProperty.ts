@@ -61,3 +61,9 @@ export function ConfigProperty(options: ConfigPropertyOptions) {
 export function toConfigKey(key: string): string {
 	return key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 }
+
+export type ConfigKey<T> = string & { __type: T };
+
+export function getConfigKey<T>(key: string): ConfigKey<T> {
+	return toConfigKey(key) as ConfigKey<T>;
+}

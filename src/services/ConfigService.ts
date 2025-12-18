@@ -1,3 +1,4 @@
+import type { ConfigKey } from "@decorators/ConfigProperty";
 import { ChannelType } from "@prisma/client/enums";
 import { ConfigRegistry } from "@registers/ConfigRegistry";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
@@ -18,11 +19,14 @@ export class ConfigService {
 		await EntityService.ensureRoleById(guildId, roleId);
 	}
 
-	static async get(guildId: string, key: string): Promise<string | null> {
+	static async get<T extends string | null = string | null>(
+		guildId: string,
+		key: ConfigKey<T> | string,
+	): Promise<T> {
 		const redis = RedisService.getInstance();
 		const cacheKey = `config:${guildId}:value:${key}`;
 		const cached = await redis.get(cacheKey);
-		if (cached !== null) return cached;
+		if (cached !== null) return cached as T;
 
 		const config = await prismaClient.configuration.findFirst({
 			where: { guildId, key },
@@ -38,7 +42,7 @@ export class ConfigService {
 
 		if (value !== null) await redis.set(cacheKey, value, "EX", CACHE_TTL);
 
-		return value;
+		return value as T;
 	}
 
 	static async set(

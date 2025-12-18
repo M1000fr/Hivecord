@@ -163,10 +163,7 @@ export class AchievementService {
 						guildId,
 						AchievementConfigKeys.announcementMessage,
 					);
-					const message = new MessageTemplate(
-						announcementMessage ||
-							"🏆 **Achievement Unlocked!**\n{user} has unlocked **{achievement.name}**!\n*{achievement.description}*",
-					)
+					const message = new MessageTemplate(announcementMessage)
 						.addContext("user", user)
 						.addContext("achievement", achievement)
 						.resolve();
