@@ -164,10 +164,28 @@
 				"achievement": {
 					"description": "Achievement system",
 					"list": {
-						"description": "List your achievements"
+						"description": "List your achievements",
+						"title": "🏆 Achievements"
 					},
 					"stats": {
-						"description": "View your stats"
+						"description": "View your stats",
+						"messages_total": "Messages (Total)",
+						"messages_last_hour": "Messages (Last Hour)",
+						"voice_time": "Voice Time",
+						"invites": "Invites"
+					},
+					"add": {
+						"success": "Achievement **{{name}}** ({{id}}) created!",
+						"failed": "Failed to create achievement: {{error}}"
+					},
+					"delete": {
+						"success": "Achievement **{{id}}** deleted!",
+						"failed": "Failed to delete achievement: {{error}}"
+					},
+					"edit": {
+						"no_changes": "No changes provided.",
+						"success": "Achievement **{{id}}** updated!",
+						"failed": "Failed to update achievement: {{error}}"
 					}
 				}
 			},

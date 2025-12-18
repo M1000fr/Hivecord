@@ -164,10 +164,28 @@
 				"achievement": {
 					"description": "Système de succès",
 					"list": {
-						"description": "Liste vos succès"
+						"description": "Liste vos succès",
+						"title": "🏆 Succès"
 					},
 					"stats": {
-						"description": "Voir vos statistiques"
+						"description": "Voir vos statistiques",
+						"messages_total": "Messages (Total)",
+						"messages_last_hour": "Messages (Dernière heure)",
+						"voice_time": "Temps vocal",
+						"invites": "Invitations"
+					},
+					"add": {
+						"success": "Succès **{{name}}** ({{id}}) créé !",
+						"failed": "Échec de la création du succès : {{error}}"
+					},
+					"delete": {
+						"success": "Succès **{{id}}** supprimé !",
+						"failed": "Échec de la suppression du succès : {{error}}"
+					},
+					"edit": {
+						"no_changes": "Aucune modification fournie.",
+						"success": "Succès **{{id}}** mis à jour !",
+						"failed": "Échec de la mise à jour du succès : {{error}}"
 					}
 				}
 			},
