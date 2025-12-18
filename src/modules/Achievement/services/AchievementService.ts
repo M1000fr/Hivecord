@@ -152,7 +152,11 @@ export class AchievementService {
 			);
 			if (channelId) {
 				const channel = await client.channels.fetch(channelId);
-				if (channel && channel.type === ChannelType.GuildText) {
+				if (
+					channel &&
+					(channel.type === ChannelType.GuildText ||
+						channel.type === ChannelType.GuildAnnouncement)
+				) {
 					const user = await client.users.fetch(userId);
 					const message = new MessageTemplate(
 						"🏆 **Achievement Unlocked!**\n{user.mention} has unlocked **{achievement.name}**!\n*{achievement.description}*",
