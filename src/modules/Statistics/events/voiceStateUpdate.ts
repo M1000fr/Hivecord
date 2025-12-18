@@ -1,7 +1,7 @@
 import { BaseEvent } from "@class/BaseEvent";
 import type { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
-import { StatsService } from "@modules/Statistics/services/StatsService";
+import { StatsWriter } from "@modules/Statistics/services/StatsWriter";
 import { BotEvents } from "@src/enums/BotEvents";
 import type { VoiceState } from "discord.js";
 
@@ -25,7 +25,7 @@ export default class VoiceStateUpdateEvent extends BaseEvent<
 		try {
 			// User joined a voice channel
 			if (!oldState.channel && newState.channel) {
-				await StatsService.startVoiceSession(
+				await StatsWriter.startVoiceSession(
 					userId,
 					newState.channel.id,
 					guildId,
@@ -33,7 +33,8 @@ export default class VoiceStateUpdateEvent extends BaseEvent<
 			}
 			// User left a voice channel
 			else if (oldState.channel && !newState.channel) {
-				await StatsService.endVoiceSession(
+				await StatsWriter.endVoiceSession(
+					client,
 					userId,
 					oldState.channel.id,
 					guildId,
@@ -45,12 +46,13 @@ export default class VoiceStateUpdateEvent extends BaseEvent<
 				newState.channel &&
 				oldState.channel.id !== newState.channel.id
 			) {
-				await StatsService.endVoiceSession(
+				await StatsWriter.endVoiceSession(
+					client,
 					userId,
 					oldState.channel.id,
 					guildId,
 				);
-				await StatsService.startVoiceSession(
+				await StatsWriter.startVoiceSession(
 					userId,
 					newState.channel.id,
 					guildId,

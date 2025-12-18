@@ -1,7 +1,7 @@
 import { BaseEvent } from "@class/BaseEvent";
 import type { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
-import { StatsService } from "@modules/Statistics/services/StatsService";
+import { StatsWriter } from "@modules/Statistics/services/StatsWriter";
 import { BotEvents } from "@src/enums/BotEvents";
 import type { Message } from "discord.js";
 
@@ -14,7 +14,8 @@ export default class MessageCreateEvent extends BaseEvent<
 		if (message.author.bot || !message.guild) return;
 
 		try {
-			await StatsService.recordMessage(
+			await StatsWriter.recordMessage(
+				client,
 				message.author.id,
 				message.channel.id,
 				message.guild.id,
