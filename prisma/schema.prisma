@@ -269,6 +269,15 @@ enum AchievementType {
     VOICE_DURATION
     INVITE_COUNT
     MESSAGE_RATE
+    STREAK_DAYS
+    CHANNEL_DIVERSITY
+    REACTION_COUNT
+    STREAM_DURATION
+    WORD_COUNT_AVG
+    MEDIA_COUNT
+    MENTION_REACH
+    COMMAND_USAGE
+    VOICE_PEAK_TIME
 }
 
 model Achievement {
@@ -312,6 +321,15 @@ model UserStats {
     voiceDuration  Int @default(0)
     inviteCount    Int @default(0)
     
+    // New stats
+    dailyStreak       Int       @default(0)
+    lastDailyActivity DateTime?
+    reactionCount     Int       @default(0)
+    streamDuration    Int       @default(0)
+    totalWords        Int       @default(0)
+    mediaCount        Int       @default(0)
+    commandCount      Int       @default(0)
+
     updatedAt DateTime @updatedAt
 
     User    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
