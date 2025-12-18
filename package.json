@@ -15,28 +15,28 @@
 		"husky": "^9.1.7",
 		"lint-staged": "^16.2.7",
 		"node-gyp": "^12.1.0",
-		"prettier": "^3.7.3",
+		"prettier": "^3.7.4",
 		"prettier-plugin-organize-imports": "^4.3.0",
 		"semantic-release": "^25.0.2",
-		"typescript-eslint": "^8.49.0"
+		"typescript-eslint": "^8.50.0"
 	},
 	"peerDependencies": {
 		"typescript": "^5.9.3"
 	},
 	"dependencies": {
 		"@influxdata/influxdb-client": "^1.35.0",
-		"@lingual/i18n-check": "^0.8.14",
-		"@napi-rs/canvas": "^0.1.83",
-		"@prisma/adapter-mariadb": "^7.0.1",
-		"@prisma/client": "^7.0.1",
+		"@lingual/i18n-check": "^0.8.16",
+		"@napi-rs/canvas": "^0.1.84",
+		"@prisma/adapter-mariadb": "^7.2.0",
+		"@prisma/client": "^7.2.0",
 		"axios": "^1.13.2",
 		"discord.js": "^14.25.1",
 		"gif-frames": "^1.0.1",
 		"gifencoder": "^2.0.1",
-		"i18next": "^25.7.1",
+		"i18next": "^25.7.3",
 		"ioredis": "^5.8.2",
-		"mysql2": "^3.15.3",
-		"prisma": "^7.0.1",
+		"mysql2": "^3.16.0",
+		"prisma": "^7.2.0",
 		"ts-node": "^10.9.2"
 	},
 	"resolutions": {
