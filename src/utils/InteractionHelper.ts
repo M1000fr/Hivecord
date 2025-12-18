@@ -20,7 +20,7 @@ export class InteractionHelper {
 	static async respond(
 		interaction: RepliableInteraction,
 		content: string,
-		ephemeral = true,
+		ephemeral = false,
 	): Promise<void> {
 		const payload = {
 			content,
