@@ -1,5 +1,6 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { MessageTemplate } from "@class/MessageTemplate";
+import { AchievementConfigKeys } from "@modules/Achievement/AchievementConfig";
 import { StatsReader } from "@modules/Statistics/services/StatsReader";
 import { AchievementCategory, AchievementType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
@@ -148,7 +149,7 @@ export class AchievementService {
 			// Announce
 			const channelId = await ConfigService.get(
 				guildId,
-				"announcement_channel_id",
+				AchievementConfigKeys.announcementChannelId,
 			);
 			if (channelId) {
 				const channel = await client.channels.fetch(channelId);
@@ -211,8 +212,8 @@ export class AchievementService {
 			if (allUnlocked) {
 				const configKey =
 					category === AchievementCategory.GLOBAL
-						? "global_completion_role_id"
-						: "rotated_completion_role_id";
+						? AchievementConfigKeys.globalCompletionRoleId
+						: AchievementConfigKeys.rotatedCompletionRoleId;
 				const roleId = await ConfigService.get(guildId, configKey);
 
 				if (roleId) {
@@ -241,7 +242,7 @@ export class AchievementService {
 	async checkAndRotate(guildId: string) {
 		const intervalStr = await ConfigService.get(
 			guildId,
-			"rotation_interval_days",
+			AchievementConfigKeys.rotationIntervalDays,
 		);
 		const intervalDays = intervalStr ? parseInt(intervalStr) : 7;
 

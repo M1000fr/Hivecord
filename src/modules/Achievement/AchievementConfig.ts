@@ -1,4 +1,8 @@
-import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
+import {
+	ConfigProperty,
+	EConfigType,
+	toConfigKey,
+} from "@decorators/ConfigProperty";
 
 export class AchievementConfig {
 	@ConfigProperty({
@@ -35,3 +39,18 @@ export class AchievementConfig {
 	})
 	rotationIntervalDays: number = 7;
 }
+
+export const AchievementConfigKeys = {
+	get globalCompletionRoleId() {
+		return toConfigKey("globalCompletionRoleId");
+	},
+	get rotatedCompletionRoleId() {
+		return toConfigKey("rotatedCompletionRoleId");
+	},
+	get announcementChannelId() {
+		return toConfigKey("announcementChannelId");
+	},
+	get rotationIntervalDays() {
+		return toConfigKey("rotationIntervalDays");
+	},
+};
