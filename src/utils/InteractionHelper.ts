@@ -68,7 +68,7 @@ export class InteractionHelper {
 	 */
 	static async defer(
 		interaction: RepliableInteraction,
-		ephemeral = true,
+		ephemeral = false,
 	): Promise<void> {
 		if (interaction.deferred || interaction.replied) return;
 
