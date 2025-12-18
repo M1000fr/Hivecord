@@ -82,6 +82,7 @@ export class StatsWriter {
 
 	// Voice Activity Tracking
 	static async startVoiceSession(
+		client: LeBotClient,
 		userId: string,
 		channelId: string,
 		guildId: string,
@@ -99,6 +100,12 @@ export class StatsWriter {
 			"EX",
 			86400,
 		); // 24h
+
+		client.emit(BotEvents.StatsUpdated, {
+			userId,
+			guildId,
+			type: "voice_join",
+		});
 
 		this.logger.log(`Voice session started: ${userId} in ${channelId}`);
 	}
@@ -239,12 +246,135 @@ export class StatsWriter {
 		}
 	}
 
+	// Stream Activity Tracking
+	static async startStreamSession(
+		userId: string,
+		channelId: string,
+		guildId: string,
+	): Promise<void> {
+		const redis = RedisService.getInstance();
+		const sessionId = `stream-${userId}-${channelId}-${Date.now()}`;
+		const sessionKey = `stream:session:${userId}:${channelId}`;
+		const startTime = Date.now();
+		const lastTickTime = startTime;
+
+		// Store session start in Redis
+		await redis.set(
+			sessionKey,
+			JSON.stringify({ sessionId, startTime, lastTickTime, guildId }),
+			"EX",
+			86400,
+		); // 24h
+
+		this.logger.log(`Stream session started: ${userId} in ${channelId}`);
+	}
+
+	static async endStreamSession(
+		client: LeBotClient,
+		userId: string,
+		channelId: string,
+		guildId: string,
+	): Promise<void> {
+		const redis = RedisService.getInstance();
+		const sessionKey = `stream:session:${userId}:${channelId}`;
+		const sessionData = await redis.get(sessionKey);
+
+		if (sessionData) {
+			const { lastTickTime } = JSON.parse(sessionData);
+			const endTime = Date.now();
+			const remainingDuration = Math.floor(
+				(endTime - lastTickTime) / 1000,
+			); // seconds since last tick
+			if (remainingDuration > 0) {
+				await this.addStreamDuration(
+					client,
+					userId,
+					guildId,
+					remainingDuration,
+				);
+			}
+			await redis.del(sessionKey);
+			this.logger.log(
+				`Stream session ended: ${userId} in ${channelId} (final +${remainingDuration}s)`,
+			);
+		}
+	}
+
+	static async tickActiveStreamSessions(
+		client: LeBotClient<boolean>,
+	): Promise<void> {
+		const redis = RedisService.getInstance();
+		const pattern = "stream:session:*";
+		const keys = await redis.keys(pattern);
+		const now = Date.now();
+
+		for (const key of keys) {
+			const data = await redis.get(key);
+			if (!data) continue;
+			try {
+				const { sessionId, startTime, lastTickTime, guildId } =
+					JSON.parse(data);
+				const parts = key.split(":");
+				const userId = parts[2];
+				const channelId = parts[3];
+				if (!userId || !channelId || !guildId) continue;
+
+				// Verify if the user is still streaming in the voice channel
+				const guild = client.guilds.cache.get(guildId);
+				if (!guild) {
+					await redis.del(key);
+					continue;
+				}
+				const voiceState = guild.voiceStates.cache.get(userId);
+				if (
+					!voiceState ||
+					voiceState.channelId !== channelId ||
+					!voiceState.streaming
+				) {
+					// User not in voice, different channel, or not streaming - zombie session
+					// We rely on event to close it properly, but if it's stale, we skip
+					continue;
+				}
+
+				const elapsedSeconds = Math.floor((now - lastTickTime) / 1000);
+				if (elapsedSeconds < 60) continue;
+
+				await this.addStreamDuration(
+					client as LeBotClient,
+					userId,
+					guildId,
+					elapsedSeconds,
+				);
+
+				// Update last tick
+				await redis.set(
+					key,
+					JSON.stringify({
+						sessionId,
+						startTime,
+						lastTickTime: now,
+						guildId,
+					}),
+					"EX",
+					86400,
+				);
+			} catch (err) {
+				this.logger.error(
+					`Error ticking stream session ${key}`,
+					err instanceof Error ? err.stack : String(err),
+				);
+			}
+		}
+	}
+
 	// Message Activity Tracking
 	static async recordMessage(
 		client: LeBotClient,
 		userId: string,
 		channelId: string,
 		guildId: string,
+		wordCount = 0,
+		mediaCount = 0,
 	): Promise<void> {
 		const key = `${userId}|${channelId}|${guildId}`;
 		this.messageBuffer.set(key, (this.messageBuffer.get(key) || 0) + 1);
@@ -252,8 +382,18 @@ export class StatsWriter {
 		// Update SQL UserStats
 		await prismaClient.userStats.upsert({
 			where: { userId_guildId: { userId, guildId } },
-			update: { messageCount: { increment: 1 } },
-			create: { userId, guildId, messageCount: 1 },
+			update: {
+				messageCount: { increment: 1 },
+				totalWords: { increment: wordCount },
+				mediaCount: { increment: mediaCount },
+			},
+			create: {
+				userId,
+				guildId,
+				messageCount: 1,
+				totalWords: wordCount,
+				mediaCount: mediaCount,
+			},
 		});
 
 		// Update Redis for sliding window (1h)
@@ -273,9 +413,28 @@ export class StatsWriter {
 			type: "message",
 		});
 
+		if (wordCount > 0) {
+			client.emit(BotEvents.StatsUpdated, {
+				userId,
+				guildId,
+				type: "words",
+			});
+		}
+
+		if (mediaCount > 0) {
+			client.emit(BotEvents.StatsUpdated, {
+				userId,
+				guildId,
+				type: "media",
+			});
+		}
+
 		// Track user for cache invalidation after flush
 		this.pendingUserInvalidations.add(`${userId}|${guildId}`);
 		this.scheduleFlush();
+
+		// Update daily streak
+		await this.updateDailyStreak(client, userId, guildId);
 	}
 
 	// Invite Activity Tracking
@@ -298,6 +457,182 @@ export class StatsWriter {
 		});
 
 		// Track user for cache invalidation
+		this.pendingUserInvalidations.add(`${userId}|${guildId}`);
+	}
+
+	// New Stats Tracking Methods
+
+	static async updateDailyStreak(
+		client: LeBotClient,
+		userId: string,
+		guildId: string,
+	): Promise<void> {
+		const now = new Date();
+		const today = new Date(
+			now.getFullYear(),
+			now.getMonth(),
+			now.getDate(),
+		);
+
+		const stats = await prismaClient.userStats.findUnique({
+			where: { userId_guildId: { userId, guildId } },
+			select: { lastDailyActivity: true, dailyStreak: true },
+		});
+
+		let newStreak = 1;
+		let shouldUpdate = false;
+
+		if (stats?.lastDailyActivity) {
+			const lastActivity = new Date(stats.lastDailyActivity);
+			const lastActivityDay = new Date(
+				lastActivity.getFullYear(),
+				lastActivity.getMonth(),
+				lastActivity.getDate(),
+			);
+
+			const diffTime = Math.abs(
+				today.getTime() - lastActivityDay.getTime(),
+			);
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+			if (diffDays === 0) {
+				// Already active today
+				return;
+			} else if (diffDays === 1) {
+				// Consecutive day
+				newStreak = stats.dailyStreak + 1;
+				shouldUpdate = true;
+			} else {
+				// Streak broken
+				newStreak = 1;
+				shouldUpdate = true;
+			}
+		} else {
+			shouldUpdate = true;
+		}
+
+		if (shouldUpdate) {
+			await prismaClient.userStats.upsert({
+				where: { userId_guildId: { userId, guildId } },
+				update: {
+					dailyStreak: newStreak,
+					lastDailyActivity: now,
+				},
+				create: {
+					userId,
+					guildId,
+					dailyStreak: newStreak,
+					lastDailyActivity: now,
+				},
+			});
+
+			client.emit(BotEvents.StatsUpdated, {
+				userId,
+				guildId,
+				type: "streak",
+			});
+			this.pendingUserInvalidations.add(`${userId}|${guildId}`);
+		}
+	}
+
+	static async incrementReactionCount(
+		client: LeBotClient,
+		userId: string,
+		guildId: string,
+	): Promise<void> {
+		await prismaClient.userStats.upsert({
+			where: { userId_guildId: { userId, guildId } },
+			update: { reactionCount: { increment: 1 } },
+			create: { userId, guildId, reactionCount: 1 },
+		});
+
+		client.emit(BotEvents.StatsUpdated, {
+			userId,
+			guildId,
+			type: "reaction",
+		});
+		this.pendingUserInvalidations.add(`${userId}|${guildId}`);
+	}
+
+	static async incrementCommandCount(
+		client: LeBotClient,
+		userId: string,
+		guildId: string,
+	): Promise<void> {
+		await prismaClient.userStats.upsert({
+			where: { userId_guildId: { userId, guildId } },
+			update: { commandCount: { increment: 1 } },
+			create: { userId, guildId, commandCount: 1 },
+		});
+
+		client.emit(BotEvents.StatsUpdated, {
+			userId,
+			guildId,
+			type: "command",
+		});
+		this.pendingUserInvalidations.add(`${userId}|${guildId}`);
+	}
+
+	static async incrementMediaCount(
+		client: LeBotClient,
+		userId: string,
+		guildId: string,
+		count: number,
+	): Promise<void> {
+		if (count <= 0) return;
+		await prismaClient.userStats.upsert({
+			where: { userId_guildId: { userId, guildId } },
+			update: { mediaCount: { increment: count } },
+			create: { userId, guildId, mediaCount: count },
+		});
+
+		client.emit(BotEvents.StatsUpdated, {
+			userId,
+			guildId,
+			type: "media",
+		});
+		this.pendingUserInvalidations.add(`${userId}|${guildId}`);
+	}
+
+	static async addWordCount(
+		client: LeBotClient,
+		userId: string,
+		guildId: string,
+		count: number,
+	): Promise<void> {
+		if (count <= 0) return;
+		await prismaClient.userStats.upsert({
+			where: { userId_guildId: { userId, guildId } },
+			update: { totalWords: { increment: count } },
+			create: { userId, guildId, totalWords: count },
+		});
+
+		client.emit(BotEvents.StatsUpdated, {
+			userId,
+			guildId,
+			type: "words",
+		});
+		this.pendingUserInvalidations.add(`${userId}|${guildId}`);
+	}
+
+	static async addStreamDuration(
+		client: LeBotClient,
+		userId: string,
+		guildId: string,
+		duration: number,
+	): Promise<void> {
+		if (duration <= 0) return;
+		await prismaClient.userStats.upsert({
+			where: { userId_guildId: { userId, guildId } },
+			update: { streamDuration: { increment: duration } },
+			create: { userId, guildId, streamDuration: duration },
+		});
+
+		client.emit(BotEvents.StatsUpdated, {
+			userId,
+			guildId,
+			type: "stream",
+		});
 		this.pendingUserInvalidations.add(`${userId}|${guildId}`);
 	}
 

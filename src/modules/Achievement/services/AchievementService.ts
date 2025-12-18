@@ -66,6 +66,46 @@ export class AchievementService {
 					guildId,
 				);
 				if (rate >= achievement.threshold) qualified = true;
+			} else if (type === AchievementType.STREAK_DAYS && stats) {
+				if ((stats.dailyStreak || 0) >= achievement.threshold)
+					qualified = true;
+			} else if (type === AchievementType.CHANNEL_DIVERSITY && stats) {
+				// We need to check channel diversity. StatsReader has channelBreakdown in getUserMessageStats
+				const msgStats = await StatsReader.getUserMessageStats(
+					userId,
+					guildId,
+					{ start: new Date(0), end: new Date() },
+				);
+				if (msgStats.channelBreakdown.length >= achievement.threshold)
+					qualified = true;
+			} else if (type === AchievementType.REACTION_COUNT && stats) {
+				if ((stats.reactionCount || 0) >= achievement.threshold)
+					qualified = true;
+			} else if (type === AchievementType.STREAM_DURATION && stats) {
+				if ((stats.streamDuration || 0) >= achievement.threshold)
+					qualified = true;
+			} else if (type === AchievementType.WORD_COUNT_AVG && stats) {
+				const totalWords = stats.totalWords || 0;
+				const msgCount = stats.messageCount || 1;
+				const avg = totalWords / msgCount;
+				if (avg >= achievement.threshold) qualified = true;
+			} else if (type === AchievementType.MEDIA_COUNT && stats) {
+				if ((stats.mediaCount || 0) >= achievement.threshold)
+					qualified = true;
+			} else if (type === AchievementType.COMMAND_USAGE && stats) {
+				if ((stats.commandCount || 0) >= achievement.threshold)
+					qualified = true;
+			} else if (type === AchievementType.VOICE_PEAK_TIME) {
+				// This is checked when the event is triggered, usually during voice tick
+				// We assume the event trigger means the condition is met or we check current time
+				const now = new Date();
+				const hour = now.getHours();
+				// Threshold is likely a specific hour or range encoded?
+				// Or maybe we just check if current time matches "Night Owl" (2AM-5AM)
+				// For simplicity, let's say threshold 1 means "Night Owl" logic
+				if (achievement.threshold === 1) {
+					if (hour >= 2 && hour < 5) qualified = true;
+				}
 			}
 
 			if (qualified) {

@@ -14,11 +14,16 @@ export default class MessageCreateEvent extends BaseEvent<
 		if (message.author.bot || !message.guild) return;
 
 		try {
+			const wordCount = message.content.trim().split(/\s+/).length;
+			const mediaCount = message.attachments.size + message.embeds.length;
+
 			await StatsWriter.recordMessage(
 				client,
 				message.author.id,
 				message.channel.id,
 				message.guild.id,
+				wordCount,
+				mediaCount,
 			);
 		} catch (error) {
 			console.error("Failed to record message stat:", error);

@@ -14,6 +14,7 @@ export function startVoiceSessionTickJob(client: LeBotClient<boolean>): void {
 			if (!client.isReady()) return;
 			try {
 				await StatsWriter.tickActiveVoiceSessions(client);
+				await StatsWriter.tickActiveStreamSessions(client);
 			} catch (err) {
 				logger.error(
 					"Voice session tick job error",

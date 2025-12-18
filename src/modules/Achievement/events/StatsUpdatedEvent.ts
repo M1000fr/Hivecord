@@ -16,7 +16,17 @@ export class StatsUpdatedEvent extends BaseEvent<
 		data: {
 			userId: string;
 			guildId: string;
-			type: "message" | "voice" | "invite";
+			type:
+				| "message"
+				| "voice"
+				| "invite"
+				| "streak"
+				| "reaction"
+				| "command"
+				| "media"
+				| "words"
+				| "stream"
+				| "voice_join";
 		},
 	) {
 		const { userId, guildId, type } = data;
@@ -34,6 +44,12 @@ export class StatsUpdatedEvent extends BaseEvent<
 				guildId,
 				AchievementType.MESSAGE_RATE,
 			);
+			await this.achievementService.checkAchievements(
+				client,
+				userId,
+				guildId,
+				AchievementType.CHANNEL_DIVERSITY,
+			);
 		} else if (type === "voice") {
 			await this.achievementService.checkAchievements(
 				client,
@@ -41,12 +57,61 @@ export class StatsUpdatedEvent extends BaseEvent<
 				guildId,
 				AchievementType.VOICE_DURATION,
 			);
+		} else if (type === "voice_join") {
+			await this.achievementService.checkAchievements(
+				client,
+				userId,
+				guildId,
+				AchievementType.VOICE_PEAK_TIME,
+			);
 		} else if (type === "invite") {
 			await this.achievementService.checkAchievements(
 				client,
 				userId,
 				guildId,
 				AchievementType.INVITE_COUNT,
+			);
+		} else if (type === "streak") {
+			await this.achievementService.checkAchievements(
+				client,
+				userId,
+				guildId,
+				AchievementType.STREAK_DAYS,
+			);
+		} else if (type === "reaction") {
+			await this.achievementService.checkAchievements(
+				client,
+				userId,
+				guildId,
+				AchievementType.REACTION_COUNT,
+			);
+		} else if (type === "command") {
+			await this.achievementService.checkAchievements(
+				client,
+				userId,
+				guildId,
+				AchievementType.COMMAND_USAGE,
+			);
+		} else if (type === "media") {
+			await this.achievementService.checkAchievements(
+				client,
+				userId,
+				guildId,
+				AchievementType.MEDIA_COUNT,
+			);
+		} else if (type === "words") {
+			await this.achievementService.checkAchievements(
+				client,
+				userId,
+				guildId,
+				AchievementType.WORD_COUNT_AVG,
+			);
+		} else if (type === "stream") {
+			await this.achievementService.checkAchievements(
+				client,
+				userId,
+				guildId,
+				AchievementType.STREAM_DURATION,
 			);
 		}
 	}
