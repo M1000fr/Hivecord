@@ -13,7 +13,11 @@ export class StatsUpdatedEvent extends BaseEvent<
 
 	async run(
 		client: LeBotClient,
-		data: { userId: string; guildId: string; type: "message" | "voice" },
+		data: {
+			userId: string;
+			guildId: string;
+			type: "message" | "voice" | "invite";
+		},
 	) {
 		const { userId, guildId, type } = data;
 
@@ -36,6 +40,13 @@ export class StatsUpdatedEvent extends BaseEvent<
 				userId,
 				guildId,
 				AchievementType.VOICE_DURATION,
+			);
+		} else if (type === "invite") {
+			await this.achievementService.checkAchievements(
+				client,
+				userId,
+				guildId,
+				AchievementType.INVITE_COUNT,
 			);
 		}
 	}

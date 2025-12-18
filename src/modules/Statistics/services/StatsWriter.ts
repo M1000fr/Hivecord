@@ -278,6 +278,29 @@ export class StatsWriter {
 		this.scheduleFlush();
 	}
 
+	// Invite Activity Tracking
+	static async incrementInviteCount(
+		client: LeBotClient,
+		userId: string,
+		guildId: string,
+	): Promise<void> {
+		// Update SQL UserStats
+		await prismaClient.userStats.upsert({
+			where: { userId_guildId: { userId, guildId } },
+			update: { inviteCount: { increment: 1 } },
+			create: { userId, guildId, inviteCount: 1 },
+		});
+
+		client.emit(BotEvents.StatsUpdated, {
+			userId,
+			guildId,
+			type: "invite",
+		});
+
+		// Track user for cache invalidation
+		this.pendingUserInvalidations.add(`${userId}|${guildId}`);
+	}
+
 	// Server Activity Tracking
 	static async recordJoin(userId: string, guildId: string): Promise<void> {
 		const point = new Point("server_activity")
