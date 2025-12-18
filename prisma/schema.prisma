@@ -29,6 +29,9 @@ model User {
     InvitedMembers Invitation[] @relation("Inviter")
 
     TicketsCreated Ticket[]
+
+    UserAchievements UserAchievement[]
+    UserStats        UserStats[]
 }
 
 model Guild {
@@ -42,6 +45,9 @@ model Guild {
     Sanctions         Sanction[]
     Configurations    Configuration[]
     TempVoiceChannels TempVoiceChannel[]
+
+    Achievements     Achievement[]
+    UserStats        UserStats[]
     SanctionReasons   SanctionReason[]
     CustomEmbeds      CustomEmbed[]
     Tickets           Ticket[]
@@ -251,4 +257,65 @@ model Ticket {
 
     @@index([guildId])
     @@index([creatorId])
+}
+
+enum AchievementCategory {
+    GLOBAL
+    ROTATED
+}
+
+enum AchievementType {
+    MESSAGE_COUNT
+    VOICE_DURATION
+    INVITE_COUNT
+    MESSAGE_RATE
+}
+
+model Achievement {
+    id          String              @id
+    guildId     String
+    Guild       Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
+    
+    name        String
+    description String
+    category    AchievementCategory
+    
+    type        AchievementType
+    threshold   Int
+    
+    isActive    Boolean             @default(true)
+    updatedAt   DateTime            @updatedAt
+    
+    UserAchievements UserAchievement[]
+
+    @@unique([guildId, id])
+}
+
+model UserAchievement {
+    id            Int         @id @default(autoincrement())
+    userId        String
+    achievementId String
+    guildId       String
+    unlockedAt    DateTime    @default(now())
+
+    User        User        @relation(fields: [userId], references: [id])
+    Achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, achievementId, guildId])
+}
+
+model UserStats {
+    userId  String
+    guildId String
+    
+    messageCount   Int @default(0)
+    voiceDuration  Int @default(0)
+    inviteCount    Int @default(0)
+    
+    updatedAt DateTime @updatedAt
+
+    User    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    Guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+    @@id([userId, guildId])
 }

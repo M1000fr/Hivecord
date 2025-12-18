@@ -8,6 +8,7 @@ export enum EPermission {
 
 	GroupsCreate = "commands.groups.create",
 	GroupsUpdate = "commands.groups.update",
+	AchievementSeed = "commands.achievement.seed",
 	GroupsDelete = "commands.groups.delete",
 	GroupsList = "commands.groups.list",
 
