@@ -175,16 +175,16 @@
 						"invites": "Invitations"
 					},
 					"add": {
-						"success": "Succès **{{name}}** ({{id}}) créé !",
+						"success": "Succès **{{achievement.name}}** ({{achievement.id}}) créé !\n```Name: {{achievement.name}}\nDescription: {{achievement.description}}\nCategory: {{achievement.category}}\nType: {{achievement.type}}\nThreshold: {{achievement.threshold}}```",
 						"failed": "Échec de la création du succès : {{error}}"
 					},
 					"delete": {
-						"success": "Succès **{{id}}** supprimé !",
+						"success": "Succès **{{achievement.name}}** ({{achievement.id}}) supprimé !",
 						"failed": "Échec de la suppression du succès : {{error}}"
 					},
 					"edit": {
 						"no_changes": "Aucune modification fournie.",
-						"success": "Succès **{{id}}** mis à jour !",
+						"success": "Succès **{{achievement.name}}** ({{achievement.id}}) mis à jour !\n```Name: {{achievement.name}}\nDescription: {{achievement.description}}\nCategory: {{achievement.category}}\nType: {{achievement.type}}\nThreshold: {{achievement.threshold}}```",
 						"failed": "Échec de la mise à jour du succès : {{error}}"
 					}
 				}

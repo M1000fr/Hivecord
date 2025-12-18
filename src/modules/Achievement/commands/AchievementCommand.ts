@@ -200,18 +200,18 @@ export class AchievementCommand extends BaseCommand {
 		const threshold = interaction.options.getInteger("threshold", true);
 
 		try {
-			await AchievementService.getInstance().createAchievement(
-				interaction.guildId!,
-				{ id, name, description, category, type, threshold },
-			);
+			const achievement =
+				await AchievementService.getInstance().createAchievement(
+					interaction.guildId!,
+					{ id, name, description, category, type, threshold },
+				);
 			await InteractionHelper.respondSuccess(
 				interaction,
 				i18next.t(
 					"modules.achievement.commands.achievement.add.success",
 					{
 						lng,
-						name,
-						id,
+						achievement,
 					},
 				),
 			);
@@ -246,17 +246,18 @@ export class AchievementCommand extends BaseCommand {
 		const id = interaction.options.getString("id", true);
 
 		try {
-			await AchievementService.getInstance().deleteAchievement(
-				interaction.guildId!,
-				id,
-			);
+			const achievement =
+				await AchievementService.getInstance().deleteAchievement(
+					interaction.guildId!,
+					id,
+				);
 			await InteractionHelper.respondSuccess(
 				interaction,
 				i18next.t(
 					"modules.achievement.commands.achievement.delete.success",
 					{
 						lng,
-						id,
+						achievement,
 					},
 				),
 			);
@@ -310,18 +311,19 @@ export class AchievementCommand extends BaseCommand {
 		}
 
 		try {
-			await AchievementService.getInstance().updateAchievement(
-				interaction.guildId!,
-				id,
-				data,
-			);
+			const achievement =
+				await AchievementService.getInstance().updateAchievement(
+					interaction.guildId!,
+					id,
+					data,
+				);
 			await InteractionHelper.respondSuccess(
 				interaction,
 				i18next.t(
 					"modules.achievement.commands.achievement.edit.success",
 					{
 						lng,
-						id,
+						achievement,
 					},
 				),
 			);
