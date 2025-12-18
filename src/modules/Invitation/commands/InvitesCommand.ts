@@ -2,9 +2,9 @@ import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	ApplicationCommandOptionType,
 	ChatInputCommandInteraction,
@@ -43,11 +43,8 @@ import { InvitationService } from "../services/InvitationService";
 export default class InvitesCommand extends BaseCommand {
 	@Subcommand({ name: "view", permission: EPermission.Invites })
 	async view(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const targetUser =
 			interaction.options.getUser("user") || interaction.user;
@@ -88,11 +85,8 @@ export default class InvitesCommand extends BaseCommand {
 
 	@Subcommand({ name: "top", permission: EPermission.Invites })
 	async top(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const leaderboard = await InvitationService.getLeaderboard(
 			interaction.guildId!,

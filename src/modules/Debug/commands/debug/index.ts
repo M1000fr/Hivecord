@@ -5,10 +5,10 @@ import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { OptionRoute } from "@decorators/OptionRoute";
 import { EPermission } from "@enums/EPermission";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { BotEvents } from "@src/enums/BotEvents";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	ApplicationCommandOptionType,
 	AutocompleteInteraction,
@@ -58,11 +58,8 @@ export default class DebugCommand extends BaseCommand {
 
 	@DefaultCommand(EPermission.Debug)
 	async run(client: LeBotClient<true>, interaction: CommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		if (!interaction.isChatInputCommand()) return;
 
@@ -81,11 +78,8 @@ export default class DebugCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
@@ -141,11 +135,8 @@ export default class DebugCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
@@ -188,11 +179,8 @@ export default class DebugCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
@@ -235,11 +223,8 @@ export default class DebugCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {
@@ -284,11 +269,8 @@ export default class DebugCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: CommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const member = interaction.member as GuildMember;
 		if (!member) {

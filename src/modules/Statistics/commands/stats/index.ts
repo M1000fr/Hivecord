@@ -2,11 +2,11 @@ import { BaseCommand } from "@class/BaseCommand";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { StatsReader } from "@modules/Statistics/services/StatsReader";
 import type { TimeRange } from "@modules/Statistics/types";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { ChartGenerator } from "@utils/ChartGenerator";
 import {
 	ActionRowBuilder,
@@ -26,11 +26,8 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -56,11 +53,8 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -92,11 +86,8 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply();
 		if (!interaction.guild) {
@@ -170,11 +161,8 @@ export default class StatsCommand extends BaseCommand {
 		username: string,
 		period: string,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const guildId = interaction.guild!.id;
 
@@ -292,11 +280,8 @@ export default class StatsCommand extends BaseCommand {
 		timeRange: TimeRange,
 		period: string,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const guildId = interaction.guild!.id;
 

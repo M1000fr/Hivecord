@@ -1,7 +1,7 @@
 import { LeBotClient } from "@class/LeBotClient";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -23,11 +23,8 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 		moduleName: string,
 	) {
 		if (!interaction.guildId || !interaction.channel) return;
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const currentValue = await ConfigHelper.getCurrentValue(
 			interaction.guildId,

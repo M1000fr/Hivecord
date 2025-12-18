@@ -1,6 +1,6 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { MessageTemplate } from "@class/MessageTemplate";
-import { AchievementConfigKeys } from "@modules/Achievement/AchievementConfig";
+import { AchievementConfig } from "@modules/Achievement/AchievementConfig";
 import { StatsReader } from "@modules/Statistics/services/StatsReader";
 import { AchievementCategory, AchievementType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
@@ -147,10 +147,8 @@ export class AchievementService {
 			);
 
 			// Announce
-			const channelId = await ConfigService.getChannel(
-				guildId,
-				AchievementConfigKeys.announcementChannelId,
-			);
+			const channelId = await ConfigService.of(guildId, AchievementConfig)
+				.announcementChannelId;
 			if (channelId) {
 				const channel = await client.channels.fetch(channelId);
 				if (
@@ -159,10 +157,10 @@ export class AchievementService {
 						channel.type === ChannelType.GuildAnnouncement)
 				) {
 					const user = await client.users.fetch(userId);
-					const announcementMessage = await ConfigService.get(
+					const announcementMessage = await ConfigService.of(
 						guildId,
-						AchievementConfigKeys.announcementMessage,
-					);
+						AchievementConfig,
+					).announcementMessage;
 					const message = new MessageTemplate(announcementMessage)
 						.addContext("user", user)
 						.addContext("achievement", achievement)
@@ -212,11 +210,12 @@ export class AchievementService {
 			);
 
 			if (allUnlocked) {
-				const configKey =
+				const roleId =
 					category === AchievementCategory.GLOBAL
-						? AchievementConfigKeys.globalCompletionRoleId
-						: AchievementConfigKeys.rotatedCompletionRoleId;
-				const roleId = await ConfigService.get(guildId, configKey);
+						? await ConfigService.of(guildId, AchievementConfig)
+								.globalCompletionRoleId
+						: await ConfigService.of(guildId, AchievementConfig)
+								.rotatedCompletionRoleId;
 
 				if (roleId) {
 					try {
@@ -242,11 +241,8 @@ export class AchievementService {
 	}
 
 	async checkAndRotate(guildId: string) {
-		const intervalStr = await ConfigService.get(
-			guildId,
-			AchievementConfigKeys.rotationIntervalDays,
-		);
-		const intervalDays = intervalStr ? parseInt(intervalStr) : 7;
+		const intervalDays = await ConfigService.of(guildId, AchievementConfig)
+			.rotationIntervalDays;
 
 		const activeRotated = await prismaClient.achievement.findFirst({
 			where: {

@@ -1,10 +1,9 @@
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { LogService } from "@modules/Log/services/LogService";
-import { VoiceConfigKeys } from "@modules/Voice/VoiceConfig";
 import { ConfigService } from "@services/ConfigService";
 import { EntityService } from "@services/EntityService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { Logger } from "@utils/Logger";
 import {
 	ActionRowBuilder,
@@ -23,6 +22,7 @@ import {
 	type Interaction,
 	type Message,
 } from "discord.js";
+import { VoiceConfig } from "../VoiceConfig";
 
 type ListType = "whitelist" | "blacklist";
 
@@ -37,7 +37,7 @@ export class TempVoiceService {
 
 	private static async getLanguage(guildId: string): Promise<string> {
 		return (
-			(await ConfigService.get(guildId, GeneralConfigKeys.language)) ??
+			(await ConfigService.of(guildId, GeneralConfig).generalLanguage) ??
 			"en"
 		);
 	}
@@ -242,10 +242,10 @@ export class TempVoiceService {
 	static async handleJoin(oldState: VoiceState, newState: VoiceState) {
 		if (!newState.channelId || !newState.guild || !newState.member) return;
 
-		const generatorId = await ConfigService.getChannel(
+		const generatorId = await ConfigService.of(
 			newState.guild.id,
-			VoiceConfigKeys.tempVoiceGeneratorChannelId,
-		);
+			VoiceConfig,
+		).voiceTempVoiceGeneratorChannelId;
 
 		if (newState.channelId !== generatorId) return;
 

@@ -1,5 +1,5 @@
 import { ButtonPattern } from "@decorators/Interaction";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { StatsReader } from "@modules/Statistics/services/StatsReader";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
@@ -20,11 +20,8 @@ export class StatsPeriodInteractions {
 	async handleStatsPeriodButton(
 		interaction: ButtonInteraction,
 	): Promise<void> {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const customId = interaction.customId;
 

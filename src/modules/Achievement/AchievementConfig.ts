@@ -1,8 +1,4 @@
-import {
-	ConfigProperty,
-	EConfigType,
-	getConfigKey,
-} from "@decorators/ConfigProperty";
+import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
 
 export class AchievementConfig {
 	@ConfigProperty({
@@ -50,21 +46,3 @@ export class AchievementConfig {
 	announcementMessage: string =
 		"🏆 **Achievement Unlocked!**\n{user} has unlocked **{achievement.name}**!\n*{achievement.description}*";
 }
-
-export const AchievementConfigKeys = {
-	get globalCompletionRoleId() {
-		return getConfigKey<string | null>("globalCompletionRoleId");
-	},
-	get rotatedCompletionRoleId() {
-		return getConfigKey<string | null>("rotatedCompletionRoleId");
-	},
-	get announcementChannelId() {
-		return getConfigKey<string | null>("announcementChannelId");
-	},
-	get rotationIntervalDays() {
-		return getConfigKey<string>("rotationIntervalDays");
-	},
-	get announcementMessage() {
-		return getConfigKey<string>("announcementMessage");
-	},
-};

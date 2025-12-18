@@ -1,5 +1,5 @@
 import type { ICommandClass } from "@interfaces/ICommandClass";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { PermissionService } from "@services/PermissionService";
@@ -42,12 +42,8 @@ export abstract class BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
-		const lng = interaction.guildId
-			? ((await ConfigService.get(
-					interaction.guildId,
-					GeneralConfigKeys.language,
-				)) ?? "en")
-			: "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 
 		const subcommand = interaction.options.getSubcommand(false);

@@ -4,7 +4,7 @@ import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { BackupService } from "@modules/Configuration/services/BackupService";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { InteractionHelper } from "@utils/InteractionHelper";
@@ -19,11 +19,8 @@ import { configOptions } from "./configOptions";
 export default class ConfigCommand extends BaseCommand {
 	@Subcommand({ name: "backup", permission: EPermission.ConfigureModules })
 	async backup(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const lebot = client as LeBotClient<true>;
 
@@ -58,11 +55,8 @@ export default class ConfigCommand extends BaseCommand {
 
 	@Subcommand({ name: "restore", permission: EPermission.ConfigureModules })
 	async restore(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		await InteractionHelper.defer(interaction, true);
 

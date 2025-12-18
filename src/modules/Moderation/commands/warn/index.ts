@@ -4,12 +4,12 @@ import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { DefaultCommand } from "@decorators/DefaultCommand";
 import { EPermission } from "@enums/EPermission";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { SanctionReasonService } from "@modules/Moderation/services/SanctionReasonService";
 import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { SanctionType } from "@prisma/client/client";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
@@ -58,11 +58,8 @@ export default class WarnCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: ChatInputCommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const user = interaction.options.getUser("user", true);
 		const reason = interaction.options.getString("reason", true);

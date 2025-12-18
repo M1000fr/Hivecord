@@ -1,7 +1,7 @@
 import { EConfigType } from "@decorators/ConfigProperty";
 import { ButtonPattern, SelectMenuPattern } from "@decorators/Interaction";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
@@ -67,10 +67,8 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 
 			try {
 				const lng =
-					(await ConfigService.get(
-						interaction.guildId!,
-						GeneralConfigKeys.language,
-					)) ?? "en";
+					(await ConfigService.of(interaction.guildId!, GeneralConfig)
+						.generalLanguage) ?? "en";
 				const config = await ConfigHelper.buildModuleConfigEmbed(
 					client,
 					interaction.guildId!,
@@ -185,10 +183,10 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 				const mainMessage = await this.getMainMessage(interaction);
 				if (mainMessage) {
 					const lng =
-						(await ConfigService.get(
+						(await ConfigService.of(
 							interaction.guildId!,
-							GeneralConfigKeys.language,
-						)) ?? "en";
+							GeneralConfig,
+						).generalLanguage) ?? "en";
 					const config = await ConfigHelper.buildModuleConfigEmbed(
 						client,
 						interaction.guildId!,

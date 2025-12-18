@@ -5,7 +5,6 @@ import { BotPermission } from "@decorators/BotPermission";
 import { Command } from "@decorators/Command";
 import { OptionRoute } from "@decorators/OptionRoute";
 import { EPermission } from "@enums/EPermission";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { InteractionHelper } from "@utils/InteractionHelper";
@@ -14,6 +13,7 @@ import {
 	ChatInputCommandInteraction,
 	PermissionFlagsBits,
 } from "discord.js";
+import { GeneralConfig } from "../../GeneralConfig";
 import { WelcomeRoleSyncService } from "../../services/WelcomeRoleSyncService";
 import { syncOptions } from "./syncOptions";
 
@@ -24,11 +24,8 @@ export default class SyncCommand extends BaseCommand {
 		client: LeBotClient,
 		interaction: AutocompleteInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const focusedValue = interaction.options.getFocused().toLowerCase();
 		const targets = [
@@ -57,11 +54,8 @@ export default class SyncCommand extends BaseCommand {
 		client: LeBotClient,
 		interaction: ChatInputCommandInteraction,
 	) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		await InteractionHelper.defer(interaction);
 

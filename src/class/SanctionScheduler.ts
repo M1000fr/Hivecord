@@ -1,7 +1,7 @@
-import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
 import { SanctionType } from "@prisma/client/client";
 import { ConfigService } from "@services/ConfigService";
 import { prismaClient } from "@services/prismaService";
+import { ModerationConfig } from "@src/modules/Moderation/ModerationConfig";
 import { Logger } from "@utils/Logger";
 import { Client } from "discord.js";
 
@@ -27,10 +27,10 @@ export class SanctionScheduler {
 
 	private async checkMuteConsistency() {
 		for (const guild of this.client.guilds.cache.values()) {
-			const muteRoleId = await ConfigService.getRole(
+			const muteRoleId = await ConfigService.of(
 				guild.id,
-				ModerationConfigKeys.muteRoleId,
-			);
+				ModerationConfig,
+			).moderationMuteRoleId;
 			if (!muteRoleId) continue;
 
 			const muteRole = guild.roles.cache.get(muteRoleId);
@@ -145,10 +145,10 @@ export class SanctionScheduler {
 				}
 
 				if (sanction.type === SanctionType.MUTE) {
-					const muteRoleId = await ConfigService.getRole(
+					const muteRoleId = await ConfigService.of(
 						guild.id,
-						ModerationConfigKeys.muteRoleId,
-					);
+						ModerationConfig,
+					).moderationMuteRoleId;
 					if (muteRoleId && member) {
 						await member.roles.remove(muteRoleId, "Mute expired");
 						try {

@@ -3,7 +3,7 @@ import { ConfigService } from "@services/ConfigService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 import { Guild } from "discord.js";
-import { GeneralConfigKeys } from "../GeneralConfig";
+import { GeneralConfig } from "../GeneralConfig";
 import { WelcomeRoleService } from "./WelcomeRoleService";
 
 interface SyncState {
@@ -88,10 +88,8 @@ export class WelcomeRoleSyncService {
 	private static async processGuild(guild: Guild) {
 		this.logger.log(`Processing guild ${guild.name} (${guild.id})...`);
 
-		const roleIds = await ConfigService.getRoles(
-			guild.id,
-			GeneralConfigKeys.welcomeRoles,
-		);
+		const roleIds = await ConfigService.of(guild.id, GeneralConfig)
+			.generalWelcomeRoles;
 		if (!roleIds || roleIds.length === 0) {
 			return;
 		}

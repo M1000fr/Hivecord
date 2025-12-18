@@ -1,8 +1,4 @@
-import {
-	ConfigProperty,
-	EConfigType,
-	toConfigKey,
-} from "@decorators/ConfigProperty";
+import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
 
 export class LogConfig {
 	@ConfigProperty({
@@ -124,27 +120,3 @@ export class LogConfig {
 	})
 	logEnableRoleUpdateLogs: boolean = true;
 }
-
-export const LogConfigKeys = {
-	get logChannelId() {
-		return toConfigKey("logChannelId");
-	},
-	get enableSanctionLogs() {
-		return toConfigKey("logEnableSanctionLogs");
-	},
-	get enableVoiceLogs() {
-		return toConfigKey("logEnableVoiceLogs");
-	},
-	get enableMemberLogs() {
-		return toConfigKey("logEnableMemberLogs");
-	},
-	get enableVoiceConnectionLogs() {
-		return toConfigKey("logEnableVoiceConnectionLogs");
-	},
-	get enableMessageLogs() {
-		return toConfigKey("logEnableMessageLogs");
-	},
-	get enableRoleUpdateLogs() {
-		return toConfigKey("logEnableRoleUpdateLogs");
-	},
-} as const;

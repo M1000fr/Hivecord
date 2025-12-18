@@ -1,7 +1,7 @@
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	type APIEmbed,
 	type ButtonInteraction,
@@ -62,10 +62,8 @@ export class EmbedEditorInteractions {
 		session: EmbedEditorSession,
 	) {
 		const lng =
-			(await ConfigService.get(
-				session.guildId,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+			(await ConfigService.of(session.guildId, GeneralConfig)
+				.generalLanguage) ?? "en";
 		const embed = new EmbedBuilder(session.data);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		await (interaction as any).update({
@@ -84,10 +82,8 @@ export class EmbedEditorInteractions {
 		if (!session) return;
 
 		const lng =
-			(await ConfigService.get(
-				session.guildId,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+			(await ConfigService.of(session.guildId, GeneralConfig)
+				.generalLanguage) ?? "en";
 		const value = interaction.values[0];
 		if (!value) return;
 
@@ -123,10 +119,8 @@ export class EmbedEditorInteractions {
 		if (!session) return;
 
 		const lng =
-			(await ConfigService.get(
-				session.guildId,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+			(await ConfigService.of(session.guildId, GeneralConfig)
+				.generalLanguage) ?? "en";
 		const value = interaction.values[0];
 		if (!value) return;
 

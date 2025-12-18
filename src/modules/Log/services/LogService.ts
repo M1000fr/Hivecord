@@ -1,7 +1,6 @@
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
-import { LogConfigKeys } from "@modules/Log/LogConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	type ColorResolvable,
 	Colors,
@@ -16,32 +15,23 @@ import {
 	User,
 	VoiceState,
 } from "discord.js";
+import { LogConfig } from "../LogConfig";
 
 export class LogService {
 	private static async getLogChannel(
 		guild: Guild,
 	): Promise<TextChannel | null> {
-		const channelId = await ConfigService.getChannel(
-			guild.id,
-			LogConfigKeys.logChannelId,
-		);
+		const channelId = await ConfigService.of(guild.id, LogConfig)
+			.logChannelId;
 		if (!channelId) return null;
 		const channel = guild.channels.cache.get(channelId);
 		if (!channel || !channel.isTextBased()) return null;
 		return channel as TextChannel;
 	}
 
-	private static async isEnabled(
-		guildId: string,
-		key: string,
-	): Promise<boolean> {
-		const value = await ConfigService.get(guildId, key);
-		return value === "true";
-	}
-
 	private static async getLanguage(guildId: string): Promise<string> {
 		return (
-			(await ConfigService.get(guildId, GeneralConfigKeys.language)) ??
+			(await ConfigService.of(guildId, GeneralConfig).generalLanguage) ||
 			"en"
 		);
 	}
@@ -54,7 +44,9 @@ export class LogService {
 		reason: string,
 		duration?: string,
 	) {
-		if (!(await this.isEnabled(guild.id, LogConfigKeys.enableSanctionLogs)))
+		if (
+			!(await ConfigService.of(guild.id, LogConfig).logEnableSanctionLogs)
+		)
 			return;
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
@@ -103,7 +95,7 @@ export class LogService {
 		action: string,
 		details: string,
 	) {
-		if (!(await this.isEnabled(guild.id, LogConfigKeys.enableVoiceLogs)))
+		if (!(await ConfigService.of(guild.id, LogConfig).logEnableVoiceLogs))
 			return;
 		const channel = await this.getLogChannel(guild);
 		if (!channel) return;
@@ -124,10 +116,8 @@ export class LogService {
 
 	static async logMemberJoin(member: GuildMember) {
 		if (
-			!(await this.isEnabled(
-				member.guild.id,
-				LogConfigKeys.enableMemberLogs,
-			))
+			!(await ConfigService.of(member.guild.id, LogConfig)
+				.logEnableMemberLogs)
 		)
 			return;
 		const channel = await this.getLogChannel(member.guild);
@@ -160,10 +150,8 @@ export class LogService {
 
 	static async logMemberLeave(member: GuildMember | PartialGuildMember) {
 		if (
-			!(await this.isEnabled(
-				member.guild.id,
-				LogConfigKeys.enableMemberLogs,
-			))
+			!(await ConfigService.of(member.guild.id, LogConfig)
+				.logEnableMemberLogs)
 		)
 			return;
 		const channel = await this.getLogChannel(member.guild);
@@ -200,10 +188,8 @@ export class LogService {
 
 	static async logRoleCreate(guild: Guild, role: Role) {
 		if (
-			!(await this.isEnabled(
-				guild.id,
-				LogConfigKeys.enableRoleUpdateLogs,
-			))
+			!(await ConfigService.of(guild.id, LogConfig)
+				.logEnableRoleUpdateLogs)
 		)
 			return;
 		const channel = await this.getLogChannel(guild);
@@ -239,10 +225,8 @@ export class LogService {
 		roleAfter: Role,
 	) {
 		if (
-			!(await this.isEnabled(
-				guild.id,
-				LogConfigKeys.enableRoleUpdateLogs,
-			))
+			!(await ConfigService.of(guild.id, LogConfig)
+				.logEnableRoleUpdateLogs)
 		)
 			return;
 		const channel = await this.getLogChannel(guild);
@@ -348,10 +332,8 @@ export class LogService {
 
 	static async logRoleDelete(guild: Guild, role: Role) {
 		if (
-			!(await this.isEnabled(
-				guild.id,
-				LogConfigKeys.enableRoleUpdateLogs,
-			))
+			!(await ConfigService.of(guild.id, LogConfig)
+				.logEnableRoleUpdateLogs)
 		)
 			return;
 		const channel = await this.getLogChannel(guild);
@@ -383,10 +365,8 @@ export class LogService {
 
 	static async logVoiceState(oldState: VoiceState, newState: VoiceState) {
 		if (
-			!(await this.isEnabled(
-				newState.guild.id,
-				LogConfigKeys.enableVoiceConnectionLogs,
-			))
+			!(await ConfigService.of(newState.guild.id, LogConfig)
+				.logEnableVoiceConnectionLogs)
 		)
 			return;
 		const channel = await this.getLogChannel(newState.guild);
@@ -469,10 +449,8 @@ export class LogService {
 		newMessage: Message | PartialMessage,
 	) {
 		if (
-			!(await this.isEnabled(
-				newMessage.guild!.id,
-				LogConfigKeys.enableMessageLogs,
-			))
+			!(await ConfigService.of(newMessage.guild!.id, LogConfig)
+				.logEnableMessageLogs)
 		)
 			return;
 		if (newMessage.author?.bot) return;
@@ -528,10 +506,8 @@ export class LogService {
 
 	static async logMessageDelete(message: Message | PartialMessage) {
 		if (
-			!(await this.isEnabled(
-				message.guild!.id,
-				LogConfigKeys.enableMessageLogs,
-			))
+			!(await ConfigService.of(message.guild!.id, LogConfig)
+				.logEnableMessageLogs)
 		)
 			return;
 		if (message.author?.bot) return;

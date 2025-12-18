@@ -1,9 +1,9 @@
 import { SelectMenuPattern } from "@decorators/Interaction";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { GroupService } from "@modules/GroupManager/services/GroupService";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { PermissionService } from "@services/PermissionService";
+import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
 	ActionRowBuilder,
@@ -17,11 +17,8 @@ import {
 export class GroupPermissionInteractions {
 	@SelectMenuPattern("group_permissions_*")
 	async handlePermissions(interaction: StringSelectMenuInteraction) {
-		const lng =
-			(await ConfigService.get(
-				interaction.guildId!,
-				GeneralConfigKeys.language,
-			)) ?? "en";
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 
 		const parts = interaction.customId.split("_");

@@ -1,20 +1,20 @@
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
-import { LogService } from "@modules/Log/services/LogService";
-import { ModerationConfigKeys } from "@modules/Moderation/ModerationConfig";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
 import { EntityService } from "@services/EntityService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
+import { LogService } from "@src/modules/Log/services/LogService";
 import { Logger } from "@utils/Logger";
 import { Guild, GuildMember, User } from "discord.js";
+import { ModerationConfig } from "../ModerationConfig";
 
 export class SanctionService {
 	private static logger = new Logger("SanctionService");
 
 	private static async getLanguage(guildId: string): Promise<string> {
 		return (
-			(await ConfigService.get(guildId, GeneralConfigKeys.language)) ??
+			(await ConfigService.of(guildId, GeneralConfig)).generalLanguage ||
 			"en"
 		);
 	}
@@ -41,10 +41,8 @@ export class SanctionService {
 	}
 
 	private static async getMuteRole(guild: Guild) {
-		const muteRoleId = await ConfigService.getRole(
-			guild.id,
-			ModerationConfigKeys.muteRoleId,
-		);
+		const muteRoleId = await ConfigService.of(guild.id, ModerationConfig)
+			.moderationMuteRoleId;
 		if (!muteRoleId) {
 			const lng = await this.getLanguage(guild.id);
 			throw new Error(

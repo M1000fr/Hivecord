@@ -36,7 +36,7 @@ export interface ConfigPropertyOptions {
 	nonNull?: boolean;
 }
 
-interface IConfigClass {
+export interface IConfigClass {
 	configProperties?: Record<string, ConfigPropertyOptions>;
 }
 
@@ -63,7 +63,3 @@ export function toConfigKey(key: string): string {
 }
 
 export type ConfigKey<T> = string & { __type: T };
-
-export function getConfigKey<T>(key: string): ConfigKey<T> {
-	return toConfigKey(key) as ConfigKey<T>;
-}

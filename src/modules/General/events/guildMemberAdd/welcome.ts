@@ -3,7 +3,6 @@ import { LeBotClient } from "@class/LeBotClient";
 import { MessageTemplate } from "@class/MessageTemplate";
 import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
-import { GeneralConfigKeys } from "@modules/General/GeneralConfig";
 import { WelcomeImageService } from "@modules/General/services/WelcomeImageService";
 import { InvitationService } from "@modules/Invitation/services/InvitationService";
 import { ConfigService } from "@services/ConfigService";
@@ -17,6 +16,7 @@ import {
 	TextChannel,
 } from "discord.js";
 import path from "path";
+import { GeneralConfig } from "../../GeneralConfig";
 
 @Event({
 	name: BotEvents.MemberJoinProcessed,
@@ -32,10 +32,10 @@ export default class WelcomeEvent extends BaseEvent<
 		invite: Invite | null,
 	) {
 		try {
-			const welcomeChannelId = await ConfigService.getChannel(
+			const welcomeChannelId = await ConfigService.of(
 				member.guild.id,
-				GeneralConfigKeys.welcomeChannelId,
-			);
+				GeneralConfig,
+			).generalWelcomeChannelId;
 			if (!welcomeChannelId) {
 				this.logger.warn(
 					`No welcome channel configured for guild ${member.guild.id}.`,
@@ -79,16 +79,16 @@ export default class WelcomeEvent extends BaseEvent<
 			}
 
 			// Check for custom embed
-			const welcomeEmbedName = await ConfigService.get(
+			const welcomeEmbedName = await ConfigService.of(
 				member.guild.id,
-				GeneralConfigKeys.welcomeEmbedName,
-			);
+				GeneralConfig,
+			).generalWelcomeEmbedName;
 
 			// Get configured background
-			const configuredBackground = await ConfigService.get(
+			const configuredBackground = await ConfigService.of(
 				member.guild.id,
-				GeneralConfigKeys.welcomeBackground,
-			);
+				GeneralConfig,
+			).generalWelcomeBackground;
 
 			const backgroundPath = configuredBackground
 				? path.join(process.cwd(), configuredBackground)
@@ -99,10 +99,10 @@ export default class WelcomeEvent extends BaseEvent<
 				size: 256,
 			});
 
-			const welcomeMessageImageConfig = await ConfigService.get(
+			const welcomeMessageImageConfig = await ConfigService.of(
 				member.guild.id,
-				GeneralConfigKeys.welcomeMessageImage,
-			);
+				GeneralConfig,
+			).generalWelcomeMessageImage;
 
 			const welcomeMessageImageTemplate = new MessageTemplate(
 				welcomeMessageImageConfig || "Welcome!",
@@ -121,10 +121,10 @@ export default class WelcomeEvent extends BaseEvent<
 				welcomeMessageImage,
 			);
 
-			const welcomeMessageConfig = await ConfigService.get(
+			const welcomeMessageConfig = await ConfigService.of(
 				member.guild.id,
-				GeneralConfigKeys.welcomeMessage,
-			);
+				GeneralConfig,
+			).generalWelcomeMessage;
 
 			const attachment = new AttachmentBuilder(buffer, {
 				name: "welcome.gif",

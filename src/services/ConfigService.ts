@@ -1,4 +1,9 @@
-import type { ConfigKey } from "@decorators/ConfigProperty";
+import {
+	EConfigType,
+	toConfigKey,
+	type ConfigKey,
+	type IConfigClass,
+} from "@decorators/ConfigProperty";
 import { ChannelType } from "@prisma/client/enums";
 import { ConfigRegistry } from "@registers/ConfigRegistry";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
@@ -9,8 +14,54 @@ import { Logger } from "@utils/Logger";
 
 const CACHE_TTL = 60; // 60 seconds
 
+export type ConfigProxy<T> = {
+	[K in keyof T]: Promise<T[K]>;
+};
+
 export class ConfigService {
 	private static logger = new Logger("ConfigService");
+
+	static of<T extends object>(
+		guildId: string,
+		configClass: new () => T,
+	): ConfigProxy<T> {
+		const metadata = (configClass as unknown as IConfigClass)
+			.configProperties;
+
+		return new Proxy({} as ConfigProxy<T>, {
+			get: (_target, prop) => {
+				if (typeof prop !== "string") return undefined;
+				const key = toConfigKey(prop);
+				const options = metadata?.[prop];
+
+				if (!options) {
+					return this.get(guildId, key);
+				}
+
+				switch (options.type) {
+					case EConfigType.Channel:
+						return this.getChannel(guildId, key);
+					case EConfigType.Role:
+						return this.getRole(guildId, key);
+					case EConfigType.RoleArray:
+						return this.getRoles(guildId, key);
+					case EConfigType.StringArray:
+						return this.getMany(guildId, key);
+					case EConfigType.Integer:
+					case EConfigType.Number:
+						return this.get(guildId, key).then((v) =>
+							v !== null ? Number(v) : null,
+						);
+					case EConfigType.Boolean:
+						return this.get(guildId, key).then((v) =>
+							v !== null ? v === "true" : null,
+						);
+					default:
+						return this.get(guildId, key);
+				}
+			},
+		});
+	}
 
 	private static async ensureRoleExists(
 		roleId: string,
