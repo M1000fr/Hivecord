@@ -1,40 +1,23 @@
 import { BaseCommand } from "@class/BaseCommand";
 import { LeBotClient } from "@class/LeBotClient";
+import { Autocomplete } from "@decorators/Autocomplete";
 import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
+import { AchievementService } from "@modules/Achievement/services/AchievementService";
 import { StatsReader } from "@modules/Statistics/services/StatsReader";
 import type { Achievement } from "@prisma/client/client";
 import { AchievementCategory, AchievementType } from "@prisma/client/enums";
 import { prismaClient } from "@services/prismaService";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
-	ApplicationCommandOptionType,
+	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	EmbedBuilder,
 } from "discord.js";
+import { achievementOptions } from "./achievementOptions";
 
-@Command({
-	name: "achievement",
-	description: "Achievement system",
-	options: [
-		{
-			name: "list",
-			description: "List all achievements",
-			type: ApplicationCommandOptionType.Subcommand,
-		},
-		{
-			name: "stats",
-			description: "View your achievement stats",
-			type: ApplicationCommandOptionType.Subcommand,
-		},
-		{
-			name: "seed",
-			description: "Seed default achievements",
-			type: ApplicationCommandOptionType.Subcommand,
-		},
-	],
-})
+@Command(achievementOptions)
 export class AchievementCommand extends BaseCommand {
 	@Subcommand({
 		name: "list",
@@ -136,168 +119,143 @@ export class AchievementCommand extends BaseCommand {
 		await interaction.editReply({ embeds: [embed] });
 	}
 
+	@Autocomplete({ optionName: "id" })
+	async autocompleteAchievement(
+		client: LeBotClient,
+		interaction: AutocompleteInteraction,
+	) {
+		const focusedValue = interaction.options.getFocused().toLowerCase();
+		const achievements =
+			await AchievementService.getInstance().getAchievements(
+				interaction.guildId!,
+			);
+		const filtered = achievements
+			.filter(
+				(a) =>
+					a.name.toLowerCase().includes(focusedValue) ||
+					a.id.toLowerCase().includes(focusedValue),
+			)
+			.map((a) => ({
+				name: `${a.id} - ${a.name}`,
+				value: a.id,
+			}))
+			.slice(0, 25);
+		await interaction.respond(filtered);
+	}
+
 	@Subcommand({
-		name: "seed",
-		permission: EPermission.AchievementSeed,
+		name: "add",
+		permission: EPermission.AchievementCreate,
 	})
-	async seed(client: LeBotClient, interaction: ChatInputCommandInteraction) {
+	async add(client: LeBotClient, interaction: ChatInputCommandInteraction) {
 		await InteractionHelper.defer(interaction);
-		const guildId = interaction.guildId!;
 
-		const defaults = [
-			{
-				id: "MSG_100",
-				name: "Chatterbox",
-				description: "Send 100 messages",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.MESSAGE_COUNT,
-				threshold: 100,
-			},
-			{
-				id: "MSG_1000",
-				name: "Legendary Chatter",
-				description: "Send 1000 messages",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.MESSAGE_COUNT,
-				threshold: 1000,
-			},
-			{
-				id: "VOICE_1H",
-				name: "Listener",
-				description: "Spend 1 hour in voice",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.VOICE_DURATION,
-				threshold: 3600,
-			},
-			{
-				id: "VOICE_10H",
-				name: "Talkative",
-				description: "Spend 10 hours in voice",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.VOICE_DURATION,
-				threshold: 36000,
-			},
-			{
-				id: "INVITE_5",
-				name: "Recruiter",
-				description: "Invite 5 people",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.INVITE_COUNT,
-				threshold: 5,
-			},
-			{
-				id: "STREAK_7",
-				name: "Dedicated",
-				description: "Be active for 7 consecutive days",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.STREAK_DAYS,
-				threshold: 7,
-			},
-			{
-				id: "DIVERSITY_5",
-				name: "Explorer",
-				description: "Post in 5 different channels",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.CHANNEL_DIVERSITY,
-				threshold: 5,
-			},
-			{
-				id: "REACTION_100",
-				name: "Reactor",
-				description: "Add or receive 100 reactions",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.REACTION_COUNT,
-				threshold: 100,
-			},
-			{
-				id: "STREAM_1H",
-				name: "Streamer",
-				description: "Stream for 1 hour",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.STREAM_DURATION,
-				threshold: 3600,
-			},
-			{
-				id: "WORDY",
-				name: "Novelist",
-				description: "Average 50 words per message",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.WORD_COUNT_AVG,
-				threshold: 50,
-			},
-			{
-				id: "MEDIA_50",
-				name: "Content Creator",
-				description: "Share 50 images or videos",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.MEDIA_COUNT,
-				threshold: 50,
-			},
-			{
-				id: "REACH_10",
-				name: "Influencer",
-				description: "Interact with 10 unique users",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.MENTION_REACH,
-				threshold: 10,
-			},
-			{
-				id: "COMMANDER",
-				name: "Power User",
-				description: "Use 100 slash commands",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.COMMAND_USAGE,
-				threshold: 100,
-			},
-			{
-				id: "NIGHT_OWL",
-				name: "Night Owl",
-				description: "Be in voice between 2AM and 5AM",
-				category: AchievementCategory.GLOBAL,
-				type: AchievementType.VOICE_PEAK_TIME,
-				threshold: 1,
-			},
+		const id = interaction.options.getString("id", true);
+		const name = interaction.options.getString("name", true);
+		const description = interaction.options.getString("description", true);
+		const category = interaction.options.getString(
+			"category",
+			true,
+		) as AchievementCategory;
+		const type = interaction.options.getString(
+			"type",
+			true,
+		) as AchievementType;
+		const threshold = interaction.options.getInteger("threshold", true);
 
-			{
-				id: "SPEED_TYPER",
-				name: "Speed Typer",
-				description: "Send 100 messages in 1 hour",
-				category: AchievementCategory.ROTATED,
-				type: AchievementType.MESSAGE_RATE,
-				threshold: 100,
-			},
-			{
-				id: "CASUAL_TYPER",
-				name: "Casual Typer",
-				description: "Send 20 messages in 1 hour",
-				category: AchievementCategory.ROTATED,
-				type: AchievementType.MESSAGE_RATE,
-				threshold: 20,
-			},
-		];
+		try {
+			await AchievementService.getInstance().createAchievement(
+				interaction.guildId!,
+				{ id, name, description, category, type, threshold },
+			);
+			await InteractionHelper.respondSuccess(
+				interaction,
+				`Achievement **${name}** (${id}) created!`,
+			);
+		} catch (error) {
+			await InteractionHelper.respondError(
+				interaction,
+				`Failed to create achievement: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			);
+		}
+	}
 
-		let count = 0;
-		for (const def of defaults) {
-			await prismaClient.achievement.upsert({
-				where: { guildId_id: { guildId, id: def.id } },
-				update: {},
-				create: {
-					id: def.id,
-					guildId,
-					name: def.name,
-					description: def.description,
-					category: def.category,
-					type: def.type,
-					threshold: def.threshold,
-					isActive: def.category === AchievementCategory.GLOBAL, // Global always active, Rotated starts inactive
-				},
-			});
-			count++;
+	@Subcommand({
+		name: "delete",
+		permission: EPermission.AchievementDelete,
+	})
+	async delete(
+		client: LeBotClient,
+		interaction: ChatInputCommandInteraction,
+	) {
+		await InteractionHelper.defer(interaction);
+		const id = interaction.options.getString("id", true);
+
+		try {
+			await AchievementService.getInstance().deleteAchievement(
+				interaction.guildId!,
+				id,
+			);
+			await InteractionHelper.respondSuccess(
+				interaction,
+				`Achievement **${id}** deleted!`,
+			);
+		} catch (error) {
+			await InteractionHelper.respondError(
+				interaction,
+				`Failed to delete achievement: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			);
+		}
+	}
+
+	@Subcommand({
+		name: "edit",
+		permission: EPermission.AchievementEdit,
+	})
+	async edit(client: LeBotClient, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
+		const id = interaction.options.getString("id", true);
+		const name = interaction.options.getString("name");
+		const description = interaction.options.getString("description");
+		const threshold = interaction.options.getInteger("threshold");
+		const active = interaction.options.getBoolean("active");
+
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const data: any = {};
+		if (name) data.name = name;
+		if (description) data.description = description;
+		if (threshold) data.threshold = threshold;
+		if (active !== null) data.isActive = active;
+
+		if (Object.keys(data).length === 0) {
+			await InteractionHelper.respondError(
+				interaction,
+				"No changes provided.",
+			);
+			return;
 		}
 
-		await InteractionHelper.respondSuccess(
-			interaction,
-			`Seeded ${count} achievements!`,
-		);
+		try {
+			await AchievementService.getInstance().updateAchievement(
+				interaction.guildId!,
+				id,
+				data,
+			);
+			await InteractionHelper.respondSuccess(
+				interaction,
+				`Achievement **${id}** updated!`,
+			);
+		} catch (error) {
+			await InteractionHelper.respondError(
+				interaction,
+				`Failed to update achievement: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			);
+		}
 	}
 }

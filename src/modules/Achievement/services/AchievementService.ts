@@ -298,4 +298,52 @@ export class AchievementService {
 			`Rotated achievements for guild ${guildId}: ${ids.join(", ")}`,
 		);
 	}
+
+	async createAchievement(
+		guildId: string,
+		data: {
+			id: string;
+			name: string;
+			description: string;
+			category: AchievementCategory;
+			type: AchievementType;
+			threshold: number;
+		},
+	) {
+		return prismaClient.achievement.create({
+			data: {
+				...data,
+				guildId,
+				isActive: data.category === AchievementCategory.GLOBAL,
+			},
+		});
+	}
+
+	async deleteAchievement(guildId: string, achievementId: string) {
+		return prismaClient.achievement.delete({
+			where: { guildId_id: { guildId, id: achievementId } },
+		});
+	}
+
+	async updateAchievement(
+		guildId: string,
+		achievementId: string,
+		data: Partial<{
+			name: string;
+			description: string;
+			threshold: number;
+			isActive: boolean;
+		}>,
+	) {
+		return prismaClient.achievement.update({
+			where: { guildId_id: { guildId, id: achievementId } },
+			data,
+		});
+	}
+
+	async getAchievements(guildId: string) {
+		return prismaClient.achievement.findMany({
+			where: { guildId },
+		});
+	}
 }
