@@ -5,9 +5,11 @@ import { Command } from "@decorators/Command";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { AchievementService } from "@modules/Achievement/services/AchievementService";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { StatsReader } from "@modules/Statistics/services/StatsReader";
 import type { Achievement } from "@prisma/client/client";
 import { AchievementCategory, AchievementType } from "@prisma/client/enums";
+import { ConfigService } from "@services/ConfigService";
 import { prismaClient } from "@services/prismaService";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
@@ -15,6 +17,7 @@ import {
 	ChatInputCommandInteraction,
 	EmbedBuilder,
 } from "discord.js";
+import i18next from "i18next";
 import { achievementOptions } from "./achievementOptions";
 
 @Command(achievementOptions)
@@ -26,6 +29,8 @@ export class AchievementCommand extends BaseCommand {
 		await InteractionHelper.defer(interaction);
 		const userId = interaction.user.id;
 		const guildId = interaction.guildId!;
+		const lng = await ConfigService.of(guildId, GeneralConfig)
+			.generalLanguage;
 
 		const achievements = await prismaClient.achievement.findMany({
 			where: { guildId },
@@ -50,7 +55,14 @@ export class AchievementCommand extends BaseCommand {
 		};
 
 		const embed = new EmbedBuilder()
-			.setTitle("🏆 Achievements")
+			.setTitle(
+				i18next.t(
+					"modules.achievement.commands.achievement.list.title",
+					{
+						lng,
+					},
+				),
+			)
 			.setColor("Gold")
 			.setThumbnail(interaction.user.displayAvatarURL());
 
@@ -58,7 +70,9 @@ export class AchievementCommand extends BaseCommand {
 			// Split into chunks if too long, but for now simple join
 			const desc = global.map(formatAchievement).join("\n");
 			embed.addFields({
-				name: "🌍 Global Achievements",
+				name: i18next.t("modules.achievement.global_title", {
+					lng,
+				}),
 				value:
 					desc.length > 1024 ? desc.substring(0, 1021) + "..." : desc,
 			});
@@ -67,7 +81,9 @@ export class AchievementCommand extends BaseCommand {
 		if (rotated.length > 0) {
 			const desc = rotated.map(formatAchievement).join("\n");
 			embed.addFields({
-				name: "🔄 Seasonal Achievements",
+				name: i18next.t("modules.achievement.rotated_title", {
+					lng,
+				}),
 				value:
 					desc.length > 1024 ? desc.substring(0, 1021) + "..." : desc,
 			});
@@ -83,6 +99,8 @@ export class AchievementCommand extends BaseCommand {
 		await InteractionHelper.defer(interaction);
 		const userId = interaction.user.id;
 		const guildId = interaction.guildId!;
+		const lng = await ConfigService.of(guildId, GeneralConfig)
+			.generalLanguage;
 
 		const stats = await StatsReader.getUserStats(userId, guildId);
 		const msgRate = await StatsReader.getMessageCountInLastHour(
@@ -91,26 +109,42 @@ export class AchievementCommand extends BaseCommand {
 		);
 
 		const embed = new EmbedBuilder()
-			.setTitle("📊 Your Stats")
+			.setTitle(
+				i18next.t("modules.achievement.stats_title", {
+					lng,
+				}),
+			)
 			.setColor("Blue")
 			.addFields(
 				{
-					name: "Messages (Total)",
+					name: i18next.t(
+						"modules.achievement.commands.achievement.stats.messages_total",
+						{ lng },
+					),
 					value: stats?.messageCount.toString() || "0",
 					inline: true,
 				},
 				{
-					name: "Messages (Last Hour)",
+					name: i18next.t(
+						"modules.achievement.commands.achievement.stats.messages_last_hour",
+						{ lng },
+					),
 					value: msgRate.toString(),
 					inline: true,
 				},
 				{
-					name: "Voice Time",
+					name: i18next.t(
+						"modules.achievement.commands.achievement.stats.voice_time",
+						{ lng },
+					),
 					value: `${Math.floor((stats?.voiceDuration || 0) / 60)} mins`,
 					inline: true,
 				},
 				{
-					name: "Invites",
+					name: i18next.t(
+						"modules.achievement.commands.achievement.stats.invites",
+						{ lng },
+					),
 					value: stats?.inviteCount.toString() || "0",
 					inline: true,
 				},
@@ -149,6 +183,8 @@ export class AchievementCommand extends BaseCommand {
 	})
 	async add(client: LeBotClient, interaction: ChatInputCommandInteraction) {
 		await InteractionHelper.defer(interaction);
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 
 		const id = interaction.options.getString("id", true);
 		const name = interaction.options.getString("name", true);
@@ -170,14 +206,28 @@ export class AchievementCommand extends BaseCommand {
 			);
 			await InteractionHelper.respondSuccess(
 				interaction,
-				`Achievement **${name}** (${id}) created!`,
+				i18next.t(
+					"modules.achievement.commands.achievement.add.success",
+					{
+						lng,
+						name,
+						id,
+					},
+				),
 			);
 		} catch (error) {
 			await InteractionHelper.respondError(
 				interaction,
-				`Failed to create achievement: ${
-					error instanceof Error ? error.message : String(error)
-				}`,
+				i18next.t(
+					"modules.achievement.commands.achievement.add.failed",
+					{
+						lng,
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
 			);
 		}
 	}
@@ -191,6 +241,8 @@ export class AchievementCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	) {
 		await InteractionHelper.defer(interaction);
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const id = interaction.options.getString("id", true);
 
 		try {
@@ -200,14 +252,27 @@ export class AchievementCommand extends BaseCommand {
 			);
 			await InteractionHelper.respondSuccess(
 				interaction,
-				`Achievement **${id}** deleted!`,
+				i18next.t(
+					"modules.achievement.commands.achievement.delete.success",
+					{
+						lng,
+						id,
+					},
+				),
 			);
 		} catch (error) {
 			await InteractionHelper.respondError(
 				interaction,
-				`Failed to delete achievement: ${
-					error instanceof Error ? error.message : String(error)
-				}`,
+				i18next.t(
+					"modules.achievement.commands.achievement.delete.failed",
+					{
+						lng,
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
 			);
 		}
 	}
@@ -218,6 +283,8 @@ export class AchievementCommand extends BaseCommand {
 	})
 	async edit(client: LeBotClient, interaction: ChatInputCommandInteraction) {
 		await InteractionHelper.defer(interaction);
+		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
+			.generalLanguage;
 		const id = interaction.options.getString("id", true);
 		const name = interaction.options.getString("name");
 		const description = interaction.options.getString("description");
@@ -234,7 +301,10 @@ export class AchievementCommand extends BaseCommand {
 		if (Object.keys(data).length === 0) {
 			await InteractionHelper.respondError(
 				interaction,
-				"No changes provided.",
+				i18next.t(
+					"modules.achievement.commands.achievement.edit.no_changes",
+					{ lng },
+				),
 			);
 			return;
 		}
@@ -247,14 +317,27 @@ export class AchievementCommand extends BaseCommand {
 			);
 			await InteractionHelper.respondSuccess(
 				interaction,
-				`Achievement **${id}** updated!`,
+				i18next.t(
+					"modules.achievement.commands.achievement.edit.success",
+					{
+						lng,
+						id,
+					},
+				),
 			);
 		} catch (error) {
 			await InteractionHelper.respondError(
 				interaction,
-				`Failed to update achievement: ${
-					error instanceof Error ? error.message : String(error)
-				}`,
+				i18next.t(
+					"modules.achievement.commands.achievement.edit.failed",
+					{
+						lng,
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
 			);
 		}
 	}
