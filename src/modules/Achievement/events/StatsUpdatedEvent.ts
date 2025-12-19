@@ -11,6 +11,23 @@ export class StatsUpdatedEvent extends BaseEvent<
 > {
 	private achievementService = AchievementService.getInstance();
 
+	private readonly typeMapping: Record<string, AchievementType[]> = {
+		message: [
+			AchievementType.MESSAGE_COUNT,
+			AchievementType.MESSAGE_RATE,
+			AchievementType.CHANNEL_DIVERSITY,
+		],
+		voice: [AchievementType.VOICE_DURATION],
+		voice_join: [AchievementType.VOICE_PEAK_TIME],
+		invite: [AchievementType.INVITE_COUNT],
+		streak: [AchievementType.STREAK_DAYS],
+		reaction: [AchievementType.REACTION_COUNT],
+		command: [AchievementType.COMMAND_USAGE],
+		media: [AchievementType.MEDIA_COUNT],
+		words: [AchievementType.WORD_COUNT_AVG],
+		stream: [AchievementType.STREAM_DURATION],
+	};
+
 	async run(
 		client: LeBotClient,
 		data: {
@@ -31,88 +48,24 @@ export class StatsUpdatedEvent extends BaseEvent<
 	) {
 		const { userId, guildId, type } = data;
 
-		if (type === "message") {
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.MESSAGE_COUNT,
-			);
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.MESSAGE_RATE,
-			);
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.CHANNEL_DIVERSITY,
-			);
-		} else if (type === "voice") {
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.VOICE_DURATION,
-			);
-		} else if (type === "voice_join") {
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.VOICE_PEAK_TIME,
-			);
-		} else if (type === "invite") {
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.INVITE_COUNT,
-			);
-		} else if (type === "streak") {
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.STREAK_DAYS,
-			);
-		} else if (type === "reaction") {
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.REACTION_COUNT,
-			);
-		} else if (type === "command") {
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.COMMAND_USAGE,
-			);
-		} else if (type === "media") {
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.MEDIA_COUNT,
-			);
-		} else if (type === "words") {
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.WORD_COUNT_AVG,
-			);
-		} else if (type === "stream") {
-			await this.achievementService.checkAchievements(
-				client,
-				userId,
-				guildId,
-				AchievementType.STREAM_DURATION,
-			);
+		const guild =
+			client.guilds.cache.get(guildId) ??
+			(await client.guilds.fetch(guildId).catch(() => null));
+		const user =
+			client.users.cache.get(userId) ??
+			(await client.users.fetch(userId).catch(() => null));
+
+		if (!guild || !user) return;
+
+		const achievementTypes = this.typeMapping[type];
+		if (achievementTypes) {
+			for (const achievementType of achievementTypes) {
+				await this.achievementService.checkAchievements(
+					user,
+					guild,
+					achievementType,
+				);
+			}
 		}
 	}
 }

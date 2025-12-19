@@ -1,4 +1,3 @@
-import { LeBotClient } from "@class/LeBotClient";
 import { MessageTemplate } from "@class/MessageTemplate";
 import { AchievementConfig } from "@modules/Achievement/AchievementConfig";
 import { StatsReader } from "@modules/Statistics/services/StatsReader";
@@ -6,7 +5,7 @@ import { AchievementCategory, AchievementType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
-import { ChannelType, TextChannel } from "discord.js";
+import { ChannelType, Guild, TextChannel, User } from "discord.js";
 
 export class AchievementService {
 	private static instance: AchievementService;
@@ -19,12 +18,11 @@ export class AchievementService {
 		return AchievementService.instance;
 	}
 
-	async checkAchievements(
-		client: LeBotClient,
-		userId: string,
-		guildId: string,
-		type: AchievementType,
-	) {
+	async checkAchievements(user: User, guild: Guild, type: AchievementType) {
+		if (user.bot) return;
+		const userId = user.id;
+		const guildId = guild.id;
+
 		// Fetch all active achievements for this guild and type
 		const achievements = await prismaClient.achievement.findMany({
 			where: {
@@ -110,22 +108,16 @@ export class AchievementService {
 			}
 
 			if (qualified) {
-				await this.unlockAchievement(
-					client,
-					userId,
-					guildId,
-					achievement.id,
-				);
+				await this.unlockAchievement(user, guild, achievement.id);
 			}
 		}
 	}
 
-	async unlockAchievement(
-		client: LeBotClient,
-		userId: string,
-		guildId: string,
-		achievementId: string,
-	) {
+	async unlockAchievement(user: User, guild: Guild, achievementId: string) {
+		if (user.bot) return;
+		const userId = user.id;
+		const guildId = guild.id;
+
 		try {
 			const achievement = await prismaClient.achievement.findUnique({
 				where: { guildId_id: { guildId, id: achievementId } },
@@ -150,13 +142,12 @@ export class AchievementService {
 			const channelId = await ConfigService.of(guildId, AchievementConfig)
 				.announcementChannelId;
 			if (channelId) {
-				const channel = await client.channels.fetch(channelId);
+				const channel = await guild.channels.fetch(channelId);
 				if (
 					channel &&
 					(channel.type === ChannelType.GuildText ||
 						channel.type === ChannelType.GuildAnnouncement)
 				) {
-					const user = await client.users.fetch(userId);
 					const announcementMessage = await ConfigService.of(
 						guildId,
 						AchievementConfig,
@@ -171,7 +162,7 @@ export class AchievementService {
 			}
 
 			// Check for completion rewards
-			await this.checkCompletionRewards(client, userId, guildId);
+			await this.checkCompletionRewards(user, guild);
 		} catch (error) {
 			this.logger.error(
 				`Error unlocking achievement ${achievementId} for user ${userId}:`,
@@ -180,11 +171,10 @@ export class AchievementService {
 		}
 	}
 
-	async checkCompletionRewards(
-		client: LeBotClient,
-		userId: string,
-		guildId: string,
-	) {
+	async checkCompletionRewards(user: User, guild: Guild) {
+		const userId = user.id;
+		const guildId = guild.id;
+
 		const categories = [
 			AchievementCategory.GLOBAL,
 			AchievementCategory.ROTATED,
@@ -219,7 +209,6 @@ export class AchievementService {
 
 				if (roleId) {
 					try {
-						const guild = await client.guilds.fetch(guildId);
 						const member = await guild.members.fetch(userId);
 						if (member && !member.roles.cache.has(roleId)) {
 							await member.roles.add(roleId);
