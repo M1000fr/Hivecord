@@ -36,7 +36,10 @@ startVoiceSessionTickJob(leBotInstance);
 try {
 	await leBotInstance.start(process.env.DISCORD_TOKEN as string);
 } catch (error) {
-	logger.error("Failed to start LeBot:", error);
+	logger.error(
+		"Failed to start LeBot:",
+		error instanceof Error ? error.stack : String(error),
+	);
 	process.exit(1);
 }
 
