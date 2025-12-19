@@ -29,7 +29,7 @@ export interface ConfigPropertyOptions {
 	displayNameLocalizations?: LocalizationMap;
 	description: string;
 	descriptionLocalizations?: LocalizationMap;
-	type: keyof typeof EConfigType | EConfigType;
+	type: EConfigType;
 	required?: boolean;
 	defaultValue?: unknown;
 	choices?: ConfigChoice[];
