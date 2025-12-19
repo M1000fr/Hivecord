@@ -14,7 +14,15 @@ manager.on("shardCreate", (shard) => {
 });
 
 manager.spawn().catch((error) => {
-	logger.error("Failed to spawn shards:", error);
+	// If the error is just that the shard died (likely due to a startup error we already logged),
+	// don't print the huge stack trace.
+	if (error.code === "ShardingReadyDied") {
+		logger.error(
+			"Shard died during startup. Check previous logs for errors.",
+		);
+	} else {
+		logger.error("Failed to spawn shards:", error);
+	}
 });
 
 // Health check server
