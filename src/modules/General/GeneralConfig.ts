@@ -1,7 +1,9 @@
 import { ConfigContext } from "@decorators/ConfigContext";
 import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
+import { ModuleConfig } from "@decorators/ModuleConfig";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 
+@ModuleConfig()
 export class GeneralConfig {
 	@ConfigProperty({
 		displayName: "Bot Language",

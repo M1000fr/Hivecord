@@ -1,5 +1,7 @@
 import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
+import { ModuleConfig } from "@decorators/ModuleConfig";
 
+@ModuleConfig()
 export class AchievementConfig {
 	@ConfigProperty({
 		displayName: "Global Completion Role",
