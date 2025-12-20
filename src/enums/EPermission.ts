@@ -6,12 +6,13 @@ export enum EPermission {
 	Config = "commands.config",
 	Invites = "commands.invites",
 
-	GroupsCreate = "commands.groups.create",
-	GroupsUpdate = "commands.groups.update",
 	AchievementSeed = "commands.achievement.seed",
 	AchievementCreate = "commands.achievement.create",
 	AchievementDelete = "commands.achievement.delete",
 	AchievementEdit = "commands.achievement.edit",
+
+	GroupsCreate = "commands.groups.create",
+	GroupsUpdate = "commands.groups.update",
 	GroupsDelete = "commands.groups.delete",
 	GroupsList = "commands.groups.list",
 
