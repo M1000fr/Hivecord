@@ -1,9 +1,11 @@
 name: CD
 
 on:
-    push:
-        branches:
-            - main
+    workflow_run:
+        workflows: ["Release"]
+        branches: ["main"]
+        types:
+            - completed
 
 env:
     REGISTRY: reg.m1000.fr
@@ -11,6 +13,7 @@ env:
 
 jobs:
     build:
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
         runs-on: self-hosted
         permissions:
             contents: read
