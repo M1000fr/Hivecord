@@ -36,10 +36,9 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 		moduleName: string,
 	) {
 		if (!interaction.guildId) {
-			await InteractionHelper.respondError(
-				interaction,
-				"This command can only be used in a server.",
-			);
+			await InteractionHelper.respond(interaction, {
+				content: "This interaction can only be used in a server.",
+			});
 			return;
 		}
 

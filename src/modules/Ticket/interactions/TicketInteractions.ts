@@ -56,16 +56,14 @@ export class TicketInteractions {
 				category,
 				reason,
 			);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				`Ticket created: ${channel}`,
-			);
+			await InteractionHelper.respond(interaction, {
+				content: `Ticket created successfully: <#${channel.id}>`,
+			});
 		} catch (error) {
 			console.error("Error creating ticket:", error);
-			await InteractionHelper.respondError(
-				interaction,
-				"Failed to create ticket.",
-			);
+			await InteractionHelper.respond(interaction, {
+				content: "Failed to create ticket. Please try again later.",
+			});
 		}
 	}
 
@@ -87,10 +85,9 @@ export class TicketInteractions {
 			(supportRole && member.roles.cache.has(supportRole as string));
 
 		if (!hasPermission) {
-			await InteractionHelper.respondError(
-				interaction,
-				"You do not have permission to close this ticket.",
-			);
+			await InteractionHelper.respond(interaction, {
+				content: "You do not have permission to close this ticket.",
+			});
 			return;
 		}
 

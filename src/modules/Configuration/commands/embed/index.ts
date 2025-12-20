@@ -7,12 +7,12 @@ import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
 	EmbedBuilder,
-	MessageFlags,
 } from "discord.js";
 import { embedOptions } from "./embedOptions";
 import { EmbedEditorMenus } from "./utils/EmbedEditorMenus";
@@ -38,6 +38,7 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "builder", permission: EPermission.ConfigureModules })
 	async builder(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -58,7 +59,7 @@ export default class EmbedCommand extends BaseCommand {
 		}
 
 		const embed = new EmbedBuilder(data);
-		await interaction.reply({
+		await InteractionHelper.respond(interaction, {
 			content: t("modules.configuration.commands.embed.editor_intro", {
 				name,
 			}),
@@ -83,6 +84,7 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "edit", permission: EPermission.ConfigureModules })
 	async edit(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -90,17 +92,16 @@ export default class EmbedCommand extends BaseCommand {
 		const data = await CustomEmbedService.get(interaction.guildId!, name);
 
 		if (!data) {
-			await interaction.reply({
+			await InteractionHelper.respond(interaction, {
 				content: t("modules.configuration.commands.embed.not_found", {
 					name,
 				}),
-				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
 
 		const embed = new EmbedBuilder(data);
-		await interaction.reply({
+		await InteractionHelper.respond(interaction, {
 			content: t("modules.configuration.commands.embed.editor_intro", {
 				name,
 			}),
@@ -125,36 +126,37 @@ export default class EmbedCommand extends BaseCommand {
 
 	@Subcommand({ name: "delete", permission: EPermission.ConfigureModules })
 	async delete(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		await CustomEmbedService.delete(interaction.guildId!, name);
-		await interaction.reply({
+		await InteractionHelper.respond(interaction, {
 			content: t("modules.configuration.commands.embed.deleted", {
 				name,
 			}),
-			flags: MessageFlags.Ephemeral,
 		});
 	}
 
 	@Subcommand({ name: "list", permission: EPermission.ConfigureModules })
 	async list(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const embeds = await CustomEmbedService.list(interaction.guildId!);
 
-		await interaction.reply({
+		await InteractionHelper.respond(interaction, {
 			content: t("modules.configuration.commands.embed.list", {
 				embeds: embeds.map((e) => `- \`${e}\``).join("\n") || "None",
 			}),
-			flags: MessageFlags.Ephemeral,
 		});
 	}
 
 	@Subcommand({ name: "preview", permission: EPermission.ConfigureModules })
 	async preview(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -169,21 +171,19 @@ export default class EmbedCommand extends BaseCommand {
 			context,
 		);
 		if (!embed) {
-			await interaction.reply({
+			await InteractionHelper.respond(interaction, {
 				content: t("modules.configuration.commands.embed.not_found", {
 					name,
 				}),
-				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
 
-		await interaction.reply({
+		await InteractionHelper.respond(interaction, {
 			content: t("modules.configuration.commands.embed.preview", {
 				name,
 			}),
 			embeds: [embed],
-			flags: MessageFlags.Ephemeral,
 		});
 	}
 }

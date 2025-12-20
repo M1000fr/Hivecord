@@ -242,10 +242,9 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		)) as string[];
 
 		if (currentValues.length === 0) {
-			await InteractionHelper.respondError(
-				interaction,
-				"No values to remove.",
-			);
+			await InteractionHelper.respond(interaction, {
+				content: "No values to remove.",
+			});
 			return;
 		}
 
@@ -351,10 +350,9 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		)) as string[];
 
 		if (currentValues.length === 0) {
-			await InteractionHelper.respondError(
-				interaction,
-				"No values to edit.",
-			);
+			await InteractionHelper.respond(interaction, {
+				content: "No values to edit.",
+			});
 			return;
 		}
 
@@ -474,7 +472,9 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			);
 			await this.refreshView(interaction, moduleName, propertyKey);
 		} else {
-			await InteractionHelper.respondError(interaction, "Invalid index.");
+			await InteractionHelper.respond(interaction, {
+				content: "Invalid index.",
+			});
 		}
 	}
 }

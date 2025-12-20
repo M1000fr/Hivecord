@@ -36,10 +36,9 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 		if (moduleName) {
 			const selectedProperty = interaction.values[0];
 			if (!selectedProperty) {
-				await InteractionHelper.respondError(
-					interaction,
-					"No property selected.",
-				);
+				await InteractionHelper.respond(interaction, {
+					content: "❌ No property selected.",
+				});
 				return;
 			}
 
@@ -50,18 +49,16 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 			);
 
 			if (!module?.options.config) {
-				await InteractionHelper.respondError(
-					interaction,
-					"Module not found.",
-				);
+				await InteractionHelper.respond(interaction, {
+					content: "❌ Module not found.",
+				});
 				return;
 			}
 
 			if (!propertyOptions) {
-				await InteractionHelper.respondError(
-					interaction,
-					"Property not found.",
-				);
+				await InteractionHelper.respond(interaction, {
+					content: "❌ Property not found.",
+				});
 				return;
 			}
 

@@ -54,33 +54,30 @@ export default class SyncCommand extends BaseCommand {
 		client: LeBotClient,
 		interaction: ChatInputCommandInteraction,
 	) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		await InteractionHelper.defer(interaction);
 
 		try {
 			const state = await WelcomeRoleSyncService.getState(
 				interaction.guildId!,
 			);
 			if (state.isRunning) {
-				await InteractionHelper.respondError(
-					interaction,
-					t("modules.general.commands.sync.in_progress"),
-				);
+				await InteractionHelper.respond(interaction, {
+					content: t("modules.general.commands.sync.in_progress"),
+				});
 				return;
 			}
 
 			await WelcomeRoleSyncService.start(interaction.guild!);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				t("modules.general.commands.sync.started"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.general.commands.sync.started"),
+			});
 		} catch {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.general.commands.sync.failed"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.general.commands.sync.failed"),
+			});
 		}
 	}
 }

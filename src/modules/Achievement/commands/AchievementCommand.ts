@@ -205,20 +205,18 @@ export class AchievementCommand extends BaseCommand {
 					interaction.guildId!,
 					{ id, name, description, category, type, threshold },
 				);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				i18next.t(
+			await InteractionHelper.respond(interaction, {
+				content: i18next.t(
 					"modules.achievement.commands.achievement.add.success",
 					{
 						lng,
 						achievement,
 					},
 				),
-			);
+			});
 		} catch (error) {
-			await InteractionHelper.respondError(
-				interaction,
-				i18next.t(
+			await InteractionHelper.respond(interaction, {
+				content: i18next.t(
 					"modules.achievement.commands.achievement.add.failed",
 					{
 						lng,
@@ -228,7 +226,7 @@ export class AchievementCommand extends BaseCommand {
 								: String(error),
 					},
 				),
-			);
+			});
 		}
 	}
 
@@ -251,20 +249,18 @@ export class AchievementCommand extends BaseCommand {
 					interaction.guildId!,
 					id,
 				);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				i18next.t(
+			await InteractionHelper.respond(interaction, {
+				content: i18next.t(
 					"modules.achievement.commands.achievement.delete.success",
 					{
 						lng,
 						achievement,
 					},
 				),
-			);
+			});
 		} catch (error) {
-			await InteractionHelper.respondError(
-				interaction,
-				i18next.t(
+			await InteractionHelper.respond(interaction, {
+				content: i18next.t(
 					"modules.achievement.commands.achievement.delete.failed",
 					{
 						lng,
@@ -274,7 +270,7 @@ export class AchievementCommand extends BaseCommand {
 								: String(error),
 					},
 				),
-			);
+			});
 		}
 	}
 
@@ -300,13 +296,12 @@ export class AchievementCommand extends BaseCommand {
 		if (active !== null) data.isActive = active;
 
 		if (Object.keys(data).length === 0) {
-			await InteractionHelper.respondError(
-				interaction,
-				i18next.t(
+			await InteractionHelper.respond(interaction, {
+				content: i18next.t(
 					"modules.achievement.commands.achievement.edit.no_changes",
 					{ lng },
 				),
-			);
+			});
 			return;
 		}
 
@@ -317,20 +312,18 @@ export class AchievementCommand extends BaseCommand {
 					id,
 					data,
 				);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				i18next.t(
+			await InteractionHelper.respond(interaction, {
+				content: i18next.t(
 					"modules.achievement.commands.achievement.edit.success",
 					{
 						lng,
 						achievement,
 					},
 				),
-			);
+			});
 		} catch (error) {
-			await InteractionHelper.respondError(
-				interaction,
-				i18next.t(
+			await InteractionHelper.respond(interaction, {
+				content: i18next.t(
 					"modules.achievement.commands.achievement.edit.failed",
 					{
 						lng,
@@ -340,7 +333,7 @@ export class AchievementCommand extends BaseCommand {
 								: String(error),
 					},
 				),
-			);
+			});
 		}
 	}
 }

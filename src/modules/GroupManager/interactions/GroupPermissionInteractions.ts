@@ -35,13 +35,15 @@ export class GroupPermissionInteractions {
 		try {
 			const group = await GroupService.getGroupById(id);
 			if (!group) {
-				await InteractionHelper.respondError(
-					interaction,
-					t("modules.configuration.services.group.not_found_id", {
-						lng,
-						id,
-					}),
-				);
+				await InteractionHelper.respond(interaction, {
+					content: t(
+						"modules.configuration.services.group.not_found_id",
+						{
+							lng,
+							id,
+						},
+					),
+				});
 				return;
 			}
 
@@ -120,13 +122,17 @@ export class GroupPermissionInteractions {
 				components: rows,
 			});
 		} catch (error) {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.configuration.commands.group.permissions_failed", {
-					error:
-						error instanceof Error ? error.message : String(error),
-				}),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t(
+					"modules.configuration.commands.group.permissions_failed",
+					{
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
+			});
 		}
 	}
 }

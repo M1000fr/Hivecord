@@ -50,56 +50,64 @@ export default class GroupCommand extends BaseCommand {
 
 	@Subcommand({ name: "create", permission: EPermission.GroupsCreate })
 	async create(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		const role = interaction.options.getRole("role", true);
 
-		await InteractionHelper.defer(interaction);
-
 		if (!interaction.guild) return;
 
 		try {
 			await GroupService.createGroup(interaction.guild, name, role.id);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				t("modules.configuration.commands.group.created", { name }),
-			);
-		} catch (error: unknown) {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.configuration.commands.group.create_failed", {
-					error:
-						error instanceof Error ? error.message : String(error),
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.configuration.commands.group.created", {
+					name,
 				}),
-			);
+			});
+		} catch (error: unknown) {
+			await InteractionHelper.respond(interaction, {
+				content: t(
+					"modules.configuration.commands.group.create_failed",
+					{
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
+			});
 		}
 	}
 
 	@Subcommand({ name: "delete", permission: EPermission.GroupsDelete })
 	async delete(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 
-		await InteractionHelper.defer(interaction);
-
 		try {
 			await GroupService.deleteGroup(interaction.guildId!, name);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				t("modules.configuration.commands.group.deleted", { name }),
-			);
-		} catch (error: unknown) {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.configuration.commands.group.delete_failed", {
-					error:
-						error instanceof Error ? error.message : String(error),
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.configuration.commands.group.deleted", {
+					name,
 				}),
-			);
+			});
+		} catch (error: unknown) {
+			await InteractionHelper.respond(interaction, {
+				content: t(
+					"modules.configuration.commands.group.delete_failed",
+					{
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
+			});
 		}
 	}
 
@@ -108,12 +116,11 @@ export default class GroupCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		await InteractionHelper.defer(interaction, true);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const groupName = interaction.options.getString("group", true);
-
-		await InteractionHelper.defer(interaction, true);
 
 		try {
 			const group = await GroupService.getGroup(
@@ -121,13 +128,15 @@ export default class GroupCommand extends BaseCommand {
 				groupName,
 			);
 			if (!group) {
-				await InteractionHelper.respondError(
-					interaction,
-					t("modules.configuration.services.group.not_found", {
-						lng,
-						name: groupName,
-					}),
-				);
+				await InteractionHelper.respond(interaction, {
+					content: t(
+						"modules.configuration.services.group.not_found",
+						{
+							lng,
+							name: groupName,
+						},
+					),
+				});
 				return;
 			}
 
@@ -190,22 +199,26 @@ export default class GroupCommand extends BaseCommand {
 				components: rows,
 			});
 		} catch (error: unknown) {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.configuration.commands.group.permissions_failed", {
-					error:
-						error instanceof Error ? error.message : String(error),
-				}),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t(
+					"modules.configuration.commands.group.permissions_failed",
+					{
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
+			});
 		}
 	}
 
 	@Subcommand({ name: "list", permission: EPermission.GroupsList })
 	async list(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction, false);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		await InteractionHelper.defer(interaction, false);
 
 		try {
 			const groups = await GroupService.listGroups(interaction.guildId!);
@@ -251,13 +264,12 @@ export default class GroupCommand extends BaseCommand {
 
 			await pager.start(interaction);
 		} catch (error: unknown) {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.configuration.commands.group.list_failed", {
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.configuration.commands.group.list_failed", {
 					error:
 						error instanceof Error ? error.message : String(error),
 				}),
-			);
+			});
 		}
 	}
 }

@@ -54,18 +54,17 @@ export class TicketCommand extends BaseCommand {
 			EConfigType.Channel,
 		);
 		if (!channelId) {
-			await InteractionHelper.respondError(
-				interaction,
-				"Ticket creation channel is not configured. Please configure 'createMessageChannel' first.",
-			);
+			await InteractionHelper.respond(interaction, {
+				content:
+					"Ticket creation channel is not configured. Please configure 'createMessageChannel' first.",
+			});
 			return;
 		}
 
 		await TicketService.updateCreationMessage(interaction.guildId);
-		await InteractionHelper.respondSuccess(
-			interaction,
-			"Ticket creation message updated.",
-		);
+		await InteractionHelper.respond(interaction, {
+			content: "Ticket creation message updated.",
+		});
 	}
 
 	@Subcommand({ name: "close" })
@@ -83,23 +82,20 @@ export class TicketCommand extends BaseCommand {
 			});
 
 			if (!ticket) {
-				await InteractionHelper.respondError(
-					interaction,
-					"Ticket not found.",
-				);
+				await InteractionHelper.respond(interaction, {
+					content: "Ticket not found.",
+				});
 				return;
 			}
 
 			await TicketService.closeTicket(ticket.channelId);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				`Ticket #${ticketId} closed.`,
-			);
+			await InteractionHelper.respond(interaction, {
+				content: `Ticket #${ticketId} closed.`,
+			});
 		} catch {
-			await InteractionHelper.respondError(
-				interaction,
-				"Failed to close ticket.",
-			);
+			await InteractionHelper.respond(interaction, {
+				content: "Failed to close ticket.",
+			});
 		}
 	}
 

@@ -9,6 +9,7 @@ import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { BotEvents } from "@src/enums/BotEvents";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	ApplicationCommandOptionType,
 	AutocompleteInteraction,
@@ -58,14 +59,14 @@ export default class DebugCommand extends BaseCommand {
 
 	@DefaultCommand(EPermission.Debug)
 	async run(client: LeBotClient<true>, interaction: CommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		if (!interaction.isChatInputCommand()) return;
 
-		await interaction.reply({
+		await InteractionHelper.respond(interaction, {
 			content: t("modules.debug.commands.debug.unknown_action"),
-			flags: [MessageFlags.Ephemeral],
 		});
 	}
 

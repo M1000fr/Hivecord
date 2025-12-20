@@ -46,10 +46,11 @@ export default class ConfigCommand extends BaseCommand {
 			});
 		} catch (error) {
 			console.error("Backup creation failed:", error);
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.configuration.commands.config.backup_failed"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t(
+					"modules.configuration.commands.config.backup_failed",
+				),
+			});
 		}
 	}
 
@@ -64,10 +65,11 @@ export default class ConfigCommand extends BaseCommand {
 			const attachment = interaction.options.getAttachment("file", true);
 
 			if (!attachment.name.endsWith(".enc")) {
-				await InteractionHelper.respondError(
-					interaction,
-					t("modules.configuration.commands.config.invalid_file"),
-				);
+				await InteractionHelper.respond(interaction, {
+					content: t(
+						"modules.configuration.commands.config.invalid_file",
+					),
+				});
 				return;
 			}
 
@@ -83,10 +85,11 @@ export default class ConfigCommand extends BaseCommand {
 			// Restore the backup
 			await BackupService.restoreBackup(buffer, interaction.guildId!);
 
-			await InteractionHelper.respondSuccess(
-				interaction,
-				t("modules.configuration.commands.config.restore_success"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t(
+					"modules.configuration.commands.config.restore_success",
+				),
+			});
 		} catch (error) {
 			console.error("Backup restoration failed:", error);
 			const errorMessage =
@@ -94,7 +97,9 @@ export default class ConfigCommand extends BaseCommand {
 					? error.message
 					: t("modules.configuration.commands.config.restore_failed");
 
-			await InteractionHelper.respondError(interaction, errorMessage);
+			await InteractionHelper.respond(interaction, {
+				content: errorMessage,
+			});
 		}
 	}
 }
