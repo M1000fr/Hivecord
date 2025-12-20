@@ -54,10 +54,10 @@ export default class SyncCommand extends BaseCommand {
 		client: LeBotClient,
 		interaction: ChatInputCommandInteraction,
 	) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		await InteractionHelper.defer(interaction);
 
 		try {
 			const state = await WelcomeRoleSyncService.getState(
