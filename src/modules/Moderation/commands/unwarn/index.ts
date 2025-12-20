@@ -8,6 +8,7 @@ import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
@@ -53,7 +54,7 @@ export default class UnwarnCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: ChatInputCommandInteraction,
 	) {
-		await interaction.deferReply();
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -72,19 +73,24 @@ export default class UnwarnCommand extends BaseCommand {
 				moderator,
 				warnId,
 			);
-			await interaction.editReply(
-				t("modules.moderation.commands.unwarn.success", {
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.moderation.commands.unwarn.success", {
 					id: warnId,
 					userTag: user.tag,
 				}),
-			);
+			});
 		} catch (error: unknown) {
-			await interaction.editReply(
-				t("modules.moderation.commands.unwarn.failed_with_error", {
-					error:
-						error instanceof Error ? error.message : String(error),
-				}),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t(
+					"modules.moderation.commands.unwarn.failed_with_error",
+					{
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
+			});
 		}
 	}
 }

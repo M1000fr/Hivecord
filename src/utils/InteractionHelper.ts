@@ -1,4 +1,6 @@
 import {
+	InteractionResponse,
+	Message,
 	MessageFlags,
 	type CommandInteraction,
 	type InteractionReplyOptions,
@@ -22,15 +24,19 @@ export class InteractionHelper {
 	static async respond(
 		interaction: RepliableInteraction,
 		payload: InteractionReplyOptions | InteractionUpdateOptions,
-	): Promise<void> {
+	): Promise<Message | InteractionResponse> {
 		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp(payload as InteractionReplyOptions);
+			return await interaction.followUp(
+				payload as InteractionReplyOptions,
+			);
 		} else if (interaction.isModalSubmit()) {
-			await interaction.reply(payload as InteractionReplyOptions);
+			return await interaction.reply(payload as InteractionReplyOptions);
 		} else if (interaction.isMessageComponent()) {
-			await interaction.update(payload as InteractionUpdateOptions);
+			return await interaction.update(
+				payload as InteractionUpdateOptions,
+			);
 		} else {
-			await interaction.reply(payload as InteractionReplyOptions);
+			return await interaction.reply(payload as InteractionReplyOptions);
 		}
 	}
 

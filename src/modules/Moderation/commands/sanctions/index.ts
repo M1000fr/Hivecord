@@ -319,7 +319,7 @@ export default class SanctionsCommand extends BaseCommand {
 			: await SanctionReasonService.getAll(interaction.guildId!);
 
 		if (reasons.length === 0) {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.sanctions.no_reasons_found",
 				),

@@ -4,6 +4,7 @@ import { EConfigType } from "@decorators/ConfigProperty";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
@@ -145,14 +146,14 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 					`${propertyOptions.description}\n\n**Current value:** ${formattedValue}\n\n✅ **File uploaded successfully!**`,
 				);
 
-				await interaction.editReply({
+				await InteractionHelper.respond(interaction, {
 					embeds: [newEmbed],
 				});
 
 				await m.delete().catch(() => {}); // Clean up user message
 			} catch (error) {
 				console.error("Failed to upload file:", error);
-				await interaction.followUp({
+				await InteractionHelper.respond(interaction, {
 					content: "❌ Failed to upload file.",
 				});
 			}

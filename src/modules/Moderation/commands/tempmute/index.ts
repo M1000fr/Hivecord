@@ -10,6 +10,7 @@ import { SanctionType } from "@prisma/client/client";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import { DurationParser } from "@utils/DurationParser";
 import {
 	AutocompleteInteraction,
@@ -50,7 +51,7 @@ export default class TempMuteCommand extends BaseCommand {
 	@DefaultCommand(EPermission.TempMute)
 	@BotPermission(PermissionsBitField.Flags.ManageRoles)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
-		await interaction.deferReply();
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -69,7 +70,7 @@ export default class TempMuteCommand extends BaseCommand {
 		}
 
 		if (!finalDurationString) {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.tempmute.select_predefined_reason",
 				),
@@ -79,7 +80,7 @@ export default class TempMuteCommand extends BaseCommand {
 
 		const duration = DurationParser.parse(finalDurationString);
 		if (!duration) {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.tempmute.invalid_duration",
 				),
@@ -98,15 +99,15 @@ export default class TempMuteCommand extends BaseCommand {
 				finalDurationString,
 				reason,
 			);
-			await interaction.editReply(
-				t("modules.moderation.commands.tempmute.success", {
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.moderation.commands.tempmute.success", {
 					userTag: user.tag,
 					duration: finalDurationString,
 					reason,
 				}),
-			);
+			});
 		} catch (error: unknown) {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content:
 					(error instanceof Error ? error.message : null) ||
 					t("modules.moderation.commands.tempmute.failed"),

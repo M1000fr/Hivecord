@@ -6,6 +6,7 @@ import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	ChatInputCommandInteraction,
 	Client,
@@ -19,7 +20,7 @@ export default class UnlockCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Unlock)
 	@BotPermission(PermissionsBitField.Flags.ManageChannels)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
-		await interaction.deferReply();
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -34,7 +35,7 @@ export default class UnlockCommand extends BaseCommand {
 		if (target === "channel") {
 			const channel = interaction.channel;
 			if (!channel || !("permissionOverwrites" in channel)) {
-				return interaction.editReply({
+				return InteractionHelper.respond(interaction, {
 					content: t(
 						"modules.moderation.commands.unlock.cannot_unlock_channel",
 					),
@@ -49,7 +50,7 @@ export default class UnlockCommand extends BaseCommand {
 				{ reason: `Unlock Command: ${reason}` },
 			);
 
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.unlock.channel_success",
 					{
@@ -63,7 +64,7 @@ export default class UnlockCommand extends BaseCommand {
 					PermissionsBitField.Flags.Administrator,
 				)
 			) {
-				return interaction.editReply({
+				return InteractionHelper.respond(interaction, {
 					content: t(
 						"modules.moderation.commands.unlock.admin_required",
 					),
@@ -80,7 +81,7 @@ export default class UnlockCommand extends BaseCommand {
 				newPermissions,
 				`Server Unlock Command: ${reason}`,
 			);
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.unlock.server_success",
 					{
