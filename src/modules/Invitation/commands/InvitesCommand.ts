@@ -5,6 +5,7 @@ import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	ApplicationCommandOptionType,
 	ChatInputCommandInteraction,
@@ -43,6 +44,7 @@ import { InvitationService } from "../services/InvitationService";
 export default class InvitesCommand extends BaseCommand {
 	@Subcommand({ name: "view", permission: EPermission.Invites })
 	async view(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -80,11 +82,12 @@ export default class InvitesCommand extends BaseCommand {
 			)
 			.setTimestamp();
 
-		await interaction.reply({ embeds: [embed] });
+		await InteractionHelper.respond(interaction, { embeds: [embed] });
 	}
 
 	@Subcommand({ name: "top", permission: EPermission.Invites })
 	async top(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -122,6 +125,6 @@ export default class InvitesCommand extends BaseCommand {
 			.setFooter({ text: t("modules.invitation.commands.top.footer") })
 			.setTimestamp();
 
-		await interaction.reply({ embeds: [embed] });
+		await InteractionHelper.respond(interaction, { embeds: [embed] });
 	}
 }
