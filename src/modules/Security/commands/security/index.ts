@@ -7,10 +7,10 @@ import { HeatpointService } from "@modules/Security/services/HeatpointService";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	ChatInputCommandInteraction,
 	Client,
-	MessageFlags,
 	PermissionsBitField,
 } from "discord.js";
 import { securityOptions } from "./securityOptions";
@@ -20,6 +20,7 @@ export default class SecurityCommand extends BaseCommand {
 	@DefaultCommand(EPermission.SecurityHeatpoint)
 	@BotPermission(PermissionsBitField.Flags.ModerateMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -34,7 +35,7 @@ export default class SecurityCommand extends BaseCommand {
 					`user:${user.id}`,
 				);
 
-				await interaction.reply({
+				await InteractionHelper.respond(interaction, {
 					content: t(
 						"modules.security.commands.security.heatpoints_user",
 						{
@@ -42,7 +43,6 @@ export default class SecurityCommand extends BaseCommand {
 							heatpoints: Math.round(heat),
 						},
 					),
-					flags: [MessageFlags.Ephemeral],
 				});
 			} else if (subcommand === "reset") {
 				const target = interaction.options.getString("target", true);
@@ -53,11 +53,10 @@ export default class SecurityCommand extends BaseCommand {
 					await HeatpointService.resetAllUserHeat(
 						interaction.guildId!,
 					);
-					await interaction.reply({
+					await InteractionHelper.respond(interaction, {
 						content: t(
 							"modules.security.commands.security.reset_all_users",
 						),
-						flags: [MessageFlags.Ephemeral],
 					});
 				} else if (target === "channel") {
 					const channel =
@@ -68,19 +67,17 @@ export default class SecurityCommand extends BaseCommand {
 							interaction.guildId!,
 							`channel:${channel.id}`,
 						);
-						await interaction.reply({
+						await InteractionHelper.respond(interaction, {
 							content: t(
 								"modules.security.commands.security.reset_channel",
 								{ channel: channel.toString() },
 							),
-							flags: [MessageFlags.Ephemeral],
 						});
 					} else {
-						await interaction.reply({
+						await InteractionHelper.respond(interaction, {
 							content: t(
 								"modules.security.commands.security.channel_not_found",
 							),
-							flags: [MessageFlags.Ephemeral],
 						});
 					}
 				} else if (target === "server") {
@@ -88,11 +85,10 @@ export default class SecurityCommand extends BaseCommand {
 						interaction.guildId!,
 						`global:${guild.id}`,
 					);
-					await interaction.reply({
+					await InteractionHelper.respond(interaction, {
 						content: t(
 							"modules.security.commands.security.reset_server",
 						),
-						flags: [MessageFlags.Ephemeral],
 					});
 				}
 			}
