@@ -50,13 +50,12 @@ export default class GroupCommand extends BaseCommand {
 
 	@Subcommand({ name: "create", permission: EPermission.GroupsCreate })
 	async create(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		const role = interaction.options.getRole("role", true);
-
-		await InteractionHelper.defer(interaction);
 
 		if (!interaction.guild) return;
 
@@ -84,12 +83,11 @@ export default class GroupCommand extends BaseCommand {
 
 	@Subcommand({ name: "delete", permission: EPermission.GroupsDelete })
 	async delete(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
-
-		await InteractionHelper.defer(interaction);
 
 		try {
 			await GroupService.deleteGroup(interaction.guildId!, name);
@@ -118,12 +116,11 @@ export default class GroupCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		await InteractionHelper.defer(interaction, true);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const groupName = interaction.options.getString("group", true);
-
-		await InteractionHelper.defer(interaction, true);
 
 		try {
 			const group = await GroupService.getGroup(
@@ -218,10 +215,10 @@ export default class GroupCommand extends BaseCommand {
 
 	@Subcommand({ name: "list", permission: EPermission.GroupsList })
 	async list(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction, false);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		await InteractionHelper.defer(interaction, false);
 
 		try {
 			const groups = await GroupService.listGroups(interaction.guildId!);
