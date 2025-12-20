@@ -10,7 +10,6 @@ import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	ChatInputCommandInteraction,
 	Client,
-	MessageFlags,
 	PermissionsBitField,
 } from "discord.js";
 import { unbanOptions } from "./unbanOptions";
@@ -20,6 +19,7 @@ export default class UnbanCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Unban)
 	@BotPermission(PermissionsBitField.Flags.BanMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -29,17 +29,16 @@ export default class UnbanCommand extends BaseCommand {
 
 		try {
 			await SanctionService.unban(interaction.guild, user);
-			await interaction.reply(
+			await interaction.editReply(
 				t("modules.moderation.commands.unban.success", {
 					userTag: user.tag,
 				}),
 			);
 		} catch (error: unknown) {
-			await interaction.reply({
+			await interaction.editReply({
 				content:
 					(error instanceof Error ? error.message : null) ||
 					t("modules.moderation.commands.unban.failed"),
-				flags: [MessageFlags.Ephemeral],
 			});
 		}
 	}

@@ -1,5 +1,7 @@
 import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
+import { ModuleConfig } from "@decorators/ModuleConfig";
 
+@ModuleConfig()
 export class TicketConfig {
 	@ConfigProperty({
 		description: "The channel where the ticket creation panel will be sent",

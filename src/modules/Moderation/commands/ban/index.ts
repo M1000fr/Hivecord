@@ -14,7 +14,6 @@ import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
-	MessageFlags,
 	PermissionsBitField,
 } from "discord.js";
 import { banOptions } from "./banOptions";
@@ -46,6 +45,7 @@ export default class BanCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Ban)
 	@BotPermission(PermissionsBitField.Flags.BanMembers)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -65,18 +65,17 @@ export default class BanCommand extends BaseCommand {
 				reason,
 				deleteMessagesDays * 24 * 60 * 60,
 			);
-			await interaction.reply(
+			await interaction.editReply(
 				t("modules.moderation.commands.ban.success", {
 					userTag: user.tag,
 					reason: reason,
 				}),
 			);
 		} catch (error: unknown) {
-			await interaction.reply({
+			await interaction.editReply({
 				content:
 					(error instanceof Error ? error.message : null) ||
 					t("modules.moderation.commands.ban.error"),
-				flags: [MessageFlags.Ephemeral],
 			});
 		}
 	}

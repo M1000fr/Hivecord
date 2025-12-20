@@ -282,11 +282,17 @@ export class LeBotClient<
 								break;
 							}
 						} catch {
-							// Ignore instantiation errors
+							this.logger.warn(
+								`Failed to instantiate exported class ${exportedKey} from ${moduleFile}.`,
+							);
 						}
 					}
-				} catch {
-					// Ignore import errors
+				} catch (error) {
+					this.logger.error(
+						`Failed to load module from ${moduleFile}:`,
+						error instanceof Error ? error.stack : String(error),
+					);
+					throw error;
 				}
 			}
 		}

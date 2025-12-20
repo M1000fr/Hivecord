@@ -15,7 +15,6 @@ import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
-	MessageFlags,
 	PermissionsBitField,
 } from "discord.js";
 import { tempMuteOptions } from "./tempMuteOptions";
@@ -51,6 +50,7 @@ export default class TempMuteCommand extends BaseCommand {
 	@DefaultCommand(EPermission.TempMute)
 	@BotPermission(PermissionsBitField.Flags.ManageRoles)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -69,22 +69,20 @@ export default class TempMuteCommand extends BaseCommand {
 		}
 
 		if (!finalDurationString) {
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.tempmute.select_predefined_reason",
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
 		const duration = DurationParser.parse(finalDurationString);
 		if (!duration) {
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.tempmute.invalid_duration",
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
@@ -100,7 +98,7 @@ export default class TempMuteCommand extends BaseCommand {
 				finalDurationString,
 				reason,
 			);
-			await interaction.reply(
+			await interaction.editReply(
 				t("modules.moderation.commands.tempmute.success", {
 					userTag: user.tag,
 					duration: finalDurationString,
@@ -108,11 +106,10 @@ export default class TempMuteCommand extends BaseCommand {
 				}),
 			);
 		} catch (error: unknown) {
-			await interaction.reply({
+			await interaction.editReply({
 				content:
 					(error instanceof Error ? error.message : null) ||
 					t("modules.moderation.commands.tempmute.failed"),
-				flags: [MessageFlags.Ephemeral],
 			});
 		}
 	}

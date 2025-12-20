@@ -3,7 +3,12 @@ import { LeBotClient } from "@class/LeBotClient";
 import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
 import { Logger } from "@utils/Logger";
-import { type Interaction, type RepliableInteraction } from "discord.js";
+import {
+	MessageFlags,
+	type Interaction,
+	type InteractionReplyOptions,
+	type RepliableInteraction,
+} from "discord.js";
 
 @Event({
 	name: BotEvents.InteractionCreate,
@@ -17,9 +22,9 @@ export default class InteractionCreateEvent extends BaseEvent<
 		interaction: RepliableInteraction,
 		message: string,
 	): Promise<void> {
-		const payload = {
+		const payload: InteractionReplyOptions = {
 			content: message,
-			ephemeral: true,
+			flags: [MessageFlags.Ephemeral],
 		};
 		if (interaction.replied || interaction.deferred) {
 			await interaction.followUp(payload);

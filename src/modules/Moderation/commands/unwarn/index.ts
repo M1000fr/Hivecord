@@ -53,6 +53,7 @@ export default class UnwarnCommand extends BaseCommand {
 		client: LeBotClient<true>,
 		interaction: ChatInputCommandInteraction,
 	) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);

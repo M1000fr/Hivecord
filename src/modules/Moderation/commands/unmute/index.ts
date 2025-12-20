@@ -10,7 +10,6 @@ import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	ChatInputCommandInteraction,
 	Client,
-	MessageFlags,
 	PermissionsBitField,
 } from "discord.js";
 import { unmuteOptions } from "./unmuteOptions";
@@ -20,6 +19,7 @@ export default class UnmuteCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Unmute)
 	@BotPermission(PermissionsBitField.Flags.ManageRoles)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -29,17 +29,16 @@ export default class UnmuteCommand extends BaseCommand {
 
 		try {
 			await SanctionService.unmute(interaction.guild, user);
-			await interaction.reply(
+			await interaction.editReply(
 				t("modules.moderation.commands.unmute.success", {
 					userTag: user.tag,
 				}),
 			);
 		} catch (error: unknown) {
-			await interaction.reply({
+			await interaction.editReply({
 				content:
 					(error instanceof Error ? error.message : null) ||
 					t("modules.moderation.commands.unmute.failed"),
-				flags: [MessageFlags.Ephemeral],
 			});
 		}
 	}

@@ -1,14 +1,21 @@
+import type { IModuleConfigClass } from "@decorators/ModuleConfig";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
 
 export function Module(options: ModuleOptions) {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return function <T extends { new (...args: any[]): object }>(
-		constructor: T,
-	) {
-		// Validation: @Module ne peut être utilisé que sur des classes (pas sur des méthodes)
+	if (options.config) {
+		const configClass = options.config as unknown as IModuleConfigClass;
+		if (!configClass.isModuleConfig) {
+			throw new Error(
+				`The configuration class ${options.config.name} in module ${options.name} must be decorated with @ModuleConfig().`,
+			);
+		}
+	}
+
+	return function <T extends { new (): object }>(constructor: T) {
 		if (typeof constructor !== "function") {
 			throw new Error(`@Module decorator can only be used on classes.`);
 		}
+		// @ts-expect-error: Mixin requires any[] constructor
 		return class extends constructor {
 			public moduleOptions = options;
 		};
