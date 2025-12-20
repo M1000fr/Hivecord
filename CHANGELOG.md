@@ -1,3 +1,10 @@
+# [1.0.0-dev.4](https://github.com/M1000fr/LeBot/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2025-12-20)
+
+### Bug Fixes
+
+- add DATABASE_URL environment variable for Prisma Client generation ([69813c4](https://github.com/M1000fr/LeBot/commit/69813c4b5cfdcb6ed5bc28fbbb296ec2f39614ab))
+- extract version from package.json for Docker image tagging ([50aaff6](https://github.com/M1000fr/LeBot/commit/50aaff6e0b1c542b16e67ff8b7a959abe42b7d85))
+
 # [1.0.0-dev.3](https://github.com/M1000fr/LeBot/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2025-12-20)
 
 ### Bug Fixes
