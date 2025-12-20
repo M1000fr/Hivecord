@@ -9,6 +9,7 @@
 		"@semantic-release/changelog": "^6.0.3",
 		"@semantic-release/git": "^10.0.1",
 		"@semantic-release/github": "^12.0.2",
+		"@semantic-release/npm": "^13.1.3",
 		"@types/bun": "latest",
 		"eslint": "^9.39.2",
 		"globals": "^16.5.0",
@@ -47,9 +48,9 @@
 		"start": "bunx prisma migrate deploy && bun .",
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit",
 		"lint": "eslint .",
+		"check:errors": "bun run typecheck && bun run lint",
 		"i18n:missing": "bun scripts/findMissingKeys.ts",
-		"prepare": "husky",
-		"check:errors": "bunx tsc -p tsconfig.json --noEmit && eslint ."
+		"prepare": "husky"
 	},
 	"lint-staged": {
 		"**/*.{ts,js,json,md}": [
