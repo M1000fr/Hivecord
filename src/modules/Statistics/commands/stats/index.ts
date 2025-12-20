@@ -7,6 +7,7 @@ import type { TimeRange } from "@modules/Statistics/types";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import { ChartGenerator } from "@utils/ChartGenerator";
 import {
 	ActionRowBuilder,
@@ -26,14 +27,15 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		await interaction.deferReply();
+
 		if (!interaction.guild) {
-			await interaction.editReply(
-				t("modules.statistics.commands.stats.server_only"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.statistics.commands.stats.server_only"),
+			});
 			return;
 		}
 		const period = "24h"; // default initial period handled via buttons
@@ -42,9 +44,9 @@ export default class StatsCommand extends BaseCommand {
 			await this.handleServerStats(interaction, timeRange, period);
 		} catch (error) {
 			console.error("Error fetching server stats:", error);
-			await interaction.editReply(
-				t("modules.statistics.commands.stats.server_error"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.statistics.commands.stats.server_error"),
+			});
 		}
 	}
 
@@ -53,14 +55,14 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		await interaction.deferReply();
 		if (!interaction.guild) {
-			await interaction.editReply(
-				t("modules.statistics.commands.stats.server_only"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.statistics.commands.stats.server_only"),
+			});
 			return;
 		}
 		const period = "24h"; // default period
@@ -75,9 +77,9 @@ export default class StatsCommand extends BaseCommand {
 			);
 		} catch (error) {
 			console.error("Error fetching personal stats:", error);
-			await interaction.editReply(
-				t("modules.statistics.commands.stats.user_error"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.statistics.commands.stats.user_error"),
+			});
 		}
 	}
 
@@ -86,21 +88,21 @@ export default class StatsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		await interaction.deferReply();
 		if (!interaction.guild) {
-			await interaction.editReply(
-				t("modules.statistics.commands.stats.server_only"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.statistics.commands.stats.server_only"),
+			});
 			return;
 		}
 		const target = interaction.options.getUser("target");
 		if (!target) {
-			await interaction.editReply(
-				t("modules.statistics.commands.stats.user_required"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.statistics.commands.stats.user_required"),
+			});
 			return;
 		}
 		const period = "24h"; // default period
@@ -115,9 +117,9 @@ export default class StatsCommand extends BaseCommand {
 			);
 		} catch (error) {
 			console.error("Error fetching user stats:", error);
-			await interaction.editReply(
-				t("modules.statistics.commands.stats.user_error"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.statistics.commands.stats.user_error"),
+			});
 		}
 	}
 
@@ -161,6 +163,7 @@ export default class StatsCommand extends BaseCommand {
 		username: string,
 		period: string,
 	): Promise<void> {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -261,7 +264,7 @@ export default class StatsCommand extends BaseCommand {
 			});
 		}
 
-		await interaction.editReply({
+		await InteractionHelper.respond(interaction, {
 			embeds: [embed],
 			files: [chartAttachment],
 			components: [
@@ -280,6 +283,7 @@ export default class StatsCommand extends BaseCommand {
 		timeRange: TimeRange,
 		period: string,
 	): Promise<void> {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -409,7 +413,7 @@ export default class StatsCommand extends BaseCommand {
 			});
 		}
 
-		await interaction.editReply({
+		await InteractionHelper.respond(interaction, {
 			embeds: [embed],
 			files: [statsAttachment],
 			components: [
