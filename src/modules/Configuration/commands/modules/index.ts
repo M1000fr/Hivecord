@@ -7,12 +7,12 @@ import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
-	MessageFlags,
 } from "discord.js";
 import { modulesOptions } from "./modulesOptions";
 
@@ -39,6 +39,7 @@ export default class ModulesCommand extends BaseCommand {
 
 	@DefaultCommand(EPermission.ConfigureModules)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -48,21 +49,19 @@ export default class ModulesCommand extends BaseCommand {
 		const module = lebot.modules.get(moduleName.toLowerCase());
 
 		if (!module) {
-			await interaction.reply({
+			await InteractionHelper.respond(interaction, {
 				content: t("modules.configuration.commands.modules.not_found", {
 					module: moduleName,
 				}),
-				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
 		if (!module.options.config) {
-			await interaction.reply({
+			await InteractionHelper.respond(interaction, {
 				content: t("modules.configuration.commands.modules.no_config", {
 					module: module.options.name,
 				}),
-				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
@@ -76,19 +75,18 @@ export default class ModulesCommand extends BaseCommand {
 		);
 
 		if (!config) {
-			await interaction.reply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.configuration.commands.modules.build_failed",
 					{
 						module: module.options.name,
 					},
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
-		await interaction.reply({
+		await InteractionHelper.respond(interaction, {
 			embeds: [config.embed],
 			components: [config.row],
 		});
