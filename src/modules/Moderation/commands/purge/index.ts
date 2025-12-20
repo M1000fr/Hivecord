@@ -6,36 +6,30 @@ import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
-import {
-	ChatInputCommandInteraction,
-	Client,
-	MessageFlags,
-	TextChannel,
-} from "discord.js";
+import { ChatInputCommandInteraction, Client, TextChannel } from "discord.js";
 import { purgeOptions } from "./purgeOptions";
 
 @Command(purgeOptions)
 export default class PurgeCommand extends BaseCommand {
 	@DefaultCommand(EPermission.ChannelPurge)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const channel = interaction.channel;
 
 		if (!channel || !(channel instanceof TextChannel)) {
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.purge.text_channel_only",
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
 
-		await interaction.reply({
+		await interaction.editReply({
 			content: t("modules.moderation.commands.purge.purging"),
-			flags: [MessageFlags.Ephemeral],
 		});
 
 		const oldId = channel.id;

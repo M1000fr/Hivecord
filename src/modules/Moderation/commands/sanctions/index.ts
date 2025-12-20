@@ -14,7 +14,6 @@ import {
 	Client,
 	Colors,
 	EmbedBuilder,
-	MessageFlags,
 } from "discord.js";
 import { sanctionsOptions } from "./sanctionsOptions";
 
@@ -25,6 +24,7 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -37,14 +37,13 @@ export default class SanctionsCommand extends BaseCommand {
 		});
 
 		if (sanctions.length === 0) {
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.sanctions.no_sanctions",
 					{
 						userTag: targetUser.tag,
 					},
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
@@ -182,13 +181,12 @@ export default class SanctionsCommand extends BaseCommand {
 				});
 			}
 
-			await interaction.reply({ embeds: [embed] });
+			await interaction.editReply({ embeds: [embed] });
 		} catch {
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.sanctions.reason_add_failed",
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 		}
 	}
@@ -210,11 +208,10 @@ export default class SanctionsCommand extends BaseCommand {
 		const duration = interaction.options.getString("duration");
 
 		if (!text && !duration) {
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.sanctions.edit_provide_field",
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
@@ -222,22 +219,20 @@ export default class SanctionsCommand extends BaseCommand {
 		try {
 			const reason = await SanctionReasonService.getById(id);
 			if (!reason) {
-				await interaction.reply({
+				await interaction.editReply({
 					content: t(
 						"modules.moderation.commands.sanctions.reason_not_found",
 						{ id },
 					),
-					flags: [MessageFlags.Ephemeral],
 				});
 				return;
 			}
 
 			if (reason.isSystem) {
-				await interaction.reply({
+				await interaction.editReply({
 					content: t(
 						"modules.moderation.commands.sanctions.cannot_edit_system",
 					),
-					flags: [MessageFlags.Ephemeral],
 				});
 				return;
 			}
@@ -247,20 +242,18 @@ export default class SanctionsCommand extends BaseCommand {
 				duration: duration || undefined,
 			});
 
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.sanctions.reason_updated",
 					{ id },
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 		} catch {
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.sanctions.reason_update_failed",
 					{ id },
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 		}
 	}
@@ -281,20 +274,18 @@ export default class SanctionsCommand extends BaseCommand {
 
 		try {
 			await SanctionReasonService.delete(id);
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.sanctions.reason_removed",
 					{ id },
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 		} catch {
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.sanctions.reason_remove_failed",
 					{ id },
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 		}
 	}
@@ -323,11 +314,10 @@ export default class SanctionsCommand extends BaseCommand {
 			: await SanctionReasonService.getAll(interaction.guildId!);
 
 		if (reasons.length === 0) {
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.sanctions.no_reasons_found",
 				),
-				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
@@ -347,6 +337,6 @@ export default class SanctionsCommand extends BaseCommand {
 
 		embed.setDescription(description.substring(0, 4096));
 
-		await interaction.reply({ embeds: [embed] });
+		await interaction.editReply({ embeds: [embed] });
 	}
 }

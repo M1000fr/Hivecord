@@ -9,7 +9,6 @@ import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	ChatInputCommandInteraction,
 	Client,
-	MessageFlags,
 	PermissionsBitField,
 	TextChannel,
 } from "discord.js";
@@ -20,6 +19,7 @@ export default class UnlockCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Unlock)
 	@BotPermission(PermissionsBitField.Flags.ManageChannels)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -34,11 +34,10 @@ export default class UnlockCommand extends BaseCommand {
 		if (target === "channel") {
 			const channel = interaction.channel;
 			if (!channel || !("permissionOverwrites" in channel)) {
-				return interaction.reply({
+				return interaction.editReply({
 					content: t(
 						"modules.moderation.commands.unlock.cannot_unlock_channel",
 					),
-					flags: [MessageFlags.Ephemeral],
 				});
 			}
 
@@ -50,7 +49,7 @@ export default class UnlockCommand extends BaseCommand {
 				{ reason: `Unlock Command: ${reason}` },
 			);
 
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.unlock.channel_success",
 					{
@@ -64,11 +63,10 @@ export default class UnlockCommand extends BaseCommand {
 					PermissionsBitField.Flags.Administrator,
 				)
 			) {
-				return interaction.reply({
+				return interaction.editReply({
 					content: t(
 						"modules.moderation.commands.unlock.admin_required",
 					),
-					flags: [MessageFlags.Ephemeral],
 				});
 			}
 
@@ -82,7 +80,7 @@ export default class UnlockCommand extends BaseCommand {
 				newPermissions,
 				`Server Unlock Command: ${reason}`,
 			);
-			await interaction.reply({
+			await interaction.editReply({
 				content: t(
 					"modules.moderation.commands.unlock.server_success",
 					{
