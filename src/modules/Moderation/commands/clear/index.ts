@@ -9,7 +9,6 @@ import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	ChatInputCommandInteraction,
 	Client,
-	MessageFlags,
 	PermissionFlagsBits,
 } from "discord.js";
 import { clearOptions } from "./clearOptions";
@@ -19,6 +18,7 @@ export default class ClearCommand extends BaseCommand {
 	@DefaultCommand(EPermission.ChannelClear)
 	@BotPermission(PermissionFlagsBits.ManageMessages)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -27,9 +27,8 @@ export default class ClearCommand extends BaseCommand {
 		let deletedMessages;
 
 		if (isNaN(Number(amount)) || Number(amount) <= 0) {
-			await interaction.reply({
+			await interaction.editReply({
 				content: t("modules.moderation.commands.clear.invalid_amount"),
-				flags: [MessageFlags.Ephemeral],
 			});
 			return;
 		}
