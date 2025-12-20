@@ -193,7 +193,7 @@ export default class GroupCommand extends BaseCommand {
 				.setColor(Colors.Blue)
 				.setTimestamp();
 
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: null,
 				embeds: [embed],
 				components: rows,
@@ -223,9 +223,11 @@ export default class GroupCommand extends BaseCommand {
 		try {
 			const groups = await GroupService.listGroups(interaction.guildId!);
 			if (groups.length === 0) {
-				await interaction.editReply(
-					t("modules.configuration.commands.group.no_groups"),
-				);
+				await InteractionHelper.respond(interaction, {
+					content: t(
+						"modules.configuration.commands.group.no_groups",
+					),
+				});
 				return;
 			}
 

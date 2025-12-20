@@ -116,7 +116,7 @@ export class GroupPermissionInteractions {
 				.setColor(Colors.Blue)
 				.setTimestamp();
 
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: null,
 				embeds: [embed],
 				components: rows,

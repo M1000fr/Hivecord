@@ -6,6 +6,7 @@ import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { BotPermission } from "@src/decorators/BotPermission";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	ChatInputCommandInteraction,
 	Client,
@@ -18,7 +19,7 @@ export default class ClearCommand extends BaseCommand {
 	@DefaultCommand(EPermission.ChannelClear)
 	@BotPermission(PermissionFlagsBits.ManageMessages)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
-		await interaction.deferReply();
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -27,7 +28,7 @@ export default class ClearCommand extends BaseCommand {
 		let deletedMessages;
 
 		if (isNaN(Number(amount)) || Number(amount) <= 0) {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t("modules.moderation.commands.clear.invalid_amount"),
 			});
 			return;
@@ -62,16 +63,14 @@ export default class ClearCommand extends BaseCommand {
 			}
 		}
 
-		await interaction
-			.reply({
-				content: t("modules.moderation.commands.clear.success", {
-					count: deletedMessages?.size || 0,
-				}),
-			})
-			.then((msg) => {
-				setTimeout(() => {
-					msg.delete().catch(() => {});
-				}, 5000);
-			});
+		await InteractionHelper.respond(interaction, {
+			content: t("modules.moderation.commands.clear.success", {
+				count: deletedMessages?.size || 0,
+			}),
+		}).then((msg) => {
+			setTimeout(() => {
+				msg.delete().catch(() => {});
+			}, 5000);
+		});
 	}
 }

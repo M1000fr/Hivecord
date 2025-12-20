@@ -7,6 +7,7 @@ import { SanctionService } from "@modules/Moderation/services/SanctionService";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	ChatInputCommandInteraction,
 	Client,
@@ -19,7 +20,7 @@ export default class UnmuteCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Unmute)
 	@BotPermission(PermissionsBitField.Flags.ManageRoles)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
-		await interaction.deferReply();
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -29,13 +30,13 @@ export default class UnmuteCommand extends BaseCommand {
 
 		try {
 			await SanctionService.unmute(interaction.guild, user);
-			await interaction.editReply(
-				t("modules.moderation.commands.unmute.success", {
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.moderation.commands.unmute.success", {
 					userTag: user.tag,
 				}),
-			);
+			});
 		} catch (error: unknown) {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content:
 					(error instanceof Error ? error.message : null) ||
 					t("modules.moderation.commands.unmute.failed"),

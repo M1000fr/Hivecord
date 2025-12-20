@@ -19,12 +19,11 @@ import { configOptions } from "./configOptions";
 export default class ConfigCommand extends BaseCommand {
 	@Subcommand({ name: "backup", permission: EPermission.ConfigureModules })
 	async backup(client: Client, interaction: ChatInputCommandInteraction) {
+		await InteractionHelper.defer(interaction, true);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const lebot = client as LeBotClient<true>;
-
-		await InteractionHelper.defer(interaction, true);
 
 		try {
 			const buffer = await BackupService.createBackup(
@@ -38,7 +37,7 @@ export default class ConfigCommand extends BaseCommand {
 				name: filename,
 			});
 
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.configuration.commands.config.backup_success",
 				),

@@ -89,7 +89,7 @@ export class AchievementCommand extends BaseCommand {
 			});
 		}
 
-		await interaction.editReply({ embeds: [embed] });
+		await InteractionHelper.respond(interaction, { embeds: [embed] });
 	}
 
 	@Subcommand({
@@ -150,7 +150,7 @@ export class AchievementCommand extends BaseCommand {
 				},
 			);
 
-		await interaction.editReply({ embeds: [embed] });
+		await InteractionHelper.respond(interaction, { embeds: [embed] });
 	}
 
 	@Autocomplete({ optionName: "id" })

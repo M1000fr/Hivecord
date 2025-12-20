@@ -6,6 +6,7 @@ import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	ChatInputCommandInteraction,
 	Client,
@@ -19,7 +20,7 @@ export default class LockCommand extends BaseCommand {
 	@DefaultCommand(EPermission.Lock)
 	@BotPermission(PermissionsBitField.Flags.ManageChannels)
 	async run(client: Client, interaction: ChatInputCommandInteraction) {
-		await interaction.deferReply();
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -33,7 +34,7 @@ export default class LockCommand extends BaseCommand {
 		if (target === "channel") {
 			const channel = interaction.channel;
 			if (!channel || !("permissionOverwrites" in channel)) {
-				return interaction.editReply({
+				return InteractionHelper.respond(interaction, {
 					content: t(
 						"modules.moderation.commands.lock.channel_error",
 					),
@@ -48,7 +49,7 @@ export default class LockCommand extends BaseCommand {
 				{ reason: `Lock Command: ${reason}` },
 			);
 
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t("modules.moderation.commands.lock.channel_success", {
 					reason: reason,
 				}),
@@ -59,7 +60,7 @@ export default class LockCommand extends BaseCommand {
 					PermissionsBitField.Flags.Administrator,
 				)
 			) {
-				return interaction.editReply({
+				return InteractionHelper.respond(interaction, {
 					content: t(
 						"modules.moderation.commands.lock.server_admin_error",
 					),
@@ -76,7 +77,7 @@ export default class LockCommand extends BaseCommand {
 				newPermissions,
 				`Server Lock Command: ${reason}`,
 			);
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t("modules.moderation.commands.lock.server_success", {
 					reason: reason,
 				}),
