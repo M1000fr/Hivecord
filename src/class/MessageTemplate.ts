@@ -1,9 +1,13 @@
+import { I18nService } from "@services/I18nService";
+
 export class MessageTemplate {
 	private template: string;
 	private context: Record<string, unknown> = {};
+	private locale: string = "en";
 
-	constructor(template: string) {
+	constructor(template: string, locale: string = "en") {
 		this.template = template;
+		this.locale = locale;
 	}
 
 	/**
@@ -49,7 +53,8 @@ export class MessageTemplate {
 	private replace(text: string): string {
 		return text.replace(/\{([a-zA-Z0-9_.]+)\}/g, (match, path) => {
 			const value = this.getValue(this.context, path);
-			if (value === undefined || value === null) return match;
+			if (value === undefined || value === null)
+				return I18nService.t("common.unknown", { lng: this.locale });
 
 			if (typeof value === "object") {
 				// Check if it has a custom toString method

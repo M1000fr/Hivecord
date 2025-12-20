@@ -1,5 +1,6 @@
 {
 	"common": {
+		"unknown": "Unknown",
 		"pagination": {
 			"page_info": "Page {{current}}/{{total}}"
 		},
