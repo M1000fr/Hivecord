@@ -36,6 +36,12 @@ export default class WelcomeEvent extends BaseEvent<
 				member.guild.id,
 				GeneralConfig,
 			).generalWelcomeChannelId;
+
+			const language = await ConfigService.of(
+				member.guild.id,
+				GeneralConfig,
+			).generalLanguage;
+
 			if (!welcomeChannelId) {
 				this.logger.warn(
 					`No welcome channel configured for guild ${member.guild.id}.`,
@@ -106,6 +112,7 @@ export default class WelcomeEvent extends BaseEvent<
 
 			const welcomeMessageImageTemplate = new MessageTemplate(
 				welcomeMessageImageConfig || "Welcome!",
+				language,
 			);
 			Object.entries(commonContext).forEach(([key, value]) => {
 				if (value !== null && value !== undefined) {
@@ -156,6 +163,7 @@ export default class WelcomeEvent extends BaseEvent<
 			if (messageTemplateStr) {
 				const welcomeMessageTemplate = new MessageTemplate(
 					messageTemplateStr,
+					language,
 				);
 				Object.entries(commonContext).forEach(([key, value]) => {
 					if (value !== null && value !== undefined) {
