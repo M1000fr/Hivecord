@@ -9,6 +9,7 @@ import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	ChatInputCommandInteraction,
 	Client,
@@ -24,7 +25,7 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
-		await interaction.deferReply();
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -37,7 +38,7 @@ export default class SanctionsCommand extends BaseCommand {
 		});
 
 		if (sanctions.length === 0) {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.sanctions.no_sanctions",
 					{
@@ -134,6 +135,7 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -181,9 +183,9 @@ export default class SanctionsCommand extends BaseCommand {
 				});
 			}
 
-			await interaction.editReply({ embeds: [embed] });
+			await InteractionHelper.respond(interaction, { embeds: [embed] });
 		} catch {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.sanctions.reason_add_failed",
 				),
@@ -200,6 +202,7 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -208,7 +211,7 @@ export default class SanctionsCommand extends BaseCommand {
 		const duration = interaction.options.getString("duration");
 
 		if (!text && !duration) {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.sanctions.edit_provide_field",
 				),
@@ -219,7 +222,7 @@ export default class SanctionsCommand extends BaseCommand {
 		try {
 			const reason = await SanctionReasonService.getById(id);
 			if (!reason) {
-				await interaction.editReply({
+				await InteractionHelper.respond(interaction, {
 					content: t(
 						"modules.moderation.commands.sanctions.reason_not_found",
 						{ id },
@@ -229,7 +232,7 @@ export default class SanctionsCommand extends BaseCommand {
 			}
 
 			if (reason.isSystem) {
-				await interaction.editReply({
+				await InteractionHelper.respond(interaction, {
 					content: t(
 						"modules.moderation.commands.sanctions.cannot_edit_system",
 					),
@@ -242,14 +245,14 @@ export default class SanctionsCommand extends BaseCommand {
 				duration: duration || undefined,
 			});
 
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.sanctions.reason_updated",
 					{ id },
 				),
 			});
 		} catch {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.sanctions.reason_update_failed",
 					{ id },
@@ -267,6 +270,7 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		await interaction.deferReply();
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -274,14 +278,14 @@ export default class SanctionsCommand extends BaseCommand {
 
 		try {
 			await SanctionReasonService.delete(id);
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.sanctions.reason_removed",
 					{ id },
 				),
 			});
 		} catch {
-			await interaction.editReply({
+			await InteractionHelper.respond(interaction, {
 				content: t(
 					"modules.moderation.commands.sanctions.reason_remove_failed",
 					{ id },
@@ -299,6 +303,7 @@ export default class SanctionsCommand extends BaseCommand {
 		client: Client,
 		interaction: ChatInputCommandInteraction,
 	) {
+		await InteractionHelper.defer(interaction);
 		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
 			.generalLanguage;
 		const t = I18nService.getFixedT(lng);
@@ -337,6 +342,6 @@ export default class SanctionsCommand extends BaseCommand {
 
 		embed.setDescription(description.substring(0, 4096));
 
-		await interaction.editReply({ embeds: [embed] });
+		await InteractionHelper.respond(interaction, { embeds: [embed] });
 	}
 }
