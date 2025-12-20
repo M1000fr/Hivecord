@@ -1,3 +1,9 @@
+## [1.0.1-dev.1](https://github.com/M1000fr/LeBot/compare/v1.0.0...v1.0.1-dev.1) (2025-12-20)
+
+### Bug Fixes
+
+- **ci:** ignore main branch for pull requests ([9cc7d6e](https://github.com/M1000fr/LeBot/commit/9cc7d6e25c7275cb2b51eb8cc79bb68c187bff48))
+
 # [1.0.0-dev.5](https://github.com/M1000fr/LeBot/compare/v1.0.0-dev.4...v1.0.0-dev.5) (2025-12-20)
 
 ### Bug Fixes
