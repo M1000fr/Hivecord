@@ -39,10 +39,9 @@ export function BotPermission(...permissions: PermissionResolvable[]) {
 			}
 
 			if (interaction && !guild) {
-				await InteractionHelper.respondError(
-					interaction,
-					"This command can only be used in a server.",
-				);
+				await InteractionHelper.respond(interaction, {
+					content: "This command can only be used in a server.",
+				});
 				return;
 			}
 
@@ -50,10 +49,9 @@ export function BotPermission(...permissions: PermissionResolvable[]) {
 				const me = guild.members.me;
 				if (!me) {
 					if (interaction) {
-						await InteractionHelper.respondError(
-							interaction,
-							"I cannot verify my permissions.",
-						);
+						await InteractionHelper.respond(interaction, {
+							content: "I cannot verify my permissions.",
+						});
 					} else {
 						logger.warn(
 							`Cannot verify permissions in guild ${guild.id} (me is missing)`,
@@ -70,10 +68,9 @@ export function BotPermission(...permissions: PermissionResolvable[]) {
 						.join(", ");
 
 					if (interaction) {
-						await InteractionHelper.respondError(
-							interaction,
-							`I am missing the following permissions to perform this action: ${formattedPermissions}`,
-						);
+						await InteractionHelper.respond(interaction, {
+							content: `I am missing the following permissions to perform this action: ${formattedPermissions}`,
+						});
 					} else {
 						logger.warn(
 							`Missing permissions in guild ${guild.name} (${guild.id}) for method ${propertyKey}: ${formattedPermissions}`,

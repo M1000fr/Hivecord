@@ -62,18 +62,23 @@ export default class GroupCommand extends BaseCommand {
 
 		try {
 			await GroupService.createGroup(interaction.guild, name, role.id);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				t("modules.configuration.commands.group.created", { name }),
-			);
-		} catch (error: unknown) {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.configuration.commands.group.create_failed", {
-					error:
-						error instanceof Error ? error.message : String(error),
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.configuration.commands.group.created", {
+					name,
 				}),
-			);
+			});
+		} catch (error: unknown) {
+			await InteractionHelper.respond(interaction, {
+				content: t(
+					"modules.configuration.commands.group.create_failed",
+					{
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
+			});
 		}
 	}
 
@@ -88,18 +93,23 @@ export default class GroupCommand extends BaseCommand {
 
 		try {
 			await GroupService.deleteGroup(interaction.guildId!, name);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				t("modules.configuration.commands.group.deleted", { name }),
-			);
-		} catch (error: unknown) {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.configuration.commands.group.delete_failed", {
-					error:
-						error instanceof Error ? error.message : String(error),
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.configuration.commands.group.deleted", {
+					name,
 				}),
-			);
+			});
+		} catch (error: unknown) {
+			await InteractionHelper.respond(interaction, {
+				content: t(
+					"modules.configuration.commands.group.delete_failed",
+					{
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
+			});
 		}
 	}
 
@@ -121,13 +131,15 @@ export default class GroupCommand extends BaseCommand {
 				groupName,
 			);
 			if (!group) {
-				await InteractionHelper.respondError(
-					interaction,
-					t("modules.configuration.services.group.not_found", {
-						lng,
-						name: groupName,
-					}),
-				);
+				await InteractionHelper.respond(interaction, {
+					content: t(
+						"modules.configuration.services.group.not_found",
+						{
+							lng,
+							name: groupName,
+						},
+					),
+				});
 				return;
 			}
 
@@ -190,13 +202,17 @@ export default class GroupCommand extends BaseCommand {
 				components: rows,
 			});
 		} catch (error: unknown) {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.configuration.commands.group.permissions_failed", {
-					error:
-						error instanceof Error ? error.message : String(error),
-				}),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t(
+					"modules.configuration.commands.group.permissions_failed",
+					{
+						error:
+							error instanceof Error
+								? error.message
+								: String(error),
+					},
+				),
+			});
 		}
 	}
 
@@ -251,13 +267,12 @@ export default class GroupCommand extends BaseCommand {
 
 			await pager.start(interaction);
 		} catch (error: unknown) {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.configuration.commands.group.list_failed", {
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.configuration.commands.group.list_failed", {
 					error:
 						error instanceof Error ? error.message : String(error),
 				}),
-			);
+			});
 		}
 	}
 }

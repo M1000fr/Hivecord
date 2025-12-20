@@ -64,23 +64,20 @@ export default class SyncCommand extends BaseCommand {
 				interaction.guildId!,
 			);
 			if (state.isRunning) {
-				await InteractionHelper.respondError(
-					interaction,
-					t("modules.general.commands.sync.in_progress"),
-				);
+				await InteractionHelper.respond(interaction, {
+					content: t("modules.general.commands.sync.in_progress"),
+				});
 				return;
 			}
 
 			await WelcomeRoleSyncService.start(interaction.guild!);
-			await InteractionHelper.respondSuccess(
-				interaction,
-				t("modules.general.commands.sync.started"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.general.commands.sync.started"),
+			});
 		} catch {
-			await InteractionHelper.respondError(
-				interaction,
-				t("modules.general.commands.sync.failed"),
-			);
+			await InteractionHelper.respond(interaction, {
+				content: t("modules.general.commands.sync.failed"),
+			});
 		}
 	}
 }

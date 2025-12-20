@@ -1,6 +1,8 @@
 import {
 	MessageFlags,
 	type CommandInteraction,
+	type InteractionReplyOptions,
+	type InteractionUpdateOptions,
 	type MessageComponentInteraction,
 	type ModalSubmitInteraction,
 } from "discord.js";
@@ -19,26 +21,16 @@ export class InteractionHelper {
 	 */
 	static async respond(
 		interaction: RepliableInteraction,
-		content: string,
-		ephemeral = false,
+		payload: InteractionReplyOptions | InteractionUpdateOptions,
 	): Promise<void> {
-		const payload = {
-			content,
-			ephemeral,
-		};
-
 		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp(payload);
+			await interaction.followUp(payload as InteractionReplyOptions);
 		} else if (interaction.isModalSubmit()) {
-			await interaction.reply(payload);
+			await interaction.reply(payload as InteractionReplyOptions);
 		} else if (interaction.isMessageComponent()) {
-			await interaction.update({
-				...payload,
-				embeds: [],
-				components: [],
-			});
+			await interaction.update(payload as InteractionUpdateOptions);
 		} else {
-			await interaction.reply(payload);
+			await interaction.reply(payload as InteractionReplyOptions);
 		}
 	}
 
@@ -50,7 +42,7 @@ export class InteractionHelper {
 		error: string | Error,
 	): Promise<void> {
 		const message = error instanceof Error ? error.message : error;
-		await this.respond(interaction, `❌ ${message}`, true);
+		await this.respond(interaction, { content: `❌ ${message}` });
 	}
 
 	/**
@@ -58,9 +50,9 @@ export class InteractionHelper {
 	 */
 	static async respondSuccess(
 		interaction: RepliableInteraction,
-		message: string,
+		payload: InteractionReplyOptions | InteractionUpdateOptions,
 	): Promise<void> {
-		await this.respond(interaction, `✅ ${message}`, true);
+		await this.respond(interaction, payload);
 	}
 
 	/**

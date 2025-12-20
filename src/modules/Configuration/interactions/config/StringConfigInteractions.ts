@@ -62,10 +62,9 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		);
 
 		if (!propertyOptions) {
-			await InteractionHelper.respondError(
-				interaction,
-				"Property not found.",
-			);
+			await InteractionHelper.respond(interaction, {
+				content: "Property not found.",
+			});
 			return;
 		}
 

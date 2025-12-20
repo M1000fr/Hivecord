@@ -43,9 +43,9 @@ export abstract class BaseConfigInteractions {
 		isError = false,
 	) {
 		if (isError) {
-			await InteractionHelper.respondError(interaction, content);
+			await InteractionHelper.respond(interaction, { content });
 		} else {
-			await InteractionHelper.respond(interaction, content);
+			await InteractionHelper.respond(interaction, { content });
 		}
 	}
 
