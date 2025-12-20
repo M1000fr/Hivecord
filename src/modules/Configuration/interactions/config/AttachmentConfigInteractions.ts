@@ -130,25 +130,10 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 					true,
 				);
 
-				const formattedValue = ConfigHelper.formatValue(
-					filePath,
-					EConfigType.Attachment,
-					t,
+				// Delete interaction response and user message to reduce clutter
+				await InteractionHelper.deleteReply(interaction).catch(
+					() => {},
 				);
-				const newEmbed = this.buildPropertyEmbed(
-					propertyOptions,
-					selectedProperty,
-					formattedValue,
-					t,
-					lng,
-				);
-				newEmbed.setDescription(
-					`${propertyOptions.description}\n\n**Current value:** ${formattedValue}\n\n✅ **File uploaded successfully!**`,
-				);
-
-				await InteractionHelper.respond(interaction, {
-					embeds: [newEmbed],
-				});
 
 				await m.delete().catch(() => {}); // Clean up user message
 			} catch (error) {

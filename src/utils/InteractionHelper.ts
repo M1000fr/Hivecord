@@ -3,6 +3,7 @@ import {
 	Message,
 	MessageFlags,
 	type CommandInteraction,
+	type InteractionEditReplyOptions,
 	type InteractionReplyOptions,
 	type InteractionUpdateOptions,
 	type MessageComponentInteraction,
@@ -77,5 +78,22 @@ export class InteractionHelper {
 				flags: ephemeral ? MessageFlags.Ephemeral : undefined,
 			});
 		}
+	}
+
+	/**
+	 * Edit the original reply of an interaction
+	 */
+	static async editReply(
+		interaction: RepliableInteraction,
+		payload: InteractionEditReplyOptions,
+	): Promise<Message | InteractionResponse> {
+		return await interaction.editReply(payload);
+	}
+
+	/**
+	 * Delete the original reply of an interaction
+	 */
+	static async deleteReply(interaction: RepliableInteraction): Promise<void> {
+		await interaction.deleteReply();
 	}
 }
