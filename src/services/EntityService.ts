@@ -1,5 +1,4 @@
 import { ChannelType } from "@prisma/client/enums";
-import { prismaClient } from "@services/prismaService";
 import { Injectable } from "@src/decorators/Injectable";
 import {
 	ChannelType as DiscordChannelType,
@@ -8,10 +7,11 @@ import {
 	Role,
 	User,
 } from "discord.js";
+import type { PrismaService } from "./prismaService";
 
 @Injectable()
 export class EntityService {
-	constructor() {}
+	constructor(private readonly prisma: PrismaService) {}
 
 	async ensureGuild(guild: Guild) {
 		if (!guild || !guild.id) {
@@ -19,7 +19,7 @@ export class EntityService {
 				`Invalid guild provided to ensureGuild: ${JSON.stringify(guild)}`,
 			);
 		}
-		await prismaClient.guild.upsert({
+		await this.prisma.guild.upsert({
 			where: { id: guild.id },
 			update: { name: guild.name ?? "Unknown" },
 			create: { id: guild.id, name: guild.name ?? "Unknown" },
@@ -32,7 +32,7 @@ export class EntityService {
 				`Invalid guildId provided to ensureGuildById: ${guildId}`,
 			);
 		}
-		await prismaClient.guild.upsert({
+		await this.prisma.guild.upsert({
 			where: { id: guildId },
 			update: {},
 			create: { id: guildId, name: "Unknown" },
@@ -40,7 +40,7 @@ export class EntityService {
 	}
 
 	async ensureUser(user: User) {
-		await prismaClient.user.upsert({
+		await this.prisma.user.upsert({
 			where: { id: user.id },
 			update: { leftAt: null },
 			create: { id: user.id },
@@ -48,7 +48,7 @@ export class EntityService {
 	}
 
 	async ensureUserById(userId: string) {
-		await prismaClient.user.upsert({
+		await this.prisma.user.upsert({
 			where: { id: userId },
 			update: {},
 			create: { id: userId },
@@ -57,7 +57,7 @@ export class EntityService {
 
 	async ensureRole(role: Role) {
 		await this.ensureGuild(role.guild);
-		await prismaClient.role.upsert({
+		await this.prisma.role.upsert({
 			where: { id: role.id },
 			update: { deletedAt: null, guildId: role.guild.id },
 			create: { id: role.id, guildId: role.guild.id },
@@ -66,7 +66,7 @@ export class EntityService {
 
 	async ensureRoleById(guildId: string, roleId: string) {
 		await this.ensureGuildById(guildId);
-		await prismaClient.role.upsert({
+		await this.prisma.role.upsert({
 			where: { id: roleId },
 			update: { guildId },
 			create: { id: roleId, guildId },
@@ -90,7 +90,7 @@ export class EntityService {
 			type = ChannelType.TEXT;
 		}
 
-		await prismaClient.channel.upsert({
+		await this.prisma.channel.upsert({
 			where: { id: channel.id },
 			update: { type, deletedAt: null, guildId: channel.guild.id },
 			create: { id: channel.id, type, guildId: channel.guild.id },
@@ -103,7 +103,7 @@ export class EntityService {
 		type: ChannelType = ChannelType.TEXT,
 	) {
 		await this.ensureGuildById(guildId);
-		await prismaClient.channel.upsert({
+		await this.prisma.channel.upsert({
 			where: { id: channelId },
 			update: { type, guildId },
 			create: { id: channelId, type, guildId },

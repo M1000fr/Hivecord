@@ -1,3 +1,4 @@
+import { Injectable } from "@decorators/Injectable";
 import {
 	COMMAND_PARAMS_METADATA_KEY,
 	CommandParamType,
@@ -13,7 +14,7 @@ import type { IEventInstance } from "@interfaces/IEventInstance";
 import type { IModuleInstance } from "@interfaces/IModuleInstance";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
 import { PermissionService } from "@services/PermissionService";
-import { prismaClient } from "@services/prismaService";
+import { PrismaService } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
 import { createHash } from "crypto";
 import {
@@ -31,6 +32,7 @@ import { fileURLToPath, pathToFileURL } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+@Injectable()
 export class LeBotClient<
 	Ready extends boolean = boolean,
 > extends Client<Ready> {
@@ -46,7 +48,7 @@ export class LeBotClient<
 	private static instance: LeBotClient;
 	private logger = new Logger("LeBotClient");
 
-	constructor() {
+	constructor(public readonly prismaService: PrismaService) {
 		super({
 			intents: [
 				IntentsBitField.Flags.Guilds,
@@ -126,7 +128,7 @@ export class LeBotClient<
 				.update(JSON.stringify(commandsData))
 				.digest("hex");
 			const dbKey = `lebot:commands_hash:${debugGuildId || "global"}`;
-			const storedState = await prismaClient.botState.findUnique({
+			const storedState = await this.prismaService.botState.findUnique({
 				where: { key: dbKey },
 			});
 			const storedHash = storedState?.value;
@@ -174,7 +176,7 @@ export class LeBotClient<
 			}
 
 			// Update hash in DB
-			await prismaClient.botState.upsert({
+			await this.prismaService.botState.upsert({
 				where: { key: dbKey },
 				update: { value: hash },
 				create: { key: dbKey, value: hash },

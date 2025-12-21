@@ -1,5 +1,5 @@
 import { Injectable } from "@decorators/Injectable";
-import { prismaClient } from "@services/prismaService";
+import { PrismaService } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 
@@ -8,6 +8,8 @@ const CACHE_TTL = 60; // 60 seconds
 @Injectable()
 export class PermissionService {
 	private logger = new Logger("PermissionService");
+
+	constructor(private readonly prismaService: PrismaService) {}
 
 	async hasPermission(
 		userId: string,
@@ -29,7 +31,7 @@ export class PermissionService {
 			if (cached) {
 				permissions = JSON.parse(cached);
 			} else {
-				const groups = await prismaClient.group.findMany({
+				const groups = await this.prismaService.group.findMany({
 					where: { roleId },
 					include: {
 						Permissions: {
@@ -96,13 +98,14 @@ export class PermissionService {
 
 		const finalPermissions = Array.from(permissionsToRegister);
 
-		const existingPermissions = await prismaClient.permission.findMany({
-			where: {
-				name: {
-					in: finalPermissions,
+		const existingPermissions =
+			await this.prismaService.permission.findMany({
+				where: {
+					name: {
+						in: finalPermissions,
+					},
 				},
-			},
-		});
+			});
 
 		const existingPermissionNames = existingPermissions.map((p) => p.name);
 		const newPermissions = finalPermissions.filter(
@@ -110,7 +113,7 @@ export class PermissionService {
 		);
 
 		if (newPermissions.length > 0) {
-			await prismaClient.permission.createMany({
+			await this.prismaService.permission.createMany({
 				data: newPermissions.map((name) => ({ name })),
 				skipDuplicates: true,
 			});
@@ -121,7 +124,7 @@ export class PermissionService {
 	}
 
 	async getAllPermissions(): Promise<string[]> {
-		const permissions = await prismaClient.permission.findMany({
+		const permissions = await this.prismaService.permission.findMany({
 			select: { name: true },
 			orderBy: { name: "asc" },
 		});

@@ -9,7 +9,7 @@ import { ChannelType } from "@prisma/client/enums";
 import { ConfigRegistry } from "@registers/ConfigRegistry";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 import { EntityService } from "@services/EntityService";
-import { prismaClient } from "@services/prismaService";
+import { PrismaService } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 
@@ -23,7 +23,10 @@ export type ConfigProxy<T> = {
 export class ConfigService {
 	private logger = new Logger("ConfigService");
 
-	constructor(private readonly entityService: EntityService) {}
+	constructor(
+		private readonly entityService: EntityService,
+		private readonly prisma: PrismaService,
+	) {}
 
 	of<T extends object>(
 		guildId: string,
@@ -83,7 +86,7 @@ export class ConfigService {
 		const cached = await redis.get(cacheKey);
 		if (cached !== null) return cached as T;
 
-		const config = await prismaClient.configuration.findFirst({
+		const config = await this.prisma.configuration.findFirst({
 			where: { guildId, key },
 		});
 		let value = config?.value ?? null;
@@ -108,10 +111,10 @@ export class ConfigService {
 		this.logger.log(`Config updated [${guildId}]: ${key} = ${value}`);
 
 		// Ensure only one value exists for this key
-		await prismaClient.configuration.deleteMany({
+		await this.prisma.configuration.deleteMany({
 			where: { guildId, key },
 		});
-		await prismaClient.configuration.create({
+		await this.prisma.configuration.create({
 			data: { guildId, key, value },
 		});
 
@@ -125,7 +128,7 @@ export class ConfigService {
 		const cached = await redis.lrange(cacheKey, 0, -1);
 		if (cached && cached.length > 0) return cached;
 
-		const configs = await prismaClient.configuration.findMany({
+		const configs = await this.prisma.configuration.findMany({
 			where: { guildId, key },
 			orderBy: { id: "asc" },
 		});
@@ -153,12 +156,12 @@ export class ConfigService {
 			`Config list updated [${guildId}]: ${key} = [${values.join(", ")}]`,
 		);
 
-		await prismaClient.configuration.deleteMany({
+		await this.prisma.configuration.deleteMany({
 			where: { guildId, key },
 		});
 
 		if (values.length > 0) {
-			await prismaClient.configuration.createMany({
+			await this.prisma.configuration.createMany({
 				data: values.map((value) => ({ guildId, key, value })),
 			});
 			await redis.rpush(cacheKey, ...values);
@@ -185,7 +188,7 @@ export class ConfigService {
 		this.logger.log(`Config deleted [${guildId}]: ${key}`);
 
 		try {
-			await prismaClient.configuration.deleteMany({
+			await this.prisma.configuration.deleteMany({
 				where: { guildId, key },
 			});
 			await ConfigUpdateRegistry.execute(guildId, key, null);
@@ -200,7 +203,7 @@ export class ConfigService {
 		const cached = await redis.get(cacheKey);
 		if (cached) return cached;
 
-		const config = await prismaClient.channelConfiguration.findFirst({
+		const config = await this.prisma.channelConfiguration.findFirst({
 			where: {
 				key,
 				Channel: { guildId },
@@ -232,14 +235,14 @@ export class ConfigService {
 			channelType,
 		);
 
-		await prismaClient.$transaction([
-			prismaClient.channelConfiguration.deleteMany({
+		await this.prisma.$transaction([
+			this.prisma.channelConfiguration.deleteMany({
 				where: {
 					key,
 					Channel: { guildId },
 				},
 			}),
-			prismaClient.channelConfiguration.create({
+			this.prisma.channelConfiguration.create({
 				data: { key, channelId },
 			}),
 		]);
@@ -253,7 +256,7 @@ export class ConfigService {
 		const cached = await redis.get(cacheKey);
 		if (cached) return JSON.parse(cached);
 
-		const configs = await prismaClient.channelConfiguration.findMany({
+		const configs = await this.prisma.channelConfiguration.findMany({
 			where: {
 				key,
 				Channel: { guildId },
@@ -285,7 +288,7 @@ export class ConfigService {
 			channelType,
 		);
 
-		await prismaClient.channelConfiguration.upsert({
+		await this.prisma.channelConfiguration.upsert({
 			where: { key_channelId: { key, channelId } },
 			update: {},
 			create: { key, channelId },
@@ -304,7 +307,7 @@ export class ConfigService {
 		await redis.del(channelCacheKey);
 
 		try {
-			await prismaClient.channelConfiguration.delete({
+			await this.prisma.channelConfiguration.delete({
 				where: { key_channelId: { key, channelId } },
 			});
 		} catch {
@@ -318,7 +321,7 @@ export class ConfigService {
 		const cached = await redis.get(cacheKey);
 		if (cached) return cached;
 
-		const config = await prismaClient.roleConfiguration.findFirst({
+		const config = await this.prisma.roleConfiguration.findFirst({
 			where: {
 				key,
 				Role: { guildId },
@@ -339,14 +342,14 @@ export class ConfigService {
 		await redis.del(rolesCacheKey);
 
 		await this.ensureRoleExists(roleId, guildId);
-		await prismaClient.$transaction([
-			prismaClient.roleConfiguration.deleteMany({
+		await this.prisma.$transaction([
+			this.prisma.roleConfiguration.deleteMany({
 				where: {
 					key,
 					Role: { guildId },
 				},
 			}),
-			prismaClient.roleConfiguration.create({ data: { key, roleId } }),
+			this.prisma.roleConfiguration.create({ data: { key, roleId } }),
 		]);
 		await redis.set(cacheKey, roleId, "EX", CACHE_TTL);
 		await ConfigUpdateRegistry.execute(guildId, key, roleId);
@@ -358,7 +361,7 @@ export class ConfigService {
 		const cached = await redis.get(cacheKey);
 		if (cached) return JSON.parse(cached);
 
-		const configs = await prismaClient.roleConfiguration.findMany({
+		const configs = await this.prisma.roleConfiguration.findMany({
 			where: {
 				key,
 				Role: { guildId },
@@ -382,7 +385,7 @@ export class ConfigService {
 		await redis.del(cacheKey);
 		await redis.del(roleCacheKey);
 
-		await prismaClient.$transaction(async (tx) => {
+		await this.prisma.$transaction(async (tx) => {
 			await tx.roleConfiguration.deleteMany({
 				where: {
 					key,
@@ -409,7 +412,7 @@ export class ConfigService {
 		await redis.del(roleCacheKey);
 
 		await this.ensureRoleExists(roleId, guildId);
-		await prismaClient.roleConfiguration.upsert({
+		await this.prisma.roleConfiguration.upsert({
 			where: { key_roleId: { key, roleId } },
 			update: {},
 			create: { key, roleId },
@@ -428,7 +431,7 @@ export class ConfigService {
 		await redis.del(roleCacheKey);
 
 		try {
-			await prismaClient.roleConfiguration.delete({
+			await this.prisma.roleConfiguration.delete({
 				where: { key_roleId: { key, roleId } },
 			});
 		} catch {
@@ -443,7 +446,7 @@ export class ConfigService {
 		await redis.del(cacheKey);
 		await redis.del(rolesCacheKey);
 
-		await prismaClient.roleConfiguration.deleteMany({
+		await this.prisma.roleConfiguration.deleteMany({
 			where: {
 				key,
 				Role: { guildId },
@@ -459,7 +462,7 @@ export class ConfigService {
 		await redis.del(cacheKey);
 		await redis.del(channelsCacheKey);
 
-		await prismaClient.channelConfiguration.deleteMany({
+		await this.prisma.channelConfiguration.deleteMany({
 			where: {
 				key,
 				Channel: { guildId },
@@ -470,11 +473,11 @@ export class ConfigService {
 
 	async getAll(guildId: string): Promise<Record<string, string>> {
 		const [configs, channelConfigs, roleConfigs] = await Promise.all([
-			prismaClient.configuration.findMany({ where: { guildId } }),
-			prismaClient.channelConfiguration.findMany({
+			this.prisma.configuration.findMany({ where: { guildId } }),
+			this.prisma.channelConfiguration.findMany({
 				where: { Channel: { guildId } },
 			}),
-			prismaClient.roleConfiguration.findMany({
+			this.prisma.roleConfiguration.findMany({
 				where: { Role: { guildId } },
 			}),
 		]);

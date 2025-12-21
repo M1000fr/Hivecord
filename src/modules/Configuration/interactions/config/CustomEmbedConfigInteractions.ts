@@ -4,8 +4,8 @@ import { Injectable } from "@decorators/Injectable";
 import { SelectMenuPattern } from "@decorators/Interaction";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
-import { prismaClient } from "@services/prismaService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import type { PrismaService } from "@src/services/prismaService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
@@ -20,7 +20,11 @@ import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
 @Injectable()
 export class CustomEmbedConfigInteractions extends BaseConfigInteractions {
-	constructor(configHelper: ConfigHelper, configService: ConfigService) {
+	constructor(
+		configHelper: ConfigHelper,
+		configService: ConfigService,
+		private readonly prisma: PrismaService,
+	) {
 		super(configHelper, configService);
 	}
 
@@ -74,7 +78,7 @@ export class CustomEmbedConfigInteractions extends BaseConfigInteractions {
 		);
 
 		// Fetch custom embeds for this guild
-		const customEmbeds = await prismaClient.customEmbed.findMany({
+		const customEmbeds = await this.prisma.customEmbed.findMany({
 			where: {
 				guildId: interaction.guildId!,
 			},
