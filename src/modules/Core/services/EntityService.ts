@@ -1,9 +1,11 @@
 import { ChannelType } from "@prisma/client/enums";
 import { Injectable } from "@src/decorators/Injectable";
-import { ChannelRepository } from "@src/repositories/ChannelRepository";
-import { GuildRepository } from "@src/repositories/GuildRepository";
-import { RoleRepository } from "@src/repositories/RoleRepository";
-import { UserRepository } from "@src/repositories/UserRepository";
+import {
+	ChannelRepository,
+	GuildRepository,
+	RoleRepository,
+	UserRepository,
+} from "@src/repositories";
 import {
 	ChannelType as DiscordChannelType,
 	Guild,
