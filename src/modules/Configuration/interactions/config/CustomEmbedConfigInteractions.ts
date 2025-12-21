@@ -5,7 +5,7 @@ import { SelectMenuPattern } from "@decorators/Interaction";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
-import type { PrismaService } from "@src/services/prismaService";
+import type { PrismaService } from "@src/services/PrismaService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,

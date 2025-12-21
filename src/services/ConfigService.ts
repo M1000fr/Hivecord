@@ -9,7 +9,7 @@ import { ChannelType } from "@prisma/client/enums";
 import { ConfigRegistry } from "@registers/ConfigRegistry";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 import { EntityService } from "@services/EntityService";
-import { PrismaService } from "@services/prismaService";
+import { PrismaService } from "@services/PrismaService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 

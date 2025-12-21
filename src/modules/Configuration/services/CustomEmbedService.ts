@@ -2,7 +2,7 @@ import { MessageTemplate } from "@class/MessageTemplate";
 import { EntityService } from "@services/EntityService";
 import { RedisService } from "@services/RedisService";
 import { Injectable } from "@src/decorators/Injectable";
-import { PrismaService } from "@src/services/prismaService";
+import { PrismaService } from "@src/services/PrismaService";
 import { EmbedBuilder, type APIEmbed } from "discord.js";
 
 const EDITOR_TTL = 3600; // 1 hour

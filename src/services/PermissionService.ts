@@ -1,5 +1,5 @@
 import { Injectable } from "@decorators/Injectable";
-import { PrismaService } from "@services/prismaService";
+import { PrismaService } from "@services/PrismaService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 

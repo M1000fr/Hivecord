@@ -5,7 +5,7 @@ import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@services/EntityService";
-import type { PrismaService } from "@src/services/prismaService";
+import type { PrismaService } from "@src/services/PrismaService";
 import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";
 

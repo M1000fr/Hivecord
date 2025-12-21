@@ -13,7 +13,7 @@ import type { ICommandClass } from "@interfaces/ICommandClass";
 import type { IModuleInstance } from "@interfaces/IModuleInstance";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
 import { PermissionService } from "@services/PermissionService";
-import { PrismaService } from "@services/prismaService";
+import { PrismaService } from "@services/PrismaService";
 import { Logger } from "@utils/Logger";
 import { createHash } from "crypto";
 import {

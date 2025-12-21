@@ -1,5 +1,5 @@
 import { Injectable } from "@src/decorators/Injectable";
-import { PrismaService } from "@src/services/prismaService";
+import { PrismaService } from "@src/services/PrismaService";
 import { Logger } from "@utils/Logger";
 import { Guild } from "discord.js";
 

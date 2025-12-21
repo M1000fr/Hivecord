@@ -6,7 +6,7 @@ import { GeneralModule } from "@modules/General/GeneralModule";
 import { I18nService } from "@services/I18nService";
 import { InfluxService } from "@services/InfluxService";
 import { PermissionService } from "@services/PermissionService";
-import { PrismaService } from "@services/prismaService";
+import { PrismaService } from "@services/PrismaService";
 import { RedisService } from "@services/RedisService";
 
 @Module({

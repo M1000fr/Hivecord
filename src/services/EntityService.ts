@@ -7,7 +7,7 @@ import {
 	Role,
 	User,
 } from "discord.js";
-import { PrismaService } from "./prismaService";
+import { PrismaService } from "./PrismaService";
 
 @Injectable()
 export class EntityService {
