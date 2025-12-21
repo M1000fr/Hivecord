@@ -1,17 +1,27 @@
 import { ChannelType } from "@prisma/client/enums";
 import { Injectable } from "@src/decorators/Injectable";
 import {
+	ChannelRepository,
+	GuildRepository,
+	RoleRepository,
+	UserRepository,
+} from "@src/repositories";
+import {
 	ChannelType as DiscordChannelType,
 	Guild,
 	GuildChannel,
 	Role,
 	User,
 } from "discord.js";
-import { PrismaService } from "./PrismaService";
 
 @Injectable()
 export class EntityService {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(
+		private readonly guildRepository: GuildRepository,
+		private readonly userRepository: UserRepository,
+		private readonly roleRepository: RoleRepository,
+		private readonly channelRepository: ChannelRepository,
+	) {}
 
 	async ensureGuild(guild: Guild) {
 		if (!guild || !guild.id) {
@@ -19,11 +29,7 @@ export class EntityService {
 				`Invalid guild provided to ensureGuild: ${JSON.stringify(guild)}`,
 			);
 		}
-		await this.prisma.guild.upsert({
-			where: { id: guild.id },
-			update: { name: guild.name ?? "Unknown" },
-			create: { id: guild.id, name: guild.name ?? "Unknown" },
-		});
+		await this.guildRepository.upsert(guild.id, guild.name ?? "Unknown");
 	}
 
 	async ensureGuildById(guildId: string) {
@@ -32,45 +38,25 @@ export class EntityService {
 				`Invalid guildId provided to ensureGuildById: ${guildId}`,
 			);
 		}
-		await this.prisma.guild.upsert({
-			where: { id: guildId },
-			update: {},
-			create: { id: guildId, name: "Unknown" },
-		});
+		await this.guildRepository.upsert(guildId, "Unknown");
 	}
 
 	async ensureUser(user: User) {
-		await this.prisma.user.upsert({
-			where: { id: user.id },
-			update: { leftAt: null },
-			create: { id: user.id },
-		});
+		await this.userRepository.upsert(user.id);
 	}
 
 	async ensureUserById(userId: string) {
-		await this.prisma.user.upsert({
-			where: { id: userId },
-			update: {},
-			create: { id: userId },
-		});
+		await this.userRepository.upsert(userId);
 	}
 
 	async ensureRole(role: Role) {
 		await this.ensureGuild(role.guild);
-		await this.prisma.role.upsert({
-			where: { id: role.id },
-			update: { deletedAt: null, guildId: role.guild.id },
-			create: { id: role.id, guildId: role.guild.id },
-		});
+		await this.roleRepository.upsert(role.id, role.guild.id);
 	}
 
 	async ensureRoleById(guildId: string, roleId: string) {
 		await this.ensureGuildById(guildId);
-		await this.prisma.role.upsert({
-			where: { id: roleId },
-			update: { guildId },
-			create: { id: roleId, guildId },
-		});
+		await this.roleRepository.upsert(roleId, guildId);
 	}
 
 	async ensureChannel(channel: GuildChannel) {
@@ -84,17 +70,10 @@ export class EntityService {
 		} else if (channel.type === DiscordChannelType.GuildCategory) {
 			type = ChannelType.CATEGORY;
 		} else {
-			// Default or skip? If we need to ensure it exists, we probably need a type.
-			// Let's default to TEXT if unknown, or maybe we shouldn't ensure if it's not a supported type?
-			// But if we are here, we likely need it.
 			type = ChannelType.TEXT;
 		}
 
-		await this.prisma.channel.upsert({
-			where: { id: channel.id },
-			update: { type, deletedAt: null, guildId: channel.guild.id },
-			create: { id: channel.id, type, guildId: channel.guild.id },
-		});
+		await this.channelRepository.upsert(channel.id, channel.guild.id, type);
 	}
 
 	async ensureChannelById(
@@ -103,10 +82,6 @@ export class EntityService {
 		type: ChannelType = ChannelType.TEXT,
 	) {
 		await this.ensureGuildById(guildId);
-		await this.prisma.channel.upsert({
-			where: { id: channelId },
-			update: { type, guildId },
-			create: { id: channelId, type, guildId },
-		});
+		await this.channelRepository.upsert(channelId, guildId, type);
 	}
 }

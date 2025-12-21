@@ -5,7 +5,7 @@ import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@services/EntityService";
-import type { PrismaService } from "@src/services/PrismaService";
+import type { PrismaService } from "@services/PrismaService";
 import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";
 

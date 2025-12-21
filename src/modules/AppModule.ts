@@ -8,13 +8,35 @@ import { InfluxService } from "@services/InfluxService";
 import { PermissionService } from "@services/PermissionService";
 import { PrismaService } from "@services/PrismaService";
 import { RedisService } from "@services/RedisService";
+import {
+	ChannelRepository,
+	GuildRepository,
+	RoleRepository,
+	UserRepository,
+} from "@src/repositories";
 
 @Module({
 	name: "App",
 	global: true,
 	imports: [GeneralModule, ConfigurationModule],
-	providers: [PrismaService, PermissionService, LeBotClient],
-	exports: [PrismaService, PermissionService, LeBotClient],
+	providers: [
+		PrismaService,
+		PermissionService,
+		LeBotClient,
+		GuildRepository,
+		UserRepository,
+		RoleRepository,
+		ChannelRepository,
+	],
+	exports: [
+		PrismaService,
+		PermissionService,
+		LeBotClient,
+		GuildRepository,
+		UserRepository,
+		RoleRepository,
+		ChannelRepository,
+	],
 })
 export class AppModule {
 	static async init(container: DependencyContainer) {
