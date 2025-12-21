@@ -1,6 +1,8 @@
-import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
+import { Client } from "@decorators/Client";
 import { Event } from "@decorators/Event";
+import { EventController } from "@decorators/EventController";
+import { EventParam } from "@decorators/EventParam";
 import { BotEvents } from "@enums/BotEvents";
 import { $Enums } from "@src/prisma/client/client";
 import { prismaClient } from "@src/services/prismaService";
@@ -11,18 +13,17 @@ import {
 	type NonThreadGuildBasedChannel,
 } from "discord.js";
 
-@Event({
-	name: BotEvents.ChannelUpdate,
-})
-export default class ChannelUpdateEvent extends BaseEvent<
-	typeof BotEvents.ChannelUpdate
-> {
+@EventController()
+export default class ChannelUpdateEvent {
 	private logger = new Logger("ChannelUpdateEvent");
 
+	@Event({
+		name: BotEvents.ChannelUpdate,
+	})
 	async run(
-		client: LeBotClient<true>,
-		oldChannel: NonThreadGuildBasedChannel | DMChannel,
-		newChannel: NonThreadGuildBasedChannel | DMChannel,
+		@Client() client: LeBotClient<true>,
+		@EventParam() oldChannel: NonThreadGuildBasedChannel | DMChannel,
+		@EventParam() newChannel: NonThreadGuildBasedChannel | DMChannel,
 	) {
 		if (newChannel.isDMBased()) return;
 

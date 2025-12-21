@@ -1,17 +1,23 @@
-import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
+import { Client } from "@decorators/Client";
 import { Event } from "@decorators/Event";
+import { EventController } from "@decorators/EventController";
+import { Injectable } from "@decorators/Injectable";
 import { BotEvents } from "@enums/BotEvents";
 import { WelcomeRoleSyncService } from "../../services/WelcomeRoleSyncService";
 
-@Event({
-	name: BotEvents.ClientReady,
-})
-export default class ResumeWelcomeSyncEvent extends BaseEvent<
-	typeof BotEvents.ClientReady
-> {
-	async run(client: LeBotClient<true>) {
+@Injectable()
+@EventController()
+export default class ResumeWelcomeSyncEvent {
+	constructor(
+		private readonly welcomeRoleSyncService: WelcomeRoleSyncService,
+	) {}
+
+	@Event({
+		name: BotEvents.ClientReady,
+	})
+	async run(@Client() client: LeBotClient<true>) {
 		// Check if we need to resume a sync process
-		await WelcomeRoleSyncService.resume(client);
+		await this.welcomeRoleSyncService.resume(client);
 	}
 }

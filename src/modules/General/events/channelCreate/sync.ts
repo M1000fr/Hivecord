@@ -1,28 +1,41 @@
-import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
+import { Client } from "@decorators/Client";
 import { Event } from "@decorators/Event";
+import { EventController } from "@decorators/EventController";
+import { EventParam } from "@decorators/EventParam";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@services/EntityService";
 import { Logger } from "@utils/Logger";
 import { type Channel, type GuildChannel } from "discord.js";
 
-@Event({
-	name: BotEvents.ChannelCreate,
-})
-export default class ChannelCreateEvent extends BaseEvent<
-	typeof BotEvents.ChannelCreate
-> {
+@EventController()
+export default class ChannelCreateEvent {
 	private logger = new Logger("ChannelCreateEvent");
 
-	async run(client: LeBotClient<true>, channel: Channel) {
+	constructor(private readonly entityService: EntityService) {}
+
+	@Event({ name: BotEvents.ChannelCreate })
+	async run(
+		@Client() client: LeBotClient<true>,
+		@EventParam() channel: Channel,
+	) {
 		if (channel.isDMBased()) return;
 
 		try {
-			await EntityService.ensureChannel(channel as GuildChannel);
+			await this.entityService.ensureChannel(channel as GuildChannel);
 		} catch (error) {
 			this.logger.error(
 				`Failed to sync created channel ${channel.id}: ${error}`,
 			);
 		}
+	}
+
+	@Event({ name: BotEvents.ChannelUpdate })
+	async runUpdate(
+		@Client() client: LeBotClient<true>,
+		@EventParam() oldChannel: Channel,
+		@EventParam() newChannel: Channel,
+	) {
+		console.log(oldChannel, newChannel);
 	}
 }

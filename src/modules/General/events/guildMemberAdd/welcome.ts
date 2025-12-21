@@ -1,7 +1,9 @@
-import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
 import { MessageTemplate } from "@class/MessageTemplate";
+import { Client } from "@decorators/Client";
 import { Event } from "@decorators/Event";
+import { EventController } from "@decorators/EventController";
+import { EventParam } from "@decorators/EventParam";
 import { BotEvents } from "@enums/BotEvents";
 import { WelcomeImageService } from "@modules/General/services/WelcomeImageService";
 import { ConfigService } from "@services/ConfigService";
@@ -17,26 +19,30 @@ import {
 import path from "path";
 import { GeneralConfig } from "../../GeneralConfig";
 
-@Event({
-	name: BotEvents.MemberJoinProcessed,
-})
-export default class WelcomeEvent extends BaseEvent<
-	typeof BotEvents.MemberJoinProcessed
-> {
+@EventController()
+export default class WelcomeEvent {
 	private logger = new Logger("WelcomeEvent");
 
+	constructor(
+		private readonly customEmbedService: CustomEmbedService,
+		private readonly configService: ConfigService,
+	) {}
+
+	@Event({
+		name: BotEvents.MemberJoinProcessed,
+	})
 	async run(
-		client: LeBotClient<true>,
-		member: GuildMember,
-		invite: Invite | null,
+		@Client() client: LeBotClient<true>,
+		@EventParam() member: GuildMember,
+		@EventParam() invite: Invite | null,
 	) {
 		try {
-			const welcomeChannelId = await ConfigService.of(
+			const welcomeChannelId = await this.configService.of(
 				member.guild.id,
 				GeneralConfig,
 			).generalWelcomeChannelId;
 
-			const language = await ConfigService.of(
+			const language = await this.configService.of(
 				member.guild.id,
 				GeneralConfig,
 			).generalLanguage;
@@ -67,13 +73,13 @@ export default class WelcomeEvent extends BaseEvent<
 			};
 
 			// Check for custom embed
-			const welcomeEmbedName = await ConfigService.of(
+			const welcomeEmbedName = await this.configService.of(
 				member.guild.id,
 				GeneralConfig,
 			).generalWelcomeEmbedName;
 
 			// Get configured background
-			const configuredBackground = await ConfigService.of(
+			const configuredBackground = await this.configService.of(
 				member.guild.id,
 				GeneralConfig,
 			).generalWelcomeBackground;
@@ -87,7 +93,7 @@ export default class WelcomeEvent extends BaseEvent<
 				size: 256,
 			});
 
-			const welcomeMessageImageConfig = await ConfigService.of(
+			const welcomeMessageImageConfig = await this.configService.of(
 				member.guild.id,
 				GeneralConfig,
 			).generalWelcomeMessageImage;
@@ -110,7 +116,7 @@ export default class WelcomeEvent extends BaseEvent<
 				welcomeMessageImage,
 			);
 
-			const welcomeMessageConfig = await ConfigService.of(
+			const welcomeMessageConfig = await this.configService.of(
 				member.guild.id,
 				GeneralConfig,
 			).generalWelcomeMessage;
@@ -124,7 +130,7 @@ export default class WelcomeEvent extends BaseEvent<
 			};
 
 			if (welcomeEmbedName) {
-				const customEmbed = await CustomEmbedService.render(
+				const customEmbed = await this.customEmbedService.render(
 					member.guild.id,
 					welcomeEmbedName,
 					commonContext,

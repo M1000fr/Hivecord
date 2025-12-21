@@ -1,22 +1,29 @@
-import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
+import { Client } from "@decorators/Client";
 import { Event } from "@decorators/Event";
+import { EventController } from "@decorators/EventController";
+import { EventParam } from "@decorators/EventParam";
 import { BotEvents } from "@enums/BotEvents";
-import { EntityService } from "@services/EntityService";
+import { EntityService } from "@src/services/EntityService";
 import { Logger } from "@utils/Logger";
 import { Role } from "discord.js";
 
-@Event({
-	name: BotEvents.GuildRoleUpdate,
-})
-export default class RoleUpdateEvent extends BaseEvent<
-	typeof BotEvents.GuildRoleUpdate
-> {
+@EventController()
+export default class RoleUpdateEvent {
 	private logger = new Logger("RoleUpdateEvent");
 
-	async run(client: LeBotClient<true>, oldRole: Role, newRole: Role) {
+	constructor(private readonly entityService: EntityService) {}
+
+	@Event({
+		name: BotEvents.GuildRoleUpdate,
+	})
+	async run(
+		@Client() client: LeBotClient<true>,
+		@EventParam() oldRole: Role,
+		@EventParam() newRole: Role,
+	) {
 		try {
-			await EntityService.ensureRole(newRole);
+			await this.entityService.ensureRole(newRole);
 		} catch (error) {
 			this.logger.error(
 				`Failed to sync updated role ${newRole.id}: ${error}`,

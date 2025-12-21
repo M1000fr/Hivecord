@@ -1,22 +1,25 @@
-import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
+import { Client } from "@decorators/Client";
 import { Event } from "@decorators/Event";
+import { EventController } from "@decorators/EventController";
+import { EventParam } from "@decorators/EventParam";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@services/EntityService";
 import { Logger } from "@utils/Logger";
 import { Role } from "discord.js";
 
-@Event({
-	name: BotEvents.GuildRoleCreate,
-})
-export default class RoleCreateEvent extends BaseEvent<
-	typeof BotEvents.GuildRoleCreate
-> {
+@EventController()
+export default class RoleCreateEvent {
 	private logger = new Logger("RoleCreateEvent");
 
-	async run(client: LeBotClient<true>, role: Role) {
+	constructor(private readonly entityService: EntityService) {}
+
+	@Event({
+		name: BotEvents.GuildRoleCreate,
+	})
+	async run(@Client() client: LeBotClient<true>, @EventParam() role: Role) {
 		try {
-			await EntityService.ensureRole(role);
+			await this.entityService.ensureRole(role);
 			this.logger.log(`Synced created role ${role.name} (${role.id})`);
 		} catch (error) {
 			this.logger.error(

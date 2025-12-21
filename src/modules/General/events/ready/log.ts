@@ -1,20 +1,20 @@
-import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
+import { Client } from "@decorators/Client";
 import { Event } from "@decorators/Event";
+import { EventController } from "@decorators/EventController";
 import { BotEvents } from "@enums/BotEvents";
 import { SyncService } from "@modules/General/services/SyncService";
 import { Logger } from "@utils/Logger";
 
-@Event({
-	name: BotEvents.ClientReady,
-	once: true,
-})
-export default class ReadyEvent extends BaseEvent<
-	typeof BotEvents.ClientReady
-> {
+@EventController()
+export default class ReadyEvent {
 	private logger = new Logger("ReadyEvent");
 
-	async run(client: LeBotClient<true>) {
+	@Event({
+		name: BotEvents.ClientReady,
+		once: true,
+	})
+	async run(@Client() client: LeBotClient<true>) {
 		if (client.user) {
 			this.logger.log(`Logged in as ${client.user.tag}!`);
 		}

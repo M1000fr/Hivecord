@@ -1,7 +1,10 @@
-import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
+import { Client } from "@decorators/Client";
 import { Event } from "@decorators/Event";
+import { EventController } from "@decorators/EventController";
+import { EventParam } from "@decorators/EventParam";
 import { BotEvents } from "@enums/BotEvents";
+import { CommandService } from "@services/CommandService";
 import { Logger } from "@utils/Logger";
 import {
 	MessageFlags,
@@ -10,13 +13,11 @@ import {
 	type RepliableInteraction,
 } from "discord.js";
 
-@Event({
-	name: BotEvents.InteractionCreate,
-})
-export default class InteractionCreateEvent extends BaseEvent<
-	typeof BotEvents.InteractionCreate
-> {
+@EventController()
+export default class InteractionCreateEvent {
 	private logger = new Logger("InteractionCreateEvent");
+
+	constructor(private readonly commandService: CommandService) {}
 
 	private async sendErrorResponse(
 		interaction: RepliableInteraction,
@@ -33,13 +34,23 @@ export default class InteractionCreateEvent extends BaseEvent<
 		}
 	}
 
-	async run(client: LeBotClient<true>, interaction: Interaction) {
+	@Event({
+		name: BotEvents.InteractionCreate,
+	})
+	async run(
+		@Client() client: LeBotClient<true>,
+		@EventParam() interaction: Interaction,
+	) {
 		if (interaction.isAutocomplete()) {
 			const command = client.commands.get(interaction.commandName);
 			if (!command) return;
 
 			try {
-				await command.instance.handleAutocomplete(client, interaction);
+				await this.commandService.handleAutocomplete(
+					client,
+					interaction,
+					command.instance,
+				);
 			} catch (error: unknown) {
 				this.logger.error(
 					`Error handling autocomplete for ${interaction.commandName}:`,
@@ -61,7 +72,11 @@ export default class InteractionCreateEvent extends BaseEvent<
 		}
 
 		try {
-			await command.instance.execute(client, interaction);
+			await this.commandService.execute(
+				client,
+				interaction,
+				command.instance,
+			);
 		} catch (error) {
 			this.logger.error(error);
 			await this.sendErrorResponse(

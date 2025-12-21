@@ -1,20 +1,24 @@
-import { BaseEvent } from "@class/BaseEvent";
 import { LeBotClient } from "@class/LeBotClient";
+import { Client } from "@decorators/Client";
 import { Event } from "@decorators/Event";
+import { EventController } from "@decorators/EventController";
+import { EventParam } from "@decorators/EventParam";
 import { BotEvents } from "@enums/BotEvents";
 import { prismaClient } from "@src/services/prismaService";
 import { Logger } from "@utils/Logger";
 import { type Channel } from "discord.js";
 
-@Event({
-	name: BotEvents.ChannelDelete,
-})
-export default class ChannelDeleteEvent extends BaseEvent<
-	typeof BotEvents.ChannelDelete
-> {
+@EventController()
+export default class ChannelDeleteEvent {
 	private logger = new Logger("ChannelDeleteEvent");
 
-	async run(client: LeBotClient<true>, channel: Channel) {
+	@Event({
+		name: BotEvents.ChannelDelete,
+	})
+	async run(
+		@Client() client: LeBotClient<true>,
+		@EventParam() channel: Channel,
+	) {
 		if (channel.isDMBased()) return;
 
 		try {
