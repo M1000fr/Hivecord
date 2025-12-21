@@ -1,4 +1,3 @@
-import { I18nService } from "@modules/Core/services/I18nService";
 import {
 	type APIEmbed,
 	type APIEmbedField,
@@ -7,6 +6,7 @@ import {
 	TextInputBuilder,
 	TextInputStyle,
 } from "discord.js";
+import type { TFunction } from "i18next";
 
 export interface EmbedEditorModalData extends Partial<APIEmbed> {
 	field?: APIEmbedField;
@@ -14,26 +14,26 @@ export interface EmbedEditorModalData extends Partial<APIEmbed> {
 
 export class EmbedEditorModals {
 	static getModal(
-		lng: string,
+		t: TFunction,
 		type: string,
 		data: EmbedEditorModalData = {},
 	): ModalBuilder {
 		switch (type) {
 			case "edit_title":
-				return this.getTitleModal(lng, data);
+				return this.getTitleModal(t, data);
 			case "edit_description":
-				return this.getDescriptionModal(lng, data);
+				return this.getDescriptionModal(t, data);
 			case "edit_author":
-				return this.getAuthorModal(lng, data);
+				return this.getAuthorModal(t, data);
 			case "edit_footer":
-				return this.getFooterModal(lng, data);
+				return this.getFooterModal(t, data);
 			case "edit_images":
-				return this.getImagesModal(lng, data);
+				return this.getImagesModal(t, data);
 			case "edit_color":
-				return this.getColorModal(lng, data);
+				return this.getColorModal(t, data);
 			case "field_add":
 			case "field_edit":
-				return this.getFieldModal(lng, data);
+				return this.getFieldModal(t, data);
 			default:
 				return new ModalBuilder()
 					.setCustomId("error")
@@ -42,10 +42,9 @@ export class EmbedEditorModals {
 	}
 
 	private static getTitleModal(
-		lng: string,
+		t: TFunction,
 		data: EmbedEditorModalData,
 	): ModalBuilder {
-		const t = I18nService.getFixedT(lng);
 		const modal = new ModalBuilder()
 			.setCustomId("modal_embed_title")
 			.setTitle(
@@ -86,10 +85,9 @@ export class EmbedEditorModals {
 	}
 
 	private static getDescriptionModal(
-		lng: string,
+		t: TFunction,
 		data: EmbedEditorModalData,
 	): ModalBuilder {
-		const t = I18nService.getFixedT(lng);
 		const modal = new ModalBuilder()
 			.setCustomId("modal_embed_description")
 			.setTitle(
@@ -117,10 +115,9 @@ export class EmbedEditorModals {
 	}
 
 	private static getAuthorModal(
-		lng: string,
+		t: TFunction,
 		data: EmbedEditorModalData,
 	): ModalBuilder {
-		const t = I18nService.getFixedT(lng);
 		const modal = new ModalBuilder()
 			.setCustomId("modal_embed_author")
 			.setTitle(
@@ -161,10 +158,9 @@ export class EmbedEditorModals {
 	}
 
 	private static getFooterModal(
-		lng: string,
+		t: TFunction,
 		data: EmbedEditorModalData,
 	): ModalBuilder {
-		const t = I18nService.getFixedT(lng);
 		const modal = new ModalBuilder()
 			.setCustomId("modal_embed_footer")
 			.setTitle(
@@ -205,10 +201,9 @@ export class EmbedEditorModals {
 	}
 
 	private static getImagesModal(
-		lng: string,
+		t: TFunction,
 		data: EmbedEditorModalData,
 	): ModalBuilder {
-		const t = I18nService.getFixedT(lng);
 		const modal = new ModalBuilder()
 			.setCustomId("modal_embed_images")
 			.setTitle(
@@ -254,10 +249,9 @@ export class EmbedEditorModals {
 	}
 
 	private static getColorModal(
-		lng: string,
+		t: TFunction,
 		data: EmbedEditorModalData,
 	): ModalBuilder {
-		const t = I18nService.getFixedT(lng);
 		const modal = new ModalBuilder()
 			.setCustomId("modal_embed_color")
 			.setTitle(
@@ -292,10 +286,9 @@ export class EmbedEditorModals {
 	}
 
 	private static getFieldModal(
-		lng: string,
+		t: TFunction,
 		data: EmbedEditorModalData,
 	): ModalBuilder {
-		const t = I18nService.getFixedT(lng);
 		const modal = new ModalBuilder()
 			.setCustomId("modal_embed_field")
 			.setTitle(

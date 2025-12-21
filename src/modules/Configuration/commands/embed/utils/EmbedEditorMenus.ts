@@ -1,4 +1,3 @@
-import { I18nService } from "@modules/Core/services/I18nService";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -6,10 +5,10 @@ import {
 	StringSelectMenuBuilder,
 	type APIEmbed,
 } from "discord.js";
+import type { TFunction } from "i18next";
 
 export class EmbedEditorMenus {
-	static getMainMenu(lng: string) {
-		const t = I18nService.getFixedT(lng);
+	static getMainMenu(t: TFunction) {
 		return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
 			new StringSelectMenuBuilder()
 				.setCustomId("embed_editor_menu")
@@ -93,8 +92,7 @@ export class EmbedEditorMenus {
 		);
 	}
 
-	static getControlButtons(lng: string) {
-		const t = I18nService.getFixedT(lng);
+	static getControlButtons(t: TFunction) {
 		return new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder()
 				.setCustomId("embed_editor_save")
@@ -115,8 +113,7 @@ export class EmbedEditorMenus {
 		);
 	}
 
-	static getFieldsSubMenu(lng: string, fields: APIEmbed["fields"] = []) {
-		const t = I18nService.getFixedT(lng);
+	static getFieldsSubMenu(t: TFunction, fields: APIEmbed["fields"] = []) {
 		const options = [
 			{
 				label: t(
