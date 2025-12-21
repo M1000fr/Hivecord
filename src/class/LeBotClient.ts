@@ -1,5 +1,8 @@
 import { BaseCommand } from "@class/BaseCommand";
+import { BaseEvent } from "@class/BaseEvent";
 import { SanctionScheduler } from "@class/SanctionScheduler";
+import { DependencyContainer } from "@di/DependencyContainer";
+import type { Constructor } from "@di/types";
 import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "@interfaces/CommandOptions";
 import type { ICommandClass } from "@interfaces/ICommandClass";
@@ -36,6 +39,7 @@ export class LeBotClient<
 		string,
 		{ instance: IModuleInstance; options: ModuleOptions }
 	>();
+	private container = DependencyContainer.getInstance();
 	private static instance: LeBotClient;
 	private logger = new Logger("LeBotClient");
 	private scheduler: SanctionScheduler;
@@ -186,12 +190,17 @@ export class LeBotClient<
 	private loadCommands(options: ModuleOptions): void {
 		if (!options.commands) return;
 
+		const moduleName = options.name;
+
 		for (const CommandClass of options.commands) {
 			const cmdOptions = (CommandClass as unknown as ICommandClass)
 				.commandOptions;
 			if (!cmdOptions) continue;
 
-			const instance = new (CommandClass as unknown as ICommandClass)();
+			const instance = this.container.resolve(
+				CommandClass as unknown as Constructor<BaseCommand>,
+				moduleName,
+			) as BaseCommand;
 			this.commands.set(cmdOptions.name, {
 				instance,
 				options: cmdOptions,
@@ -202,12 +211,17 @@ export class LeBotClient<
 	private loadEvents(options: ModuleOptions): void {
 		if (!options.events) return;
 
+		const moduleName = options.name;
+
 		for (const EventClass of options.events) {
 			const evtOptions = (EventClass as unknown as IEventClass)
 				.eventOptions;
 			if (!evtOptions) continue;
 
-			const instance = new (EventClass as unknown as IEventClass)();
+			const instance = this.container.resolve(
+				EventClass as unknown as Constructor<BaseEvent<string>>,
+				moduleName,
+			);
 			const handler = async (...args: unknown[]) => {
 				try {
 					await instance.run(this, ...args);
@@ -230,6 +244,11 @@ export class LeBotClient<
 	private async loadModules() {
 		const modulesPath = path.join(__dirname, "../modules");
 		const folders = await fs.readdir(modulesPath);
+		const discoveredModules: Array<{
+			ModuleClass: Constructor<IModuleInstance>;
+			options: ModuleOptions;
+			instance?: IModuleInstance;
+		}> = [];
 
 		for (const folder of folders) {
 			const folderPath = path.join(modulesPath, folder);
@@ -259,33 +278,29 @@ export class LeBotClient<
 
 						if (typeof ExportedClass !== "function") continue;
 
-						try {
-							// eslint-disable-next-line @typescript-eslint/no-explicit-any
-							const instance = new (ExportedClass as any)();
-							if ("moduleOptions" in instance) {
-								const options = (
-									instance as unknown as IModuleInstance
-								).moduleOptions;
-
-								this.modules.set(options.name.toLowerCase(), {
-									instance:
-										instance as unknown as IModuleInstance,
-									options,
-								});
-								this.logger.log(
-									`Loading module: ${options.name}`,
-								);
-
-								this.loadCommands(options);
-								this.loadEvents(options);
-								moduleLoaded = true;
-								break;
-							}
-						} catch {
-							this.logger.warn(
-								`Failed to instantiate exported class ${exportedKey} from ${moduleFile}.`,
+						const moduleMetadata =
+							this.container.getModuleOptionsFromConstructor(
+								ExportedClass as Constructor,
 							);
-						}
+						const extracted =
+							moduleMetadata !== undefined
+								? undefined
+								: this.extractModuleOptionsFromInstance(
+										ExportedClass,
+									);
+						const moduleOptions =
+							moduleMetadata ?? extracted?.options;
+
+						if (!moduleOptions) continue;
+
+						discoveredModules.push({
+							ModuleClass:
+								ExportedClass as Constructor<IModuleInstance>,
+							options: moduleOptions,
+							instance: extracted?.instance,
+						});
+						moduleLoaded = true;
+						break;
 					}
 				} catch (error) {
 					this.logger.error(
@@ -297,10 +312,54 @@ export class LeBotClient<
 			}
 		}
 
+		for (const { options, ModuleClass } of discoveredModules) {
+			this.container.registerModule(options, ModuleClass);
+		}
+
+		for (const module of discoveredModules) {
+			const moduleInstance =
+				module.instance ??
+				(this.container.resolve(
+					module.ModuleClass,
+					module.options.name,
+				) as IModuleInstance);
+
+			this.modules.set(module.options.name.toLowerCase(), {
+				instance: moduleInstance,
+				options: module.options,
+			});
+			this.logger.log(`Loading module: ${module.options.name}`);
+
+			this.loadCommands(module.options);
+			this.loadEvents(module.options);
+		}
+
 		for (const module of this.modules.values()) {
 			if (typeof module.instance.setup === "function") {
 				await module.instance.setup(this);
 			}
 		}
+	}
+
+	private extractModuleOptionsFromInstance(
+		ExportedClass: Constructor,
+	): { options: ModuleOptions; instance: IModuleInstance } | undefined {
+		try {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const instance = new (ExportedClass as any)();
+			if ("moduleOptions" in instance) {
+				return {
+					options: (instance as unknown as IModuleInstance)
+						.moduleOptions,
+					instance: instance as unknown as IModuleInstance,
+				};
+			}
+		} catch {
+			this.logger.warn(
+				`Failed to instantiate exported class ${ExportedClass.name}.`,
+			);
+		}
+
+		return undefined;
 	}
 }
