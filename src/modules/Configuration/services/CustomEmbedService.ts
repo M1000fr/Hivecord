@@ -1,8 +1,8 @@
 import { MessageTemplate } from "@class/MessageTemplate";
 import { EntityService } from "@services/EntityService";
-import { PrismaService } from "@services/PrismaService";
 import { RedisService } from "@services/RedisService";
 import { Injectable } from "@src/decorators/Injectable";
+import { CustomEmbedRepository } from "@src/repositories";
 import { EmbedBuilder, type APIEmbed } from "discord.js";
 
 const EDITOR_TTL = 3600; // 1 hour
@@ -11,16 +11,17 @@ const EDITOR_TTL = 3600; // 1 hour
 export class CustomEmbedService {
 	constructor(
 		private readonly entityService: EntityService,
-		private readonly prisma: PrismaService,
+		private readonly customEmbedRepository: CustomEmbedRepository,
 	) {}
 
 	/**
 	 * Get a raw embed JSON by name
 	 */
 	async get(guildId: string, name: string): Promise<APIEmbed | null> {
-		const embed = await this.prisma.customEmbed.findUnique({
-			where: { guildId_name: { guildId, name } },
-		});
+		const embed = await this.customEmbedRepository.findByName(
+			guildId,
+			name,
+		);
 		if (!embed) return null;
 		return JSON.parse(embed.data);
 	}
@@ -30,31 +31,21 @@ export class CustomEmbedService {
 	 */
 	async save(guildId: string, name: string, data: APIEmbed): Promise<void> {
 		await this.entityService.ensureGuildById(guildId);
-		await this.prisma.customEmbed.upsert({
-			where: { guildId_name: { guildId, name } },
-			update: { data: JSON.stringify(data) },
-			create: { guildId, name, data: JSON.stringify(data) },
-		});
+		await this.customEmbedRepository.upsert(guildId, name, data);
 	}
 
 	/**
 	 * Delete an embed
 	 */
 	async delete(guildId: string, name: string): Promise<void> {
-		await this.prisma.customEmbed.delete({
-			where: { guildId_name: { guildId, name } },
-		});
+		await this.customEmbedRepository.delete(guildId, name);
 	}
 
 	/**
 	 * List all embeds
 	 */
 	async list(guildId: string): Promise<string[]> {
-		const embeds = await this.prisma.customEmbed.findMany({
-			where: { guildId },
-			select: { name: true },
-		});
-		return embeds.map((e) => e.name);
+		return this.customEmbedRepository.listNames(guildId);
 	}
 
 	/**

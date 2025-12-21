@@ -10,6 +10,7 @@ import { PrismaService } from "@services/PrismaService";
 import { RedisService } from "@services/RedisService";
 import {
 	ChannelRepository,
+	CustomEmbedRepository,
 	GuildRepository,
 	RoleRepository,
 	UserRepository,
@@ -27,6 +28,7 @@ import {
 		UserRepository,
 		RoleRepository,
 		ChannelRepository,
+		CustomEmbedRepository,
 	],
 	exports: [
 		PrismaService,
@@ -36,6 +38,7 @@ import {
 		UserRepository,
 		RoleRepository,
 		ChannelRepository,
+		CustomEmbedRepository,
 	],
 })
 export class AppModule {

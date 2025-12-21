@@ -1,5 +1,5 @@
-import { PrismaService } from "@services/PrismaService";
 import { Injectable } from "@src/decorators/Injectable";
+import { GuildRepository } from "@src/repositories";
 import { Logger } from "@utils/Logger";
 import { Guild } from "discord.js";
 
@@ -7,7 +7,7 @@ import { Guild } from "discord.js";
 export class SyncService {
 	private logger = new Logger("SyncService");
 
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly guildRepository: GuildRepository) {}
 
 	async syncGuild(guild: Guild) {
 		this.logger.log(`Syncing guild ${guild.name}...`);
@@ -16,10 +16,6 @@ export class SyncService {
 	}
 
 	async syncGuildRecord(guild: Guild) {
-		await this.prisma.guild.upsert({
-			where: { id: guild.id },
-			update: { name: guild.name },
-			create: { id: guild.id, name: guild.name },
-		});
+		await this.guildRepository.upsert(guild.id, guild.name);
 	}
 }
