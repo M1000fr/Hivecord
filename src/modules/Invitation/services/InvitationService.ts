@@ -1,5 +1,6 @@
 import type { LeBotClient } from "@class/LeBotClient";
 import { BotPermission } from "@decorators/BotPermission";
+import { Service } from "@decorators/Service";
 import { StatsWriter } from "@modules/Statistics/services/StatsWriter";
 import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
@@ -7,6 +8,7 @@ import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 import { Guild, Invite, PermissionsBitField } from "discord.js";
 
+@Service()
 export class InvitationService {
 	private static logger = new Logger("InvitationService");
 	private static redis = RedisService.getInstance();

@@ -1,7 +1,9 @@
+import { Service } from "@decorators/Service";
 import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
 import { Guild } from "discord.js";
 
+@Service()
 export class SyncService {
 	private static logger = new Logger("SyncService");
 

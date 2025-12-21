@@ -12,6 +12,8 @@ import UnmuteCommand from "./commands/unmute/index";
 import UnwarnCommand from "./commands/unwarn/index";
 import WarnCommand from "./commands/warn/index";
 import { GuildMemberAddEvent } from "./events/GuildMemberAddEvent";
+import { SanctionReasonService } from "./services/SanctionReasonService";
+import { SanctionService } from "./services/SanctionService";
 
 @Module({
 	name: "Moderation",
@@ -30,5 +32,7 @@ import { GuildMemberAddEvent } from "./events/GuildMemberAddEvent";
 	],
 	events: [GuildMemberAddEvent],
 	config: ModerationConfig,
+	providers: [SanctionService, SanctionReasonService],
+	exports: [SanctionService, SanctionReasonService],
 })
 export class ModerationModule {}

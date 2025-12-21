@@ -1,4 +1,5 @@
 import { MessageTemplate } from "@class/MessageTemplate";
+import { Service } from "@decorators/Service";
 import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
@@ -6,6 +7,7 @@ import { EmbedBuilder, type APIEmbed } from "discord.js";
 
 const EDITOR_TTL = 3600; // 1 hour
 
+@Service()
 export class CustomEmbedService {
 	/**
 	 * Get a raw embed JSON by name

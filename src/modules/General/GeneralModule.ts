@@ -19,6 +19,11 @@ import RoleCreateEvent from "./events/roleCreate/sync";
 import RoleDeleteEvent from "./events/roleDelete/sync";
 import RoleUpdateEvent from "./events/roleUpdate/sync";
 import { PingCommandInteractions } from "./interactions/PingCommandInteractions";
+import { SpacerService } from "./services/SpacerService";
+import { SyncService } from "./services/SyncService";
+import { WelcomeImageService } from "./services/WelcomeImageService";
+import { WelcomeRoleService } from "./services/WelcomeRoleService";
+import { WelcomeRoleSyncService } from "./services/WelcomeRoleSyncService";
 
 @Module({
 	name: "General",
@@ -43,5 +48,19 @@ import { PingCommandInteractions } from "./interactions/PingCommandInteractions"
 	],
 	interactions: [PingCommandInteractions],
 	config: GeneralConfig,
+	providers: [
+		SpacerService,
+		SyncService,
+		WelcomeImageService,
+		WelcomeRoleService,
+		WelcomeRoleSyncService,
+	],
+	exports: [
+		SpacerService,
+		SyncService,
+		WelcomeImageService,
+		WelcomeRoleService,
+		WelcomeRoleSyncService,
+	],
 })
 export class GeneralModule {}

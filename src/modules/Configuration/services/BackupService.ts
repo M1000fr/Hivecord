@@ -3,6 +3,7 @@ import {
 	EConfigType,
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
+import { Service } from "@decorators/Service";
 import { ConfigService } from "@services/ConfigService";
 import { Logger } from "@utils/Logger";
 import {
@@ -147,6 +148,7 @@ class ConfigRestorer {
 	}
 }
 
+@Service()
 export class BackupService {
 	private static logger = new Logger("BackupService");
 	private static readonly BACKUP_VERSION = 3;

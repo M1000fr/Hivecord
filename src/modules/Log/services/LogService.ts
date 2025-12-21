@@ -1,3 +1,4 @@
+import { Service } from "@decorators/Service";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
@@ -17,6 +18,7 @@ import {
 } from "discord.js";
 import { LogConfig } from "../LogConfig";
 
+@Service()
 export class LogService {
 	private static async getLogChannel(
 		guild: Guild,

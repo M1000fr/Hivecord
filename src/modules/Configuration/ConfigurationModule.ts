@@ -8,6 +8,8 @@ import { RoleChannelConfigInteractions } from "./interactions/config/RoleChannel
 import { StringArrayConfigInteractions } from "./interactions/config/StringArrayConfigInteractions";
 import { StringConfigInteractions } from "./interactions/config/StringConfigInteractions";
 import { EmbedEditorInteractions } from "./interactions/EmbedEditorInteractions";
+import { BackupService } from "./services/BackupService";
+import { CustomEmbedService } from "./services/CustomEmbedService";
 
 @Module({
 	name: "Configuration",
@@ -21,5 +23,7 @@ import { EmbedEditorInteractions } from "./interactions/EmbedEditorInteractions"
 		RoleChannelConfigInteractions,
 		StringArrayConfigInteractions,
 	],
+	providers: [BackupService, CustomEmbedService],
+	exports: [BackupService, CustomEmbedService],
 })
 export class ConfigurationModule {}

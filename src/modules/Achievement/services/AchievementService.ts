@@ -1,4 +1,5 @@
 import { MessageTemplate } from "@class/MessageTemplate";
+import { Service } from "@decorators/Service";
 import { AchievementConfig } from "@modules/Achievement/AchievementConfig";
 import { StatsReader } from "@modules/Statistics/services/StatsReader";
 import { AchievementCategory, AchievementType } from "@prisma/client/enums";
@@ -7,6 +8,7 @@ import { prismaClient } from "@services/prismaService";
 import { Logger } from "@utils/Logger";
 import { ChannelType, Guild, TextChannel, User } from "discord.js";
 
+@Service()
 export class AchievementService {
 	private static instance: AchievementService;
 	private logger = new Logger("AchievementService");

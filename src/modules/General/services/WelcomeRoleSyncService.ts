@@ -1,4 +1,5 @@
 import { LeBotClient } from "@class/LeBotClient";
+import { Service } from "@decorators/Service";
 import { ConfigService } from "@services/ConfigService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
@@ -11,6 +12,7 @@ interface SyncState {
 	lastMemberId: string | null;
 }
 
+@Service()
 export class WelcomeRoleSyncService {
 	private static logger = new Logger("WelcomeRoleSyncService");
 	private static readonly REDIS_KEY = "bot:welcome_sync:state";

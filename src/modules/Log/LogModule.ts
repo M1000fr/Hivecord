@@ -8,6 +8,7 @@ import MessageDeleteEvent from "./events/MessageDelete";
 import MessageUpdateEvent from "./events/MessageUpdate";
 import VoiceStateUpdateEvent from "./events/VoiceStateUpdate";
 import { LogConfig } from "./LogConfig";
+import { LogService } from "./services/LogService";
 
 @Module({
 	name: "Log",
@@ -23,5 +24,7 @@ import { LogConfig } from "./LogConfig";
 		MessageDeleteEvent,
 	],
 	config: LogConfig,
+	providers: [LogService],
+	exports: [LogService],
 })
 export class LogModule {}

@@ -1,3 +1,4 @@
+import { Service } from "@decorators/Service";
 import type {
 	GroupModel,
 	PermissionModel,
@@ -12,6 +13,7 @@ import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { Logger } from "@utils/Logger";
 import { Guild } from "discord.js";
 
+@Service()
 export class GroupService {
 	private static async getLanguage(guildId: string): Promise<string> {
 		return (

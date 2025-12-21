@@ -1,6 +1,8 @@
+import { Service } from "@decorators/Service";
 import { SanctionType, type SanctionReason } from "@prisma/client/client";
 import { prismaClient as prisma } from "@services/prismaService";
 
+@Service()
 export class SanctionReasonService {
 	static async create(
 		guildId: string,

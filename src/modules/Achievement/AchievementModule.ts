@@ -12,6 +12,8 @@ import { AchievementService } from "./services/AchievementService";
 	config: AchievementConfig,
 	events: [StatsUpdatedEvent],
 	commands: [AchievementCommand],
+	providers: [AchievementService],
+	exports: [AchievementService],
 })
 export class AchievementModule implements IModuleInstance {
 	moduleOptions!: ModuleOptions;

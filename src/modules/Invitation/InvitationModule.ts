@@ -5,6 +5,7 @@ import { GuildMemberRemove } from "./events/GuildMemberRemove";
 import { InviteCreate } from "./events/InviteCreate";
 import { InviteDelete } from "./events/InviteDelete";
 import { Ready } from "./events/Ready";
+import { InvitationService } from "./services/InvitationService";
 
 @Module({
 	name: "Invitation",
@@ -16,5 +17,7 @@ import { Ready } from "./events/Ready";
 		GuildMemberRemove,
 	],
 	commands: [InvitesCommand],
+	providers: [InvitationService],
+	exports: [InvitationService],
 })
 export class InvitationModule {}

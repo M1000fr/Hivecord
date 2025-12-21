@@ -1,3 +1,4 @@
+import { Service } from "@decorators/Service";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
@@ -9,6 +10,7 @@ import { Logger } from "@utils/Logger";
 import { Guild, GuildMember, User } from "discord.js";
 import { ModerationConfig } from "../ModerationConfig";
 
+@Service()
 export class SanctionService {
 	private static logger = new Logger("SanctionService");
 

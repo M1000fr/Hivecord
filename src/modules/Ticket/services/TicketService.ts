@@ -1,6 +1,7 @@
 import type { LeBotClient } from "@class/LeBotClient";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { OnConfigUpdate } from "@decorators/OnConfigUpdate";
+import { Service } from "@decorators/Service";
 import { ChannelType as PrismaChannelType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
 import { EntityService } from "@services/EntityService";
@@ -19,6 +20,7 @@ import {
 } from "discord.js";
 import { TicketConfigKeys } from "../TicketConfig";
 
+@Service()
 export class TicketService {
 	private static logger = new Logger("TicketService");
 

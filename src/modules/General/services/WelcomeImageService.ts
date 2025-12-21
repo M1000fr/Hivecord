@@ -1,9 +1,11 @@
+import { Service } from "@decorators/Service";
 import { Canvas, Image, loadImage, type SKRSContext2D } from "@napi-rs/canvas";
 import { Logger } from "@utils/Logger";
 import gifFrames from "gif-frames";
 import GIFEncoder from "gifencoder";
 import { Stream } from "stream";
 
+@Service()
 export class WelcomeImageService {
 	private static logger = new Logger("WelcomeImageService");
 
