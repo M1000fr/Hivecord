@@ -45,7 +45,7 @@ export abstract class BaseConfigInteractions {
 	protected async respondToInteraction(
 		interaction: RepliableInteraction,
 		content: string,
-		isError = false,
+		_isError = false,
 	) {
 		const payload = { content };
 		if (interaction.replied || interaction.deferred) {
