@@ -15,11 +15,7 @@ export type CacheType =
 export class ConfigCacheService {
 	constructor(private readonly redis: RedisService) {}
 
-	private getCacheKey(
-		guildId: string,
-		type: CacheType,
-		key: string,
-	): string {
+	private getCacheKey(guildId: string, type: CacheType, key: string): string {
 		return `config:${guildId}:${type}:${key}`;
 	}
 
