@@ -12,4 +12,5 @@ export interface ModuleOptions {
 	config?: new () => object;
 	providers?: Provider[];
 	exports?: ProviderToken[];
+	imports?: Constructor<object>[];
 }

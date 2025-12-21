@@ -25,9 +25,8 @@ import {
 	PermissionsBitField,
 	type ApplicationCommandDataResolvable,
 } from "discord.js";
-import { promises as fs } from "fs";
 import path from "path";
-import { fileURLToPath, pathToFileURL } from "url";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -269,100 +268,31 @@ export class LeBotClient<
 	}
 
 	private async loadModules() {
-		const modulesPath = path.join(__dirname, "../modules");
-		const folders = await fs.readdir(modulesPath);
-		const discoveredModules: Array<{
-			ModuleClass: Constructor<IModuleInstance>;
-			options: ModuleOptions;
-			instance?: IModuleInstance;
-		}> = [];
+		const registeredModules = this.container.getRegisteredModules();
 
-		for (const folder of folders) {
-			const folderPath = path.join(modulesPath, folder);
-			const stat = await fs.stat(folderPath);
-			if (!stat.isDirectory()) continue;
+		for (const [name, { options, moduleClass }] of registeredModules) {
+			if (options.type !== "bot") continue;
 
-			const filesInFolder = await fs.readdir(folderPath);
-			const candidateFiles = filesInFolder.filter(
-				(f) =>
-					f.startsWith(folder) &&
-					(f.endsWith(".ts") || f.endsWith(".js")),
-			);
+			this.logger.log(`Loading module: ${options.name}`);
 
-			let moduleLoaded = false;
+			let moduleInstance: IModuleInstance | undefined;
 
-			for (const moduleFile of candidateFiles) {
-				if (moduleLoaded) break;
-
-				const moduleFilePath = path.join(folderPath, moduleFile);
-				try {
-					const imported = await import(
-						pathToFileURL(moduleFilePath).href
-					);
-
-					for (const exportedKey in imported) {
-						const ExportedClass = imported[exportedKey];
-
-						if (typeof ExportedClass !== "function") continue;
-
-						const moduleMetadata =
-							this.container.getModuleOptionsFromConstructor(
-								ExportedClass as Constructor,
-							);
-						const extracted =
-							moduleMetadata !== undefined
-								? undefined
-								: this.extractModuleOptionsFromInstance(
-										ExportedClass,
-									);
-						const moduleOptions =
-							moduleMetadata ?? extracted?.options;
-
-						if (!moduleOptions) continue;
-
-						if (!moduleOptions.type) {
-							moduleOptions.type = "bot";
-						}
-
-						discoveredModules.push({
-							ModuleClass:
-								ExportedClass as Constructor<IModuleInstance>,
-							options: moduleOptions,
-							instance: extracted?.instance,
-						});
-						moduleLoaded = true;
-						break;
-					}
-				} catch (error) {
-					this.logger.error(
-						`Failed to load module from ${moduleFile}:`,
-						error instanceof Error ? error.stack : String(error),
-					);
-					throw error;
-				}
+			if (moduleClass) {
+				moduleInstance = this.container.resolve(
+					moduleClass as Constructor<IModuleInstance>,
+					options.name,
+				);
 			}
-		}
 
-		for (const { options, ModuleClass } of discoveredModules) {
-			this.container.registerModule(options, ModuleClass);
-		}
+			if (moduleInstance) {
+				this.modules.set(name, {
+					instance: moduleInstance,
+					options: options,
+				});
+			}
 
-		for (const module of discoveredModules) {
-			const moduleInstance =
-				module.instance ??
-				(this.container.resolve(
-					module.ModuleClass,
-					module.options.name,
-				) as IModuleInstance);
-
-			this.modules.set(module.options.name.toLowerCase(), {
-				instance: moduleInstance,
-				options: module.options,
-			});
-			this.logger.log(`Loading module: ${module.options.name}`);
-
-			this.loadCommands(module.options);
-			this.loadEvents(module.options);
+			this.loadCommands(options);
+			this.loadEvents(options);
 		}
 
 		for (const module of this.modules.values()) {

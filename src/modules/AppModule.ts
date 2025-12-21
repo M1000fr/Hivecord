@@ -1,6 +1,8 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Module } from "@decorators/Module";
 import { DependencyContainer } from "@di/DependencyContainer";
+import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
+import { GeneralModule } from "@modules/General/GeneralModule";
 import { I18nService } from "@services/I18nService";
 import { InfluxService } from "@services/InfluxService";
 import { PermissionService } from "@services/PermissionService";
@@ -11,6 +13,7 @@ import { RedisService } from "@services/RedisService";
 	name: "App",
 	type: "application",
 	global: true,
+	imports: [GeneralModule, ConfigurationModule],
 	providers: [PrismaService, PermissionService, LeBotClient],
 	exports: [PrismaService, PermissionService, LeBotClient],
 })

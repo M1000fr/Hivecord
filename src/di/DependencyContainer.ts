@@ -33,12 +33,21 @@ export class DependencyContainer {
 
 	private globalInstances = new Map<ProviderToken, unknown>();
 	private moduleInstances = new Map<string, Map<ProviderToken, unknown>>();
+	private registeredModules = new Map<
+		string,
+		{ options: ModuleOptions; moduleClass?: Constructor }
+	>();
 
 	static getInstance(): DependencyContainer {
 		return this.instance;
 	}
 
 	registerModule(options: ModuleOptions, moduleClass?: Constructor): void {
+		this.registeredModules.set(options.name.toLowerCase(), {
+			options,
+			moduleClass,
+		});
+
 		this.registerProviders(options.providers ?? [], {
 			moduleName: options.name,
 			exports: options.exports,
@@ -54,6 +63,29 @@ export class DependencyContainer {
 			};
 			this.storeProvider(provider, options.exports);
 		}
+
+		if (options.imports) {
+			for (const ImportedModule of options.imports) {
+				const importedOptions =
+					this.getModuleOptionsFromConstructor(ImportedModule);
+				if (importedOptions) {
+					this.registerModule(importedOptions, ImportedModule);
+				}
+			}
+		}
+	}
+
+	public getModuleOptionsFromConstructor(
+		target: Constructor,
+	): ModuleOptions | undefined {
+		return Reflect.getMetadata(MODULE_OPTIONS_METADATA_KEY, target);
+	}
+
+	public getRegisteredModules(): Map<
+		string,
+		{ options: ModuleOptions; moduleClass?: Constructor }
+	> {
+		return this.registeredModules;
 	}
 
 	registerProviders(
@@ -105,14 +137,6 @@ export class DependencyContainer {
 		);
 		this.saveInstance(provider, instance, normalizedModule);
 		return instance as T;
-	}
-
-	getModuleOptionsFromConstructor(
-		target: Constructor,
-	): ModuleOptions | undefined {
-		return Reflect.getMetadata(MODULE_OPTIONS_METADATA_KEY, target) as
-			| ModuleOptions
-			| undefined;
 	}
 
 	private findProvider(
