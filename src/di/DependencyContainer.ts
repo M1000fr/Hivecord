@@ -22,6 +22,7 @@ interface ProviderRegistrationContext {
 
 export class DependencyContainer {
 	private static instance = new DependencyContainer();
+	public static isInstantiating = false;
 
 	private globalProviders = new Map<ProviderToken, ResolvedProvider>();
 	private moduleProviders = new Map<
@@ -256,7 +257,12 @@ export class DependencyContainer {
 			return this.resolve(tokenToUse, moduleName ?? provider.moduleName);
 		});
 
-		return new provider.useClass(...dependencies) as T;
+		DependencyContainer.isInstantiating = true;
+		try {
+			return new provider.useClass(...dependencies) as T;
+		} finally {
+			DependencyContainer.isInstantiating = false;
+		}
 	}
 
 	private saveInstance<T>(
