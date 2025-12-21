@@ -1,6 +1,7 @@
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { CustomEmbedService } from "@modules/Configuration/services/CustomEmbedService";
+import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import {
 	type APIEmbed,
@@ -70,14 +71,15 @@ export class EmbedEditorInteractions {
 		const lng =
 			(await this.configService.of(session.guildId, GeneralConfig)
 				.generalLanguage) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const embed = new EmbedBuilder(session.data);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		await (interaction as any).update({
 			content: `**Embed Editor**: Editing \`${session.name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
 			embeds: [embed],
 			components: [
-				EmbedEditorMenus.getMainMenu(lng),
-				EmbedEditorMenus.getControlButtons(lng),
+				EmbedEditorMenus.getMainMenu(t),
+				EmbedEditorMenus.getControlButtons(t),
 			],
 		});
 	}
@@ -90,6 +92,7 @@ export class EmbedEditorInteractions {
 		const lng =
 			(await this.configService.of(session.guildId, GeneralConfig)
 				.generalLanguage) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const value = interaction.values[0];
 		if (!value) return;
 
@@ -97,8 +100,8 @@ export class EmbedEditorInteractions {
 			// Show fields submenu
 			await interaction.update({
 				components: [
-					EmbedEditorMenus.getFieldsSubMenu(lng, session.data.fields),
-					EmbedEditorMenus.getControlButtons(lng),
+					EmbedEditorMenus.getFieldsSubMenu(t, session.data.fields),
+					EmbedEditorMenus.getControlButtons(t),
 				],
 			});
 			return;
@@ -110,12 +113,12 @@ export class EmbedEditorInteractions {
 			content: `**Embed Editor**: Editing \`${session.name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
 			embeds: [embed],
 			components: [
-				EmbedEditorMenus.getMainMenu(lng),
-				EmbedEditorMenus.getControlButtons(lng),
+				EmbedEditorMenus.getMainMenu(t),
+				EmbedEditorMenus.getControlButtons(t),
 			],
 		});
 
-		const modal = EmbedEditorModals.getModal(lng, value, session.data);
+		const modal = EmbedEditorModals.getModal(t, value, session.data);
 		await interaction.showModal(modal);
 	}
 
@@ -127,6 +130,7 @@ export class EmbedEditorInteractions {
 		const lng =
 			(await this.configService.of(session.guildId, GeneralConfig)
 				.generalLanguage) ?? "en";
+		const t = I18nService.getFixedT(lng);
 		const value = interaction.values[0];
 		if (!value) return;
 
@@ -139,8 +143,8 @@ export class EmbedEditorInteractions {
 			// Reset the menu selection
 			await interaction.message.edit({
 				components: [
-					EmbedEditorMenus.getFieldsSubMenu(lng, session.data.fields),
-					EmbedEditorMenus.getControlButtons(lng),
+					EmbedEditorMenus.getFieldsSubMenu(t, session.data.fields),
+					EmbedEditorMenus.getControlButtons(t),
 				],
 			});
 
@@ -154,14 +158,14 @@ export class EmbedEditorInteractions {
 				session.userId,
 			);
 
-			const modal = EmbedEditorModals.getModal(lng, "field_add");
+			const modal = EmbedEditorModals.getModal(t, "field_add");
 			await interaction.showModal(modal);
 		} else if (value.startsWith("field_edit_")) {
 			// Reset the menu selection
 			await interaction.message.edit({
 				components: [
-					EmbedEditorMenus.getFieldsSubMenu(lng, session.data.fields),
-					EmbedEditorMenus.getControlButtons(lng),
+					EmbedEditorMenus.getFieldsSubMenu(t, session.data.fields),
+					EmbedEditorMenus.getControlButtons(t),
 				],
 			});
 
@@ -178,7 +182,7 @@ export class EmbedEditorInteractions {
 					session.userId,
 				);
 
-				const modal = EmbedEditorModals.getModal(lng, "field_edit", {
+				const modal = EmbedEditorModals.getModal(t, "field_edit", {
 					field,
 				});
 				await interaction.showModal(modal);
