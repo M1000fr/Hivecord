@@ -1,13 +1,8 @@
-import { Injectable } from "@decorators/Injectable";
-import { PrismaService } from "@modules/Core/services/PrismaService";
+import { Repository } from "@decorators/Repository";
 import { BaseRepository } from "./BaseRepository";
 
-@Injectable()
+@Repository()
 export class RoleRepository extends BaseRepository {
-	constructor(prisma: PrismaService) {
-		super(prisma);
-	}
-
 	async upsert(
 		roleId: string,
 		guildId: string,

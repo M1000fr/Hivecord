@@ -1,14 +1,9 @@
-import { Injectable } from "@decorators/Injectable";
-import { PrismaService } from "@modules/Core/services/PrismaService";
+import { Repository } from "@decorators/Repository";
 import { ChannelType } from "@prisma/client/enums";
 import { BaseRepository } from "./BaseRepository";
 
-@Injectable()
+@Repository()
 export class ChannelRepository extends BaseRepository {
-	constructor(prisma: PrismaService) {
-		super(prisma);
-	}
-
 	async upsert(
 		channelId: string,
 		guildId: string,
