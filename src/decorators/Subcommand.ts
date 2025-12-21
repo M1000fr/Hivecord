@@ -1,5 +1,5 @@
 import { EPermission } from "@enums/EPermission";
-import type { ICommandClass } from "@interfaces/ICommandClass";
+import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 
 export interface SubcommandOptions {
 	name: string;

@@ -3,8 +3,8 @@ import {
 	CommandParamType,
 	type CommandParameter,
 } from "@decorators/params";
-import type { ICommandClass } from "@interfaces/ICommandClass";
-import type { ICommandInstance } from "@interfaces/ICommandInstance";
+import type { ICommandClass } from "@interfaces/ICommandClass.ts";
+import type { ICommandInstance } from "@interfaces/ICommandInstance.ts";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";

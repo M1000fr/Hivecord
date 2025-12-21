@@ -8,7 +8,7 @@ import { BotEvents } from "@enums/BotEvents";
 import { WelcomeImageService } from "@modules/General/services/WelcomeImageService";
 import { ConfigService } from "@services/ConfigService";
 import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
-import type { ContextOf } from "@src/types/ContextOf";
+import type { ContextOf } from "@src/types/ContextOf.ts";
 import { Logger } from "@utils/Logger";
 import {
 	AttachmentBuilder,

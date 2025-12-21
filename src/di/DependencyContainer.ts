@@ -12,7 +12,7 @@ import {
 	type ResolvedProvider,
 	type ValueProvider,
 } from "@di/types";
-import type { ModuleOptions } from "@interfaces/ModuleOptions";
+import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
 
 interface ProviderRegistrationContext {
 	moduleName?: string;

@@ -1,6 +1,6 @@
 import { EPermission } from "@enums/EPermission";
-import type { CommandOptions } from "@interfaces/CommandOptions";
-import type { ICommandClass } from "@interfaces/ICommandClass";
+import type { CommandOptions } from "@interfaces/CommandOptions.ts";
+import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 
 export function CommandController(options: CommandOptions) {
 	return function (target: unknown) {

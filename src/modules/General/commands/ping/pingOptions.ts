@@ -1,4 +1,4 @@
-import type { CommandOptions } from "@interfaces/CommandOptions";
+import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import { InteractionContextType } from "discord.js";
 
 export const pingOptions: CommandOptions = {

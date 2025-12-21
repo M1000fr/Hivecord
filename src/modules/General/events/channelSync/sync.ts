@@ -6,7 +6,7 @@ import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@services/EntityService";
 import { PrismaService } from "@services/PrismaService";
-import type { ContextOf } from "@src/types/ContextOf";
+import type { ContextOf } from "@src/types/ContextOf.ts";
 import { Logger } from "@utils/Logger";
 
 @EventController()

@@ -1,4 +1,4 @@
-import type { EventOptions } from "@interfaces/EventOptions";
+import type { EventOptions } from "@interfaces/EventOptions.ts";
 import type { ClientEvents } from "discord.js";
 import "reflect-metadata";
 

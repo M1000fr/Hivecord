@@ -2,7 +2,7 @@ import "reflect-metadata";
 
 import type { IModuleConfigClass } from "@decorators/ModuleConfig";
 import { MODULE_OPTIONS_METADATA_KEY, type ProviderToken } from "@di/types";
-import type { ModuleOptions } from "@interfaces/ModuleOptions";
+import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
 
 function ensureExportsAreDeclared(options: ModuleOptions) {
 	if (options.exports && !options.providers) {

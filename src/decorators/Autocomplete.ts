@@ -1,4 +1,4 @@
-import type { ICommandClass } from "@interfaces/ICommandClass";
+import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 
 export interface AutocompleteOptions {
 	optionName: string;

@@ -5,7 +5,7 @@ import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
 import { InteractionRegistry } from "@registers/InteractionRegistry";
-import type { ContextOf } from "@src/types/ContextOf";
+import type { ContextOf } from "@src/types/ContextOf.ts";
 
 @EventController()
 export default class InteractionRegistryHandler {

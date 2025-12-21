@@ -4,7 +4,7 @@ import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { SyncService } from "@modules/General/services/SyncService";
-import type { ContextOf } from "@src/types/ContextOf";
+import type { ContextOf } from "@src/types/ContextOf.ts";
 import { Logger } from "@utils/Logger";
 import { Events } from "discord.js";
 

@@ -5,7 +5,7 @@ import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
-import type { ContextOf } from "@src/types/ContextOf";
+import type { ContextOf } from "@src/types/ContextOf.ts";
 import { WelcomeRoleService } from "../../services/WelcomeRoleService";
 
 @Injectable()

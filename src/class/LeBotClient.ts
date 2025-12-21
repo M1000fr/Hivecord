@@ -8,10 +8,10 @@ import {
 import { DependencyContainer } from "@di/DependencyContainer";
 import type { Constructor } from "@di/types";
 import { EPermission } from "@enums/EPermission";
-import type { CommandOptions } from "@interfaces/CommandOptions";
-import type { ICommandClass } from "@interfaces/ICommandClass";
-import type { IModuleInstance } from "@interfaces/IModuleInstance";
-import type { ModuleOptions } from "@interfaces/ModuleOptions";
+import type { CommandOptions } from "@interfaces/CommandOptions.ts";
+import type { ICommandClass } from "@interfaces/ICommandClass.ts";
+import type { IModuleInstance } from "@interfaces/IModuleInstance.ts";
+import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
 import { PermissionService } from "@services/PermissionService";
 import { PrismaService } from "@services/PrismaService";
 import { Logger } from "@utils/Logger";
