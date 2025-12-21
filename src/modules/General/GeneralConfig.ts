@@ -1,5 +1,5 @@
 import { ConfigContext } from "@decorators/ConfigContext";
-import { ConfigProperty } from "@decorators/ConfigProperty";
+import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 
@@ -14,7 +14,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "La langue globale du bot (ex: en, fr)",
 		},
-		type: "StringChoice",
+		type: EConfigType.StringChoice,
 		choices: [
 			{
 				name: "English",
@@ -44,7 +44,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Le texte à afficher sur l'image de bienvenue",
 		},
-		type: "String",
+		type: EConfigType.String,
 	})
 	generalWelcomeMessageImage: string = "Welcome!";
 
@@ -63,7 +63,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Le texte du message de bienvenue",
 		},
-		type: "String",
+		type: EConfigType.String,
 	})
 	generalWelcomeMessage: string = "Welcome {user} to {guild}!";
 
@@ -76,7 +76,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Le salon où envoyer les messages de bienvenue",
 		},
-		type: "Channel",
+		type: EConfigType.Channel,
 	})
 	generalWelcomeChannelId: string = "";
 
@@ -89,7 +89,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Le nom de l'embed personnalisé à utiliser",
 		},
-		type: "CustomEmbed",
+		type: EConfigType.CustomEmbed,
 	})
 	generalWelcomeEmbedName: string = "";
 
@@ -102,7 +102,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Rôles à ajouter aux nouveaux membres",
 		},
-		type: "RoleArray",
+		type: EConfigType.RoleArray,
 	})
 	generalWelcomeRoles: string[] = [];
 
@@ -115,7 +115,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "L'image de fond pour la carte de bienvenue",
 		},
-		type: "Attachment",
+		type: EConfigType.Attachment,
 	})
 	generalWelcomeBackground: string = "";
 }

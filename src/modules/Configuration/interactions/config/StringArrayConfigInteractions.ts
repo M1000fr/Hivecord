@@ -210,7 +210,6 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
-			[],
 		)) as string[];
 
 		const newValues = [...currentValues, newValue];
@@ -237,7 +236,6 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
-			[],
 		)) as string[];
 
 		if (currentValues.length === 0) {
@@ -317,7 +315,6 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
-			[],
 		)) as string[];
 
 		const newValues = currentValues.filter(
@@ -346,7 +343,6 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
-			[],
 		)) as string[];
 
 		if (currentValues.length === 0) {
@@ -413,7 +409,6 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
-			[],
 		)) as string[];
 
 		const valueToEdit = currentValues[Number(index)] || "";
@@ -457,7 +452,6 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
-			[],
 		)) as string[];
 
 		if (index >= 0 && index < currentValues.length) {

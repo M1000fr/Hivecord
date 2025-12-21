@@ -28,7 +28,7 @@ export interface ConfigPropertyOptions {
 	displayNameLocalizations?: LocalizationMap;
 	description: string;
 	descriptionLocalizations?: LocalizationMap;
-	type: EConfigType | keyof typeof EConfigType;
+	type: EConfigType;
 	required?: boolean;
 	choices?: ConfigChoice[];
 	nonNull?: boolean;
