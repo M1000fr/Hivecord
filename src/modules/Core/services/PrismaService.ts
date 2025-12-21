@@ -3,7 +3,7 @@ import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "@prisma/client/client";
 import { Logger } from "@utils/Logger";
 
-@Injectable()
+@Injectable({ scope: "global" })
 export class PrismaService extends PrismaClient {
 	private readonly logger = new Logger("PrismaService");
 

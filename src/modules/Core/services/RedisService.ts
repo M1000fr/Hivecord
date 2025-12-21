@@ -2,7 +2,7 @@ import { Injectable } from "@decorators/Injectable";
 import { Logger } from "@utils/Logger";
 import Redis from "ioredis";
 
-@Injectable()
+@Injectable({ scope: "global" })
 export class RedisService {
 	public readonly client: Redis;
 	private readonly logger = new Logger("RedisService");
