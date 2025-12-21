@@ -1,6 +1,7 @@
 import { Module } from "@decorators/Module";
 import {
 	ChannelRepository,
+	CustomEmbedRepository,
 	GuildRepository,
 	RoleRepository,
 	UserRepository,
@@ -27,6 +28,7 @@ import { RedisService } from "./services/RedisService";
 		UserRepository,
 		RoleRepository,
 		ChannelRepository,
+		CustomEmbedRepository,
 	],
 	exports: [
 		PrismaService,
@@ -40,6 +42,7 @@ import { RedisService } from "./services/RedisService";
 		UserRepository,
 		RoleRepository,
 		ChannelRepository,
+		CustomEmbedRepository,
 	],
 })
 export class CoreModule {}
