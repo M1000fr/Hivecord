@@ -21,10 +21,11 @@ export class WelcomeRoleSyncService {
 	constructor(
 		private readonly configService: ConfigService,
 		private readonly welcomeRoleService: WelcomeRoleService,
+		private readonly redis: RedisService,
 	) {}
 
 	async getState(guildId: string): Promise<SyncState> {
-		const redis = RedisService.getInstance();
+		const redis = this.redis.client;
 		const state = await redis.get(
 			`${WelcomeRoleSyncService.REDIS_KEY}:${guildId}`,
 		);
@@ -34,7 +35,7 @@ export class WelcomeRoleSyncService {
 	}
 
 	async setState(guildId: string, state: SyncState) {
-		const redis = RedisService.getInstance();
+		const redis = this.redis.client;
 		await redis.set(
 			`${WelcomeRoleSyncService.REDIS_KEY}:${guildId}`,
 			JSON.stringify(state),

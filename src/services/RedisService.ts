@@ -1,30 +1,28 @@
+import { Injectable } from "@decorators/Injectable";
 import { Logger } from "@utils/Logger";
 import Redis from "ioredis";
 
+@Injectable()
 export class RedisService {
-	private static instance: Redis;
-	static logger = new Logger("RedisService");
+	public readonly client: Redis;
+	private readonly logger = new Logger("RedisService");
 
-	public static getInstance(): Redis {
-		if (!this.instance) {
-			const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
-			this.instance = new Redis(redisUrl);
+	constructor() {
+		const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
+		this.client = new Redis(redisUrl);
 
-			this.instance.on("error", (err) => {
-				this.logger.error("Redis Error:", err.stack, "RedisService");
-			});
+		this.client.on("error", (err) => {
+			this.logger.error("Redis Error:", err.stack, "RedisService");
+		});
 
-			this.instance.on("connect", () => {
-				this.logger.log("Connected to Redis");
-			});
-		}
-		return this.instance;
+		this.client.on("connect", () => {
+			this.logger.log("Connected to Redis");
+		});
 	}
 
-	public static async checkConnection(): Promise<void> {
-		const redis = this.getInstance();
+	public async checkConnection(): Promise<void> {
 		try {
-			await redis.ping();
+			await this.client.ping();
 		} catch (error) {
 			const trace = error instanceof Error ? error.stack : String(error);
 			this.logger.error(

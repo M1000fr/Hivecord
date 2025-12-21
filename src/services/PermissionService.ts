@@ -9,7 +9,10 @@ const CACHE_TTL = 60; // 60 seconds
 export class PermissionService {
 	private logger = new Logger("PermissionService");
 
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private readonly redis: RedisService,
+	) {}
 
 	async hasPermission(
 		userId: string,
@@ -21,7 +24,7 @@ export class PermissionService {
 			return true;
 		}
 
-		const redis = RedisService.getInstance();
+		const redis = this.redis.client;
 
 		for (const roleId of userRoleIds) {
 			const cacheKey = `permissions:role:${roleId}`;

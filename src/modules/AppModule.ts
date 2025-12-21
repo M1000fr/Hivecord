@@ -21,8 +21,10 @@ import {
 	global: true,
 	imports: [GeneralModule, ConfigurationModule],
 	providers: [
+		RedisService,
 		PrismaService,
 		PermissionService,
+
 		LeBotClient,
 		GuildRepository,
 		UserRepository,
@@ -48,7 +50,8 @@ export class AppModule {
 		await prismaService.checkDatabaseConnection();
 
 		// Check other connections
-		await RedisService.checkConnection();
+		const redisService = container.resolve(RedisService);
+		await redisService.checkConnection();
 		await InfluxService.checkConnection();
 
 		// Initialize I18n

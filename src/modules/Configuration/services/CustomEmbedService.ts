@@ -12,6 +12,7 @@ export class CustomEmbedService {
 	constructor(
 		private readonly entityService: EntityService,
 		private readonly customEmbedRepository: CustomEmbedRepository,
+		private readonly redis: RedisService,
 	) {}
 
 	/**
@@ -81,7 +82,7 @@ export class CustomEmbedService {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		meta?: Record<string, any>;
 	} | null> {
-		const redis = RedisService.getInstance();
+		const redis = this.redis.client;
 		const key = `embed:editor:${sessionId}`;
 		const data = await redis.get(key);
 		return data ? JSON.parse(data) : null;
@@ -96,7 +97,7 @@ export class CustomEmbedService {
 		meta?: Record<string, any>,
 		userId?: string,
 	): Promise<void> {
-		const redis = RedisService.getInstance();
+		const redis = this.redis.client;
 		const key = `embed:editor:${sessionId}`;
 		await redis.set(
 			key,
@@ -107,7 +108,7 @@ export class CustomEmbedService {
 	}
 
 	async clearEditorSession(sessionId: string): Promise<void> {
-		const redis = RedisService.getInstance();
+		const redis = this.redis.client;
 		const key = `embed:editor:${sessionId}`;
 		await redis.del(key);
 	}

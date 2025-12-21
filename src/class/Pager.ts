@@ -1,3 +1,4 @@
+import { DependencyContainer } from "@di/DependencyContainer";
 import { PagerRegistry } from "@registers/PagerRegistry";
 import { RedisService } from "@services/RedisService";
 import {
@@ -137,7 +138,9 @@ export class Pager<T> {
 
 		// If persistent, save state and return (don't start collector)
 		if (this.type) {
-			const redis = RedisService.getInstance();
+			const redisService =
+				DependencyContainer.getInstance().resolve(RedisService);
+			const redis = redisService.client;
 			const state = {
 				items: this.items,
 				itemsPerPage: this.itemsPerPage,
@@ -195,8 +198,11 @@ export class Pager<T> {
 	static async handleInteraction(
 		interaction: ButtonInteraction | StringSelectMenuInteraction,
 	) {
-		const redis = RedisService.getInstance();
+		const redisService =
+			DependencyContainer.getInstance().resolve(RedisService);
+		const redis = redisService.client;
 		const key = `pager:${interaction.message.id}`;
+
 		const data = await redis.get(key);
 
 		if (!data) return false; // Not a pager interaction
