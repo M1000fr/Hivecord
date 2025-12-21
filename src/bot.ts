@@ -1,24 +1,11 @@
 import "reflect-metadata";
 
-import { LeBotClient } from "@class/LeBotClient";
-import { I18nService } from "@services/I18nService";
-import { InfluxService } from "@services/InfluxService";
-import { checkDatabaseConnection } from "@services/prismaService";
-import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
+import { Bootstrap } from "./Bootstrap";
 
 const logger = new Logger("Bootstrap");
-logger.log("Starting LeBot...");
 
-// Check connections before starting
-await checkDatabaseConnection();
-await RedisService.checkConnection();
-await InfluxService.checkConnection();
-
-// Initialize I18n
-await I18nService.init();
-
-const leBotInstance = new LeBotClient();
+const leBotInstance = await Bootstrap.create();
 
 try {
 	await leBotInstance.start(process.env.DISCORD_TOKEN as string);
