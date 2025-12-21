@@ -24,7 +24,8 @@
 			"@types/*": ["./src/types/*"],
 			"@utils/*": ["./src/utils/*"],
 			"@registers/*": ["./src/registers/*"],
-			"@prisma/*": ["./src/prisma/*"]
+			"@prisma/*": ["./src/prisma/*"],
+			"@di/*": ["./src/di/*"]
 		},
 		// Best practices
 		"strict": true,
@@ -36,6 +37,7 @@
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"noPropertyAccessFromIndexSignature": false,
-		"experimentalDecorators": true
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true
 	}
 }
