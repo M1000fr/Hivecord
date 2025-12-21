@@ -122,7 +122,7 @@ export class LeBotClient<
 			const hash = createHash("md5")
 				.update(JSON.stringify(commandsData))
 				.digest("hex");
-			const dbKey = `lebot:commands_hash:${debugGuildId || "global"}`;
+			const dbKey = `commands_hash:${debugGuildId || "global"}`;
 			const storedState = await this.prismaService.botState.findUnique({
 				where: { key: dbKey },
 			});

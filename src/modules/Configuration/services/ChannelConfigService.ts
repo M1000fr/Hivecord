@@ -14,11 +14,8 @@ export class ChannelConfigService {
 
 	async get(guildId: string, key: string): Promise<string | null> {
 		return this.cache.get(guildId, "channel", key, async () => {
-			const config = await this.prisma.channelConfiguration.findFirst({
-				where: {
-					key,
-					Channel: { guildId },
-				},
+			const config = await this.prisma.channelConfiguration.findUnique({
+				where: { key },
 			});
 			return config?.channelId ?? null;
 		});
@@ -37,24 +34,18 @@ export class ChannelConfigService {
 			channelType,
 		);
 
-		await this.prisma.$transaction([
-			this.prisma.channelConfiguration.deleteMany({
-				where: {
-					key,
-					Channel: { guildId },
-				},
-			}),
-			this.prisma.channelConfiguration.create({
-				data: { key, channelId },
-			}),
-		]);
+		await this.prisma.channelConfiguration.upsert({
+			where: { key },
+			update: { channelId },
+			create: { key, channelId },
+		});
 
 		await this.cache.invalidate(guildId, key);
 	}
 
-	async getMany(guildId: string, key: string): Promise<string[]> {
+	async getList(guildId: string, key: string): Promise<string[]> {
 		return this.cache.get(guildId, "channels", key, async () => {
-			const configs = await this.prisma.channelConfiguration.findMany({
+			const configs = await this.prisma.channelListConfiguration.findMany({
 				where: {
 					key,
 					Channel: { guildId },
@@ -64,7 +55,7 @@ export class ChannelConfigService {
 		});
 	}
 
-	async add(
+	async addToList(
 		guildId: string,
 		key: string,
 		channelId: string,
@@ -77,7 +68,7 @@ export class ChannelConfigService {
 			channelType,
 		);
 
-		await this.prisma.channelConfiguration.upsert({
+		await this.prisma.channelListConfiguration.upsert({
 			where: { key_channelId: { key, channelId } },
 			update: {},
 			create: { key, channelId },
@@ -86,13 +77,13 @@ export class ChannelConfigService {
 		await this.cache.invalidate(guildId, key);
 	}
 
-	async remove(
+	async removeFromList(
 		guildId: string,
 		key: string,
 		channelId: string,
 	): Promise<void> {
 		try {
-			await this.prisma.channelConfiguration.delete({
+			await this.prisma.channelListConfiguration.delete({
 				where: { key_channelId: { key, channelId } },
 			});
 			await this.cache.invalidate(guildId, key);
@@ -101,8 +92,19 @@ export class ChannelConfigService {
 		}
 	}
 
-	async delete(guildId: string, key: string): Promise<void> {
-		await this.prisma.channelConfiguration.deleteMany({
+	async delete(guildId: string, key: string, _channelId: string): Promise<void> {
+		try {
+			await this.prisma.channelConfiguration.delete({
+				where: { key },
+			});
+			await this.cache.invalidate(guildId, key);
+		} catch {
+			// Ignore if not found
+		}
+	}
+
+	async clearList(guildId: string, key: string): Promise<void> {
+		await this.prisma.channelListConfiguration.deleteMany({
 			where: {
 				key,
 				Channel: { guildId },

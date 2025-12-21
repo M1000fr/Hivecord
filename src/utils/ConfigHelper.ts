@@ -82,7 +82,7 @@ export class ConfigHelper {
 		if (type === EConfigType.Role)
 			value = await this.configService.getRole(guildId, snakeKey);
 		else if (type === EConfigType.RoleArray)
-			value = await this.configService.getRoles(guildId, snakeKey);
+			value = await this.configService.getRoleList(guildId, snakeKey);
 		else if (type === EConfigType.StringArray) {
 			value = await this.configService.getMany(guildId, snakeKey);
 		} else if (type === EConfigType.Channel)
@@ -106,7 +106,7 @@ export class ConfigHelper {
 				value as string,
 			);
 		if (type === EConfigType.RoleArray)
-			return this.configService.setRoles(
+			return this.configService.setRoleList(
 				guildId,
 				snakeKey,
 				value as string[],
@@ -132,10 +132,10 @@ export class ConfigHelper {
 		type: EConfigType,
 	): Promise<void> {
 		const snakeKey = ConfigHelper.toSnakeCase(key);
-		if (type === EConfigType.Role)
-			return this.configService.deleteRole(guildId, snakeKey);
+		if (type === EConfigType.Role || type === EConfigType.RoleArray)
+			return this.configService.clearRoleList(guildId, snakeKey);
 		if (type === EConfigType.Channel)
-			return this.configService.deleteChannel(guildId, snakeKey);
+			return this.configService.clearChannelList(guildId, snakeKey);
 		return this.configService.delete(guildId, snakeKey);
 	}
 

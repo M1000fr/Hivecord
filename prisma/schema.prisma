@@ -79,8 +79,9 @@ model Channel {
     type      ChannelType
     deletedAt DateTime?
 
-    ChannelConfigurations ChannelConfiguration[]
-    Ticket                Ticket?
+    SingleChannelConfigs ChannelConfiguration[]       @relation("SingleChannelConfigs")
+    ListChannelConfigs   ChannelListConfiguration[] @relation("ListChannelConfigs")
+    Ticket               Ticket?
 }
 
 model Role {
@@ -89,8 +90,9 @@ model Role {
     Guild     Guild     @relation(fields: [guildId], references: [id])
     deletedAt DateTime?
 
-    Groups             Group[]
-    RoleConfigurations RoleConfiguration[]
+    Groups            Group[]
+    SingleRoleConfigs RoleConfiguration[]       @relation("SingleRoleConfigs")
+    ListRoleConfigs   RoleListConfiguration[] @relation("ListRoleConfigs")
 }
 
 model Permission {
@@ -165,17 +167,29 @@ model Configuration {
 }
 
 model ChannelConfiguration {
+    key       String  @id
+    channelId String
+    Channel   Channel @relation("SingleChannelConfigs", fields: [channelId], references: [id])
+}
+
+model ChannelListConfiguration {
     key       String
     channelId String
-    Channel   Channel @relation(fields: [channelId], references: [id])
+    Channel   Channel @relation("ListChannelConfigs", fields: [channelId], references: [id])
 
     @@id([key, channelId])
 }
 
 model RoleConfiguration {
+    key    String @id
+    roleId String
+    Role   Role   @relation("SingleRoleConfigs", fields: [roleId], references: [id])
+}
+
+model RoleListConfiguration {
     key    String
     roleId String
-    Role   Role   @relation(fields: [roleId], references: [id])
+    Role   Role   @relation("ListRoleConfigs", fields: [roleId], references: [id])
 
     @@id([key, roleId])
 }

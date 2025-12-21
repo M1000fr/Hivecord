@@ -20,11 +20,8 @@ export class RoleConfigService {
 
 	async get(guildId: string, key: string): Promise<string | null> {
 		return this.cache.get(guildId, "role", key, async () => {
-			const config = await this.prisma.roleConfiguration.findFirst({
-				where: {
-					key,
-					Role: { guildId },
-				},
+			const config = await this.prisma.roleConfiguration.findUnique({
+				where: { key },
 			});
 			return config?.roleId ?? null;
 		});
@@ -32,22 +29,18 @@ export class RoleConfigService {
 
 	async set(guildId: string, key: string, roleId: string): Promise<void> {
 		await this.ensureRoleExists(roleId, guildId);
-		await this.prisma.$transaction([
-			this.prisma.roleConfiguration.deleteMany({
-				where: {
-					key,
-					Role: { guildId },
-				},
-			}),
-			this.prisma.roleConfiguration.create({ data: { key, roleId } }),
-		]);
+		await this.prisma.roleConfiguration.upsert({
+			where: { key },
+			update: { roleId },
+			create: { key, roleId },
+		});
 
 		await this.cache.invalidate(guildId, key);
 	}
 
-	async getMany(guildId: string, key: string): Promise<string[]> {
+	async getList(guildId: string, key: string): Promise<string[]> {
 		return this.cache.get(guildId, "roles", key, async () => {
-			const configs = await this.prisma.roleConfiguration.findMany({
+			const configs = await this.prisma.roleListConfiguration.findMany({
 				where: {
 					key,
 					Role: { guildId },
@@ -57,13 +50,13 @@ export class RoleConfigService {
 		});
 	}
 
-	async setMany(
+	async setList(
 		guildId: string,
 		key: string,
 		roleIds: string[],
 	): Promise<void> {
 		await this.prisma.$transaction(async (tx) => {
-			await tx.roleConfiguration.deleteMany({
+			await tx.roleListConfiguration.deleteMany({
 				where: {
 					key,
 					Role: { guildId },
@@ -75,16 +68,16 @@ export class RoleConfigService {
 					update: { guildId },
 					create: { id: roleId, guildId },
 				});
-				await tx.roleConfiguration.create({ data: { key, roleId } });
+				await tx.roleListConfiguration.create({ data: { key, roleId } });
 			}
 		});
 
 		await this.cache.invalidate(guildId, key);
 	}
 
-	async add(guildId: string, key: string, roleId: string): Promise<void> {
+	async addToList(guildId: string, key: string, roleId: string): Promise<void> {
 		await this.ensureRoleExists(roleId, guildId);
-		await this.prisma.roleConfiguration.upsert({
+		await this.prisma.roleListConfiguration.upsert({
 			where: { key_roleId: { key, roleId } },
 			update: {},
 			create: { key, roleId },
@@ -93,9 +86,9 @@ export class RoleConfigService {
 		await this.cache.invalidate(guildId, key);
 	}
 
-	async remove(guildId: string, key: string, roleId: string): Promise<void> {
+	async removeFromList(guildId: string, key: string, roleId: string): Promise<void> {
 		try {
-			await this.prisma.roleConfiguration.delete({
+			await this.prisma.roleListConfiguration.delete({
 				where: { key_roleId: { key, roleId } },
 			});
 			await this.cache.invalidate(guildId, key);
@@ -104,8 +97,19 @@ export class RoleConfigService {
 		}
 	}
 
-	async delete(guildId: string, key: string): Promise<void> {
-		await this.prisma.roleConfiguration.deleteMany({
+	async delete(guildId: string, key: string, _roleId: string): Promise<void> {
+		try {
+			await this.prisma.roleConfiguration.delete({
+				where: { key },
+			});
+			await this.cache.invalidate(guildId, key);
+		} catch {
+			// Ignore if not found
+		}
+	}
+
+	async clearList(guildId: string, key: string): Promise<void> {
+		await this.prisma.roleListConfiguration.deleteMany({
 			where: {
 				key,
 				Role: { guildId },

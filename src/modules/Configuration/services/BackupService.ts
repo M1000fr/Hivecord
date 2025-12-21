@@ -103,7 +103,7 @@ class ConfigExtractor {
 	): Promise<string | string[] | null> {
 		if (type === EConfigType.Role) {
 			// Check if it's a multi-role configuration
-			const roles = await configService.getRoles(guildId, key);
+			const roles = await configService.getRoleList(guildId, key);
 			if (roles.length > 0) return roles;
 
 			const role = await configService.getRole(guildId, key);
@@ -136,7 +136,7 @@ class ConfigRestorer {
 					if (value.length === 1 && value[0]) {
 						await configService.setRole(guildId, key, value[0]);
 					} else if (value.length > 1) {
-						await configService.setRoles(guildId, key, value);
+						await configService.setRoleList(guildId, key, value);
 					}
 				}
 			} else if (type === EConfigType.Channel) {

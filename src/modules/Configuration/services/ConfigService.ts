@@ -53,7 +53,7 @@ export class ConfigService {
 					case EConfigType.Role:
 						return this.roleConfig.get(guildId, key);
 					case EConfigType.RoleArray:
-						return this.roleConfig.getMany(guildId, key);
+					return this.roleConfig.getList(guildId, key);
 					case EConfigType.StringArray:
 						return this.getMany(guildId, key);
 					case EConfigType.Integer:
@@ -175,25 +175,39 @@ export class ConfigService {
 		await this.notifyUpdate(guildId, key, channelId);
 	}
 
-	async getChannels(guildId: string, key: string): Promise<string[]> {
-		return this.channelConfig.getMany(guildId, key);
+	async getChannelList(guildId: string, key: string): Promise<string[]> {
+		return this.channelConfig.getList(guildId, key);
 	}
 
-	async addChannel(
+	async addChannelToList(
 		guildId: string,
 		key: string,
 		channelId: string,
 		channelType: ChannelType = ChannelType.TEXT,
 	): Promise<void> {
-		await this.channelConfig.add(guildId, key, channelId, channelType);
+		await this.channelConfig.addToList(guildId, key, channelId, channelType);
 	}
 
-	async removeChannel(
+	async removeChannelFromListFromList(
 		guildId: string,
 		key: string,
 		channelId: string,
 	): Promise<void> {
-		await this.channelConfig.remove(guildId, key, channelId);
+		await this.channelConfig.removeFromList(guildId, key, channelId);
+	}
+
+	async deleteChannel(
+		guildId: string,
+		key: string,
+		channelId: string,
+	): Promise<void> {
+		await this.channelConfig.delete(guildId, key, channelId);
+		await this.notifyUpdate(guildId, key, null);
+	}
+
+	async clearChannelList(guildId: string, key: string): Promise<void> {
+		await this.channelConfig.clearList(guildId, key);
+		await this.notifyUpdate(guildId, key, null);
 	}
 
 	async getRole(guildId: string, key: string): Promise<string | null> {
@@ -205,47 +219,57 @@ export class ConfigService {
 		await this.notifyUpdate(guildId, key, roleId);
 	}
 
-	async getRoles(guildId: string, key: string): Promise<string[]> {
-		return this.roleConfig.getMany(guildId, key);
+	async getRoleList(guildId: string, key: string): Promise<string[]> {
+		return this.roleConfig.getList(guildId, key);
 	}
 
-	async setRoles(
+	async setRoleList(
 		guildId: string,
 		key: string,
 		roleIds: string[],
 	): Promise<void> {
-		await this.roleConfig.setMany(guildId, key, roleIds);
+		await this.roleConfig.setList(guildId, key, roleIds);
 	}
 
-	async addRole(guildId: string, key: string, roleId: string): Promise<void> {
-		await this.roleConfig.add(guildId, key, roleId);
+	async addRoleToListToList(guildId: string, key: string, roleId: string): Promise<void> {
+		await this.roleConfig.addToList(guildId, key, roleId);
 	}
 
-	async removeRole(
+	async removeRoleFromListFromList(
 		guildId: string,
 		key: string,
 		roleId: string,
 	): Promise<void> {
-		await this.roleConfig.remove(guildId, key, roleId);
+		await this.roleConfig.removeFromList(guildId, key, roleId);
 	}
 
-	async deleteRole(guildId: string, key: string): Promise<void> {
-		await this.roleConfig.delete(guildId, key);
+	async deleteRole(
+		guildId: string,
+		key: string,
+		roleId: string,
+	): Promise<void> {
+		await this.roleConfig.delete(guildId, key, roleId);
 		await this.notifyUpdate(guildId, key, null);
 	}
 
-	async deleteChannel(guildId: string, key: string): Promise<void> {
-		await this.channelConfig.delete(guildId, key);
+	async clearRoleList(guildId: string, key: string): Promise<void> {
+		await this.roleConfig.clearList(guildId, key);
 		await this.notifyUpdate(guildId, key, null);
 	}
 
 	async getAll(guildId: string): Promise<Record<string, string>> {
-		const [configs, channelConfigs, roleConfigs] = await Promise.all([
+		const [configs, channelConfigs, channelListConfigs, roleConfigs, roleListConfigs] = await Promise.all([
 			this.prisma.configuration.findMany({ where: { guildId } }),
 			this.prisma.channelConfiguration.findMany({
 				where: { Channel: { guildId } },
 			}),
+			this.prisma.channelListConfiguration.findMany({
+				where: { Channel: { guildId } },
+			}),
 			this.prisma.roleConfiguration.findMany({
+				where: { Role: { guildId } },
+			}),
+			this.prisma.roleListConfiguration.findMany({
 				where: { Role: { guildId } },
 			}),
 		]);
@@ -255,7 +279,11 @@ export class ConfigService {
 			...Object.fromEntries(
 				channelConfigs.map((c) => [c.key, c.channelId]),
 			),
+			...Object.fromEntries(
+				channelListConfigs.map((c) => [c.key, c.channelId]),
+			),
 			...Object.fromEntries(roleConfigs.map((c) => [c.key, c.roleId])),
+			...Object.fromEntries(roleListConfigs.map((c) => [c.key, c.roleId])),
 		};
 	}
 }
