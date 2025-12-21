@@ -58,7 +58,6 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 			selectedProperty,
 			propertyOptions.type,
 			t,
-			propertyOptions.defaultValue,
 			propertyOptions,
 		);
 		const embed = this.buildPropertyEmbed(

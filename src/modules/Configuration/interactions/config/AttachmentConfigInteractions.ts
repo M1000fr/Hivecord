@@ -33,7 +33,6 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 			selectedProperty,
 			propertyOptions.type,
 			t,
-			propertyOptions.defaultValue,
 		);
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,

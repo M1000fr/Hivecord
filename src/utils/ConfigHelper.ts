@@ -75,7 +75,6 @@ export class ConfigHelper {
 		guildId: string,
 		key: string,
 		type: EConfigType,
-		defaultValue?: unknown,
 	): Promise<string | string[] | null> {
 		const snakeKey = ConfigHelper.toSnakeCase(key);
 		let value: string | string[] | null = null;
@@ -90,9 +89,6 @@ export class ConfigHelper {
 			value = await this.configService.getChannel(guildId, snakeKey);
 		else value = await this.configService.get(guildId, snakeKey);
 
-		if (value === null && defaultValue !== undefined) {
-			return String(defaultValue);
-		}
 		return value;
 	}
 
@@ -156,17 +152,11 @@ export class ConfigHelper {
 		key: string,
 		type: EConfigType,
 		t: TFunction,
-		defaultValue?: unknown,
 		options?: ConfigPropertyOptions,
 		locale?: string,
 	): Promise<string> {
 		try {
-			const value = await this.fetchValue(
-				guildId,
-				key,
-				type,
-				options?.nonNull ? defaultValue : undefined,
-			);
+			const value = await this.fetchValue(guildId, key, type);
 			return value
 				? ConfigHelper.formatValue(value, type, t, options, locale)
 				: t("utils.config_helper.not_set");
@@ -225,7 +215,6 @@ export class ConfigHelper {
 				key,
 				opt.type,
 				t,
-				opt.defaultValue,
 				opt,
 				language,
 			);

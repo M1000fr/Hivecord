@@ -51,7 +51,6 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 			interaction.guildId,
 			selectedProperty,
 			EConfigType.Boolean,
-			propertyOptions.defaultValue,
 		);
 
 		const isTrue = String(currentValue) === "true";

@@ -61,7 +61,6 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			guildId,
 			propertyKey,
 			EConfigType.StringArray,
-			propertyOptions.defaultValue,
 		)) as string[];
 
 		const lng =

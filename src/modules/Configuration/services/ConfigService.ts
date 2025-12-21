@@ -9,7 +9,6 @@ import { EntityService } from "@modules/Core/services/EntityService";
 import { PrismaService } from "@modules/Core/services/PrismaService";
 import { RedisService } from "@modules/Core/services/RedisService";
 import { ChannelType } from "@prisma/client/enums";
-import { ConfigRegistry } from "@registers/ConfigRegistry";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 import { Logger } from "@utils/Logger";
 
@@ -166,14 +165,7 @@ export class ConfigService {
 			const config = await this.prisma.configuration.findFirst({
 				where: { guildId, key },
 			});
-			let value = config?.value ?? null;
-
-			if (value === null) {
-				const defaultValue = ConfigRegistry.getDefault(key);
-				if (defaultValue !== undefined) {
-					value = String(defaultValue);
-				}
-			}
+			const value = config?.value ?? null;
 			return value as T;
 		});
 	}

@@ -1,5 +1,5 @@
 import { ConfigContext } from "@decorators/ConfigContext";
-import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
+import { ConfigProperty } from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 
@@ -14,7 +14,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "La langue globale du bot (ex: en, fr)",
 		},
-		type: EConfigType.StringChoice,
+		type: "StringChoice",
 		choices: [
 			{
 				name: "English",
@@ -25,7 +25,6 @@ export class GeneralConfig {
 				value: "fr",
 			},
 		],
-		defaultValue: "en",
 		nonNull: true,
 	})
 	generalLanguage: string = "en";
@@ -45,8 +44,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Le texte à afficher sur l'image de bienvenue",
 		},
-		type: EConfigType.String,
-		defaultValue: "Welcome!",
+		type: "String",
 	})
 	generalWelcomeMessageImage: string = "Welcome!";
 
@@ -65,8 +63,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Le texte du message de bienvenue",
 		},
-		type: EConfigType.String,
-		defaultValue: "Welcome {user} to {guild}!",
+		type: "String",
 	})
 	generalWelcomeMessage: string = "Welcome {user} to {guild}!";
 
@@ -79,7 +76,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Le salon où envoyer les messages de bienvenue",
 		},
-		type: EConfigType.Channel,
+		type: "Channel",
 	})
 	generalWelcomeChannelId: string = "";
 
@@ -92,8 +89,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Le nom de l'embed personnalisé à utiliser",
 		},
-		type: EConfigType.CustomEmbed,
-		defaultValue: "",
+		type: "CustomEmbed",
 	})
 	generalWelcomeEmbedName: string = "";
 
@@ -106,7 +102,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Rôles à ajouter aux nouveaux membres",
 		},
-		type: EConfigType.RoleArray,
+		type: "RoleArray",
 	})
 	generalWelcomeRoles: string[] = [];
 
@@ -119,7 +115,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "L'image de fond pour la carte de bienvenue",
 		},
-		type: EConfigType.Attachment,
+		type: "Attachment",
 	})
 	generalWelcomeBackground: string = "";
 }

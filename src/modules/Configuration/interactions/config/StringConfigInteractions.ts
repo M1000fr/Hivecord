@@ -77,7 +77,6 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				interaction.guildId!,
 				propertyKey,
 				EConfigType.String,
-				propertyOptions.defaultValue,
 			)) || "";
 		const labelText = ConfigHelper.truncate(
 			propertyOptions.description,
@@ -132,7 +131,6 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			selectedProperty,
 			propertyOptions.type,
 			t,
-			propertyOptions.defaultValue,
 		);
 
 		const module = (interaction.client as LeBotClient).modules.get(

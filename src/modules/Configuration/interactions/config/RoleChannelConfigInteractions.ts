@@ -141,14 +141,12 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			selectedProperty,
 			propertyOptions.type,
 			t,
-			propertyOptions.defaultValue,
 		);
 
 		const rawValue = await this.configHelper.fetchValue(
 			interaction.guildId!,
 			selectedProperty,
 			propertyOptions.type,
-			propertyOptions.defaultValue,
 		);
 
 		const embed = this.buildPropertyEmbed(
