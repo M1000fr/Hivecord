@@ -143,8 +143,13 @@ export class LeBotClient<
 					commandsData as unknown as ApplicationCommandDataResolvable[],
 				);
 
-				this.logger.log("Clearing global commands (DEBUG mode)...");
-				await this.application?.commands.set([]);
+				const currentGlobalCommands =
+					await this.application?.commands.fetch();
+				console.log(currentGlobalCommands);
+				if (currentGlobalCommands && currentGlobalCommands.size > 0) {
+					this.logger.log("Clearing global commands (DEBUG mode)...");
+					await this.application?.commands.set([]);
+				}
 			} else {
 				this.logger.log(
 					`Started refreshing ${commandsData.length} application (/) commands GLOBALLY.`,
