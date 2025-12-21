@@ -3,8 +3,8 @@ import {
 	EConfigType,
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
-import { Service } from "@decorators/Service";
 import { ConfigService } from "@services/ConfigService";
+import { Injectable } from "@src/decorators/Injectable";
 import { Logger } from "@utils/Logger";
 import {
 	createCipheriv,
@@ -148,7 +148,7 @@ class ConfigRestorer {
 	}
 }
 
-@Service()
+@Injectable()
 export class BackupService {
 	private static logger = new Logger("BackupService");
 	private static readonly BACKUP_VERSION = 3;

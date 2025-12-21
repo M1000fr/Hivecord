@@ -1,10 +1,10 @@
-import { Service } from "@decorators/Service";
 import { ConfigService } from "@services/ConfigService";
+import { Injectable } from "@src/decorators/Injectable";
 import { Logger } from "@utils/Logger";
 import { DiscordAPIError, type GuildMember } from "discord.js";
 import { GeneralConfig } from "../GeneralConfig";
 
-@Service()
+@Injectable()
 export class WelcomeRoleService {
 	private static logger = new Logger("WelcomeRoleService");
 	private static queue: GuildMember[] = [];

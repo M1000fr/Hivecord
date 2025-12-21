@@ -1,6 +1,6 @@
-import { Service } from "@decorators/Service";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { Injectable } from "@src/decorators/Injectable";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	type ColorResolvable,
@@ -18,7 +18,7 @@ import {
 } from "discord.js";
 import { LogConfig } from "../LogConfig";
 
-@Service()
+@Injectable()
 export class LogService {
 	private static async getLogChannel(
 		guild: Guild,

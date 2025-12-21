@@ -1,4 +1,3 @@
-import { Service } from "@decorators/Service";
 import type {
 	GroupModel,
 	PermissionModel,
@@ -9,11 +8,12 @@ import { EntityService } from "@services/EntityService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
+import { Injectable } from "@src/decorators/Injectable";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { Logger } from "@utils/Logger";
 import { Guild } from "discord.js";
 
-@Service()
+@Injectable()
 export class GroupService {
 	private static async getLanguage(guildId: string): Promise<string> {
 		return (

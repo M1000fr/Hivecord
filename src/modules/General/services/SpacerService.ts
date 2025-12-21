@@ -1,8 +1,8 @@
-import { Service } from "@decorators/Service";
 import { Canvas } from "@napi-rs/canvas";
+import { Injectable } from "@src/decorators/Injectable";
 import { Colors } from "discord.js";
 
-@Service()
+@Injectable()
 export class SpacerService {
 	/**
 	 * Generates a spacer bar image with a gradient

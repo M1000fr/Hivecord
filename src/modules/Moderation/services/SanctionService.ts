@@ -1,16 +1,16 @@
-import { Service } from "@decorators/Service";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { SanctionType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
 import { EntityService } from "@services/EntityService";
 import { I18nService } from "@services/I18nService";
 import { prismaClient } from "@services/prismaService";
+import { Injectable } from "@src/decorators/Injectable";
 import { LogService } from "@src/modules/Log/services/LogService";
 import { Logger } from "@utils/Logger";
 import { Guild, GuildMember, User } from "discord.js";
 import { ModerationConfig } from "../ModerationConfig";
 
-@Service()
+@Injectable()
 export class SanctionService {
 	private static logger = new Logger("SanctionService");
 

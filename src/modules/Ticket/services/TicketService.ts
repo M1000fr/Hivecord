@@ -1,12 +1,12 @@
 import type { LeBotClient } from "@class/LeBotClient";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { OnConfigUpdate } from "@decorators/OnConfigUpdate";
-import { Service } from "@decorators/Service";
 import { ChannelType as PrismaChannelType } from "@prisma/client/enums";
 import { ConfigService } from "@services/ConfigService";
 import { EntityService } from "@services/EntityService";
 import { prismaClient } from "@services/prismaService";
 import { Client } from "@src/decorators/Client";
+import { Injectable } from "@src/decorators/Injectable";
 import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { Logger } from "@utils/Logger";
@@ -20,7 +20,7 @@ import {
 } from "discord.js";
 import { TicketConfigKeys } from "../TicketConfig";
 
-@Service()
+@Injectable()
 export class TicketService {
 	private static logger = new Logger("TicketService");
 
