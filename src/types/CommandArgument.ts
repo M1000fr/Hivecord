@@ -3,12 +3,11 @@ import type {
 	ChatInputCommandInteraction,
 	Client,
 } from "discord.js";
-import type { TFunction } from "i18next";
+import type { GuildLanguageContext } from "./GuildLanguageContext";
 
 export type CommandArgument =
 	| Client
 	| ChatInputCommandInteraction
 	| AutocompleteInteraction
-	| TFunction<"translation", undefined>
-	| string
+	| GuildLanguageContext
 	| undefined;

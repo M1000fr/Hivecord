@@ -3,7 +3,6 @@ import "reflect-metadata";
 export * from "./Client";
 export * from "./Context";
 export * from "./GuildLanguage";
-export * from "./GuildLocale";
 export * from "./Translate";
 
 export const COMMAND_PARAMS_METADATA_KEY = "lebot:command:params";
@@ -12,7 +11,6 @@ export enum CommandParamType {
 	Client = "CLIENT",
 	Interaction = "INTERACTION",
 	Translate = "TRANSLATE",
-	GuildLocale = "GUILD_LOCALE",
 	AutocompleteInteraction = "AUTOCOMPLETE_INTERACTION",
 	Context = "CONTEXT",
 }
