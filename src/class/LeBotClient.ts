@@ -131,6 +131,19 @@ export class LeBotClient<
 
 			if (hash === storedHash) {
 				this.logger.log("Commands are up to date (hash match).");
+				if (debugGuildId) {
+					const currentGlobalCommands =
+						await this.application?.commands.fetch();
+					if (
+						currentGlobalCommands &&
+						currentGlobalCommands.size > 0
+					) {
+						this.logger.log(
+							"Clearing global commands (DEBUG mode)...",
+						);
+						await this.application?.commands.set([]);
+					}
+				}
 				return;
 			}
 
@@ -145,7 +158,6 @@ export class LeBotClient<
 
 				const currentGlobalCommands =
 					await this.application?.commands.fetch();
-				console.log(currentGlobalCommands);
 				if (currentGlobalCommands && currentGlobalCommands.size > 0) {
 					this.logger.log("Clearing global commands (DEBUG mode)...");
 					await this.application?.commands.set([]);
