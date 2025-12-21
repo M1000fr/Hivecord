@@ -7,12 +7,14 @@ import { SyncService } from "@modules/General/services/SyncService";
 
 @EventController()
 export default class ReadySyncEvent {
+	constructor(private readonly syncService: SyncService) {}
+
 	@Event({
 		name: BotEvents.ClientReady,
 	})
 	async run(@Client() client: LeBotClient<true>) {
 		for (const guild of client.guilds.cache.values()) {
-			await SyncService.syncGuild(guild);
+			await this.syncService.syncGuild(guild);
 		}
 	}
 }

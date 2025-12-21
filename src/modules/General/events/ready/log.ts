@@ -10,6 +10,8 @@ import { Logger } from "@utils/Logger";
 export default class ReadyEvent {
 	private logger = new Logger("ReadyEvent");
 
+	constructor(private readonly syncService: SyncService) {}
+
 	@Event({
 		name: BotEvents.ClientReady,
 		once: true,
@@ -24,7 +26,7 @@ export default class ReadyEvent {
 		if (guildId) {
 			const guild = await client.guilds.fetch(guildId);
 			if (guild) {
-				await SyncService.syncGuild(guild);
+				await this.syncService.syncGuild(guild);
 			}
 		}
 	}

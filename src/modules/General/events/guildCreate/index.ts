@@ -11,11 +11,13 @@ import { Events, Guild } from "discord.js";
 export default class GuildCreateEvent {
 	private logger = new Logger("GuildCreateEvent");
 
+	constructor(private readonly syncService: SyncService) {}
+
 	@Event({
 		name: Events.GuildCreate,
 	})
 	async run(@Client() client: LeBotClient<true>, @EventParam() guild: Guild) {
 		this.logger.log(`Joined guild ${guild.name} (${guild.id})`);
-		await SyncService.syncGuild(guild);
+		await this.syncService.syncGuild(guild);
 	}
 }

@@ -4,11 +4,13 @@ import { Event } from "@decorators/Event";
 import { EventController } from "@decorators/EventController";
 import { EventParam } from "@decorators/EventParam";
 import { BotEvents } from "@enums/BotEvents";
-import { prismaClient } from "@services/prismaService";
+import { PrismaService } from "@services/prismaService";
 import { GuildMember } from "discord.js";
 
 @EventController()
 export default class GuildMemberRemoveSyncEvent {
+	constructor(private readonly prisma: PrismaService) {}
+
 	@Event({
 		name: BotEvents.GuildMemberRemove,
 	})
@@ -16,7 +18,7 @@ export default class GuildMemberRemoveSyncEvent {
 		@Client() client: LeBotClient<true>,
 		@EventParam() member: GuildMember,
 	) {
-		await prismaClient.user.upsert({
+		await this.prisma.user.upsert({
 			where: { id: member.id },
 			update: { leftAt: new Date() },
 			create: { id: member.id, leftAt: new Date() },

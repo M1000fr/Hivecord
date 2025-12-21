@@ -2,9 +2,7 @@ import { Module } from "@decorators/Module";
 import { GeneralConfig } from "./GeneralConfig";
 import PingCommand from "./commands/ping/index";
 import SyncCommand from "./commands/sync/index";
-import ChannelCreateEvent from "./events/channelCreate/sync";
-import ChannelDeleteEvent from "./events/channelDelete/sync";
-import ChannelUpdateEvent from "./events/channelUpdate/sync";
+import ChannelSync from "./events/channelSync/sync";
 import GuildCreateEvent from "./events/guildCreate/index";
 import WelcomeRoleAddEvent from "./events/guildMemberAdd/roleAdd";
 import GuildMemberRegisterEvent from "./events/guildMemberAdd/sync";
@@ -43,9 +41,7 @@ import { WelcomeRoleSyncService } from "./services/WelcomeRoleSyncService";
 		RoleUpdateEvent,
 		GuildMemberRegisterEvent,
 		GuildMemberRemoveSyncEvent,
-		ChannelCreateEvent,
-		ChannelDeleteEvent,
-		ChannelUpdateEvent,
+		ChannelSync,
 		GuildCreateEvent,
 	],
 	providers: [
