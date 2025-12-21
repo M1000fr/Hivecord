@@ -3,14 +3,15 @@ import { Module } from "@decorators/Module";
 import { DependencyContainer } from "@di/DependencyContainer";
 import { I18nService } from "@services/I18nService";
 import { InfluxService } from "@services/InfluxService";
+import { PermissionService } from "@services/PermissionService";
 import { PrismaService } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 
 @Module({
 	name: "App",
 	global: true,
-	providers: [PrismaService, LeBotClient],
-	exports: [PrismaService, LeBotClient],
+	providers: [PrismaService, PermissionService, LeBotClient],
+	exports: [PrismaService, PermissionService, LeBotClient],
 })
 export class AppModule {
 	static async init(container: DependencyContainer) {

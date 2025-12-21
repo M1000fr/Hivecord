@@ -48,7 +48,10 @@ export class LeBotClient<
 	private static instance: LeBotClient;
 	private logger = new Logger("LeBotClient");
 
-	constructor(public readonly prismaService: PrismaService) {
+	constructor(
+		public readonly prismaService: PrismaService,
+		private readonly permissionService: PermissionService,
+	) {
 		super({
 			intents: [
 				IntentsBitField.Flags.Guilds,
@@ -120,8 +123,7 @@ export class LeBotClient<
 		const permissions = Object.values(EPermission);
 
 		try {
-			const permissionService = this.container.resolve(PermissionService);
-			await permissionService.registerPermissions(permissions);
+			await this.permissionService.registerPermissions(permissions);
 
 			// Calculate hash of commands
 			const hash = createHash("md5")
