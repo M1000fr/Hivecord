@@ -64,10 +64,10 @@ export class InfluxService {
 				});
 			});
 
-			this.logger.log("✅ Connected to InfluxDB");
+			this.logger.log("Connected to InfluxDB");
 		} catch (error) {
 			const trace = error instanceof Error ? error.stack : String(error);
-			this.logger.error("❌ InfluxDB connection failed:", trace);
+			this.logger.error("InfluxDB connection failed:", trace);
 			process.exit(1);
 		}
 	}

@@ -42,10 +42,10 @@ async function checkDatabaseConnection() {
 	try {
 		await prismaClient.$connect();
 		await prismaClient.$queryRaw`SELECT 1`;
-		logger.log("✅ Database connection established successfully.");
+		logger.log("Database connection established successfully.");
 	} catch (error: unknown) {
 		logger.error(
-			"❌ Database connection failed:",
+			"Database connection failed:",
 			error instanceof Error ? error.stack : String(error),
 		);
 		process.exit(1);

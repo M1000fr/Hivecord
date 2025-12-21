@@ -25,11 +25,10 @@ export class RedisService {
 		const redis = this.getInstance();
 		try {
 			await redis.ping();
-			this.logger.log("✅ Connected to Redis");
 		} catch (error) {
 			const trace = error instanceof Error ? error.stack : String(error);
 			this.logger.error(
-				"❌ Redis connection failed:",
+				"Redis connection failed:",
 				trace,
 				"RedisService",
 			);
