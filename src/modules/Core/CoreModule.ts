@@ -1,4 +1,10 @@
 import { Module } from "@decorators/Module";
+import {
+	ChannelRepository,
+	GuildRepository,
+	RoleRepository,
+	UserRepository,
+} from "@src/repositories";
 import { CommandService } from "./services/CommandService";
 import { EntityService } from "./services/EntityService";
 import { I18nService } from "./services/I18nService";
@@ -17,6 +23,10 @@ import { RedisService } from "./services/RedisService";
 		EntityService,
 		CommandService,
 		PermissionService,
+		GuildRepository,
+		UserRepository,
+		RoleRepository,
+		ChannelRepository,
 	],
 	exports: [
 		PrismaService,
@@ -26,6 +36,10 @@ import { RedisService } from "./services/RedisService";
 		EntityService,
 		CommandService,
 		PermissionService,
+		GuildRepository,
+		UserRepository,
+		RoleRepository,
+		ChannelRepository,
 	],
 })
 export class CoreModule {}
