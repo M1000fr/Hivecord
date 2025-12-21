@@ -11,7 +11,6 @@ import { RedisService } from "@services/RedisService";
 
 @Module({
 	name: "App",
-	type: "application",
 	global: true,
 	imports: [GeneralModule, ConfigurationModule],
 	providers: [PrismaService, PermissionService, LeBotClient],

@@ -302,8 +302,6 @@ export class LeBotClient<
 		const registeredModules = this.container.getRegisteredModules();
 
 		for (const [name, { options, moduleClass }] of registeredModules) {
-			if (options.type !== "bot") continue;
-
 			this.logger.log(`Loading module: ${options.name}`);
 
 			let moduleInstance: IModuleInstance | undefined;
