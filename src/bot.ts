@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import { LeBotClient } from "@class/LeBotClient";
 import { I18nService } from "@services/I18nService";
 import { InfluxService } from "@services/InfluxService";
