@@ -1,11 +1,15 @@
-import { BaseCommand } from "@class/BaseCommand";
-import { BaseEvent } from "@class/BaseEvent";
+import {
+	COMMAND_PARAMS_METADATA_KEY,
+	CommandParamType,
+	type CommandParameter,
+} from "@decorators/params";
 import { DependencyContainer } from "@di/DependencyContainer";
 import type { Constructor } from "@di/types";
 import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "@interfaces/CommandOptions";
 import type { ICommandClass } from "@interfaces/ICommandClass";
 import type { IEventClass } from "@interfaces/IEventClass";
+import type { IEventInstance } from "@interfaces/IEventInstance";
 import type { IModuleInstance } from "@interfaces/IModuleInstance";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
 import { PermissionService } from "@services/PermissionService";
@@ -32,7 +36,7 @@ export class LeBotClient<
 > extends Client<Ready> {
 	public commands = new Collection<
 		string,
-		{ instance: BaseCommand; options: CommandOptions }
+		{ instance: object; options: CommandOptions }
 	>();
 	public modules = new Collection<
 		string,
@@ -114,7 +118,8 @@ export class LeBotClient<
 		const permissions = Object.values(EPermission);
 
 		try {
-			await PermissionService.registerPermissions(permissions);
+			const permissionService = this.container.resolve(PermissionService);
+			await permissionService.registerPermissions(permissions);
 
 			// Calculate hash of commands
 			const hash = createHash("md5")
@@ -194,9 +199,9 @@ export class LeBotClient<
 			if (!cmdOptions) continue;
 
 			const instance = this.container.resolve(
-				CommandClass as unknown as Constructor<BaseCommand>,
+				CommandClass as unknown as Constructor<object>,
 				moduleName,
-			) as BaseCommand;
+			);
 			this.commands.set(cmdOptions.name, {
 				instance,
 				options: cmdOptions,
@@ -215,12 +220,34 @@ export class LeBotClient<
 			if (!evtOptions) continue;
 
 			const instance = this.container.resolve(
-				EventClass as unknown as Constructor<BaseEvent<string>>,
+				EventClass as unknown as Constructor<IEventInstance>,
 				moduleName,
 			);
 			const handler = async (...args: unknown[]) => {
 				try {
-					await instance.run(this, ...args);
+					const params: CommandParameter[] =
+						Reflect.getMetadata(
+							COMMAND_PARAMS_METADATA_KEY,
+							instance,
+							"run",
+						) || [];
+
+					// Sort params by index to ensure correct order
+					params.sort((a, b) => a.index - b.index);
+
+					const finalArgs: unknown[] = [];
+					let eventArgIndex = 0;
+
+					for (const param of params) {
+						if (param.type === CommandParamType.Client) {
+							finalArgs[param.index] = this;
+						} else if (param.type === CommandParamType.EventParam) {
+							finalArgs[param.index] = args[eventArgIndex++];
+						}
+					}
+
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					await instance.run(...(finalArgs as any));
 				} catch (error: unknown) {
 					this.logger.error(
 						`Error in event ${evtOptions.name}:`,
