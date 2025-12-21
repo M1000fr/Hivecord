@@ -1,6 +1,5 @@
 import { BaseCommand } from "@class/BaseCommand";
 import { BaseEvent } from "@class/BaseEvent";
-import { SanctionScheduler } from "@class/SanctionScheduler";
 import { DependencyContainer } from "@di/DependencyContainer";
 import type { Constructor } from "@di/types";
 import { EPermission } from "@enums/EPermission";
@@ -42,7 +41,6 @@ export class LeBotClient<
 	private container = DependencyContainer.getInstance();
 	private static instance: LeBotClient;
 	private logger = new Logger("LeBotClient");
-	private scheduler: SanctionScheduler;
 
 	constructor() {
 		super({
@@ -58,7 +56,6 @@ export class LeBotClient<
 			],
 		});
 		LeBotClient.instance = this;
-		this.scheduler = new SanctionScheduler(this);
 		this.handleProcessEvents();
 	}
 
@@ -82,7 +79,6 @@ export class LeBotClient<
 
 	public async start(token: string): Promise<string> {
 		await this.loadModules();
-		this.scheduler.start();
 		try {
 			return await this.login(token);
 		} catch (error: unknown) {

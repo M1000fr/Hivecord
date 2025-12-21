@@ -4,7 +4,6 @@ import { MessageTemplate } from "@class/MessageTemplate";
 import { Event } from "@decorators/Event";
 import { BotEvents } from "@enums/BotEvents";
 import { WelcomeImageService } from "@modules/General/services/WelcomeImageService";
-import { InvitationService } from "@modules/Invitation/services/InvitationService";
 import { ConfigService } from "@services/ConfigService";
 import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import { Logger } from "@utils/Logger";
@@ -66,23 +65,6 @@ export default class WelcomeEvent extends BaseEvent<
 				invite: invite,
 				// inviterTotalInvites: inviterTotalInvitesCount,
 			};
-
-			if (invite) {
-				const inviterTotalInvitesCount = invite
-					? await InvitationService.getInviteCounts(
-							member.guild.id,
-							invite.inviter?.id || "",
-						)
-					: {
-							active: 0,
-							fake: 0,
-							total: 0,
-						};
-
-				Object.assign(commonContext, {
-					inviterTotalInvites: inviterTotalInvitesCount,
-				});
-			}
 
 			// Check for custom embed
 			const welcomeEmbedName = await ConfigService.of(
