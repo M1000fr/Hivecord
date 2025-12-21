@@ -2,7 +2,6 @@ import { LeBotClient } from "@class/LeBotClient";
 import { Autocomplete } from "@decorators/Autocomplete";
 import { BotPermission } from "@decorators/BotPermission";
 import { CommandController } from "@decorators/Command";
-import { Injectable } from "@decorators/Injectable";
 import { AutocompleteInteraction } from "@decorators/Interaction";
 import { OptionRoute } from "@decorators/OptionRoute";
 import { Client } from "@decorators/params/Client";
@@ -19,7 +18,6 @@ import {
 import { GeneralConfig } from "../../GeneralConfig";
 import { syncOptions } from "./syncOptions";
 
-@Injectable()
 @CommandController(syncOptions)
 export default class SyncCommand {
 	constructor(

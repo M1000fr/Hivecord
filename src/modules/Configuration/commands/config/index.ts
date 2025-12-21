@@ -24,7 +24,7 @@ export default class ConfigCommand {
 		private readonly backupService: BackupService,
 	) {}
 
-	@Subcommand({ name: "backup", permission: EPermission.ConfigureModules })
+	@Subcommand({ permission: EPermission.ConfigureModules })
 	async backup(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
@@ -65,7 +65,7 @@ export default class ConfigCommand {
 		}
 	}
 
-	@Subcommand({ name: "restore", permission: EPermission.ConfigureModules })
+	@Subcommand({ permission: EPermission.ConfigureModules })
 	async restore(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,

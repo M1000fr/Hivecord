@@ -46,7 +46,7 @@ export default class EmbedCommand {
 		);
 	}
 
-	@Subcommand({ name: "builder", permission: EPermission.ConfigureModules })
+	@Subcommand({ permission: EPermission.ConfigureModules })
 	async builder(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
@@ -100,7 +100,7 @@ export default class EmbedCommand {
 		);
 	}
 
-	@Subcommand({ name: "edit", permission: EPermission.ConfigureModules })
+	@Subcommand({ permission: EPermission.ConfigureModules })
 	async edit(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
@@ -150,7 +150,7 @@ export default class EmbedCommand {
 		);
 	}
 
-	@Subcommand({ name: "delete", permission: EPermission.ConfigureModules })
+	@Subcommand({ permission: EPermission.ConfigureModules })
 	async delete(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
@@ -170,7 +170,7 @@ export default class EmbedCommand {
 		});
 	}
 
-	@Subcommand({ name: "list", permission: EPermission.ConfigureModules })
+	@Subcommand({ permission: EPermission.ConfigureModules })
 	async list(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
@@ -190,7 +190,7 @@ export default class EmbedCommand {
 		});
 	}
 
-	@Subcommand({ name: "preview", permission: EPermission.ConfigureModules })
+	@Subcommand({ permission: EPermission.ConfigureModules })
 	async preview(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
