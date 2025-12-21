@@ -1,9 +1,9 @@
 # .vscode/i18n-ally-custom-framework.yml
 languageIds:
-  - typescript
-  - javascript
+    - typescript
+    - javascript
 usageMatchRegex:
-  # Matches: t('key'), I18nService.t('key')
-  # \b ensures we don't match words ending in t like 'await', 'test', etc.
-  - '\b(?:t|I18nService\.t)\s*\(\s*[''"`](.*?)[''"`]'
+    # Matches: t('key'), I18nService.t('key'), locale('key')
+    # \b ensures we don't match words ending in t like 'await', 'test', etc.
+    - '\b(?:t|I18nService\.t|locale)\s*\(\s*[''"`](.*?)[''"`]'
 monopoly: true
