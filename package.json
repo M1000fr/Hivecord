@@ -38,6 +38,7 @@
 		"ioredis": "^5.8.2",
 		"mysql2": "^3.16.0",
 		"prisma": "^7.2.0",
+		"reflect-metadata": "^0.2.2",
 		"ts-node": "^10.9.2"
 	},
 	"resolutions": {
