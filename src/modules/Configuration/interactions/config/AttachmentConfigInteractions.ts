@@ -39,8 +39,7 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 			propertyOptions,
 			selectedProperty,
 			currentValue,
-			t,
-			lng,
+			{ locale: lng, t },
 		);
 
 		embed.setDescription(

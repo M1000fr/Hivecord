@@ -146,8 +146,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			propertyOptions,
 			selectedProperty,
 			currentValue,
-			t,
-			lng,
+			{ locale: lng, t },
 			configContexts,
 		);
 

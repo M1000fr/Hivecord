@@ -73,8 +73,7 @@ export class CustomEmbedConfigInteractions extends BaseConfigInteractions {
 			propertyOptions,
 			selectedProperty,
 			currentValue,
-			t,
-			lng,
+			{ locale: lng, t },
 		);
 
 		// Fetch custom embeds for this guild

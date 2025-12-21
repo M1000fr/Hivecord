@@ -78,8 +78,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			propertyOptions,
 			propertyKey,
 			displayValue,
-			t,
-			lng,
+			{ locale: lng, t },
 		);
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(

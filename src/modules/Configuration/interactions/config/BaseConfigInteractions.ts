@@ -25,7 +25,7 @@ import {
 	type StringSelectMenuInteraction,
 	type UserSelectMenuInteraction,
 } from "discord.js";
-import type { TFunction } from "i18next";
+import type { GuildLanguageContext } from "../../../../types/GuildLanguageContext";
 
 export type ConfigInteraction =
 	| ButtonInteraction
@@ -261,18 +261,17 @@ export abstract class BaseConfigInteractions {
 		propertyOptions: ConfigPropertyOptions,
 		selectedProperty: string,
 		currentValue: string,
-		t: TFunction,
-		lng: string,
+		lang: GuildLanguageContext,
 		configContexts?: Record<string, ConfigContextVariable[]>,
 	) {
 		const embed = new EmbedBuilder()
 			.setTitle(
-				t("utils.config_helper.configure_property", {
+				lang.t("utils.config_helper.configure_property", {
 					property: propertyOptions.displayName || selectedProperty,
 				}),
 			)
 			.setDescription(
-				`${propertyOptions.description}\n\n**${t("utils.config_helper.current")}:** ${currentValue}`,
+				`${propertyOptions.description}\n\n**${lang.t("utils.config_helper.current")}:** ${currentValue}`,
 			)
 			.setColor("#5865F2")
 			.setTimestamp();
@@ -283,14 +282,15 @@ export abstract class BaseConfigInteractions {
 				.map((v) => {
 					const data = ConfigContextData[v];
 					const desc =
-						data.descriptionLocalizations?.[lng as Locale] ||
-						data.description;
+						data.descriptionLocalizations?.[
+							lang.locale as Locale
+						] || data.description;
 					return `- \`{${v}}\`: ${desc}`;
 				})
 				.join("\n");
 
 			embed.addFields({
-				name: t(
+				name: lang.t(
 					"utils.config_helper.available_variables",
 					"Available Variables",
 				),
