@@ -142,6 +142,9 @@ export class LeBotClient<
 				await guild.commands.set(
 					commandsData as unknown as ApplicationCommandDataResolvable[],
 				);
+
+				this.logger.log("Clearing global commands (DEBUG mode)...");
+				await this.application?.commands.set([]);
 			} else {
 				this.logger.log(
 					`Started refreshing ${commandsData.length} application (/) commands GLOBALLY.`,
