@@ -4,15 +4,15 @@ import { Injectable } from "@decorators/Injectable";
 import { Client } from "@decorators/params/index.ts";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
-import { ConfigService } from "@services/ConfigService";
-import { I18nService } from "@services/I18nService";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { CustomEmbedService } from "@modules/Configuration/services/CustomEmbedService";
+import { I18nService } from "@modules/Core/services/I18nService";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import type { LeBotClient } from "@src/class/LeBotClient";
 import {
 	AutocompleteInteraction,
 	CommandInteraction,
 } from "@src/decorators/Interaction";
-import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
-import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import {
 	ChatInputCommandInteraction,
 	AutocompleteInteraction as DiscordAutocompleteInteraction,

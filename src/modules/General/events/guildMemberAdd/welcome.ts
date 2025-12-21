@@ -5,9 +5,9 @@ import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { CustomEmbedService } from "@modules/Configuration/services/CustomEmbedService";
 import { WelcomeImageService } from "@modules/General/services/WelcomeImageService";
-import { ConfigService } from "@services/ConfigService";
-import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import type { ContextOf } from "@src/types/ContextOf.ts";
 import { Logger } from "@utils/Logger";
 import {

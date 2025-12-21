@@ -1,6 +1,6 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { ConfigService } from "@services/ConfigService";
-import { RedisService } from "@services/RedisService";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { RedisService } from "@modules/Core/services/RedisService";
 import { Injectable } from "@src/decorators/Injectable";
 import { Logger } from "@utils/Logger";
 import { Guild } from "discord.js";

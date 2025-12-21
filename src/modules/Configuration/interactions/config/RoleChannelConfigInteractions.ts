@@ -4,9 +4,9 @@ import {
 } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
 import { SelectMenuPattern } from "@decorators/Interaction";
-import { ConfigService } from "@services/ConfigService";
-import { I18nService } from "@services/I18nService";
-import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { I18nService } from "@modules/Core/services/I18nService";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,

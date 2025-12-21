@@ -9,8 +9,8 @@ import {
 	ModalPattern,
 	SelectMenuPattern,
 } from "@decorators/Interaction";
-import { ConfigService } from "@services/ConfigService";
-import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
 
 import {

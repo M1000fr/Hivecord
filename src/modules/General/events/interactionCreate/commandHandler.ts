@@ -4,7 +4,7 @@ import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
-import { CommandService } from "@services/CommandService";
+import { CommandService } from "@modules/Core/services/CommandService";
 import type { ContextOf } from "@src/types/ContextOf.ts";
 import { Logger } from "@utils/Logger";
 import {

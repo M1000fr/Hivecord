@@ -1,6 +1,6 @@
 import { DependencyContainer } from "@di/DependencyContainer";
+import { RedisService } from "@modules/Core/services/RedisService";
 import { PagerRegistry } from "@registers/PagerRegistry";
-import { RedisService } from "@services/RedisService";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,

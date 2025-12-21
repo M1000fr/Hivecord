@@ -1,5 +1,5 @@
 import { Injectable } from "@decorators/Injectable";
-import { PrismaService } from "@services/PrismaService";
+import { PrismaService } from "@modules/Core/services/PrismaService";
 
 @Injectable()
 export class BaseRepository {

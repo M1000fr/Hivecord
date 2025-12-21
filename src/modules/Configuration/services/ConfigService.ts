@@ -5,12 +5,12 @@ import {
 	type IConfigClass,
 } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
+import { EntityService } from "@modules/Core/services/EntityService";
+import { PrismaService } from "@modules/Core/services/PrismaService";
+import { RedisService } from "@modules/Core/services/RedisService";
 import { ChannelType } from "@prisma/client/enums";
 import { ConfigRegistry } from "@registers/ConfigRegistry";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
-import { EntityService } from "@services/EntityService";
-import { PrismaService } from "@services/PrismaService";
-import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 
 const CACHE_TTL = 60; // 60 seconds

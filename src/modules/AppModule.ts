@@ -2,12 +2,12 @@ import { LeBotClient } from "@class/LeBotClient";
 import { Module } from "@decorators/Module";
 import { DependencyContainer } from "@di/DependencyContainer";
 import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
+import { CoreModule } from "@modules/Core/CoreModule";
+import { I18nService } from "@modules/Core/services/I18nService";
+import { InfluxService } from "@modules/Core/services/InfluxService";
+import { PrismaService } from "@modules/Core/services/PrismaService";
+import { RedisService } from "@modules/Core/services/RedisService";
 import { GeneralModule } from "@modules/General/GeneralModule";
-import { I18nService } from "@services/I18nService";
-import { InfluxService } from "@services/InfluxService";
-import { PermissionService } from "@services/PermissionService";
-import { PrismaService } from "@services/PrismaService";
-import { RedisService } from "@services/RedisService";
 import {
 	ChannelRepository,
 	CustomEmbedRepository,
@@ -19,12 +19,8 @@ import {
 @Module({
 	name: "App",
 	global: true,
-	imports: [GeneralModule, ConfigurationModule],
+	imports: [CoreModule, GeneralModule, ConfigurationModule],
 	providers: [
-		RedisService,
-		PrismaService,
-		PermissionService,
-
 		LeBotClient,
 		GuildRepository,
 		UserRepository,
@@ -33,8 +29,6 @@ import {
 		CustomEmbedRepository,
 	],
 	exports: [
-		PrismaService,
-		PermissionService,
 		LeBotClient,
 		GuildRepository,
 		UserRepository,

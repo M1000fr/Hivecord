@@ -4,7 +4,7 @@ import { Injectable } from "@decorators/Injectable";
 import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { BotEvents } from "@enums/BotEvents";
-import { WelcomeRoleSyncService } from "../../services/WelcomeRoleSyncService";
+import { WelcomeRoleSyncService } from "@modules/General/services/WelcomeRoleSyncService";
 
 @Injectable()
 @EventController()

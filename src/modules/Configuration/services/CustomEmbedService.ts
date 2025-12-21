@@ -1,6 +1,6 @@
 import { MessageTemplate } from "@class/MessageTemplate";
-import { EntityService } from "@services/EntityService";
-import { RedisService } from "@services/RedisService";
+import { EntityService } from "@modules/Core/services/EntityService";
+import { RedisService } from "@modules/Core/services/RedisService";
 import { Injectable } from "@src/decorators/Injectable";
 import { CustomEmbedRepository } from "@src/repositories";
 import { EmbedBuilder, type APIEmbed } from "discord.js";

@@ -12,8 +12,8 @@ import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import type { IModuleInstance } from "@interfaces/IModuleInstance.ts";
 import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
-import { PermissionService } from "@services/PermissionService";
-import { PrismaService } from "@services/PrismaService";
+import { PermissionService } from "@modules/Core/services/PermissionService";
+import { PrismaService } from "@modules/Core/services/PrismaService";
 import { Logger } from "@utils/Logger";
 import { createHash } from "crypto";
 import {

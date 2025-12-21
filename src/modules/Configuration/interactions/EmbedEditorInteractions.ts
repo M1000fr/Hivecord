@@ -1,7 +1,7 @@
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
-import { ConfigService } from "@services/ConfigService";
-import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
-import { GeneralConfig } from "@src/modules/General/GeneralConfig";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { CustomEmbedService } from "@modules/Configuration/services/CustomEmbedService";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import {
 	type APIEmbed,
 	type ButtonInteraction,

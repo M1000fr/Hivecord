@@ -20,7 +20,6 @@
 			"@enums/*": ["./src/enums/*"],
 			"@interfaces/*": ["./src/interfaces/*"],
 			"@modules/*": ["./src/modules/*"],
-			"@services/*": ["./src/services/*"],
 			"@types/*": ["./src/types/*"],
 			"@utils/*": ["./src/utils/*"],
 			"@registers/*": ["./src/registers/*"],

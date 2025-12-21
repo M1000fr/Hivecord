@@ -5,9 +5,9 @@ import { Client } from "@decorators/params/index.ts";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { BackupService } from "@modules/Configuration/services/BackupService";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
-import { ConfigService } from "@services/ConfigService";
-import { I18nService } from "@services/I18nService";
 import { CommandInteraction } from "@src/decorators/Interaction";
 import {
 	AttachmentBuilder,

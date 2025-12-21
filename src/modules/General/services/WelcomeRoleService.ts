@@ -1,4 +1,4 @@
-import { ConfigService } from "@services/ConfigService";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { Injectable } from "@src/decorators/Injectable";
 import { Logger } from "@utils/Logger";
 import { DiscordAPIError, type GuildMember } from "discord.js";

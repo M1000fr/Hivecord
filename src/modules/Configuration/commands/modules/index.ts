@@ -10,7 +10,7 @@ import { Client } from "@decorators/params/Client";
 import { GuildLocale } from "@decorators/params/GuildLocale";
 import { Translate } from "@decorators/params/Translate";
 import { EPermission } from "@enums/EPermission";
-import { ConfigService } from "@services/ConfigService";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ChatInputCommandInteraction,

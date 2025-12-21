@@ -5,10 +5,11 @@ import {
 } from "@decorators/params";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import type { ICommandInstance } from "@interfaces/ICommandInstance.ts";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { I18nService } from "@modules/Core/services/I18nService";
+import { PermissionService } from "@modules/Core/services/PermissionService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
-import { ConfigService } from "@services/ConfigService";
-import { I18nService } from "@services/I18nService";
-import { PermissionService } from "@services/PermissionService";
+import type { CommandArgument } from "@src/types/CommandArgument";
 import { Logger } from "@utils/Logger";
 import {
 	AutocompleteInteraction,
@@ -16,7 +17,6 @@ import {
 	Client,
 	MessageFlags,
 } from "discord.js";
-import type { CommandArgument } from "../types/CommandArgument";
 
 import { Injectable } from "@decorators/Injectable";
 import type { TFunction } from "i18next";

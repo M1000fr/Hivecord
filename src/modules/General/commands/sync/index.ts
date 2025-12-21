@@ -7,16 +7,16 @@ import { AutocompleteInteraction } from "@decorators/Interaction";
 import { OptionRoute } from "@decorators/OptionRoute";
 import { Client } from "@decorators/params/Client";
 import { EPermission } from "@enums/EPermission";
-import { ConfigService } from "@services/ConfigService";
-import { I18nService } from "@services/I18nService";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { I18nService } from "@modules/Core/services/I18nService";
 
+import { WelcomeRoleSyncService } from "@modules/General/services/WelcomeRoleSyncService";
 import {
 	ChatInputCommandInteraction,
 	AutocompleteInteraction as DiscordAutocompleteInteraction,
 	PermissionFlagsBits,
 } from "discord.js";
 import { GeneralConfig } from "../../GeneralConfig";
-import { WelcomeRoleSyncService } from "../../services/WelcomeRoleSyncService";
 import { syncOptions } from "./syncOptions";
 
 @Injectable()

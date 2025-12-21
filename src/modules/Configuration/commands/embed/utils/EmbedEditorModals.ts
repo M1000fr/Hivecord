@@ -1,4 +1,4 @@
-import { I18nService } from "@services/I18nService";
+import { I18nService } from "@modules/Core/services/I18nService";
 import {
 	type APIEmbed,
 	type APIEmbedField,

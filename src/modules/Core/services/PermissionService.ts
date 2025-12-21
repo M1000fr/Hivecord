@@ -1,7 +1,7 @@
 import { Injectable } from "@decorators/Injectable";
-import { PrismaService } from "@services/PrismaService";
-import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
+import { PrismaService } from "./PrismaService";
+import { RedisService } from "./RedisService";
 
 const CACHE_TTL = 60; // 60 seconds
 

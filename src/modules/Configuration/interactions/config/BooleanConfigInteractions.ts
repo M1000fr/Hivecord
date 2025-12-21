@@ -3,7 +3,7 @@ import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
 import { ButtonPattern } from "@decorators/Interaction";
-import { ConfigService } from "@services/ConfigService";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { type ButtonInteraction, type RepliableInteraction } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
