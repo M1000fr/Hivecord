@@ -1,18 +1,17 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { MessageTemplate } from "@class/MessageTemplate";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { WelcomeImageService } from "@modules/General/services/WelcomeImageService";
 import { ConfigService } from "@services/ConfigService";
 import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
+import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";
 import {
 	AttachmentBuilder,
-	GuildMember,
-	Invite,
 	type MessageCreateOptions,
 	TextChannel,
 } from "discord.js";
@@ -28,13 +27,11 @@ export default class WelcomeEvent {
 		private readonly configService: ConfigService,
 	) {}
 
-	@Event({
-		name: BotEvents.MemberJoinProcessed,
-	})
+	@On(BotEvents.MemberJoinProcessed)
 	async run(
 		@Client() client: LeBotClient<true>,
-		@EventParam() member: GuildMember,
-		@EventParam() invite: Invite | null,
+		@Context()
+		[member, invite]: ContextOf<typeof BotEvents.MemberJoinProcessed>,
 	) {
 		try {
 			const welcomeChannelId = await this.configService.of(

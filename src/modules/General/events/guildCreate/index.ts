@@ -1,11 +1,12 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
+import { On } from "@decorators/On";
 import { SyncService } from "@modules/General/services/SyncService";
+import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";
-import { Events, Guild } from "discord.js";
+import { Events } from "discord.js";
 
 @EventController()
 export default class GuildCreateEvent {
@@ -13,10 +14,11 @@ export default class GuildCreateEvent {
 
 	constructor(private readonly syncService: SyncService) {}
 
-	@Event({
-		name: Events.GuildCreate,
-	})
-	async run(@Client() client: LeBotClient<true>, @EventParam() guild: Guild) {
+	@On(Events.GuildCreate)
+	async run(
+		@Client() client: LeBotClient<true>,
+		@Context() [guild]: ContextOf<typeof Events.GuildCreate>,
+	) {
 		this.logger.log(`Joined guild ${guild.name} (${guild.id})`);
 		await this.syncService.syncGuild(guild);
 	}

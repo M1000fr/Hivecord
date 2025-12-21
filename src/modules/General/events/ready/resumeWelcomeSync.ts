@@ -1,8 +1,8 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
 import { EventController } from "@decorators/EventController";
 import { Injectable } from "@decorators/Injectable";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { WelcomeRoleSyncService } from "../../services/WelcomeRoleSyncService";
 
@@ -13,9 +13,7 @@ export default class ResumeWelcomeSyncEvent {
 		private readonly welcomeRoleSyncService: WelcomeRoleSyncService,
 	) {}
 
-	@Event({
-		name: BotEvents.ClientReady,
-	})
+	@On(BotEvents.ClientReady)
 	async run(@Client() client: LeBotClient<true>) {
 		// Check if we need to resume a sync process
 		await this.welcomeRoleSyncService.resume(client);

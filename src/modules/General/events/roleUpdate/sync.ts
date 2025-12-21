@@ -1,12 +1,12 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@src/services/EntityService";
+import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";
-import { Role } from "discord.js";
 
 @EventController()
 export default class RoleUpdateEvent {
@@ -14,13 +14,11 @@ export default class RoleUpdateEvent {
 
 	constructor(private readonly entityService: EntityService) {}
 
-	@Event({
-		name: BotEvents.GuildRoleUpdate,
-	})
+	@On(BotEvents.GuildRoleUpdate)
 	async run(
 		@Client() client: LeBotClient<true>,
-		@EventParam() oldRole: Role,
-		@EventParam() newRole: Role,
+		@Context()
+		[_oldRole, newRole]: ContextOf<typeof BotEvents.GuildRoleUpdate>,
 	) {
 		try {
 			await this.entityService.ensureRole(newRole);

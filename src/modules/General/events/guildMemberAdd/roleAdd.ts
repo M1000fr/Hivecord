@@ -1,11 +1,11 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
 import { Injectable } from "@decorators/Injectable";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
-import { GuildMember } from "discord.js";
+import type { ContextOf } from "@src/types/ContextOf";
 import { WelcomeRoleService } from "../../services/WelcomeRoleService";
 
 @Injectable()
@@ -13,12 +13,10 @@ import { WelcomeRoleService } from "../../services/WelcomeRoleService";
 export default class WelcomeRoleAddEvent {
 	constructor(private readonly welcomeRoleService: WelcomeRoleService) {}
 
-	@Event({
-		name: BotEvents.GuildMemberAdd,
-	})
+	@On(BotEvents.GuildMemberAdd)
 	async run(
 		@Client() client: LeBotClient<true>,
-		@EventParam() member: GuildMember,
+		@Context() [member]: ContextOf<typeof BotEvents.GuildMemberAdd>,
 	) {
 		await this.welcomeRoleService.addWelcomeRoles(member);
 	}

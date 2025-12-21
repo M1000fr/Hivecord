@@ -1,4 +1,5 @@
 import { Injectable } from "@decorators/Injectable";
+import { EVENT_METADATA_KEY } from "@decorators/On";
 import {
 	COMMAND_PARAMS_METADATA_KEY,
 	CommandParamType,
@@ -9,8 +10,6 @@ import type { Constructor } from "@di/types";
 import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "@interfaces/CommandOptions";
 import type { ICommandClass } from "@interfaces/ICommandClass";
-import type { IEventClass } from "@interfaces/IEventClass";
-import type { IEventInstance } from "@interfaces/IEventInstance";
 import type { IModuleInstance } from "@interfaces/IModuleInstance";
 import type { ModuleOptions } from "@interfaces/ModuleOptions";
 import { PermissionService } from "@services/PermissionService";
@@ -233,51 +232,68 @@ export class LeBotClient<
 		const moduleName = options.name;
 
 		for (const EventClass of options.events) {
-			const evtOptions = (EventClass as unknown as IEventClass)
-				.eventOptions;
-			if (!evtOptions) continue;
-
 			const instance = this.container.resolve(
-				EventClass as unknown as Constructor<IEventInstance>,
+				EventClass as unknown as Constructor<object>,
 				moduleName,
 			);
-			const handler = async (...args: unknown[]) => {
-				try {
-					const params: CommandParameter[] =
-						Reflect.getMetadata(
-							COMMAND_PARAMS_METADATA_KEY,
-							instance,
-							"run",
-						) || [];
 
-					// Sort params by index to ensure correct order
-					params.sort((a, b) => a.index - b.index);
+			const prototype = Object.getPrototypeOf(instance);
+			const methods = Object.getOwnPropertyNames(prototype);
 
-					const finalArgs: unknown[] = [];
-					let eventArgIndex = 0;
+			for (const methodName of methods) {
+				const evtOptions = Reflect.getMetadata(
+					EVENT_METADATA_KEY,
+					prototype,
+					methodName,
+				);
 
-					for (const param of params) {
-						if (param.type === CommandParamType.Client) {
-							finalArgs[param.index] = this;
-						} else if (param.type === CommandParamType.EventParam) {
-							finalArgs[param.index] = args[eventArgIndex++];
+				if (!evtOptions) continue;
+
+				const handler = async (...args: unknown[]) => {
+					try {
+						const params: CommandParameter[] =
+							Reflect.getMetadata(
+								COMMAND_PARAMS_METADATA_KEY,
+								prototype,
+								methodName,
+							) || [];
+
+						// Sort params by index to ensure correct order
+						params.sort((a, b) => a.index - b.index);
+
+						const finalArgs: unknown[] = [];
+
+						for (const param of params) {
+							if (param.type === CommandParamType.Client) {
+								finalArgs[param.index] = this;
+							} else if (
+								param.type === CommandParamType.Context
+							) {
+								finalArgs[param.index] = args;
+							}
 						}
+
+						const method = (instance as Record<string, unknown>)[
+							methodName
+						];
+						if (typeof method === "function") {
+							await method.apply(instance, finalArgs);
+						}
+					} catch (error: unknown) {
+						this.logger.error(
+							`Error in event ${evtOptions.name} (method: ${methodName}):`,
+							error instanceof Error
+								? error.stack
+								: String(error),
+						);
 					}
+				};
 
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					await instance.run(...(finalArgs as any));
-				} catch (error: unknown) {
-					this.logger.error(
-						`Error in event ${evtOptions.name}:`,
-						error instanceof Error ? error.stack : String(error),
-					);
+				if (evtOptions.once) {
+					this.once(evtOptions.name, handler);
+				} else {
+					this.on(evtOptions.name, handler);
 				}
-			};
-
-			if (evtOptions.once) {
-				this.once(evtOptions.name, handler);
-			} else {
-				this.on(evtOptions.name, handler);
 			}
 		}
 	}

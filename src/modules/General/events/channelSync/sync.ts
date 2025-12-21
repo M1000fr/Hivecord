@@ -1,13 +1,13 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@services/EntityService";
 import type { PrismaService } from "@src/services/prismaService";
+import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";
-import { GuildChannel } from "discord.js";
 
 @EventController()
 export default class ChannelSync {
@@ -18,10 +18,10 @@ export default class ChannelSync {
 		private readonly prisma: PrismaService,
 	) {}
 
-	@Event({ name: BotEvents.ChannelCreate })
+	@On(BotEvents.ChannelCreate)
 	async onCreate(
 		@Client() _client: LeBotClient<true>,
-		@EventParam() channel: GuildChannel,
+		@Context() [channel]: ContextOf<typeof BotEvents.ChannelCreate>,
 	) {
 		if (channel.isDMBased()) return;
 
@@ -34,12 +34,10 @@ export default class ChannelSync {
 		}
 	}
 
-	@Event({
-		name: BotEvents.ChannelDelete,
-	})
+	@On(BotEvents.ChannelDelete)
 	async onDelete(
 		@Client() _client: LeBotClient<true>,
-		@EventParam() channel: GuildChannel,
+		@Context() [channel]: ContextOf<typeof BotEvents.ChannelDelete>,
 	) {
 		if (channel.isDMBased()) return;
 
@@ -55,11 +53,11 @@ export default class ChannelSync {
 		}
 	}
 
-	@Event({ name: BotEvents.ChannelUpdate })
+	@On(BotEvents.ChannelUpdate)
 	async onUpdate(
 		@Client() _client: LeBotClient<true>,
-		@EventParam() _oldChannel: GuildChannel,
-		@EventParam() newChannel: GuildChannel,
+		@Context()
+		[_oldChannel, newChannel]: ContextOf<typeof BotEvents.ChannelUpdate>,
 	) {
 		if (newChannel.isDMBased()) return;
 

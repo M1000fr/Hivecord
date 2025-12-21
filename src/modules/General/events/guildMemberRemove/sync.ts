@@ -1,22 +1,20 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { PrismaService } from "@services/prismaService";
-import { GuildMember } from "discord.js";
+import type { ContextOf } from "@src/types/ContextOf";
 
 @EventController()
 export default class GuildMemberRemoveSyncEvent {
 	constructor(private readonly prisma: PrismaService) {}
 
-	@Event({
-		name: BotEvents.GuildMemberRemove,
-	})
+	@On(BotEvents.GuildMemberRemove)
 	async run(
 		@Client() client: LeBotClient<true>,
-		@EventParam() member: GuildMember,
+		@Context() [member]: ContextOf<typeof BotEvents.GuildMemberRemove>,
 	) {
 		await this.prisma.user.upsert({
 			where: { id: member.id },

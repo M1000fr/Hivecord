@@ -1,14 +1,14 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { CommandService } from "@services/CommandService";
+import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";
 import {
 	MessageFlags,
-	type Interaction,
 	type InteractionReplyOptions,
 	type RepliableInteraction,
 } from "discord.js";
@@ -34,12 +34,10 @@ export default class InteractionCreateEvent {
 		}
 	}
 
-	@Event({
-		name: BotEvents.InteractionCreate,
-	})
+	@On(BotEvents.InteractionCreate)
 	async run(
 		@Client() client: LeBotClient<true>,
-		@EventParam() interaction: Interaction,
+		@Context() [interaction]: ContextOf<typeof BotEvents.InteractionCreate>,
 	) {
 		if (interaction.isAutocomplete()) {
 			const command = client.commands.get(interaction.commandName);

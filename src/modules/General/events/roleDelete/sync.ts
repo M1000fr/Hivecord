@@ -1,12 +1,12 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { PrismaService } from "@src/services/prismaService";
+import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";
-import { Role } from "discord.js";
 
 @EventController()
 export default class RoleDeleteEvent {
@@ -14,10 +14,11 @@ export default class RoleDeleteEvent {
 
 	constructor(private readonly prisma: PrismaService) {}
 
-	@Event({
-		name: BotEvents.GuildRoleDelete,
-	})
-	async run(@Client() client: LeBotClient<true>, @EventParam() role: Role) {
+	@On(BotEvents.GuildRoleDelete)
+	async run(
+		@Client() client: LeBotClient<true>,
+		@Context() [role]: ContextOf<typeof BotEvents.GuildRoleDelete>,
+	) {
 		try {
 			await this.prisma.role.upsert({
 				where: { id: role.id },

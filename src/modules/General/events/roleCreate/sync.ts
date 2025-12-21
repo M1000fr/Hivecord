@@ -1,12 +1,12 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@services/EntityService";
+import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";
-import { Role } from "discord.js";
 
 @EventController()
 export default class RoleCreateEvent {
@@ -14,10 +14,11 @@ export default class RoleCreateEvent {
 
 	constructor(private readonly entityService: EntityService) {}
 
-	@Event({
-		name: BotEvents.GuildRoleCreate,
-	})
-	async run(@Client() client: LeBotClient<true>, @EventParam() role: Role) {
+	@On(BotEvents.GuildRoleCreate)
+	async run(
+		@Client() client: LeBotClient<true>,
+		@Context() [role]: ContextOf<typeof BotEvents.GuildRoleCreate>,
+	) {
 		try {
 			await this.entityService.ensureRole(role);
 			this.logger.log(`Synced created role ${role.name} (${role.id})`);

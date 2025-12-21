@@ -1,12 +1,12 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@services/EntityService";
+import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";
-import { GuildMember } from "discord.js";
 
 @EventController()
 export default class GuildMemberRegisterEvent {
@@ -14,12 +14,10 @@ export default class GuildMemberRegisterEvent {
 
 	constructor(private readonly entityService: EntityService) {}
 
-	@Event({
-		name: BotEvents.GuildMemberAdd,
-	})
+	@On(BotEvents.GuildMemberAdd)
 	async run(
 		@Client() client: LeBotClient<true>,
-		@EventParam() member: GuildMember,
+		@Context() [member]: ContextOf<typeof BotEvents.GuildMemberAdd>,
 	) {
 		try {
 			await this.entityService.ensureUser(member.user);

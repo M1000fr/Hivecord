@@ -8,7 +8,7 @@ export enum CommandParamType {
 	Translate = "TRANSLATE",
 	GuildLocale = "GUILD_LOCALE",
 	AutocompleteInteraction = "AUTOCOMPLETE_INTERACTION",
-	EventParam = "EVENT_PARAM",
+	Context = "CONTEXT",
 }
 
 export interface CommandParameter {

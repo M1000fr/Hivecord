@@ -1,20 +1,18 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Client } from "@decorators/Client";
-import { Event } from "@decorators/Event";
+import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
-import { EventParam } from "@decorators/EventParam";
+import { On } from "@decorators/On";
 import { BotEvents } from "@enums/BotEvents";
 import { InteractionRegistry } from "@registers/InteractionRegistry";
-import { type Interaction } from "discord.js";
+import type { ContextOf } from "@src/types/ContextOf";
 
 @EventController()
 export default class InteractionRegistryHandler {
-	@Event({
-		name: BotEvents.InteractionCreate,
-	})
+	@On(BotEvents.InteractionCreate)
 	async run(
 		@Client() client: LeBotClient<true>,
-		@EventParam() interaction: Interaction,
+		@Context() [interaction]: ContextOf<typeof BotEvents.InteractionCreate>,
 	) {
 		if (interaction.isButton()) {
 			const handler = InteractionRegistry.getButtonHandler(
