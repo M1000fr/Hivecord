@@ -53,7 +53,7 @@ export class ConfigService {
 					case EConfigType.Role:
 						return this.roleConfig.get(guildId, key);
 					case EConfigType.RoleArray:
-					return this.roleConfig.getList(guildId, key);
+						return this.roleConfig.getList(guildId, key);
 					case EConfigType.StringArray:
 						return this.getMany(guildId, key);
 					case EConfigType.Integer:
@@ -185,10 +185,15 @@ export class ConfigService {
 		channelId: string,
 		channelType: ChannelType = ChannelType.TEXT,
 	): Promise<void> {
-		await this.channelConfig.addToList(guildId, key, channelId, channelType);
+		await this.channelConfig.addToList(
+			guildId,
+			key,
+			channelId,
+			channelType,
+		);
 	}
 
-	async removeChannelFromListFromList(
+	async removeChannelFromList(
 		guildId: string,
 		key: string,
 		channelId: string,
@@ -231,11 +236,15 @@ export class ConfigService {
 		await this.roleConfig.setList(guildId, key, roleIds);
 	}
 
-	async addRoleToListToList(guildId: string, key: string, roleId: string): Promise<void> {
+	async addRoleToList(
+		guildId: string,
+		key: string,
+		roleId: string,
+	): Promise<void> {
 		await this.roleConfig.addToList(guildId, key, roleId);
 	}
 
-	async removeRoleFromListFromList(
+	async removeRoleFromList(
 		guildId: string,
 		key: string,
 		roleId: string,
@@ -258,7 +267,13 @@ export class ConfigService {
 	}
 
 	async getAll(guildId: string): Promise<Record<string, string>> {
-		const [configs, channelConfigs, channelListConfigs, roleConfigs, roleListConfigs] = await Promise.all([
+		const [
+			configs,
+			channelConfigs,
+			channelListConfigs,
+			roleConfigs,
+			roleListConfigs,
+		] = await Promise.all([
 			this.prisma.configuration.findMany({ where: { guildId } }),
 			this.prisma.channelConfiguration.findMany({
 				where: { Channel: { guildId } },
@@ -283,7 +298,9 @@ export class ConfigService {
 				channelListConfigs.map((c) => [c.key, c.channelId]),
 			),
 			...Object.fromEntries(roleConfigs.map((c) => [c.key, c.roleId])),
-			...Object.fromEntries(roleListConfigs.map((c) => [c.key, c.roleId])),
+			...Object.fromEntries(
+				roleListConfigs.map((c) => [c.key, c.roleId]),
+			),
 		};
 	}
 }

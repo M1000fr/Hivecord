@@ -45,12 +45,14 @@ export class ChannelConfigService {
 
 	async getList(guildId: string, key: string): Promise<string[]> {
 		return this.cache.get(guildId, "channels", key, async () => {
-			const configs = await this.prisma.channelListConfiguration.findMany({
-				where: {
-					key,
-					Channel: { guildId },
+			const configs = await this.prisma.channelListConfiguration.findMany(
+				{
+					where: {
+						key,
+						Channel: { guildId },
+					},
 				},
-			});
+			);
 			return configs.map((c) => c.channelId);
 		});
 	}
@@ -92,7 +94,11 @@ export class ChannelConfigService {
 		}
 	}
 
-	async delete(guildId: string, key: string, _channelId: string): Promise<void> {
+	async delete(
+		guildId: string,
+		key: string,
+		_channelId: string,
+	): Promise<void> {
 		try {
 			await this.prisma.channelConfiguration.delete({
 				where: { key },

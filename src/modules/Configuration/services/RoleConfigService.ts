@@ -68,14 +68,20 @@ export class RoleConfigService {
 					update: { guildId },
 					create: { id: roleId, guildId },
 				});
-				await tx.roleListConfiguration.create({ data: { key, roleId } });
+				await tx.roleListConfiguration.create({
+					data: { key, roleId },
+				});
 			}
 		});
 
 		await this.cache.invalidate(guildId, key);
 	}
 
-	async addToList(guildId: string, key: string, roleId: string): Promise<void> {
+	async addToList(
+		guildId: string,
+		key: string,
+		roleId: string,
+	): Promise<void> {
 		await this.ensureRoleExists(roleId, guildId);
 		await this.prisma.roleListConfiguration.upsert({
 			where: { key_roleId: { key, roleId } },
@@ -86,7 +92,11 @@ export class RoleConfigService {
 		await this.cache.invalidate(guildId, key);
 	}
 
-	async removeFromList(guildId: string, key: string, roleId: string): Promise<void> {
+	async removeFromList(
+		guildId: string,
+		key: string,
+		roleId: string,
+	): Promise<void> {
 		try {
 			await this.prisma.roleListConfiguration.delete({
 				where: { key_roleId: { key, roleId } },
