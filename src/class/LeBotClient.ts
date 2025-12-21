@@ -320,6 +320,10 @@ export class LeBotClient<
 
 						if (!moduleOptions) continue;
 
+						if (!moduleOptions.type) {
+							moduleOptions.type = "bot";
+						}
+
 						discoveredModules.push({
 							ModuleClass:
 								ExportedClass as Constructor<IModuleInstance>,

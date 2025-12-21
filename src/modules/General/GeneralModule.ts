@@ -25,6 +25,7 @@ import { WelcomeRoleSyncService } from "./services/WelcomeRoleSyncService";
 
 @Module({
 	name: "General",
+	type: "bot",
 	config: GeneralConfig,
 	commands: [PingCommand, SyncCommand],
 	interactions: [PingCommandInteractions],

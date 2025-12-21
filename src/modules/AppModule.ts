@@ -9,6 +9,7 @@ import { RedisService } from "@services/RedisService";
 
 @Module({
 	name: "App",
+	type: "application",
 	global: true,
 	providers: [PrismaService, PermissionService, LeBotClient],
 	exports: [PrismaService, PermissionService, LeBotClient],

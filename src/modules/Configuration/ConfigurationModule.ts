@@ -13,6 +13,7 @@ import { CustomEmbedService } from "./services/CustomEmbedService";
 
 @Module({
 	name: "Configuration",
+	type: "bot",
 	commands: [ModulesCommand, ConfigCommand, EmbedCommand],
 	events: [],
 	interactions: [
