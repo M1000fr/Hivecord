@@ -1,1 +1,2 @@
 bunx lint-staged
+bunx prettier --write . --log-level warn
