@@ -1,9 +1,9 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Pager } from "@class/Pager";
-import { Client } from "@decorators/Client";
-import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
+import { Client } from "@decorators/params/Client";
+import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
 import type { ContextOf } from "@src/types/ContextOf";
 import { DiscordAPIError } from "discord.js";

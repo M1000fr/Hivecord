@@ -1,8 +1,8 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { Client } from "@decorators/Client";
-import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
+import { Client } from "@decorators/params/Client";
+import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@services/EntityService";
 import { PrismaService } from "@src/services/PrismaService";

@@ -1,8 +1,8 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { Client } from "@decorators/Client";
-import { Context } from "@decorators/Context";
 import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
+import { Client } from "@decorators/params/Client";
+import { Context } from "@decorators/params/Context";
 import { SyncService } from "@modules/General/services/SyncService";
 import type { ContextOf } from "@src/types/ContextOf";
 import { Logger } from "@utils/Logger";

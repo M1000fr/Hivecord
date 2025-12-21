@@ -93,7 +93,7 @@ export function ModalPattern(pattern: string) {
 	};
 }
 
-import { CommandParamType, registerCommandParameter } from "./params";
+import { CommandParamType, registerCommandParameter } from "@decorators/params";
 
 export function CommandInteraction(): ParameterDecorator {
 	return (

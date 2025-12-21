@@ -1,8 +1,8 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { Client } from "@decorators/Client";
 import { EventController } from "@decorators/EventController";
 import { Injectable } from "@decorators/Injectable";
 import { On } from "@decorators/On";
+import { Client } from "@decorators/params/Client";
 import { BotEvents } from "@enums/BotEvents";
 import { WelcomeRoleSyncService } from "../../services/WelcomeRoleSyncService";
 

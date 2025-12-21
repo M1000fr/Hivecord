@@ -1,7 +1,7 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { Client } from "@decorators/Client";
 import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
+import { Client } from "@decorators/params/Client";
 import { BotEvents } from "@enums/BotEvents";
 import { SyncService } from "@modules/General/services/SyncService";
 

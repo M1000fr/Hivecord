@@ -1,14 +1,14 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Autocomplete } from "@decorators/Autocomplete";
-import { Client } from "@decorators/Client";
 import { Command, CommandController } from "@decorators/Command";
-import { GuildLocale } from "@decorators/GuildLocale";
 import { Injectable } from "@decorators/Injectable";
 import {
 	AutocompleteInteraction,
 	CommandInteraction,
 } from "@decorators/Interaction";
-import { Translate } from "@decorators/Translate";
+import { Client } from "@decorators/params/Client";
+import { GuildLocale } from "@decorators/params/GuildLocale";
+import { Translate } from "@decorators/params/Translate";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
 import { InteractionHelper } from "@src/utils/InteractionHelper";

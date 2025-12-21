@@ -1,11 +1,11 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Autocomplete } from "@decorators/Autocomplete";
 import { BotPermission } from "@decorators/BotPermission";
-import { Client } from "@decorators/Client";
 import { CommandController } from "@decorators/Command";
 import { Injectable } from "@decorators/Injectable";
 import { AutocompleteInteraction } from "@decorators/Interaction";
 import { OptionRoute } from "@decorators/OptionRoute";
+import { Client } from "@decorators/params/Client";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
