@@ -2,12 +2,12 @@ import { EPermission } from "@enums/EPermission";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 
 export interface SubcommandOptions {
-	name: string;
+	name?: string;
 	group?: string;
 	permission?: EPermission;
 }
 
-export function Subcommand(options: SubcommandOptions) {
+export function Subcommand(options?: SubcommandOptions) {
 	return function (
 		target: object,
 		propertyKey: string,
@@ -17,12 +17,14 @@ export function Subcommand(options: SubcommandOptions) {
 		if (!constructor.subcommands) {
 			constructor.subcommands = new Map();
 		}
-		constructor.subcommands.set(
-			options.group ? `${options.group}:${options.name}` : options.name,
-			{
-				method: propertyKey,
-				permission: options.permission,
-			},
-		);
+
+		// Infer name from method name if not provided
+		const name = options?.name ?? propertyKey;
+		const group = options?.group;
+
+		constructor.subcommands.set(group ? `${group}:${name}` : name, {
+			method: propertyKey,
+			permission: options?.permission,
+		});
 	};
 }
