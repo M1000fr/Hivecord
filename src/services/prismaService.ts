@@ -18,7 +18,6 @@ export class PrismaService extends PrismaClient {
 			database: dbConfig.database,
 		});
 		super({ adapter });
-		this.checkDatabaseConnection();
 	}
 
 	private static extractDatabaseLoginFromEnv(): {
