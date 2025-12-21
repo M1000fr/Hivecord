@@ -1,10 +1,9 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { type IConfigClass } from "@decorators/ConfigContext";
+import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
-import { Injectable } from "@decorators/Injectable";
 import { ButtonPattern, ModalPattern } from "@decorators/Interaction";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -22,12 +21,8 @@ import {
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
-@Injectable()
+@ConfigInteraction()
 export class StringConfigInteractions extends BaseConfigInteractions {
-	constructor(configHelper: ConfigHelper, configService: ConfigService) {
-		super(configHelper, configService);
-	}
-
 	@ModalPattern("module_config_modal:*")
 	async handleTextModal(interaction: ModalSubmitInteraction) {
 		const ctx = await this.getInteractionContext(interaction);

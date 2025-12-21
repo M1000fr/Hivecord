@@ -1,19 +1,13 @@
 import { LeBotClient } from "@class/LeBotClient";
+import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
-import { Injectable } from "@decorators/Injectable";
 import { ButtonPattern } from "@decorators/Interaction";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { ConfigHelper } from "@utils/ConfigHelper";
 import { type ButtonInteraction, type RepliableInteraction } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
-@Injectable()
+@ConfigInteraction()
 export class BooleanConfigInteractions extends BaseConfigInteractions {
-	constructor(configHelper: ConfigHelper, configService: ConfigService) {
-		super(configHelper, configService);
-	}
-
 	@ButtonPattern("module_config_bool:*")
 	async handleBooleanButton(interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);

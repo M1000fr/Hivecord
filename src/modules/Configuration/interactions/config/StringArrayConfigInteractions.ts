@@ -1,15 +1,14 @@
 import { LeBotClient } from "@class/LeBotClient";
+import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import {
 	EConfigType,
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
-import { Injectable } from "@decorators/Injectable";
 import {
 	ButtonPattern,
 	ModalPattern,
 	SelectMenuPattern,
 } from "@decorators/Interaction";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
 
@@ -30,12 +29,8 @@ import {
 import i18next from "i18next";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
-@Injectable()
+@ConfigInteraction()
 export class StringArrayConfigInteractions extends BaseConfigInteractions {
-	constructor(configHelper: ConfigHelper, configService: ConfigService) {
-		super(configHelper, configService);
-	}
-
 	async show(
 		interaction: RepliableInteraction,
 		propertyOptions: ConfigPropertyOptions,

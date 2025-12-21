@@ -1,11 +1,9 @@
 import { LeBotClient } from "@class/LeBotClient";
+import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
-import { Injectable } from "@decorators/Injectable";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
-import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -16,12 +14,8 @@ import {
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
-@Injectable()
+@ConfigInteraction()
 export class AttachmentConfigInteractions extends BaseConfigInteractions {
-	constructor(configHelper: ConfigHelper, configService: ConfigService) {
-		super(configHelper, configService);
-	}
-
 	async show(
 		interaction: RepliableInteraction,
 		propertyOptions: ConfigPropertyOptions,

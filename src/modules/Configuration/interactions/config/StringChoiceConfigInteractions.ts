@@ -1,8 +1,7 @@
+import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
-import { Injectable } from "@decorators/Injectable";
 import { SelectMenuPattern } from "@decorators/Interaction";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -18,12 +17,8 @@ import {
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
-@Injectable()
+@ConfigInteraction()
 export class StringChoiceConfigInteractions extends BaseConfigInteractions {
-	constructor(configHelper: ConfigHelper, configService: ConfigService) {
-		super(configHelper, configService);
-	}
-
 	@SelectMenuPattern("module_config_choice:*")
 	async handleChoiceSelection(interaction: StringSelectMenuInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
