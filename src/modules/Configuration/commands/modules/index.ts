@@ -6,17 +6,15 @@ import {
 	AutocompleteInteraction,
 	CommandInteraction,
 } from "@decorators/Interaction";
-import { Client } from "@decorators/params/Client";
-import { GuildLocale } from "@decorators/params/GuildLocale";
-import { Translate } from "@decorators/params/Translate";
+import { Client, GuildLanguage } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ChatInputCommandInteraction,
 	AutocompleteInteraction as DiscordAutocompleteInteraction,
 } from "discord.js";
-import type { TFunction } from "i18next";
 import { modulesOptions } from "./modulesOptions.ts";
 
 @Injectable()
@@ -50,8 +48,7 @@ export default class ModulesCommand {
 	async run(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
-		@Translate() t: TFunction,
-		@GuildLocale() locale: string,
+		@GuildLanguage() lang: GuildLanguageContext,
 	) {
 		await interaction.deferReply();
 		const lebot = client;
@@ -61,18 +58,24 @@ export default class ModulesCommand {
 
 		if (!module) {
 			await interaction.editReply({
-				content: t("modules.configuration.commands.modules.not_found", {
-					module: moduleName,
-				}),
+				content: lang.t(
+					"modules.configuration.commands.modules.not_found",
+					{
+						module: moduleName,
+					},
+				),
 			});
 			return;
 		}
 
 		if (!module.options.config) {
 			await interaction.editReply({
-				content: t("modules.configuration.commands.modules.no_config", {
-					module: module.options.name,
-				}),
+				content: lang.t(
+					"modules.configuration.commands.modules.no_config",
+					{
+						module: module.options.name,
+					},
+				),
 			});
 			return;
 		}
@@ -82,13 +85,13 @@ export default class ModulesCommand {
 			interaction.guildId!,
 			moduleName,
 			interaction.user.id,
-			t,
-			locale,
+			lang.t,
+			lang.locale,
 		);
 
 		if (!config) {
 			await interaction.editReply({
-				content: t(
+				content: lang.t(
 					"modules.configuration.commands.modules.build_failed",
 					{
 						module: module.options.name,

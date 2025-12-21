@@ -10,6 +10,7 @@ import { I18nService } from "@modules/Core/services/I18nService";
 import { PermissionService } from "@modules/Core/services/PermissionService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import type { CommandArgument } from "@src/types/CommandArgument";
+import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { Logger } from "@utils/Logger";
 import {
 	AutocompleteInteraction,
@@ -19,7 +20,6 @@ import {
 } from "discord.js";
 
 import { Injectable } from "@decorators/Injectable";
-import type { TFunction } from "i18next";
 
 @Injectable()
 export class CommandService {
@@ -33,16 +33,16 @@ export class CommandService {
 	/**
 	 * Resolves i18n translation function and language code for a guild.
 	 * @param guildId The ID of the guild.
-	 * @returns An object containing the translation function (t) and language code (lng).
+	 * @returns GuildLanguageContext containing locale and translation function.
 	 * @private
 	 */
 	private async getI18n(
 		guildId: string | null,
-	): Promise<{ t: TFunction; lng: string }> {
-		const lng = await this.configService.of(guildId!, GeneralConfig)
+	): Promise<GuildLanguageContext> {
+		const locale = await this.configService.of(guildId!, GeneralConfig)
 			.generalLanguage;
-		const t = I18nService.getFixedT(lng);
-		return { t, lng };
+		const t = I18nService.getFixedT(locale);
+		return { locale, t };
 	}
 
 	/**
@@ -51,8 +51,7 @@ export class CommandService {
 	 * @param interaction The interaction that triggered the command.
 	 * @param commandInstance The instance of the command class.
 	 * @param method The name of the method to invoke.
-	 * @param t The translation function.
-	 * @param lng The language code.
+	 * @param langCtx The guild language context.
 	 * @param logSuffix Optional suffix for the success log message.
 	 * @private
 	 */
@@ -61,8 +60,7 @@ export class CommandService {
 		interaction: ChatInputCommandInteraction | AutocompleteInteraction,
 		commandInstance: object,
 		method: string,
-		t: TFunction,
-		lng: string,
+		langCtx: GuildLanguageContext,
 		logSuffix?: string,
 	): Promise<void> {
 		const args = this.resolveArguments(
@@ -70,8 +68,7 @@ export class CommandService {
 			method,
 			client,
 			interaction,
-			t,
-			lng,
+			langCtx,
 		);
 
 		await (
@@ -104,14 +101,13 @@ export class CommandService {
 
 		const method = autocompletes?.get(focusedOption.name);
 		if (method) {
-			const { t, lng } = await this.getI18n(interaction.guildId);
+			const langCtx = await this.getI18n(interaction.guildId);
 			await this.invoke(
 				client,
 				interaction,
 				commandInstance,
 				method,
-				t,
-				lng,
+				langCtx,
 			);
 		}
 	}
@@ -128,7 +124,7 @@ export class CommandService {
 		interaction: ChatInputCommandInteraction,
 		commandInstance: object,
 	): Promise<void> {
-		const { t, lng } = await this.getI18n(interaction.guildId);
+		const langCtx = await this.getI18n(interaction.guildId);
 		const commandClass = commandInstance.constructor as ICommandClass;
 
 		// 1. Try Subcommands
@@ -159,8 +155,7 @@ export class CommandService {
 					interaction,
 					commandInstance,
 					method,
-					t,
-					lng,
+					langCtx,
 					` (subcommand: ${key})`,
 				);
 				return;
@@ -194,8 +189,7 @@ export class CommandService {
 						interaction,
 						commandInstance,
 						method,
-						t,
-						lng,
+						langCtx,
 						` (option: ${optionName})`,
 					);
 					return;
@@ -223,8 +217,7 @@ export class CommandService {
 				interaction,
 				commandInstance,
 				defaultCommand,
-				t,
-				lng,
+				langCtx,
 				"",
 			);
 		}
@@ -246,15 +239,14 @@ export class CommandService {
 		method: string,
 		client: Client,
 		interaction: ChatInputCommandInteraction | AutocompleteInteraction,
-		t?: TFunction,
-		lng?: string,
+		langCtx?: GuildLanguageContext,
 	): CommandArgument[] {
 		const params: CommandParameter[] =
 			Reflect.getMetadata(COMMAND_PARAMS_METADATA_KEY, target, method) ||
 			[];
 
 		if (params.length === 0) {
-			return [client, interaction, t];
+			return [client, interaction, langCtx];
 		}
 
 		const args: CommandArgument[] = [];
@@ -268,10 +260,7 @@ export class CommandService {
 					args[param.index] = interaction;
 					break;
 				case CommandParamType.Translate:
-					args[param.index] = t;
-					break;
-				case CommandParamType.GuildLocale:
-					args[param.index] = lng;
+					args[param.index] = langCtx;
 					break;
 			}
 		}

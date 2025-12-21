@@ -1,14 +1,13 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { CommandController } from "@decorators/Command";
 import { Injectable } from "@decorators/Injectable";
-import { Client } from "@decorators/params/index.ts";
+import { Client, GuildLanguage } from "@decorators/params/index.ts";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { BackupService } from "@modules/Configuration/services/BackupService";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { I18nService } from "@modules/Core/services/I18nService";
-import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { CommandInteraction } from "@src/decorators/Interaction";
+import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import {
 	AttachmentBuilder,
 	ChatInputCommandInteraction,
@@ -28,13 +27,9 @@ export default class ConfigCommand {
 	async backup(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
+		@GuildLanguage() lang: GuildLanguageContext,
 	) {
 		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-		const lng = await this.configService.of(
-			interaction.guildId!,
-			GeneralConfig,
-		).generalLanguage;
-		const t = I18nService.getFixedT(lng);
 		const lebot = client as LeBotClient<true>;
 
 		try {
@@ -50,7 +45,7 @@ export default class ConfigCommand {
 			});
 
 			await interaction.editReply({
-				content: t(
+				content: lang.t(
 					"modules.configuration.commands.config.backup_success",
 				),
 				files: [attachment],
@@ -58,7 +53,7 @@ export default class ConfigCommand {
 		} catch (error) {
 			console.error("Backup creation failed:", error);
 			await interaction.editReply({
-				content: t(
+				content: lang.t(
 					"modules.configuration.commands.config.backup_failed",
 				),
 			});
@@ -69,12 +64,8 @@ export default class ConfigCommand {
 	async restore(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
+		@GuildLanguage() lang: GuildLanguageContext,
 	) {
-		const lng = await this.configService.of(
-			interaction.guildId!,
-			GeneralConfig,
-		).generalLanguage;
-		const t = I18nService.getFixedT(lng);
 		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 		try {
@@ -82,7 +73,7 @@ export default class ConfigCommand {
 
 			if (!attachment.name.endsWith(".enc")) {
 				await interaction.editReply({
-					content: t(
+					content: lang.t(
 						"modules.configuration.commands.config.invalid_file",
 					),
 				});
@@ -105,7 +96,7 @@ export default class ConfigCommand {
 			);
 
 			await interaction.editReply({
-				content: t(
+				content: lang.t(
 					"modules.configuration.commands.config.restore_success",
 				),
 			});
@@ -114,7 +105,9 @@ export default class ConfigCommand {
 			const errorMessage =
 				error instanceof Error
 					? error.message
-					: t("modules.configuration.commands.config.restore_failed");
+					: lang.t(
+							"modules.configuration.commands.config.restore_failed",
+						);
 
 			await interaction.editReply({
 				content: errorMessage,
