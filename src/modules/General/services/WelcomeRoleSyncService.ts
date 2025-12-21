@@ -14,24 +14,34 @@ interface SyncState {
 
 @Injectable()
 export class WelcomeRoleSyncService {
-	private static logger = new Logger("WelcomeRoleSyncService");
+	private readonly logger = new Logger("WelcomeRoleSyncService");
 	private static readonly REDIS_KEY = "bot:welcome_sync:state";
 	private static readonly BATCH_SIZE = 50;
 
-	static async getState(guildId: string): Promise<SyncState> {
+	constructor(
+		private readonly configService: ConfigService,
+		private readonly welcomeRoleService: WelcomeRoleService,
+	) {}
+
+	async getState(guildId: string): Promise<SyncState> {
 		const redis = RedisService.getInstance();
-		const state = await redis.get(`${this.REDIS_KEY}:${guildId}`);
+		const state = await redis.get(
+			`${WelcomeRoleSyncService.REDIS_KEY}:${guildId}`,
+		);
 		return state
 			? JSON.parse(state)
 			: { isRunning: false, lastMemberId: null };
 	}
 
-	static async setState(guildId: string, state: SyncState) {
+	async setState(guildId: string, state: SyncState) {
 		const redis = RedisService.getInstance();
-		await redis.set(`${this.REDIS_KEY}:${guildId}`, JSON.stringify(state));
+		await redis.set(
+			`${WelcomeRoleSyncService.REDIS_KEY}:${guildId}`,
+			JSON.stringify(state),
+		);
 	}
 
-	static async start(guild: Guild) {
+	async start(guild: Guild) {
 		const state = await this.getState(guild.id);
 		if (state.isRunning) {
 			this.logger.warn(`Sync already running for guild ${guild.id}.`);
@@ -45,7 +55,7 @@ export class WelcomeRoleSyncService {
 		this.process(guild);
 	}
 
-	static async resume(client: LeBotClient<true>) {
+	async resume(client: LeBotClient<true>) {
 		// Check all guilds for running state
 		const guilds = client.guilds.cache;
 		for (const guild of guilds.values()) {
@@ -59,13 +69,13 @@ export class WelcomeRoleSyncService {
 		}
 	}
 
-	static async stop(guildId: string) {
+	async stop(guildId: string) {
 		const state = await this.getState(guildId);
 		await this.setState(guildId, { ...state, isRunning: false });
 		this.logger.log(`Welcome role sync stopped for guild ${guildId}.`);
 	}
 
-	private static async process(guild: Guild) {
+	private async process(guild: Guild) {
 		try {
 			const state = await this.getState(guild.id);
 			if (!state.isRunning) return;
@@ -87,10 +97,10 @@ export class WelcomeRoleSyncService {
 		}
 	}
 
-	private static async processGuild(guild: Guild) {
+	private async processGuild(guild: Guild) {
 		this.logger.log(`Processing guild ${guild.name} (${guild.id})...`);
 
-		const roleIds = await ConfigService.of(guild.id, GeneralConfig)
+		const roleIds = await this.configService.of(guild.id, GeneralConfig)
 			.generalWelcomeRoles;
 		if (!roleIds || roleIds.length === 0) {
 			return;
@@ -130,7 +140,7 @@ export class WelcomeRoleSyncService {
 				);
 
 				if (missingRoles.length > 0) {
-					await WelcomeRoleService.addWelcomeRoles(member);
+					await this.welcomeRoleService.addWelcomeRoles(member);
 					// Small delay to prevent rate limits even with the service queue
 					await new Promise((resolve) => setTimeout(resolve, 200));
 				}

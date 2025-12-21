@@ -67,6 +67,7 @@ class CryptoHelper {
 
 class ConfigExtractor {
 	static async extractModuleConfig(
+		configService: ConfigService,
 		moduleName: string,
 		configClass: {
 			configProperties?: Record<string, ConfigPropertyOptions>;
@@ -81,6 +82,7 @@ class ConfigExtractor {
 			const snakeCaseKey = this.toSnakeCase(propertyKey);
 
 			const value = await this.getConfigValue(
+				configService,
 				guildId,
 				snakeCaseKey,
 				opt.type,
@@ -94,22 +96,23 @@ class ConfigExtractor {
 	}
 
 	private static async getConfigValue(
+		configService: ConfigService,
 		guildId: string,
 		key: string,
 		type: EConfigType,
 	): Promise<string | string[] | null> {
 		if (type === EConfigType.Role) {
 			// Check if it's a multi-role configuration
-			const roles = await ConfigService.getRoles(guildId, key);
+			const roles = await configService.getRoles(guildId, key);
 			if (roles.length > 0) return roles;
 
-			const role = await ConfigService.getRole(guildId, key);
+			const role = await configService.getRole(guildId, key);
 			return role ? [role] : null;
 		}
 		if (type === EConfigType.Channel) {
-			return await ConfigService.getChannel(guildId, key);
+			return await configService.getChannel(guildId, key);
 		}
-		return await ConfigService.get(guildId, key);
+		return await configService.get(guildId, key);
 	}
 
 	private static toSnakeCase(str: string): string {
@@ -119,6 +122,7 @@ class ConfigExtractor {
 
 class ConfigRestorer {
 	static async restoreModuleConfig(
+		configService: ConfigService,
 		moduleConfig: ModuleConfig,
 		guildId: string,
 	): Promise<void> {
@@ -130,18 +134,18 @@ class ConfigRestorer {
 			if (type === EConfigType.Role) {
 				if (Array.isArray(value)) {
 					if (value.length === 1 && value[0]) {
-						await ConfigService.setRole(guildId, key, value[0]);
+						await configService.setRole(guildId, key, value[0]);
 					} else if (value.length > 1) {
-						await ConfigService.setRoles(guildId, key, value);
+						await configService.setRoles(guildId, key, value);
 					}
 				}
 			} else if (type === EConfigType.Channel) {
 				if (typeof value === "string") {
-					await ConfigService.setChannel(guildId, key, value);
+					await configService.setChannel(guildId, key, value);
 				}
 			} else {
 				if (typeof value === "string") {
-					await ConfigService.set(guildId, key, value);
+					await configService.set(guildId, key, value);
 				}
 			}
 		}
@@ -150,10 +154,12 @@ class ConfigRestorer {
 
 @Injectable()
 export class BackupService {
-	private static logger = new Logger("BackupService");
+	private readonly logger = new Logger("BackupService");
 	private static readonly BACKUP_VERSION = 3;
 
-	static async createBackup(
+	constructor(private readonly configService: ConfigService) {}
+
+	async createBackup(
 		client: LeBotClient<true>,
 		guildId: string,
 	): Promise<Buffer> {
@@ -167,6 +173,7 @@ export class BackupService {
 				| undefined;
 			if (configClass?.configProperties) {
 				const moduleConfig = await ConfigExtractor.extractModuleConfig(
+					this.configService,
 					moduleName,
 					configClass,
 					guildId,
@@ -183,7 +190,7 @@ export class BackupService {
 
 		const backupData: BackupData = {
 			timestamp: new Date().toISOString(),
-			version: this.BACKUP_VERSION,
+			version: BackupService.BACKUP_VERSION,
 			modules,
 		};
 
@@ -193,7 +200,7 @@ export class BackupService {
 		return Buffer.from(encrypted, "utf-8");
 	}
 
-	static async restoreBackup(buffer: Buffer, guildId: string): Promise<void> {
+	async restoreBackup(buffer: Buffer, guildId: string): Promise<void> {
 		this.logger.log("Restoring modular configuration backup...");
 
 		try {
@@ -201,9 +208,9 @@ export class BackupService {
 			const json = CryptoHelper.decrypt(encrypted);
 			const backup: BackupData = JSON.parse(json);
 
-			if (backup.version !== this.BACKUP_VERSION) {
+			if (backup.version !== BackupService.BACKUP_VERSION) {
 				this.logger.warn(
-					`Backup version mismatch: expected ${this.BACKUP_VERSION}, got ${backup.version}`,
+					`Backup version mismatch: expected ${BackupService.BACKUP_VERSION}, got ${backup.version}`,
 				);
 			}
 
@@ -213,7 +220,11 @@ export class BackupService {
 
 			for (const moduleConfig of backup.modules) {
 				this.logger.log(`Restoring ${moduleConfig.moduleName}...`);
-				await ConfigRestorer.restoreModuleConfig(moduleConfig, guildId);
+				await ConfigRestorer.restoreModuleConfig(
+					this.configService,
+					moduleConfig,
+					guildId,
+				);
 				this.logger.log(
 					`Restored ${Object.keys(moduleConfig.configurations).length} configs for ${moduleConfig.moduleName}`,
 				);

@@ -9,10 +9,12 @@ const EDITOR_TTL = 3600; // 1 hour
 
 @Injectable()
 export class CustomEmbedService {
+	constructor(private readonly entityService: EntityService) {}
+
 	/**
 	 * Get a raw embed JSON by name
 	 */
-	static async get(guildId: string, name: string): Promise<APIEmbed | null> {
+	async get(guildId: string, name: string): Promise<APIEmbed | null> {
 		const embed = await prismaClient.customEmbed.findUnique({
 			where: { guildId_name: { guildId, name } },
 		});
@@ -23,12 +25,8 @@ export class CustomEmbedService {
 	/**
 	 * Save an embed
 	 */
-	static async save(
-		guildId: string,
-		name: string,
-		data: APIEmbed,
-	): Promise<void> {
-		await EntityService.ensureGuildById(guildId);
+	async save(guildId: string, name: string, data: APIEmbed): Promise<void> {
+		await this.entityService.ensureGuildById(guildId);
 		await prismaClient.customEmbed.upsert({
 			where: { guildId_name: { guildId, name } },
 			update: { data: JSON.stringify(data) },
@@ -39,7 +37,7 @@ export class CustomEmbedService {
 	/**
 	 * Delete an embed
 	 */
-	static async delete(guildId: string, name: string): Promise<void> {
+	async delete(guildId: string, name: string): Promise<void> {
 		await prismaClient.customEmbed.delete({
 			where: { guildId_name: { guildId, name } },
 		});
@@ -48,7 +46,7 @@ export class CustomEmbedService {
 	/**
 	 * List all embeds
 	 */
-	static async list(guildId: string): Promise<string[]> {
+	async list(guildId: string): Promise<string[]> {
 		const embeds = await prismaClient.customEmbed.findMany({
 			where: { guildId },
 			select: { name: true },
@@ -59,7 +57,7 @@ export class CustomEmbedService {
 	/**
 	 * Render an embed with context
 	 */
-	static async render(
+	async render(
 		guildId: string,
 		name: string,
 		context: Record<string, unknown>,
@@ -81,7 +79,7 @@ export class CustomEmbedService {
 
 	// --- Editor Session Management (Redis) ---
 
-	static async getEditorSession(sessionId: string): Promise<{
+	async getEditorSession(sessionId: string): Promise<{
 		guildId: string;
 		name: string;
 		data: APIEmbed;
@@ -95,7 +93,7 @@ export class CustomEmbedService {
 		return data ? JSON.parse(data) : null;
 	}
 
-	static async setEditorSession(
+	async setEditorSession(
 		sessionId: string,
 		guildId: string,
 		name: string,
@@ -114,7 +112,7 @@ export class CustomEmbedService {
 		);
 	}
 
-	static async clearEditorSession(sessionId: string): Promise<void> {
+	async clearEditorSession(sessionId: string): Promise<void> {
 		const redis = RedisService.getInstance();
 		const key = `embed:editor:${sessionId}`;
 		await redis.del(key);

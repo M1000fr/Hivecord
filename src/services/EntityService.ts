@@ -1,5 +1,6 @@
 import { ChannelType } from "@prisma/client/enums";
 import { prismaClient } from "@services/prismaService";
+import { Injectable } from "@src/decorators/Injectable";
 import {
 	ChannelType as DiscordChannelType,
 	Guild,
@@ -8,8 +9,11 @@ import {
 	User,
 } from "discord.js";
 
+@Injectable()
 export class EntityService {
-	static async ensureGuild(guild: Guild) {
+	constructor() {}
+
+	async ensureGuild(guild: Guild) {
 		if (!guild || !guild.id) {
 			throw new Error(
 				`Invalid guild provided to ensureGuild: ${JSON.stringify(guild)}`,
@@ -22,7 +26,7 @@ export class EntityService {
 		});
 	}
 
-	static async ensureGuildById(guildId: string) {
+	async ensureGuildById(guildId: string) {
 		if (!guildId) {
 			throw new Error(
 				`Invalid guildId provided to ensureGuildById: ${guildId}`,
@@ -35,7 +39,7 @@ export class EntityService {
 		});
 	}
 
-	static async ensureUser(user: User) {
+	async ensureUser(user: User) {
 		await prismaClient.user.upsert({
 			where: { id: user.id },
 			update: { leftAt: null },
@@ -43,7 +47,7 @@ export class EntityService {
 		});
 	}
 
-	static async ensureUserById(userId: string) {
+	async ensureUserById(userId: string) {
 		await prismaClient.user.upsert({
 			where: { id: userId },
 			update: {},
@@ -51,8 +55,8 @@ export class EntityService {
 		});
 	}
 
-	static async ensureRole(role: Role) {
-		await EntityService.ensureGuild(role.guild);
+	async ensureRole(role: Role) {
+		await this.ensureGuild(role.guild);
 		await prismaClient.role.upsert({
 			where: { id: role.id },
 			update: { deletedAt: null, guildId: role.guild.id },
@@ -60,8 +64,8 @@ export class EntityService {
 		});
 	}
 
-	static async ensureRoleById(guildId: string, roleId: string) {
-		await EntityService.ensureGuildById(guildId);
+	async ensureRoleById(guildId: string, roleId: string) {
+		await this.ensureGuildById(guildId);
 		await prismaClient.role.upsert({
 			where: { id: roleId },
 			update: { guildId },
@@ -69,8 +73,8 @@ export class EntityService {
 		});
 	}
 
-	static async ensureChannel(channel: GuildChannel) {
-		await EntityService.ensureGuild(channel.guild);
+	async ensureChannel(channel: GuildChannel) {
+		await this.ensureGuild(channel.guild);
 
 		let type: ChannelType;
 		if (channel.type === DiscordChannelType.GuildText) {
@@ -93,12 +97,12 @@ export class EntityService {
 		});
 	}
 
-	static async ensureChannelById(
+	async ensureChannelById(
 		guildId: string,
 		channelId: string,
 		type: ChannelType = ChannelType.TEXT,
 	) {
-		await EntityService.ensureGuildById(guildId);
+		await this.ensureGuildById(guildId);
 		await prismaClient.channel.upsert({
 			where: { id: channelId },
 			update: { type, guildId },

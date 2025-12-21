@@ -6,20 +6,22 @@ import { GeneralConfig } from "../GeneralConfig";
 
 @Injectable()
 export class WelcomeRoleService {
-	private static logger = new Logger("WelcomeRoleService");
-	private static queue: GuildMember[] = [];
-	private static isProcessing = false;
-	private static readonly BATCH_SIZE = 5;
-	private static readonly DELAY_BETWEEN_BATCHES = 1000;
+	private readonly logger = new Logger("WelcomeRoleService");
+	private queue: GuildMember[] = [];
+	private isProcessing = false;
+	private readonly BATCH_SIZE = 5;
+	private readonly DELAY_BETWEEN_BATCHES = 1000;
 
-	static async queueWelcomeRoleAdd(member: GuildMember) {
+	constructor(private readonly configService: ConfigService) {}
+
+	async queueWelcomeRoleAdd(member: GuildMember) {
 		this.queue.push(member);
 		if (!this.isProcessing) {
 			this.processQueue();
 		}
 	}
 
-	private static async processQueue() {
+	private async processQueue() {
 		if (this.isProcessing) return;
 		this.isProcessing = true;
 
@@ -36,16 +38,16 @@ export class WelcomeRoleService {
 		this.isProcessing = false;
 	}
 
-	static async addWelcomeRoles(member: GuildMember) {
+	async addWelcomeRoles(member: GuildMember) {
 		try {
-			const roleIds = await ConfigService.of(
+			const roleIds = await this.configService.of(
 				member.guild.id,
 				GeneralConfig,
 			).generalWelcomeRoles;
 			if (!roleIds || roleIds.length === 0) return;
 
 			const rolesToAdd = roleIds.filter(
-				(roleId) => !member.roles.cache.has(roleId),
+				(roleId: string) => !member.roles.cache.has(roleId),
 			);
 			if (rolesToAdd.length === 0) return;
 

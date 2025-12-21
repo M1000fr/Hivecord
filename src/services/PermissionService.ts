@@ -1,13 +1,15 @@
+import { Injectable } from "@decorators/Injectable";
 import { prismaClient } from "@services/prismaService";
 import { RedisService } from "@services/RedisService";
 import { Logger } from "@utils/Logger";
 
 const CACHE_TTL = 60; // 60 seconds
 
+@Injectable()
 export class PermissionService {
-	private static logger = new Logger("PermissionService");
+	private logger = new Logger("PermissionService");
 
-	static async hasPermission(
+	async hasPermission(
 		userId: string,
 		guildOwnerId: string | undefined,
 		userRoleIds: string[],
@@ -60,7 +62,7 @@ export class PermissionService {
 		return false;
 	}
 
-	private static checkPermission(
+	private checkPermission(
 		userPermissions: string[],
 		requiredPermission: string,
 	): boolean {
@@ -76,7 +78,7 @@ export class PermissionService {
 		return false;
 	}
 
-	static async registerPermissions(permissions: string[]) {
+	async registerPermissions(permissions: string[]) {
 		if (permissions.length === 0) return;
 
 		const permissionsToRegister = new Set<string>(permissions);
@@ -118,7 +120,7 @@ export class PermissionService {
 		}
 	}
 
-	static async getAllPermissions(): Promise<string[]> {
+	async getAllPermissions(): Promise<string[]> {
 		const permissions = await prismaClient.permission.findMany({
 			select: { name: true },
 			orderBy: { name: "asc" },

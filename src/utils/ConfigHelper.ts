@@ -4,7 +4,6 @@ import {
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
 import { ConfigService } from "@services/ConfigService";
-import { I18nService } from "@services/I18nService";
 import {
 	ActionRowBuilder,
 	EmbedBuilder,
@@ -14,7 +13,12 @@ import {
 } from "discord.js";
 import type { TFunction } from "i18next";
 
+import { Injectable } from "@decorators/Injectable";
+
+@Injectable()
 export class ConfigHelper {
+	constructor(private readonly configService: ConfigService) {}
+
 	static toSnakeCase(str: string): string {
 		return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 	}
@@ -67,24 +71,24 @@ export class ConfigHelper {
 		return this.truncate(String(value), 100);
 	}
 
-	static async fetchValue(
+	async fetchValue(
 		guildId: string,
 		key: string,
 		type: EConfigType,
 		defaultValue?: unknown,
 	): Promise<string | string[] | null> {
-		const snakeKey = this.toSnakeCase(key);
+		const snakeKey = ConfigHelper.toSnakeCase(key);
 		let value: string | string[] | null = null;
 
 		if (type === EConfigType.Role)
-			value = await ConfigService.getRole(guildId, snakeKey);
+			value = await this.configService.getRole(guildId, snakeKey);
 		else if (type === EConfigType.RoleArray)
-			value = await ConfigService.getRoles(guildId, snakeKey);
+			value = await this.configService.getRoles(guildId, snakeKey);
 		else if (type === EConfigType.StringArray) {
-			value = await ConfigService.getMany(guildId, snakeKey);
+			value = await this.configService.getMany(guildId, snakeKey);
 		} else if (type === EConfigType.Channel)
-			value = await ConfigService.getChannel(guildId, snakeKey);
-		else value = await ConfigService.get(guildId, snakeKey);
+			value = await this.configService.getChannel(guildId, snakeKey);
+		else value = await this.configService.get(guildId, snakeKey);
 
 		if (value === null && defaultValue !== undefined) {
 			return String(defaultValue);
@@ -92,35 +96,51 @@ export class ConfigHelper {
 		return value;
 	}
 
-	static async saveValue(
+	async saveValue(
 		guildId: string,
 		key: string,
 		value: string | string[],
 		type: EConfigType,
 	): Promise<void> {
-		const snakeKey = this.toSnakeCase(key);
+		const snakeKey = ConfigHelper.toSnakeCase(key);
 		if (type === EConfigType.Role)
-			return ConfigService.setRole(guildId, snakeKey, value as string);
+			return this.configService.setRole(
+				guildId,
+				snakeKey,
+				value as string,
+			);
 		if (type === EConfigType.RoleArray)
-			return ConfigService.setRoles(guildId, snakeKey, value as string[]);
+			return this.configService.setRoles(
+				guildId,
+				snakeKey,
+				value as string[],
+			);
 		if (type === EConfigType.StringArray)
-			return ConfigService.setMany(guildId, snakeKey, value as string[]);
+			return this.configService.setMany(
+				guildId,
+				snakeKey,
+				value as string[],
+			);
 		if (type === EConfigType.Channel)
-			return ConfigService.setChannel(guildId, snakeKey, value as string);
-		return ConfigService.set(guildId, snakeKey, value as string);
+			return this.configService.setChannel(
+				guildId,
+				snakeKey,
+				value as string,
+			);
+		return this.configService.set(guildId, snakeKey, value as string);
 	}
 
-	static async deleteValue(
+	async deleteValue(
 		guildId: string,
 		key: string,
 		type: EConfigType,
 	): Promise<void> {
-		const snakeKey = this.toSnakeCase(key);
+		const snakeKey = ConfigHelper.toSnakeCase(key);
 		if (type === EConfigType.Role)
-			return ConfigService.deleteRole(guildId, snakeKey);
+			return this.configService.deleteRole(guildId, snakeKey);
 		if (type === EConfigType.Channel)
-			return ConfigService.deleteChannel(guildId, snakeKey);
-		return ConfigService.delete(guildId, snakeKey);
+			return this.configService.deleteChannel(guildId, snakeKey);
+		return this.configService.delete(guildId, snakeKey);
 	}
 
 	static buildCustomId(parts: string[]): string {
@@ -131,7 +151,7 @@ export class ConfigHelper {
 		return customId.split(":");
 	}
 
-	static async getCurrentValue(
+	async getCurrentValue(
 		guildId: string,
 		key: string,
 		type: EConfigType,
@@ -148,21 +168,21 @@ export class ConfigHelper {
 				options?.nonNull ? defaultValue : undefined,
 			);
 			return value
-				? this.formatValue(value, type, t, options, locale)
+				? ConfigHelper.formatValue(value, type, t, options, locale)
 				: t("utils.config_helper.not_set");
 		} catch {
 			return t("utils.config_helper.not_set");
 		}
 	}
 
-	static async buildModuleConfigEmbed(
+	async buildModuleConfigEmbed(
 		client: LeBotClient<true>,
 		guildId: string,
 		moduleName: string,
 		userId: string,
+		t: TFunction,
 		locale: string,
 	) {
-		const t = I18nService.getFixedT(locale);
 		const module = client.modules.get(moduleName.toLowerCase());
 		if (!module?.options.config) return null;
 
@@ -191,12 +211,13 @@ export class ConfigHelper {
 			configProperties,
 		).entries()) {
 			const opt = options;
+			const language = locale || "en";
 			const displayName =
-				opt.displayNameLocalizations?.[locale as Locale] ||
+				opt.displayNameLocalizations?.[language as Locale] ||
 				opt.displayName ||
 				key;
 			const description =
-				opt.descriptionLocalizations?.[locale as Locale] ||
+				opt.descriptionLocalizations?.[language as Locale] ||
 				opt.description;
 
 			const currentValue = await this.getCurrentValue(
@@ -206,19 +227,19 @@ export class ConfigHelper {
 				t,
 				opt.defaultValue,
 				opt,
-				locale,
+				language,
 			);
 
 			embed.addFields({
 				name: `${idx + 1}. ${displayName}`,
-				value: `${description}\n${t("utils.config_helper.type")}: \`${this.getTypeName(opt.type as EConfigType, t)}\`\n${t("utils.config_helper.current")}: ${currentValue}`,
+				value: `${description}\n${t("utils.config_helper.type")}: \`${ConfigHelper.getTypeName(opt.type as EConfigType, t)}\`\n${t("utils.config_helper.current")}: ${currentValue}`,
 				inline: true,
 			});
 		}
 
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(
-				this.buildCustomId([
+				ConfigHelper.buildCustomId([
 					"module_config",
 					moduleName.toLowerCase(),
 					userId,
@@ -228,17 +249,18 @@ export class ConfigHelper {
 			.addOptions(
 				Object.entries(configProperties).map(([key, options], idx) => {
 					const opt = options;
+					const language = locale || "en";
 					const displayName =
-						opt.displayNameLocalizations?.[locale as Locale] ||
+						opt.displayNameLocalizations?.[language as Locale] ||
 						opt.displayName ||
 						key;
 					const description =
-						opt.descriptionLocalizations?.[locale as Locale] ||
+						opt.descriptionLocalizations?.[language as Locale] ||
 						opt.description;
 
 					return new StringSelectMenuOptionBuilder()
 						.setLabel(`${idx + 1}. ${displayName}`)
-						.setDescription(this.truncate(description, 100))
+						.setDescription(ConfigHelper.truncate(description, 100))
 						.setValue(key);
 				}),
 			);
