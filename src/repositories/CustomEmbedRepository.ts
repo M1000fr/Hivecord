@@ -1,9 +1,14 @@
 import { Injectable } from "@decorators/Injectable";
+import { PrismaService } from "@modules/Core/services/PrismaService";
 import type { APIEmbed } from "discord.js";
 import { BaseRepository } from "./BaseRepository";
 
 @Injectable()
 export class CustomEmbedRepository extends BaseRepository {
+	constructor(prisma: PrismaService) {
+		super(prisma);
+	}
+
 	async findByName(guildId: string, name: string) {
 		return this.prisma.customEmbed.findUnique({
 			where: { guildId_name: { guildId, name } },
