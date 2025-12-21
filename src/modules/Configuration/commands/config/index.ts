@@ -1,32 +1,41 @@
-import { BaseCommand } from "@class/BaseCommand";
 import { LeBotClient } from "@class/LeBotClient";
-import { Command } from "@decorators/Command";
+import { CommandController } from "@decorators/Command";
+import { Injectable } from "@decorators/Injectable";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { BackupService } from "@modules/Configuration/services/BackupService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import { Client } from "@src/decorators/Client";
+import { CommandInteraction } from "@src/decorators/Interaction";
 import { InteractionHelper } from "@utils/InteractionHelper";
-import {
-	AttachmentBuilder,
-	ChatInputCommandInteraction,
-	Client,
-} from "discord.js";
+import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
 import { configOptions } from "./configOptions";
 
-@Command(configOptions)
-export default class ConfigCommand extends BaseCommand {
+@Injectable()
+@CommandController(configOptions)
+export default class ConfigCommand {
+	constructor(
+		private readonly configService: ConfigService,
+		private readonly backupService: BackupService,
+	) {}
+
 	@Subcommand({ name: "backup", permission: EPermission.ConfigureModules })
-	async backup(client: Client, interaction: ChatInputCommandInteraction) {
+	async backup(
+		@Client() client: LeBotClient<true>,
+		@CommandInteraction() interaction: ChatInputCommandInteraction,
+	) {
 		await InteractionHelper.defer(interaction, true);
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const lebot = client as LeBotClient<true>;
 
 		try {
-			const buffer = await BackupService.createBackup(
+			const buffer = await this.backupService.createBackup(
 				lebot,
 				interaction.guildId!,
 			);
@@ -54,9 +63,14 @@ export default class ConfigCommand extends BaseCommand {
 	}
 
 	@Subcommand({ name: "restore", permission: EPermission.ConfigureModules })
-	async restore(client: Client, interaction: ChatInputCommandInteraction) {
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+	async restore(
+		@Client() client: LeBotClient<true>,
+		@CommandInteraction() interaction: ChatInputCommandInteraction,
+	) {
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		await InteractionHelper.defer(interaction, true);
 
@@ -82,7 +96,10 @@ export default class ConfigCommand extends BaseCommand {
 			const buffer = Buffer.from(arrayBuffer);
 
 			// Restore the backup
-			await BackupService.restoreBackup(buffer, interaction.guildId!);
+			await this.backupService.restoreBackup(
+				buffer,
+				interaction.guildId!,
+			);
 
 			await InteractionHelper.respond(interaction, {
 				content: t(

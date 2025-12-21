@@ -1,31 +1,42 @@
-import { BaseCommand } from "@class/BaseCommand";
 import { Autocomplete } from "@decorators/Autocomplete";
-import { Command } from "@decorators/Command";
+import { CommandController } from "@decorators/Command";
+import { Injectable } from "@decorators/Injectable";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
+import type { LeBotClient } from "@src/class/LeBotClient";
+import { Client } from "@src/decorators/Client";
+import {
+	AutocompleteInteraction,
+	CommandInteraction,
+} from "@src/decorators/Interaction";
 import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
-	AutocompleteInteraction,
 	ChatInputCommandInteraction,
-	Client,
+	AutocompleteInteraction as DiscordAutocompleteInteraction,
 	EmbedBuilder,
 } from "discord.js";
 import { embedOptions } from "./embedOptions";
 import { EmbedEditorMenus } from "./utils/EmbedEditorMenus";
 
-@Command(embedOptions)
-export default class EmbedCommand extends BaseCommand {
+@Injectable()
+@CommandController(embedOptions)
+export default class EmbedCommand {
+	constructor(
+		private readonly configService: ConfigService,
+		private readonly customEmbedService: CustomEmbedService,
+	) {}
+
 	@Autocomplete({ optionName: "name" })
 	async autocompleteName(
-		client: Client,
-		interaction: AutocompleteInteraction,
+		@Client() client: LeBotClient<true>,
+		@AutocompleteInteraction() interaction: DiscordAutocompleteInteraction,
 	) {
 		const focusedValue = interaction.options.getFocused();
-		const embeds = await CustomEmbedService.list(interaction.guildId!);
+		const embeds = await this.customEmbedService.list(interaction.guildId!);
 		const filtered = embeds.filter((choice) =>
 			choice.toLowerCase().includes(focusedValue.toLowerCase()),
 		);
@@ -37,13 +48,21 @@ export default class EmbedCommand extends BaseCommand {
 	}
 
 	@Subcommand({ name: "builder", permission: EPermission.ConfigureModules })
-	async builder(client: Client, interaction: ChatInputCommandInteraction) {
+	async builder(
+		@Client() client: LeBotClient<true>,
+		@CommandInteraction() interaction: ChatInputCommandInteraction,
+	) {
 		await InteractionHelper.defer(interaction);
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
-		let data = await CustomEmbedService.get(interaction.guildId!, name);
+		let data = await this.customEmbedService.get(
+			interaction.guildId!,
+			name,
+		);
 
 		if (!data) {
 			// Default template for new embed
@@ -72,7 +91,7 @@ export default class EmbedCommand extends BaseCommand {
 		const response = await interaction.fetchReply();
 
 		// Save to session
-		await CustomEmbedService.setEditorSession(
+		await this.customEmbedService.setEditorSession(
 			response.id,
 			interaction.guildId!,
 			name,
@@ -83,13 +102,21 @@ export default class EmbedCommand extends BaseCommand {
 	}
 
 	@Subcommand({ name: "edit", permission: EPermission.ConfigureModules })
-	async edit(client: Client, interaction: ChatInputCommandInteraction) {
+	async edit(
+		@Client() client: LeBotClient<true>,
+		@CommandInteraction() interaction: ChatInputCommandInteraction,
+	) {
 		await InteractionHelper.defer(interaction);
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
-		const data = await CustomEmbedService.get(interaction.guildId!, name);
+		const data = await this.customEmbedService.get(
+			interaction.guildId!,
+			name,
+		);
 
 		if (!data) {
 			await InteractionHelper.respond(interaction, {
@@ -114,7 +141,7 @@ export default class EmbedCommand extends BaseCommand {
 		const response = await interaction.fetchReply();
 
 		// Save to session
-		await CustomEmbedService.setEditorSession(
+		await this.customEmbedService.setEditorSession(
 			response.id,
 			interaction.guildId!,
 			name,
@@ -125,13 +152,18 @@ export default class EmbedCommand extends BaseCommand {
 	}
 
 	@Subcommand({ name: "delete", permission: EPermission.ConfigureModules })
-	async delete(client: Client, interaction: ChatInputCommandInteraction) {
+	async delete(
+		@Client() client: LeBotClient<true>,
+		@CommandInteraction() interaction: ChatInputCommandInteraction,
+	) {
 		await InteractionHelper.defer(interaction);
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
-		await CustomEmbedService.delete(interaction.guildId!, name);
+		await this.customEmbedService.delete(interaction.guildId!, name);
 		await InteractionHelper.respond(interaction, {
 			content: t("modules.configuration.commands.embed.deleted", {
 				name,
@@ -140,12 +172,17 @@ export default class EmbedCommand extends BaseCommand {
 	}
 
 	@Subcommand({ name: "list", permission: EPermission.ConfigureModules })
-	async list(client: Client, interaction: ChatInputCommandInteraction) {
+	async list(
+		@Client() client: LeBotClient<true>,
+		@CommandInteraction() interaction: ChatInputCommandInteraction,
+	) {
 		await InteractionHelper.defer(interaction);
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		const embeds = await CustomEmbedService.list(interaction.guildId!);
+		const embeds = await this.customEmbedService.list(interaction.guildId!);
 
 		await InteractionHelper.respond(interaction, {
 			content: t("modules.configuration.commands.embed.list", {
@@ -155,17 +192,22 @@ export default class EmbedCommand extends BaseCommand {
 	}
 
 	@Subcommand({ name: "preview", permission: EPermission.ConfigureModules })
-	async preview(client: Client, interaction: ChatInputCommandInteraction) {
+	async preview(
+		@Client() client: LeBotClient<true>,
+		@CommandInteraction() interaction: ChatInputCommandInteraction,
+	) {
 		await InteractionHelper.defer(interaction);
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 
 		// Dummy context
 		const context = {};
 
-		const embed = await CustomEmbedService.render(
+		const embed = await this.customEmbedService.render(
 			interaction.guildId!,
 			name,
 			context,
