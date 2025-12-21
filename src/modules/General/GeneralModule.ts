@@ -3,19 +3,17 @@ import { GeneralConfig } from "./GeneralConfig";
 import PingCommand from "./commands/ping/index";
 import SyncCommand from "./commands/sync/index";
 import ChannelSync from "./events/channelSync/sync";
-import GuildCreateEvent from "./events/guildCreate/index";
 import WelcomeRoleAddEvent from "./events/guildMemberAdd/roleAdd";
 import GuildMemberRegisterEvent from "./events/guildMemberAdd/sync";
 import WelcomeEvent from "./events/guildMemberAdd/welcome";
 import GuildMemberRemoveSyncEvent from "./events/guildMemberRemove/sync";
+import GuildSync from "./events/guildSync/index";
 import InteractionRegistryHandler from "./events/interactionCreate/InteractionRegistryHandler";
 import CommandHandlerEvent from "./events/interactionCreate/commandHandler";
 import PagerHandlerEvent from "./events/interactionCreate/pagerHandler";
 import ReadyEvent from "./events/ready/log";
 import ResumeWelcomeSyncEvent from "./events/ready/resumeWelcomeSync";
-import RoleCreateEvent from "./events/roleCreate/sync";
-import RoleDeleteEvent from "./events/roleDelete/sync";
-import RoleUpdateEvent from "./events/roleUpdate/sync";
+import RoleSync from "./events/roleSync/sync";
 import { PingCommandInteractions } from "./interactions/PingCommandInteractions";
 import { SpacerService } from "./services/SpacerService";
 import { SyncService } from "./services/SyncService";
@@ -36,13 +34,11 @@ import { WelcomeRoleSyncService } from "./services/WelcomeRoleSyncService";
 		InteractionRegistryHandler,
 		WelcomeEvent,
 		WelcomeRoleAddEvent,
-		RoleCreateEvent,
-		RoleDeleteEvent,
-		RoleUpdateEvent,
+		RoleSync,
 		GuildMemberRegisterEvent,
 		GuildMemberRemoveSyncEvent,
 		ChannelSync,
-		GuildCreateEvent,
+		GuildSync,
 	],
 	providers: [
 		SpacerService,

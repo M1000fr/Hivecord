@@ -9,13 +9,13 @@ import { Logger } from "@utils/Logger";
 import { Events } from "discord.js";
 
 @EventController()
-export default class GuildCreateEvent {
-	private logger = new Logger("GuildCreateEvent");
+export default class GuildSync {
+	private logger = new Logger("GuildSync");
 
 	constructor(private readonly syncService: SyncService) {}
 
 	@On(Events.GuildCreate)
-	async run(
+	async onCreate(
 		@Client() client: LeBotClient<true>,
 		@Context() [guild]: ContextOf<typeof Events.GuildCreate>,
 	) {
