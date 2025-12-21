@@ -1,6 +1,9 @@
 import { EConfigType } from "@decorators/ConfigProperty";
+import { Inject } from "@decorators/Inject";
+import { Injectable } from "@decorators/Injectable";
 import { ButtonPattern, SelectMenuPattern } from "@decorators/Interaction";
 import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { InteractionHelper } from "@utils/InteractionHelper";
@@ -17,14 +20,28 @@ import { StringArrayConfigInteractions } from "./StringArrayConfigInteractions";
 import { StringChoiceConfigInteractions } from "./StringChoiceConfigInteractions";
 import { StringConfigInteractions } from "./StringConfigInteractions";
 
+@Injectable()
 export class ModuleConfigInteractions extends BaseConfigInteractions {
-	private static booleanHandler = new BooleanConfigInteractions();
-	private static stringHandler = new StringConfigInteractions();
-	private static stringChoiceHandler = new StringChoiceConfigInteractions();
-	private static roleChannelHandler = new RoleChannelConfigInteractions();
-	private static attachmentHandler = new AttachmentConfigInteractions();
-	private static stringArrayHandler = new StringArrayConfigInteractions();
-	private static customEmbedHandler = new CustomEmbedConfigInteractions();
+	constructor(
+		configHelper: ConfigHelper,
+		configService: ConfigService,
+		@Inject(BooleanConfigInteractions)
+		private readonly booleanHandler: BooleanConfigInteractions,
+		@Inject(StringConfigInteractions)
+		private readonly stringHandler: StringConfigInteractions,
+		@Inject(StringChoiceConfigInteractions)
+		private readonly stringChoiceHandler: StringChoiceConfigInteractions,
+		@Inject(RoleChannelConfigInteractions)
+		private readonly roleChannelHandler: RoleChannelConfigInteractions,
+		@Inject(AttachmentConfigInteractions)
+		private readonly attachmentHandler: AttachmentConfigInteractions,
+		@Inject(StringArrayConfigInteractions)
+		private readonly stringArrayHandler: StringArrayConfigInteractions,
+		@Inject(CustomEmbedConfigInteractions)
+		private readonly customEmbedHandler: CustomEmbedConfigInteractions,
+	) {
+		super(configHelper, configService);
+	}
 
 	@SelectMenuPattern("module_config:*")
 	async handlePropertySelection(interaction: StringSelectMenuInteraction) {
@@ -64,13 +81,17 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 
 			try {
 				const lng =
-					(await ConfigService.of(interaction.guildId!, GeneralConfig)
-						.generalLanguage) ?? "en";
-				const config = await ConfigHelper.buildModuleConfigEmbed(
+					(await this.configService.of(
+						interaction.guildId!,
+						GeneralConfig,
+					).generalLanguage) ?? "en";
+				const t = I18nService.getFixedT(lng);
+				const config = await this.configHelper.buildModuleConfigEmbed(
 					client,
 					interaction.guildId!,
 					moduleName,
 					userId,
+					t,
 					lng,
 				);
 				if (config && interaction.message) {
@@ -90,49 +111,49 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 			].includes(propertyOptions.type);
 
 			if (isRoleOrChannel) {
-				await ModuleConfigInteractions.roleChannelHandler.show(
+				await this.roleChannelHandler.show(
 					interaction,
 					propertyOptions,
 					selectedProperty,
 					moduleName,
 				);
 			} else if (propertyOptions.type === EConfigType.Boolean) {
-				await ModuleConfigInteractions.booleanHandler.show(
+				await this.booleanHandler.show(
 					interaction,
 					propertyOptions,
 					selectedProperty,
 					moduleName,
 				);
 			} else if (propertyOptions.type === EConfigType.StringChoice) {
-				await ModuleConfigInteractions.stringChoiceHandler.show(
+				await this.stringChoiceHandler.show(
 					interaction,
 					propertyOptions,
 					selectedProperty,
 					moduleName,
 				);
 			} else if (propertyOptions.type === EConfigType.Attachment) {
-				await ModuleConfigInteractions.attachmentHandler.show(
+				await this.attachmentHandler.show(
 					interaction,
 					propertyOptions,
 					selectedProperty,
 					moduleName,
 				);
 			} else if (propertyOptions.type === EConfigType.StringArray) {
-				await ModuleConfigInteractions.stringArrayHandler.show(
+				await this.stringArrayHandler.show(
 					interaction,
 					propertyOptions,
 					selectedProperty,
 					moduleName,
 				);
 			} else if (propertyOptions.type === EConfigType.CustomEmbed) {
-				await ModuleConfigInteractions.customEmbedHandler.show(
+				await this.customEmbedHandler.show(
 					interaction,
 					propertyOptions,
 					selectedProperty,
 					moduleName,
 				);
 			} else {
-				await ModuleConfigInteractions.stringHandler.show(
+				await this.stringHandler.show(
 					interaction,
 					propertyOptions,
 					selectedProperty,
@@ -171,7 +192,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 
 		if (propertyOptions) {
 			try {
-				await ConfigHelper.deleteValue(
+				await this.configHelper.deleteValue(
 					interaction.guildId!,
 					propertyKey,
 					propertyOptions.type,
@@ -180,17 +201,20 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 				const mainMessage = await this.getMainMessage(interaction);
 				if (mainMessage) {
 					const lng =
-						(await ConfigService.of(
+						(await this.configService.of(
 							interaction.guildId!,
 							GeneralConfig,
 						).generalLanguage) ?? "en";
-					const config = await ConfigHelper.buildModuleConfigEmbed(
-						client,
-						interaction.guildId!,
-						moduleName,
-						userId,
-						lng,
-					);
+					const t = I18nService.getFixedT(lng);
+					const config =
+						await this.configHelper.buildModuleConfigEmbed(
+							client,
+							interaction.guildId!,
+							moduleName,
+							userId,
+							t,
+							lng,
+						);
 					if (config) {
 						await mainMessage.edit({
 							embeds: [config.embed],
@@ -200,7 +224,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 				}
 				await this.respondToInteraction(
 					interaction,
-					"✅ Configuration cleared.",
+					"Configuration cleared.",
 				);
 				if (interaction.message?.deletable) {
 					await interaction.message.delete().catch(() => {});

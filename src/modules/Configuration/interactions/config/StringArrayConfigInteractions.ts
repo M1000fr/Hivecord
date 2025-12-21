@@ -3,6 +3,7 @@ import {
 	EConfigType,
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
+import { Injectable } from "@decorators/Injectable";
 import {
 	ButtonPattern,
 	ModalPattern,
@@ -29,7 +30,12 @@ import {
 import i18next from "i18next";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
+@Injectable()
 export class StringArrayConfigInteractions extends BaseConfigInteractions {
+	constructor(configHelper: ConfigHelper, configService: ConfigService) {
+		super(configHelper, configService);
+	}
+
 	async show(
 		interaction: RepliableInteraction,
 		propertyOptions: ConfigPropertyOptions,
@@ -56,7 +62,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		propertyKey: string,
 		moduleName: string,
 	) {
-		const currentValues = (await ConfigHelper.fetchValue(
+		const currentValues = (await this.configHelper.fetchValue(
 			guildId,
 			propertyKey,
 			EConfigType.StringArray,
@@ -64,8 +70,8 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		)) as string[];
 
 		const lng =
-			(await ConfigService.of(guildId, GeneralConfig).generalLanguage) ??
-			"en";
+			(await this.configService.of(guildId, GeneralConfig)
+				.generalLanguage) ?? "en";
 		const t = i18next.getFixedT(lng);
 
 		const displayValue =
@@ -207,7 +213,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const propertyKey = parts[2]!;
 		const newValue = interaction.fields.getTextInputValue("value");
 
-		const currentValues = (await ConfigHelper.fetchValue(
+		const currentValues = (await this.configHelper.fetchValue(
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -216,7 +222,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 
 		const newValues = [...currentValues, newValue];
 
-		await ConfigHelper.saveValue(
+		await this.configHelper.saveValue(
 			interaction.guildId!,
 			propertyKey,
 			newValues,
@@ -234,7 +240,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const moduleName = parts[1]!;
 		const propertyKey = parts[2]!;
 
-		const currentValues = (await ConfigHelper.fetchValue(
+		const currentValues = (await this.configHelper.fetchValue(
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -313,7 +319,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const propertyKey = parts[2]!;
 		const selectedIndices = interaction.values.map(Number);
 
-		const currentValues = (await ConfigHelper.fetchValue(
+		const currentValues = (await this.configHelper.fetchValue(
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -324,7 +330,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			(_, index) => !selectedIndices.includes(index),
 		);
 
-		await ConfigHelper.saveValue(
+		await this.configHelper.saveValue(
 			interaction.guildId!,
 			propertyKey,
 			newValues,
@@ -342,7 +348,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const moduleName = parts[1]!;
 		const propertyKey = parts[2]!;
 
-		const currentValues = (await ConfigHelper.fetchValue(
+		const currentValues = (await this.configHelper.fetchValue(
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -411,7 +417,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const index = interaction.values[0];
 		if (!index) return;
 
-		const currentValues = (await ConfigHelper.fetchValue(
+		const currentValues = (await this.configHelper.fetchValue(
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -455,7 +461,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const index = Number(parts[4]);
 		const newValue = interaction.fields.getTextInputValue("value");
 
-		const currentValues = (await ConfigHelper.fetchValue(
+		const currentValues = (await this.configHelper.fetchValue(
 			interaction.guildId!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -464,7 +470,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 
 		if (index >= 0 && index < currentValues.length) {
 			currentValues[index] = newValue;
-			await ConfigHelper.saveValue(
+			await this.configHelper.saveValue(
 				interaction.guildId!,
 				propertyKey,
 				currentValues,

@@ -1,24 +1,21 @@
-import { BaseCommand } from "@class/BaseCommand";
-import { Command } from "@decorators/Command";
-import { DefaultCommand } from "@decorators/DefaultCommand";
+import { Command, CommandController } from "@decorators/Command";
 import { EPermission } from "@enums/EPermission";
-import { InteractionHelper } from "@src/utils/InteractionHelper";
-import { ChatInputCommandInteraction, Client } from "discord.js";
+import type { LeBotClient } from "@src/class/LeBotClient";
+import { Client } from "@src/decorators/Client";
+import { GuildLanguage } from "@src/decorators/GuildLanguage";
+import { CommandInteraction } from "@src/decorators/Interaction";
+import { ChatInputCommandInteraction } from "discord.js";
 import type { TFunction } from "i18next";
 import { pingOptions } from "./pingOptions";
 
-@Command(pingOptions)
-export default class PingCommand extends BaseCommand {
-	@DefaultCommand(EPermission.Ping)
-	async run(
-		client: Client,
-		interaction: ChatInputCommandInteraction,
-		t: TFunction<"translation", undefined>,
+@CommandController(pingOptions)
+export default class PingCommand {
+	@Command(EPermission.Ping)
+	async default(
+		@Client() client: LeBotClient,
+		@GuildLanguage() locale: TFunction,
+		@CommandInteraction() interaction: ChatInputCommandInteraction,
 	) {
-		await InteractionHelper.respond(interaction, {
-			content: t("modules.general.commands.ping.response"),
-		});
-
-		return true;
+		interaction.reply(locale("modules.general.commands.ping.response"));
 	}
 }

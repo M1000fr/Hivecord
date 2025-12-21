@@ -4,11 +4,5 @@ import { InteractionContextType } from "discord.js";
 export const pingOptions: CommandOptions = {
 	name: "ping",
 	description: "Replies with Pong!",
-	nameLocalizations: {
-		fr: "ping",
-	},
-	descriptionLocalizations: {
-		fr: "Répond avec Pong !",
-	},
 	contexts: [InteractionContextType.Guild],
 };

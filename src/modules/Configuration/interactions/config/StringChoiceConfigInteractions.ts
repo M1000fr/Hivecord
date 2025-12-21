@@ -1,5 +1,6 @@
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
+import { Injectable } from "@decorators/Injectable";
 import { SelectMenuPattern } from "@decorators/Interaction";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
@@ -17,7 +18,12 @@ import {
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
+@Injectable()
 export class StringChoiceConfigInteractions extends BaseConfigInteractions {
+	constructor(configHelper: ConfigHelper, configService: ConfigService) {
+		super(configHelper, configService);
+	}
+
 	@SelectMenuPattern("module_config_choice:*")
 	async handleChoiceSelection(interaction: StringSelectMenuInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
@@ -47,10 +53,12 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		const currentValue = await ConfigHelper.getCurrentValue(
+		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guildId!,
 			selectedProperty,
 			propertyOptions.type,

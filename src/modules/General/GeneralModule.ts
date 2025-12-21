@@ -27,7 +27,9 @@ import { WelcomeRoleSyncService } from "./services/WelcomeRoleSyncService";
 
 @Module({
 	name: "General",
+	config: GeneralConfig,
 	commands: [PingCommand, SyncCommand],
+	interactions: [PingCommandInteractions],
 	events: [
 		ReadyEvent,
 		ResumeWelcomeSyncEvent,
@@ -46,8 +48,6 @@ import { WelcomeRoleSyncService } from "./services/WelcomeRoleSyncService";
 		ChannelUpdateEvent,
 		GuildCreateEvent,
 	],
-	interactions: [PingCommandInteractions],
-	config: GeneralConfig,
 	providers: [
 		SpacerService,
 		SyncService,

@@ -2,6 +2,7 @@ import { LeBotClient } from "@class/LeBotClient";
 import { type IConfigClass } from "@decorators/ConfigContext";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
+import { Injectable } from "@decorators/Injectable";
 import { ButtonPattern, ModalPattern } from "@decorators/Interaction";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
@@ -21,7 +22,12 @@ import {
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
+@Injectable()
 export class StringConfigInteractions extends BaseConfigInteractions {
+	constructor(configHelper: ConfigHelper, configService: ConfigService) {
+		super(configHelper, configService);
+	}
+
 	@ModalPattern("module_config_modal:*")
 	async handleTextModal(interaction: ModalSubmitInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
@@ -69,7 +75,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		}
 
 		const rawValue =
-			(await ConfigHelper.fetchValue(
+			(await this.configHelper.fetchValue(
 				interaction.guildId!,
 				propertyKey,
 				EConfigType.String,
@@ -118,10 +124,12 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		const currentValue = await ConfigHelper.getCurrentValue(
+		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guildId!,
 			selectedProperty,
 			propertyOptions.type,

@@ -1,6 +1,7 @@
 import { LeBotClient } from "@class/LeBotClient";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
+import { Injectable } from "@decorators/Injectable";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
@@ -16,7 +17,12 @@ import {
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
+@Injectable()
 export class AttachmentConfigInteractions extends BaseConfigInteractions {
+	constructor(configHelper: ConfigHelper, configService: ConfigService) {
+		super(configHelper, configService);
+	}
+
 	async show(
 		interaction: RepliableInteraction,
 		propertyOptions: ConfigPropertyOptions,
@@ -24,10 +30,12 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 		moduleName: string,
 	) {
 		if (!interaction.guildId || !interaction.channel) return;
-		const lng = await ConfigService.of(interaction.guildId, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		const currentValue = await ConfigHelper.getCurrentValue(
+		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guildId,
 			selectedProperty,
 			propertyOptions.type,

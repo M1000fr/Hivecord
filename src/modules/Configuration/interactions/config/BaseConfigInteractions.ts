@@ -7,6 +7,7 @@ import {
 } from "@enums/ConfigContextVariable";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
+import { I18nService } from "@services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
@@ -37,6 +38,11 @@ export type ConfigInteraction =
 	| MentionableSelectMenuInteraction;
 
 export abstract class BaseConfigInteractions {
+	constructor(
+		protected readonly configHelper: ConfigHelper,
+		protected readonly configService: ConfigService,
+	) {}
+
 	protected async respondToInteraction(
 		interaction: RepliableInteraction,
 		content: string,
@@ -113,7 +119,7 @@ export abstract class BaseConfigInteractions {
 		if (!interaction.guildId) return;
 
 		try {
-			await ConfigHelper.saveValue(
+			await this.configHelper.saveValue(
 				interaction.guildId,
 				propertyKey,
 				value,
@@ -123,13 +129,17 @@ export abstract class BaseConfigInteractions {
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
 				const lng =
-					(await ConfigService.of(interaction.guildId, GeneralConfig)
-						.generalLanguage) ?? "en";
-				const config = await ConfigHelper.buildModuleConfigEmbed(
+					(await this.configService.of(
+						interaction.guildId,
+						GeneralConfig,
+					).generalLanguage) ?? "en";
+				const t = I18nService.getFixedT(lng);
+				const config = await this.configHelper.buildModuleConfigEmbed(
 					client,
 					interaction.guildId,
 					moduleName,
 					interaction.user.id,
+					t,
 					lng,
 				);
 				if (config) {

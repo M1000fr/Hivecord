@@ -1,31 +1,41 @@
-import { BaseCommand } from "@class/BaseCommand";
 import { LeBotClient } from "@class/LeBotClient";
 import { Autocomplete } from "@decorators/Autocomplete";
 import { BotPermission } from "@decorators/BotPermission";
-import { Command } from "@decorators/Command";
+import { Client } from "@decorators/Client";
+import { CommandController } from "@decorators/Command";
+import { Injectable } from "@decorators/Injectable";
+import { AutocompleteInteraction } from "@decorators/Interaction";
 import { OptionRoute } from "@decorators/OptionRoute";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { InteractionHelper } from "@utils/InteractionHelper";
 import {
-	AutocompleteInteraction,
 	ChatInputCommandInteraction,
+	AutocompleteInteraction as DiscordAutocompleteInteraction,
 	PermissionFlagsBits,
 } from "discord.js";
 import { GeneralConfig } from "../../GeneralConfig";
 import { WelcomeRoleSyncService } from "../../services/WelcomeRoleSyncService";
 import { syncOptions } from "./syncOptions";
 
-@Command(syncOptions)
-export default class SyncCommand extends BaseCommand {
+@Injectable()
+@CommandController(syncOptions)
+export default class SyncCommand {
+	constructor(
+		private readonly configService: ConfigService,
+		private readonly welcomeRoleSyncService: WelcomeRoleSyncService,
+	) {}
+
 	@Autocomplete({ optionName: "target" })
 	async autocompleteTarget(
-		client: LeBotClient,
-		interaction: AutocompleteInteraction,
+		@Client() client: LeBotClient,
+		@AutocompleteInteraction() interaction: DiscordAutocompleteInteraction,
 	) {
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
 		const focusedValue = interaction.options.getFocused().toLowerCase();
 		const targets = [
@@ -55,12 +65,14 @@ export default class SyncCommand extends BaseCommand {
 		interaction: ChatInputCommandInteraction,
 	) {
 		await InteractionHelper.defer(interaction);
-		const lng = await ConfigService.of(interaction.guildId!, GeneralConfig)
-			.generalLanguage;
+		const lng = await this.configService.of(
+			interaction.guildId!,
+			GeneralConfig,
+		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
 
 		try {
-			const state = await WelcomeRoleSyncService.getState(
+			const state = await this.welcomeRoleSyncService.getState(
 				interaction.guildId!,
 			);
 			if (state.isRunning) {
@@ -70,7 +82,7 @@ export default class SyncCommand extends BaseCommand {
 				return;
 			}
 
-			await WelcomeRoleSyncService.start(interaction.guild!);
+			await this.welcomeRoleSyncService.start(interaction.guild!);
 			await InteractionHelper.respond(interaction, {
 				content: t("modules.general.commands.sync.started"),
 			});
