@@ -12,8 +12,11 @@ import { BackupService } from "./services/BackupService";
 import { ConfigService } from "./services/ConfigService";
 import { CustomEmbedService } from "./services/CustomEmbedService";
 
+import { CoreModule } from "@modules/Core/CoreModule";
+
 @Module({
 	name: "Configuration",
+	imports: [CoreModule],
 	commands: [ModulesCommand, ConfigCommand, EmbedCommand],
 	events: [],
 	interactions: [

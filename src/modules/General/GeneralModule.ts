@@ -21,8 +21,12 @@ import { WelcomeImageService } from "./services/WelcomeImageService";
 import { WelcomeRoleService } from "./services/WelcomeRoleService";
 import { WelcomeRoleSyncService } from "./services/WelcomeRoleSyncService";
 
+import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
+import { CoreModule } from "@modules/Core/CoreModule";
+
 @Module({
 	name: "General",
+	imports: [CoreModule, ConfigurationModule],
 	config: GeneralConfig,
 	commands: [PingCommand, SyncCommand],
 	interactions: [PingCommandInteractions],
