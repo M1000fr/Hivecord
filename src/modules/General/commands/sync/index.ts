@@ -9,7 +9,7 @@ import { Client } from "@decorators/params/Client";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
-import { InteractionHelper } from "@utils/InteractionHelper";
+
 import {
 	ChatInputCommandInteraction,
 	AutocompleteInteraction as DiscordAutocompleteInteraction,
@@ -64,7 +64,7 @@ export default class SyncCommand {
 		client: LeBotClient,
 		interaction: ChatInputCommandInteraction,
 	) {
-		await InteractionHelper.defer(interaction);
+		await interaction.deferReply();
 		const lng = await this.configService.of(
 			interaction.guildId!,
 			GeneralConfig,
@@ -76,18 +76,18 @@ export default class SyncCommand {
 				interaction.guildId!,
 			);
 			if (state.isRunning) {
-				await InteractionHelper.respond(interaction, {
+				await interaction.followUp({
 					content: t("modules.general.commands.sync.in_progress"),
 				});
 				return;
 			}
 
 			await this.welcomeRoleSyncService.start(interaction.guild!);
-			await InteractionHelper.respond(interaction, {
+			await interaction.followUp({
 				content: t("modules.general.commands.sync.started"),
 			});
 		} catch {
-			await InteractionHelper.respond(interaction, {
+			await interaction.followUp({
 				content: t("modules.general.commands.sync.failed"),
 			});
 		}

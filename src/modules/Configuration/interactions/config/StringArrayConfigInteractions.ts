@@ -12,7 +12,7 @@ import {
 import { ConfigService } from "@services/ConfigService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
-import { InteractionHelper } from "@utils/InteractionHelper";
+
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -248,9 +248,10 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		)) as string[];
 
 		if (currentValues.length === 0) {
-			await InteractionHelper.respond(interaction, {
-				content: "No values to remove.",
-			});
+			await this.respondToInteraction(
+				interaction,
+				"No values to remove.",
+			);
 			return;
 		}
 
@@ -356,9 +357,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		)) as string[];
 
 		if (currentValues.length === 0) {
-			await InteractionHelper.respond(interaction, {
-				content: "No values to edit.",
-			});
+			await this.respondToInteraction(interaction, "No values to edit.");
 			return;
 		}
 
@@ -478,9 +477,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			);
 			await this.refreshView(interaction, moduleName, propertyKey);
 		} else {
-			await InteractionHelper.respond(interaction, {
-				content: "Invalid index.",
-			});
+			await this.respondToInteraction(interaction, "Invalid index.");
 		}
 	}
 }

@@ -5,7 +5,6 @@ import { Injectable } from "@decorators/Injectable";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
-import { InteractionHelper } from "@src/utils/InteractionHelper";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
@@ -139,16 +138,17 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 				);
 
 				// Delete interaction response and user message to reduce clutter
-				await InteractionHelper.deleteReply(interaction).catch(
-					() => {},
-				);
+				await interaction.deleteReply().catch(() => {});
 
 				await m.delete().catch(() => {}); // Clean up user message
 			} catch (error) {
 				console.error("Failed to upload file:", error);
-				await InteractionHelper.respond(interaction, {
-					content: "❌ Failed to upload file.",
-				});
+				const payload = { content: "❌ Failed to upload file." };
+				if (interaction.replied || interaction.deferred) {
+					await interaction.followUp(payload);
+				} else {
+					await interaction.reply(payload);
+				}
 			}
 		});
 	}

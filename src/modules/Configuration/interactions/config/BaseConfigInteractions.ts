@@ -9,7 +9,6 @@ import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
-import { InteractionHelper } from "@utils/InteractionHelper";
 import {
 	ButtonBuilder,
 	ButtonStyle,
@@ -48,10 +47,11 @@ export abstract class BaseConfigInteractions {
 		content: string,
 		isError = false,
 	) {
-		if (isError) {
-			await InteractionHelper.respond(interaction, { content });
+		const payload = { content };
+		if (interaction.replied || interaction.deferred) {
+			await interaction.followUp(payload);
 		} else {
-			await InteractionHelper.respond(interaction, { content });
+			await interaction.reply(payload);
 		}
 	}
 

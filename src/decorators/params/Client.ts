@@ -1,5 +1,5 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { CommandParamType, registerCommandParameter } from "./params";
+import { CommandParamType, registerCommandParameter } from "./index";
 
 export function Client(): ParameterDecorator;
 export function Client(target: object, propertyKey: string): void;

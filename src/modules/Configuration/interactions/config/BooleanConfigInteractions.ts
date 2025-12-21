@@ -5,7 +5,6 @@ import { Injectable } from "@decorators/Injectable";
 import { ButtonPattern } from "@decorators/Interaction";
 import { ConfigService } from "@services/ConfigService";
 import { ConfigHelper } from "@utils/ConfigHelper";
-import { InteractionHelper } from "@utils/InteractionHelper";
 import { type ButtonInteraction, type RepliableInteraction } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
@@ -43,9 +42,14 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 		moduleName: string,
 	) {
 		if (!interaction.guildId) {
-			await InteractionHelper.respond(interaction, {
+			const payload = {
 				content: "This interaction can only be used in a server.",
-			});
+			};
+			if (interaction.replied || interaction.deferred) {
+				await interaction.followUp(payload);
+			} else {
+				await interaction.reply(payload);
+			}
 			return;
 		}
 

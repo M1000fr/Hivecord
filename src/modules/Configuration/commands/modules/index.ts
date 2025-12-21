@@ -11,14 +11,13 @@ import { GuildLocale } from "@decorators/params/GuildLocale";
 import { Translate } from "@decorators/params/Translate";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
-import { InteractionHelper } from "@src/utils/InteractionHelper";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ChatInputCommandInteraction,
 	AutocompleteInteraction as DiscordAutocompleteInteraction,
 } from "discord.js";
 import type { TFunction } from "i18next";
-import { modulesOptions } from "./modulesOptions";
+import { modulesOptions } from "./modulesOptions.ts";
 
 @Injectable()
 @CommandController(modulesOptions)
@@ -54,14 +53,14 @@ export default class ModulesCommand {
 		@Translate() t: TFunction,
 		@GuildLocale() locale: string,
 	) {
-		await InteractionHelper.defer(interaction);
+		await interaction.deferReply();
 		const lebot = client;
 		const moduleName = interaction.options.getString("module", true);
 
 		const module = lebot.modules.get(moduleName.toLowerCase());
 
 		if (!module) {
-			await InteractionHelper.respond(interaction, {
+			await interaction.editReply({
 				content: t("modules.configuration.commands.modules.not_found", {
 					module: moduleName,
 				}),
@@ -70,7 +69,7 @@ export default class ModulesCommand {
 		}
 
 		if (!module.options.config) {
-			await InteractionHelper.respond(interaction, {
+			await interaction.editReply({
 				content: t("modules.configuration.commands.modules.no_config", {
 					module: module.options.name,
 				}),
@@ -88,7 +87,7 @@ export default class ModulesCommand {
 		);
 
 		if (!config) {
-			await InteractionHelper.respond(interaction, {
+			await interaction.editReply({
 				content: t(
 					"modules.configuration.commands.modules.build_failed",
 					{
@@ -99,7 +98,7 @@ export default class ModulesCommand {
 			return;
 		}
 
-		await InteractionHelper.respond(interaction, {
+		await interaction.editReply({
 			embeds: [config.embed],
 			components: [config.row],
 		});

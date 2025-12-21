@@ -6,7 +6,6 @@ import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
-import { InteractionHelper } from "@utils/InteractionHelper";
 import {
 	type ButtonInteraction,
 	type StringSelectMenuInteraction,
@@ -53,9 +52,12 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 		if (moduleName) {
 			const selectedProperty = interaction.values[0];
 			if (!selectedProperty) {
-				await InteractionHelper.respond(interaction, {
-					content: "❌ No property selected.",
-				});
+				const payload = { content: "❌ No property selected." };
+				if (interaction.replied || interaction.deferred) {
+					await interaction.followUp(payload);
+				} else {
+					await interaction.reply(payload);
+				}
 				return;
 			}
 
@@ -66,16 +68,22 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 			);
 
 			if (!module?.options.config) {
-				await InteractionHelper.respond(interaction, {
-					content: "❌ Module not found.",
-				});
+				const payload = { content: "❌ Module not found." };
+				if (interaction.replied || interaction.deferred) {
+					await interaction.followUp(payload);
+				} else {
+					await interaction.reply(payload);
+				}
 				return;
 			}
 
 			if (!propertyOptions) {
-				await InteractionHelper.respond(interaction, {
-					content: "❌ Property not found.",
-				});
+				const payload = { content: "❌ Property not found." };
+				if (interaction.replied || interaction.deferred) {
+					await interaction.followUp(payload);
+				} else {
+					await interaction.reply(payload);
+				}
 				return;
 			}
 

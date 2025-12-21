@@ -8,7 +8,7 @@ import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
-import { InteractionHelper } from "@utils/InteractionHelper";
+
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -68,9 +68,12 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		);
 
 		if (!propertyOptions) {
-			await InteractionHelper.respond(interaction, {
-				content: "Property not found.",
-			});
+			const payload = { content: "Property not found." };
+			if (interaction.replied || interaction.deferred) {
+				await interaction.followUp(payload);
+			} else {
+				await interaction.reply(payload);
+			}
 			return;
 		}
 

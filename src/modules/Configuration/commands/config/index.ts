@@ -1,16 +1,19 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { CommandController } from "@decorators/Command";
 import { Injectable } from "@decorators/Injectable";
+import { Client } from "@decorators/params/index.ts";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { BackupService } from "@modules/Configuration/services/BackupService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
-import { Client } from "@src/decorators/Client";
 import { CommandInteraction } from "@src/decorators/Interaction";
-import { InteractionHelper } from "@utils/InteractionHelper";
-import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
+import {
+	AttachmentBuilder,
+	ChatInputCommandInteraction,
+	MessageFlags,
+} from "discord.js";
 import { configOptions } from "./configOptions";
 
 @Injectable()
@@ -26,7 +29,7 @@ export default class ConfigCommand {
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
 	) {
-		await InteractionHelper.defer(interaction, true);
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 		const lng = await this.configService.of(
 			interaction.guildId!,
 			GeneralConfig,
@@ -46,7 +49,7 @@ export default class ConfigCommand {
 				name: filename,
 			});
 
-			await InteractionHelper.respond(interaction, {
+			await interaction.editReply({
 				content: t(
 					"modules.configuration.commands.config.backup_success",
 				),
@@ -54,7 +57,7 @@ export default class ConfigCommand {
 			});
 		} catch (error) {
 			console.error("Backup creation failed:", error);
-			await InteractionHelper.respond(interaction, {
+			await interaction.editReply({
 				content: t(
 					"modules.configuration.commands.config.backup_failed",
 				),
@@ -72,13 +75,13 @@ export default class ConfigCommand {
 			GeneralConfig,
 		).generalLanguage;
 		const t = I18nService.getFixedT(lng);
-		await InteractionHelper.defer(interaction, true);
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 		try {
 			const attachment = interaction.options.getAttachment("file", true);
 
 			if (!attachment.name.endsWith(".enc")) {
-				await InteractionHelper.respond(interaction, {
+				await interaction.editReply({
 					content: t(
 						"modules.configuration.commands.config.invalid_file",
 					),
@@ -101,7 +104,7 @@ export default class ConfigCommand {
 				interaction.guildId!,
 			);
 
-			await InteractionHelper.respond(interaction, {
+			await interaction.editReply({
 				content: t(
 					"modules.configuration.commands.config.restore_success",
 				),
@@ -113,7 +116,7 @@ export default class ConfigCommand {
 					? error.message
 					: t("modules.configuration.commands.config.restore_failed");
 
-			await InteractionHelper.respond(interaction, {
+			await interaction.editReply({
 				content: errorMessage,
 			});
 		}

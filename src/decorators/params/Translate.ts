@@ -1,4 +1,4 @@
-import { CommandParamType, registerCommandParameter } from "./params";
+import { CommandParamType, registerCommandParameter } from "./index";
 
 export function Translate(): ParameterDecorator {
 	return (

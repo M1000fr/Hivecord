@@ -1,19 +1,18 @@
 import { Autocomplete } from "@decorators/Autocomplete";
 import { CommandController } from "@decorators/Command";
 import { Injectable } from "@decorators/Injectable";
+import { Client } from "@decorators/params/index.ts";
 import { Subcommand } from "@decorators/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@services/ConfigService";
 import { I18nService } from "@services/I18nService";
 import type { LeBotClient } from "@src/class/LeBotClient";
-import { Client } from "@src/decorators/Client";
 import {
 	AutocompleteInteraction,
 	CommandInteraction,
 } from "@src/decorators/Interaction";
 import { CustomEmbedService } from "@src/modules/Configuration/services/CustomEmbedService";
 import { GeneralConfig } from "@src/modules/General/GeneralConfig";
-import { InteractionHelper } from "@src/utils/InteractionHelper";
 import {
 	ChatInputCommandInteraction,
 	AutocompleteInteraction as DiscordAutocompleteInteraction,
@@ -52,7 +51,7 @@ export default class EmbedCommand {
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
 	) {
-		await InteractionHelper.defer(interaction);
+		await interaction.deferReply();
 		const lng = await this.configService.of(
 			interaction.guildId!,
 			GeneralConfig,
@@ -78,7 +77,7 @@ export default class EmbedCommand {
 		}
 
 		const embed = new EmbedBuilder(data);
-		await InteractionHelper.respond(interaction, {
+		await interaction.editReply({
 			content: t("modules.configuration.commands.embed.editor_intro", {
 				name,
 			}),
@@ -106,7 +105,7 @@ export default class EmbedCommand {
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
 	) {
-		await InteractionHelper.defer(interaction);
+		await interaction.deferReply();
 		const lng = await this.configService.of(
 			interaction.guildId!,
 			GeneralConfig,
@@ -119,7 +118,7 @@ export default class EmbedCommand {
 		);
 
 		if (!data) {
-			await InteractionHelper.respond(interaction, {
+			await interaction.editReply({
 				content: t("modules.configuration.commands.embed.not_found", {
 					name,
 				}),
@@ -128,7 +127,7 @@ export default class EmbedCommand {
 		}
 
 		const embed = new EmbedBuilder(data);
-		await InteractionHelper.respond(interaction, {
+		await interaction.editReply({
 			content: t("modules.configuration.commands.embed.editor_intro", {
 				name,
 			}),
@@ -156,7 +155,7 @@ export default class EmbedCommand {
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
 	) {
-		await InteractionHelper.defer(interaction);
+		await interaction.deferReply();
 		const lng = await this.configService.of(
 			interaction.guildId!,
 			GeneralConfig,
@@ -164,7 +163,7 @@ export default class EmbedCommand {
 		const t = I18nService.getFixedT(lng);
 		const name = interaction.options.getString("name", true);
 		await this.customEmbedService.delete(interaction.guildId!, name);
-		await InteractionHelper.respond(interaction, {
+		await interaction.editReply({
 			content: t("modules.configuration.commands.embed.deleted", {
 				name,
 			}),
@@ -176,7 +175,7 @@ export default class EmbedCommand {
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
 	) {
-		await InteractionHelper.defer(interaction);
+		await interaction.deferReply();
 		const lng = await this.configService.of(
 			interaction.guildId!,
 			GeneralConfig,
@@ -184,7 +183,7 @@ export default class EmbedCommand {
 		const t = I18nService.getFixedT(lng);
 		const embeds = await this.customEmbedService.list(interaction.guildId!);
 
-		await InteractionHelper.respond(interaction, {
+		await interaction.editReply({
 			content: t("modules.configuration.commands.embed.list", {
 				embeds: embeds.map((e) => `- \`${e}\``).join("\n") || "None",
 			}),
@@ -196,7 +195,7 @@ export default class EmbedCommand {
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
 	) {
-		await InteractionHelper.defer(interaction);
+		await interaction.deferReply();
 		const lng = await this.configService.of(
 			interaction.guildId!,
 			GeneralConfig,
@@ -213,7 +212,7 @@ export default class EmbedCommand {
 			context,
 		);
 		if (!embed) {
-			await InteractionHelper.respond(interaction, {
+			await interaction.editReply({
 				content: t("modules.configuration.commands.embed.not_found", {
 					name,
 				}),
@@ -221,7 +220,7 @@ export default class EmbedCommand {
 			return;
 		}
 
-		await InteractionHelper.respond(interaction, {
+		await interaction.editReply({
 			content: t("modules.configuration.commands.embed.preview", {
 				name,
 			}),
