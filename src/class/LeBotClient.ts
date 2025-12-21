@@ -25,11 +25,6 @@ import {
 	PermissionsBitField,
 	type ApplicationCommandDataResolvable,
 } from "discord.js";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 @Injectable()
 export class LeBotClient<
@@ -300,27 +295,5 @@ export class LeBotClient<
 				await module.instance.setup(this);
 			}
 		}
-	}
-
-	private extractModuleOptionsFromInstance(
-		ExportedClass: Constructor,
-	): { options: ModuleOptions; instance: IModuleInstance } | undefined {
-		try {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const instance = new (ExportedClass as any)();
-			if ("moduleOptions" in instance) {
-				return {
-					options: (instance as unknown as IModuleInstance)
-						.moduleOptions,
-					instance: instance as unknown as IModuleInstance,
-				};
-			}
-		} catch {
-			this.logger.warn(
-				`Failed to instantiate exported class ${ExportedClass.name}.`,
-			);
-		}
-
-		return undefined;
 	}
 }
