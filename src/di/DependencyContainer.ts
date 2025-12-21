@@ -17,7 +17,6 @@ import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
 interface ProviderRegistrationContext {
 	moduleName?: string;
 	exports?: ProviderToken[];
-	isModuleGlobal?: boolean;
 }
 
 export class DependencyContainer {
@@ -51,14 +50,13 @@ export class DependencyContainer {
 		this.registerProviders(options.providers ?? [], {
 			moduleName: options.name,
 			exports: options.exports,
-			isModuleGlobal: options.global,
 		});
 
 		if (moduleClass) {
 			const provider: ResolvedProvider = {
 				token: moduleClass,
 				useClass: moduleClass,
-				scope: options.global ? "global" : "module",
+				scope: "module",
 				moduleName: options.name,
 			};
 			this.storeProvider(provider, options.exports);
@@ -222,7 +220,6 @@ export class DependencyContainer {
 		context?: ProviderRegistrationContext,
 	): ProviderScope {
 		if (scope) return scope;
-		if (context?.isModuleGlobal) return "global";
 		if (!context?.moduleName) return "global";
 		return "module";
 	}

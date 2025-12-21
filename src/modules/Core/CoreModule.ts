@@ -9,7 +9,6 @@ import { RedisService } from "./services/RedisService";
 
 @Module({
 	name: "Core",
-	global: true,
 	providers: [
 		PrismaService,
 		RedisService,

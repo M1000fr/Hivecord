@@ -18,7 +18,6 @@ import {
 
 @Module({
 	name: "App",
-	global: true,
 	imports: [CoreModule, GeneralModule, ConfigurationModule],
 	providers: [
 		LeBotClient,
