@@ -11,7 +11,11 @@ import { AchievementService } from "./services/AchievementService";
 	name: "Achievement",
 	config: AchievementConfig,
 	events: [StatsUpdatedEvent],
-	commands: [AchievementCommand],
+	commands: [
+		AchievementCommand as unknown as import("@di/types").Constructor<
+			import("@class/BaseCommand").BaseCommand
+		>,
+	],
 	providers: [AchievementService],
 	exports: [AchievementService],
 })

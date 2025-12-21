@@ -22,6 +22,9 @@ import { achievementOptions } from "./achievementOptions";
 
 @Command(achievementOptions)
 export class AchievementCommand extends BaseCommand {
+	constructor(private readonly achievementService: AchievementService) {
+		super();
+	}
 	@Subcommand({
 		name: "list",
 	})
@@ -159,10 +162,9 @@ export class AchievementCommand extends BaseCommand {
 		interaction: AutocompleteInteraction,
 	) {
 		const focusedValue = interaction.options.getFocused().toLowerCase();
-		const achievements =
-			await AchievementService.getInstance().getAchievements(
-				interaction.guildId!,
-			);
+		const achievements = await this.achievementService.getAchievements(
+			interaction.guildId!,
+		);
 		const filtered = achievements
 			.filter(
 				(a) =>
@@ -200,11 +202,10 @@ export class AchievementCommand extends BaseCommand {
 		const threshold = interaction.options.getInteger("threshold", true);
 
 		try {
-			const achievement =
-				await AchievementService.getInstance().createAchievement(
-					interaction.guildId!,
-					{ id, name, description, category, type, threshold },
-				);
+			const achievement = await this.achievementService.createAchievement(
+				interaction.guildId!,
+				{ id, name, description, category, type, threshold },
+			);
 			await InteractionHelper.respond(interaction, {
 				content: i18next.t(
 					"modules.achievement.commands.achievement.add.success",
@@ -244,11 +245,10 @@ export class AchievementCommand extends BaseCommand {
 		const id = interaction.options.getString("id", true);
 
 		try {
-			const achievement =
-				await AchievementService.getInstance().deleteAchievement(
-					interaction.guildId!,
-					id,
-				);
+			const achievement = await this.achievementService.deleteAchievement(
+				interaction.guildId!,
+				id,
+			);
 			await InteractionHelper.respond(interaction, {
 				content: i18next.t(
 					"modules.achievement.commands.achievement.delete.success",
@@ -306,12 +306,11 @@ export class AchievementCommand extends BaseCommand {
 		}
 
 		try {
-			const achievement =
-				await AchievementService.getInstance().updateAchievement(
-					interaction.guildId!,
-					id,
-					data,
-				);
+			const achievement = await this.achievementService.updateAchievement(
+				interaction.guildId!,
+				id,
+				data,
+			);
 			await InteractionHelper.respond(interaction, {
 				content: i18next.t(
 					"modules.achievement.commands.achievement.edit.success",
