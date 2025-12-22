@@ -17,6 +17,8 @@ import {
 	ChatInputCommandInteraction,
 	Client,
 	MessageFlags,
+	UserContextMenuCommandInteraction,
+	MessageContextMenuCommandInteraction,
 } from "discord.js";
 
 import { Injectable } from "@decorators/Injectable";
@@ -57,7 +59,11 @@ export class CommandService {
 	 */
 	private async invoke(
 		client: Client,
-		interaction: ChatInputCommandInteraction | AutocompleteInteraction,
+		interaction:
+			| ChatInputCommandInteraction
+			| AutocompleteInteraction
+			| UserContextMenuCommandInteraction
+			| MessageContextMenuCommandInteraction,
 		commandInstance: object,
 		method: string,
 		langCtx: GuildLanguageContext,
@@ -238,7 +244,11 @@ export class CommandService {
 		target: object,
 		method: string,
 		client: Client,
-		interaction: ChatInputCommandInteraction | AutocompleteInteraction,
+		interaction:
+			| ChatInputCommandInteraction
+			| AutocompleteInteraction
+			| UserContextMenuCommandInteraction
+			| MessageContextMenuCommandInteraction,
 		langCtx?: GuildLanguageContext,
 	): CommandArgument[] {
 		const params: CommandParameter[] =
@@ -261,6 +271,27 @@ export class CommandService {
 					break;
 				case CommandParamType.Translate:
 					args[param.index] = langCtx;
+					break;
+				case CommandParamType.Context:
+					if (
+						interaction instanceof ChatInputCommandInteraction ||
+						interaction instanceof UserContextMenuCommandInteraction ||
+						interaction instanceof MessageContextMenuCommandInteraction
+					) {
+						args[param.index] = [interaction];
+					}
+					break;
+				case CommandParamType.TargetUser:
+					if (interaction instanceof UserContextMenuCommandInteraction) {
+						args[param.index] = interaction.targetUser;
+					}
+					break;
+				case CommandParamType.TargetMessage:
+					if (
+						interaction instanceof MessageContextMenuCommandInteraction
+					) {
+						args[param.index] = interaction.targetMessage;
+					}
 					break;
 			}
 		}
@@ -307,5 +338,34 @@ export class CommandService {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Executes a context menu command (user or message).
+	 * @param client The Discord client.
+	 * @param interaction The context menu command interaction.
+	 * @param commandInstance The instance of the command class.
+	 */
+	async executeContextMenu(
+		client: Client,
+		interaction:
+			| UserContextMenuCommandInteraction
+			| MessageContextMenuCommandInteraction,
+		commandInstance: object,
+	): Promise<void> {
+		const langCtx = await this.getI18n(interaction.guildId);
+
+		// Look for a method decorated with the command decorator
+		// For context menus, we'll use a convention: look for an 'execute' method
+		const method = "execute";
+
+		await this.invoke(
+			client,
+			interaction,
+			commandInstance,
+			method,
+			langCtx,
+			" (context menu)",
+		);
 	}
 }

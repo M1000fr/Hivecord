@@ -10,6 +10,7 @@ import type { Constructor } from "@di/types";
 import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
+import type { IContextMenuCommandClass } from "@interfaces/IContextMenuCommandClass.ts";
 import type { IModuleInstance } from "@interfaces/IModuleInstance.ts";
 import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
 import { PermissionService } from "@modules/Core/services/PermissionService";
@@ -23,6 +24,7 @@ import {
 	IntentsBitField,
 	PermissionsBitField,
 	type ApplicationCommandDataResolvable,
+	ApplicationCommandType,
 } from "discord.js";
 
 @Injectable()
@@ -211,6 +213,37 @@ export class LeBotClient<
 		const moduleName = options.name;
 
 		for (const CommandClass of options.commands) {
+			// Check if it's a context menu command
+			const contextMenuOptions = (
+				CommandClass as unknown as IContextMenuCommandClass
+			).contextMenuOptions;
+
+			if (contextMenuOptions) {
+				const instance = this.container.resolve(
+					CommandClass as unknown as Constructor<object>,
+					moduleName,
+				);
+
+				// Convert context menu options to Discord command format
+				const commandData: CommandOptions = {
+					name: contextMenuOptions.name,
+					description: "",
+					type:
+						contextMenuOptions.type === "user"
+							? ApplicationCommandType.User
+							: ApplicationCommandType.Message,
+					defaultMemberPermissions:
+						contextMenuOptions.defaultMemberPermissions,
+				} as CommandOptions & { type: ApplicationCommandType };
+
+				this.commands.set(contextMenuOptions.name, {
+					instance,
+					options: commandData,
+				});
+				continue;
+			}
+
+			// Regular slash command
 			const cmdOptions = (CommandClass as unknown as ICommandClass)
 				.commandOptions;
 			if (!cmdOptions) continue;

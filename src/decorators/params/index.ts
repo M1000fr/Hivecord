@@ -4,6 +4,8 @@ export * from "./Client";
 export * from "./Context";
 export * from "./GuildLanguage";
 export * from "./Translate";
+export * from "./TargetUser";
+export * from "./TargetMessage";
 
 export const COMMAND_PARAMS_METADATA_KEY = "lebot:command:params";
 
@@ -13,6 +15,8 @@ export enum CommandParamType {
 	Translate = "TRANSLATE",
 	AutocompleteInteraction = "AUTOCOMPLETE_INTERACTION",
 	Context = "CONTEXT",
+	TargetUser = "TARGET_USER",
+	TargetMessage = "TARGET_MESSAGE",
 }
 
 export interface CommandParameter {

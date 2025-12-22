@@ -1,5 +1,7 @@
 import { Module } from "@decorators/Module";
 import { GeneralConfig } from "./GeneralConfig";
+import { CopyMessageCommand } from "./commands/CopyMessageCommand";
+import { GetAvatarCommand } from "./commands/GetAvatarCommand";
 import PingCommand from "./commands/ping/index";
 import SyncCommand from "./commands/sync/index";
 import ChannelSync from "./events/channelSync/sync";
@@ -28,7 +30,7 @@ import { CoreModule } from "@modules/Core/CoreModule";
 	name: "General",
 	imports: [CoreModule, ConfigurationModule],
 	config: GeneralConfig,
-	commands: [PingCommand, SyncCommand],
+	commands: [PingCommand, SyncCommand, GetAvatarCommand, CopyMessageCommand],
 	interactions: [PingCommandInteractions],
 	events: [
 		ReadyEvent,

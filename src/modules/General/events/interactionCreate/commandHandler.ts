@@ -58,29 +58,59 @@ export default class InteractionCreateEvent {
 			return;
 		}
 
-		if (!interaction.isChatInputCommand()) return;
+		if (interaction.isChatInputCommand()) {
+			const command = client.commands.get(interaction.commandName);
 
-		const command = client.commands.get(interaction.commandName);
+			if (!command) {
+				this.logger.error(
+					`No command matching ${interaction.commandName} was found.`,
+				);
+				return;
+			}
 
-		if (!command) {
-			this.logger.error(
-				`No command matching ${interaction.commandName} was found.`,
-			);
+			try {
+				await this.commandService.execute(
+					client,
+					interaction,
+					command.instance,
+				);
+			} catch (error) {
+				this.logger.error(error);
+				await this.sendErrorResponse(
+					interaction,
+					"There was an error while executing this command!",
+				);
+			}
 			return;
 		}
 
-		try {
-			await this.commandService.execute(
-				client,
-				interaction,
-				command.instance,
-			);
-		} catch (error) {
-			this.logger.error(error);
-			await this.sendErrorResponse(
-				interaction,
-				"There was an error while executing this command!",
-			);
+		if (
+			interaction.isUserContextMenuCommand() ||
+			interaction.isMessageContextMenuCommand()
+		) {
+			const command = client.commands.get(interaction.commandName);
+
+			if (!command) {
+				this.logger.error(
+					`No context menu command matching ${interaction.commandName} was found.`,
+				);
+				return;
+			}
+
+			try {
+				await this.commandService.executeContextMenu(
+					client,
+					interaction,
+					command.instance,
+				);
+			} catch (error) {
+				this.logger.error(error);
+				await this.sendErrorResponse(
+					interaction,
+					"There was an error while executing this context menu command!",
+				);
+			}
+			return;
 		}
 	}
 }
