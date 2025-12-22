@@ -21,6 +21,7 @@ export type CommandArgument =
 			| UserContextMenuCommandInteraction
 			| MessageContextMenuCommandInteraction,
 	  ]
+	| [AutocompleteInteraction]
 	| User
 	| Message
 	| undefined;

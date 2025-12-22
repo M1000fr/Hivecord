@@ -267,8 +267,12 @@ export class CommandService {
 					args[param.index] = client;
 					break;
 				case CommandParamType.Interaction:
-				case CommandParamType.AutocompleteInteraction:
 					args[param.index] = interaction;
+					break;
+				case CommandParamType.AutocompleteInteraction:
+					if (interaction instanceof AutocompleteInteraction) {
+						args[param.index] = [interaction];
+					}
 					break;
 				case CommandParamType.Translate:
 					args[param.index] = langCtx;
