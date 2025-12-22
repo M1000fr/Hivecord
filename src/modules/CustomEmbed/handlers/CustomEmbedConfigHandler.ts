@@ -19,7 +19,7 @@ import {
 	type RepliableInteraction,
 	type StringSelectMenuInteraction,
 } from "discord.js";
-import { CUSTOM_EMBED_CONFIG_TYPE } from "../CustomEmbedConfigType";
+import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbedConfigType";
 
 @Injectable()
 export class CustomEmbedConfigHandler
@@ -33,7 +33,7 @@ export class CustomEmbedConfigHandler
 	) {
 		super(configHelper, configService);
 		ConfigTypeRegistry.register({
-			id: CUSTOM_EMBED_CONFIG_TYPE,
+			id: CUSTOM_EMBED_CONFIG_KEY,
 			name: "Custom Embed",
 			handler: this,
 		});
@@ -57,7 +57,7 @@ export class CustomEmbedConfigHandler
 				moduleName,
 				propertyKey,
 				value,
-				CUSTOM_EMBED_CONFIG_TYPE,
+				CUSTOM_EMBED_CONFIG_KEY,
 				false,
 				true,
 			);
