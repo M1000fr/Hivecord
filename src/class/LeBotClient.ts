@@ -6,7 +6,7 @@ import {
 	type CommandParameter,
 } from "@decorators/params";
 import { DependencyContainer } from "@di/DependencyContainer";
-import type { Constructor } from "@di/types";
+import { INJECTABLE_METADATA_KEY, type Constructor } from "@di/types";
 import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
@@ -331,11 +331,60 @@ export class LeBotClient<
 		}
 	}
 
+	private validateInjectableClasses(
+		classes: Constructor[],
+		context: string,
+	): void {
+		for (const ClassConstructor of classes) {
+			const isInjectable = Reflect.hasMetadata(
+				INJECTABLE_METADATA_KEY,
+				ClassConstructor,
+			);
+			if (!isInjectable) {
+				this.logger.error(
+					`Class "${ClassConstructor.name}" in ${context} is missing @Injectable() decorator. ` +
+						`All providers, commands, and event controllers must be decorated with @Injectable().`,
+				);
+				throw new Error(
+					`Missing @Injectable() decorator on ${ClassConstructor.name} (${context})`,
+				);
+			}
+		}
+	}
+
 	private async loadModules() {
 		const registeredModules = this.container.getRegisteredModules();
 
 		for (const [name, { options, moduleClass }] of registeredModules) {
 			this.logger.log(`Loading module: ${options.name}`);
+
+			// Validate providers
+			if (options.providers) {
+				const providerClasses = options.providers.filter(
+					(p): p is Constructor =>
+						typeof p === "function" && "prototype" in p,
+				);
+				this.validateInjectableClasses(
+					providerClasses,
+					`module "${options.name}" providers`,
+				);
+			}
+
+			// Validate commands
+			if (options.commands) {
+				this.validateInjectableClasses(
+					options.commands,
+					`module "${options.name}" commands`,
+				);
+			}
+
+			// Validate events
+			if (options.events) {
+				this.validateInjectableClasses(
+					options.events,
+					`module "${options.name}" events`,
+				);
+			}
 
 			let moduleInstance: IModuleInstance | undefined;
 
