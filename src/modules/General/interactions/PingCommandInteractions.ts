@@ -1,5 +1,5 @@
-import { Button } from "@decorators/Interaction";
 import { Injectable } from "@decorators/Injectable";
+import { Button } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { ButtonInteraction, MessageFlags } from "discord.js";
 

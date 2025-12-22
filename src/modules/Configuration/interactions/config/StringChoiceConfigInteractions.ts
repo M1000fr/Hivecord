@@ -21,7 +21,9 @@ import { BaseConfigInteractions } from "./BaseConfigInteractions";
 @ConfigInteraction()
 export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 	@SelectMenuPattern("module_config_choice:*")
-	async handleChoiceSelection(@Interaction() interaction: StringSelectMenuInteraction) {
+	async handleChoiceSelection(
+		@Interaction() interaction: StringSelectMenuInteraction,
+	) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts } = ctx;

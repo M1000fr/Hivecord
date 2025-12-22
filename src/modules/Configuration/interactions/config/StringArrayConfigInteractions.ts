@@ -304,7 +304,9 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 	}
 
 	@SelectMenuPattern("module_config_array_remove_sub:*:*:*")
-	async handleRemoveSelect(@Interaction() interaction: StringSelectMenuInteraction) {
+	async handleRemoveSelect(
+		@Interaction() interaction: StringSelectMenuInteraction,
+	) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { parts } = ctx;
@@ -397,7 +399,9 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 	}
 
 	@SelectMenuPattern("module_config_array_edit_sel:*:*:*")
-	async handleEditSelect(@Interaction() interaction: StringSelectMenuInteraction) {
+	async handleEditSelect(
+		@Interaction() interaction: StringSelectMenuInteraction,
+	) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { parts, userId } = ctx;

@@ -1,6 +1,6 @@
+import { Injectable } from "@decorators/Injectable";
 import type { QueryApi, WriteApi } from "@influxdata/influxdb-client";
 import { InfluxDB, Point } from "@influxdata/influxdb-client";
-import { Injectable } from "@decorators/Injectable";
 import { Logger } from "@utils/Logger";
 import { AsyncLocalStorage } from "async_hooks";
 

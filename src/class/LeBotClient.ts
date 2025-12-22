@@ -343,7 +343,7 @@ export class LeBotClient<
 		context: string,
 	): string[] {
 		const errors: string[] = [];
-		
+
 		for (const ClassConstructor of classes) {
 			const isInjectable = Reflect.hasMetadata(
 				INJECTABLE_METADATA_KEY,
@@ -355,7 +355,7 @@ export class LeBotClient<
 				);
 			}
 		}
-		
+
 		return errors;
 	}
 
@@ -372,7 +372,7 @@ export class LeBotClient<
 					(p): p is Constructor =>
 						typeof p === "function" && "prototype" in p,
 				);
-				
+
 				if (providerClasses.length > 0) {
 					const errors = this.validateInjectableClasses(
 						providerClasses,
@@ -390,18 +390,18 @@ export class LeBotClient<
 					`Found ${allErrors.length} missing @Injectable() decorator${allErrors.length > 1 ? "s" : ""}:\n` +
 					`${"=".repeat(80)}\n`,
 			);
-			
+
 			allErrors.forEach((error, index) => {
 				this.logger.error(`${index + 1}. ${error}`);
 			});
-			
+
 			this.logger.error(
 				`\n${"=".repeat(80)}\n` +
 					`All providers, commands, and event controllers must be decorated with @Injectable().\n` +
 					`Please add the @Injectable() decorator to the classes listed above.\n` +
 					`${"=".repeat(80)}\n`,
 			);
-			
+
 			throw new Error(
 				`Found ${allErrors.length} class${allErrors.length > 1 ? "es" : ""} missing @Injectable() decorator`,
 			);

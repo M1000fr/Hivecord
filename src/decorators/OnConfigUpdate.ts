@@ -46,8 +46,7 @@ export function OnConfigUpdate(propertyName: string) {
 								args[param.index] = value;
 								break;
 							case CommandParamType.Client:
-								args[param.index] =
-									container.resolve("Client");
+								args[param.index] = container.resolve("Client");
 								break;
 							default:
 								break;

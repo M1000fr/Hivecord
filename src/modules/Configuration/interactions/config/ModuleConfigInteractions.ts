@@ -42,7 +42,9 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 	}
 
 	@SelectMenuPattern("module_config:*")
-	async handlePropertySelection(@Interaction() interaction: StringSelectMenuInteraction) {
+	async handlePropertySelection(
+		@Interaction() interaction: StringSelectMenuInteraction,
+	) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts, userId } = ctx;

@@ -169,7 +169,10 @@ export class CommandService {
 		}
 
 		// 2. Try Option Routes
-		if (commandClass.optionRoutes && commandClass.optionRoutes instanceof Map) {
+		if (
+			commandClass.optionRoutes &&
+			commandClass.optionRoutes instanceof Map
+		) {
 			for (const [optionName, valueMap] of commandClass.optionRoutes) {
 				const optionValue = interaction.options.get(optionName)?.value;
 				const route =
@@ -251,10 +254,14 @@ export class CommandService {
 			| MessageContextMenuCommandInteraction,
 		langCtx?: GuildLanguageContext,
 	): CommandArgument[] {
-		const paramsMetadata =
-			Reflect.getMetadata(COMMAND_PARAMS_METADATA_KEY, target, method);
-		const params: CommandParameter[] =
-			Array.isArray(paramsMetadata) ? paramsMetadata : [];
+		const paramsMetadata = Reflect.getMetadata(
+			COMMAND_PARAMS_METADATA_KEY,
+			target,
+			method,
+		);
+		const params: CommandParameter[] = Array.isArray(paramsMetadata)
+			? paramsMetadata
+			: [];
 
 		if (params.length === 0) {
 			return [client, interaction, langCtx];

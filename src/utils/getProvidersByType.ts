@@ -1,8 +1,4 @@
-import type {
-	Constructor,
-	Provider,
-	ProviderType,
-} from "@di/types";
+import type { Constructor, Provider, ProviderType } from "@di/types";
 import { PROVIDER_TYPE_METADATA_KEY } from "@di/types";
 import "reflect-metadata";
 

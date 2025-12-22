@@ -1,6 +1,6 @@
+import { Injectable } from "@decorators/Injectable";
 import en from "@src/locales/en.json";
 import fr from "@src/locales/fr.json";
-import { Injectable } from "@decorators/Injectable";
 import i18next from "i18next";
 
 export type { TFunction } from "i18next";

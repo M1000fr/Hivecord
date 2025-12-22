@@ -11,7 +11,7 @@ export function CommandController(options: CommandOptions) {
 		Injectable()(target);
 		// Mark as command provider
 		Reflect.defineMetadata(PROVIDER_TYPE_METADATA_KEY, "command", target);
-		
+
 		const commandClass = target as unknown as ICommandClass;
 		commandClass.commandOptions = options;
 	};

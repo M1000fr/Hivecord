@@ -1,5 +1,5 @@
-import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { Injectable } from "@decorators/Injectable";
+import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { Interaction as InteractionParam } from "@decorators/params";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";

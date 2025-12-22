@@ -23,7 +23,9 @@ import { BaseConfigInteractions } from "./BaseConfigInteractions";
 @ConfigInteraction()
 export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 	@SelectMenuPattern("module_config_role:*")
-	async handleRoleSelection(@Interaction() interaction: RoleSelectMenuInteraction) {
+	async handleRoleSelection(
+		@Interaction() interaction: RoleSelectMenuInteraction,
+	) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts } = ctx;
@@ -54,7 +56,9 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 	}
 
 	@SelectMenuPattern("module_config_channel:*")
-	async handleChannelSelection(@Interaction() interaction: ChannelSelectMenuInteraction) {
+	async handleChannelSelection(
+		@Interaction() interaction: ChannelSelectMenuInteraction,
+	) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts } = ctx;

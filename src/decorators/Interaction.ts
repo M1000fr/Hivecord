@@ -1,12 +1,12 @@
-import { DependencyContainer } from "@di/DependencyContainer";
-import type { Constructor } from "@di/types";
-import { InteractionRegistry } from "@registers/InteractionRegistry";
 import {
 	COMMAND_PARAMS_METADATA_KEY,
 	type CommandParameter,
 	CommandParamType,
 	registerCommandParameter,
 } from "@decorators/params/index.ts";
+import { DependencyContainer } from "@di/DependencyContainer";
+import type { Constructor } from "@di/types";
+import { InteractionRegistry } from "@registers/InteractionRegistry";
 
 function createHandler(target: object, propertyKey: string) {
 	return async (interaction: unknown) => {
