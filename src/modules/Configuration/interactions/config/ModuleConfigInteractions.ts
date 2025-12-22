@@ -5,6 +5,7 @@ import { ButtonPattern, SelectMenuPattern } from "@decorators/Interaction";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
+import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	type ButtonInteraction,
@@ -13,7 +14,6 @@ import {
 import { AttachmentConfigInteractions } from "./AttachmentConfigInteractions";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 import { BooleanConfigInteractions } from "./BooleanConfigInteractions";
-import { CustomEmbedConfigInteractions } from "./CustomEmbedConfigInteractions";
 import { RoleChannelConfigInteractions } from "./RoleChannelConfigInteractions";
 import { StringArrayConfigInteractions } from "./StringArrayConfigInteractions";
 import { StringChoiceConfigInteractions } from "./StringChoiceConfigInteractions";
@@ -36,8 +36,6 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 		private readonly attachmentHandler: AttachmentConfigInteractions,
 		@Inject(StringArrayConfigInteractions)
 		private readonly stringArrayHandler: StringArrayConfigInteractions,
-		@Inject(CustomEmbedConfigInteractions)
-		private readonly customEmbedHandler: CustomEmbedConfigInteractions,
 	) {
 		super(configHelper, configService);
 	}
@@ -112,11 +110,26 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 				console.error("Failed to reset select menu:", error);
 			}
 
+			// Check if it's a custom registered type
+			const customType = ConfigTypeRegistry.get(
+				propertyOptions.type as string,
+			);
+			if (customType) {
+				await customType.handler.show(
+					interaction,
+					propertyOptions,
+					selectedProperty,
+					moduleName,
+				);
+				return;
+			}
+
+			// Handle built-in types
 			const isRoleOrChannel = [
 				EConfigType.Role,
 				EConfigType.RoleArray,
 				EConfigType.Channel,
-			].includes(propertyOptions.type);
+			].includes(propertyOptions.type as EConfigType);
 
 			if (isRoleOrChannel) {
 				await this.roleChannelHandler.show(
@@ -153,14 +166,8 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 					selectedProperty,
 					moduleName,
 				);
-			} else if (propertyOptions.type === EConfigType.CustomEmbed) {
-				await this.customEmbedHandler.show(
-					interaction,
-					propertyOptions,
-					selectedProperty,
-					moduleName,
-				);
 			} else {
+				// Default to string handler
 				await this.stringHandler.show(
 					interaction,
 					propertyOptions,
