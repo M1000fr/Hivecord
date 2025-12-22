@@ -73,7 +73,7 @@ export class EmbedEditorInteractions {
 	) {
 		const lng =
 			(await this.configService.of(session.guildId, GeneralConfig)
-				.generalLanguage) ?? "en";
+				.Language) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const embed = new EmbedBuilder(session.data);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,7 +96,7 @@ export class EmbedEditorInteractions {
 
 		const lng =
 			(await this.configService.of(session.guildId, GeneralConfig)
-				.generalLanguage) ?? "en";
+				.Language) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const value = interaction.values[0];
 		if (!value) return;
@@ -136,7 +136,7 @@ export class EmbedEditorInteractions {
 
 		const lng =
 			(await this.configService.of(session.guildId, GeneralConfig)
-				.generalLanguage) ?? "en";
+				.Language) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const value = interaction.values[0];
 		if (!value) return;

@@ -26,7 +26,7 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 		const lng = await this.configService.of(
 			interaction.guildId,
 			GeneralConfig,
-		).generalLanguage;
+		).Language;
 		const t = I18nService.getFixedT(lng);
 		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guildId,

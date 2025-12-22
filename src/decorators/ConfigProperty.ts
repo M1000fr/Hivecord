@@ -37,13 +37,41 @@ export interface IConfigClass {
 	configProperties?: Record<string, ConfigPropertyOptions>;
 }
 
+/**
+ * Helper to define a config key with a default value.
+ * Returns the default value at compile time but an object with metadata at runtime.
+ */
+export function configKey<T>(defaultValue?: T): T {
+	return {
+		__isConfigKey: true,
+		defaultValue,
+	} as unknown as T;
+}
+
 export function ConfigProperty(options: ConfigPropertyOptions) {
 	return function (target: object, propertyKey: string) {
-		const constructor = target.constructor as IConfigClass;
+		const isStatic = typeof target === "function";
+		const constructor = (isStatic ? target : target.constructor) as unknown as {
+			configProperties?: Record<string, ConfigPropertyOptions>;
+		};
+
 		if (!constructor.configProperties) {
 			constructor.configProperties = {};
 		}
 		constructor.configProperties[propertyKey] = options;
+
+		// If the property was initialized with configKey(), attach metadata to it
+		const val = (target as Record<string, unknown>)[propertyKey];
+		if (val && typeof val === "object" && (val as Record<string, unknown>).__isConfigKey) {
+			const configKeyVal = val as unknown as {
+				configClass?: unknown;
+				propertyKey?: string;
+				options?: ConfigPropertyOptions;
+			};
+			configKeyVal.configClass = constructor;
+			configKeyVal.propertyKey = propertyKey;
+			configKeyVal.options = options;
+		}
 	};
 }
 

@@ -18,7 +18,6 @@ import {
 } from "discord.js";
 import path from "path";
 import { GeneralConfig } from "../../GeneralConfig";
-import { GeneralConfigKey } from "../../GeneralConfigKey";
 
 @EventController()
 export default class WelcomeEvent {
@@ -35,22 +34,22 @@ export default class WelcomeEvent {
 		@Context()
 		[member]: ContextOf<typeof BotEvents.GuildMemberAdd>,
 
-		@GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeChannelId)
+		@GuildConfig(GeneralConfig.WelcomeChannelId)
 		welcomeChannelId: string | undefined,
 
-		@GuildConfig(GeneralConfig, GeneralConfigKey.Language)
+		@GuildConfig(GeneralConfig.Language)
 		language: string,
 
-		@GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeEmbedName)
+		@GuildConfig(GeneralConfig.WelcomeEmbedName)
 		welcomeEmbedName: string | undefined,
 
-		@GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeBackground)
+		@GuildConfig(GeneralConfig.WelcomeBackground)
 		configuredBackground: string | undefined,
 
-		@GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeMessageImage)
+		@GuildConfig(GeneralConfig.WelcomeMessageImage)
 		welcomeMessageImageConfig: string,
 
-		@GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeMessage)
+		@GuildConfig(GeneralConfig.WelcomeMessage)
 		welcomeMessageConfig: string,
 	) {
 		try {

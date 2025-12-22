@@ -43,7 +43,7 @@ export class CommandService {
 		guildId: string | null,
 	): Promise<GuildLanguageContext> {
 		const locale = await this.configService.of(guildId!, GeneralConfig)
-			.generalLanguage;
+			.Language;
 		const t = I18nService.getFixedT(locale);
 		return { locale, t };
 	}

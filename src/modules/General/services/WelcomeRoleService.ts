@@ -43,7 +43,7 @@ export class WelcomeRoleService {
 			const roleIds = await this.configService.of(
 				member.guild.id,
 				GeneralConfig,
-			).generalWelcomeRoles;
+			).WelcomeRoles;
 			if (!roleIds || roleIds.length === 0) return;
 
 			const rolesToAdd = roleIds.filter(

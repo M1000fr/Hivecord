@@ -1,5 +1,5 @@
 import { ConfigContext } from "@decorators/ConfigContext";
-import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
+import { ConfigProperty, EConfigType, configKey } from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 import { CUSTOM_EMBED_CONFIG_KEY } from "@src/modules/CustomEmbed/CustomEmbedConfigKey";
@@ -28,7 +28,7 @@ export class GeneralConfig {
 		],
 		nonNull: true,
 	})
-	generalLanguage: string = "en";
+	static Language = configKey("en");
 
 	@ConfigContext([
 		ConfigContextVariable.User,
@@ -47,7 +47,7 @@ export class GeneralConfig {
 		},
 		type: EConfigType.String,
 	})
-	generalWelcomeMessageImage: string = "Welcome!";
+	static WelcomeMessageImage = configKey("Welcome!");
 
 	@ConfigContext([
 		ConfigContextVariable.User,
@@ -66,7 +66,7 @@ export class GeneralConfig {
 		},
 		type: EConfigType.String,
 	})
-	generalWelcomeMessage: string = "Welcome {user} to {guild}!";
+	static WelcomeMessage = configKey("Welcome {user} to {guild}!");
 
 	@ConfigProperty({
 		displayName: "Welcome Channel",
@@ -79,7 +79,7 @@ export class GeneralConfig {
 		},
 		type: EConfigType.Channel,
 	})
-	generalWelcomeChannelId: string = "";
+	static WelcomeChannelId = configKey("");
 
 	@ConfigProperty({
 		displayName: "Welcome Embed",
@@ -92,7 +92,7 @@ export class GeneralConfig {
 		},
 		type: CUSTOM_EMBED_CONFIG_KEY,
 	})
-	generalWelcomeEmbedName: string = "";
+	static WelcomeEmbedName = configKey("");
 
 	@ConfigProperty({
 		displayName: "Welcome Roles",
@@ -105,7 +105,7 @@ export class GeneralConfig {
 		},
 		type: EConfigType.RoleArray,
 	})
-	generalWelcomeRoles: string[] = [];
+	static WelcomeRoles = configKey<string[]>([]);
 
 	@ConfigProperty({
 		displayName: "Welcome Background",
@@ -118,5 +118,14 @@ export class GeneralConfig {
 		},
 		type: EConfigType.Attachment,
 	})
-	generalWelcomeBackground: string = "";
+	static WelcomeBackground = configKey("");
+
+	// Instance properties for ConfigProxy compatibility
+	Language!: string;
+	WelcomeMessageImage!: string;
+	WelcomeMessage!: string;
+	WelcomeChannelId!: string;
+	WelcomeEmbedName!: string;
+	WelcomeRoles!: string[];
+	WelcomeBackground!: string;
 }

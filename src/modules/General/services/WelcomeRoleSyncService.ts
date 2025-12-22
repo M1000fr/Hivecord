@@ -102,13 +102,13 @@ export class WelcomeRoleSyncService {
 		this.logger.log(`Processing guild ${guild.name} (${guild.id})...`);
 
 		const roleIds = await this.configService.of(guild.id, GeneralConfig)
-			.generalWelcomeRoles;
+			.WelcomeRoles;
 		if (!roleIds || roleIds.length === 0) {
 			return;
 		}
 
 		// Filter roles that exist in this guild
-		const guildRoleIds = roleIds.filter((roleId) =>
+		const guildRoleIds = roleIds.filter((roleId: string) =>
 			guild.roles.cache.has(roleId),
 		);
 		if (guildRoleIds.length === 0) return;
@@ -137,7 +137,7 @@ export class WelcomeRoleSyncService {
 
 				// Check if member is missing any role
 				const missingRoles = guildRoleIds.filter(
-					(roleId) => !member.roles.cache.has(roleId),
+					(roleId: string) => !member.roles.cache.has(roleId),
 				);
 
 				if (missingRoles.length > 0) {

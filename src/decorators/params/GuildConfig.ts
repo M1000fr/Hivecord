@@ -1,6 +1,5 @@
 import { DependencyContainer } from "@di/DependencyContainer";
-import type { ConfigService } from "@modules/Configuration/services/ConfigService";
-import type { Constructor } from "@di/types";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import {
 	registerCommandParameter,
 	CommandParamType,
@@ -8,57 +7,6 @@ import {
 import "reflect-metadata";
 
 const GUILD_CONFIG_METADATA_KEY = "lebot:param:guild-config";
-
-export interface ConfigKeyDefinition<T = unknown> {
-	key: string;
-	hasDefault: boolean;
-	__type?: T;
-}
-
-interface GuildConfigMetadata {
-	configClass: Constructor;
-	propertyKey: string;
-	hasDefault: boolean;
-}
-
-/**
- * Store metadata about the config to retrieve
- */
-function setGuildConfigMetadata(
-	target: object,
-	methodKey: string | symbol | undefined,
-	parameterIndex: number,
-	configClass: Constructor,
-	propertyKey: string,
-	hasDefault: boolean,
-): void {
-	const metadata: GuildConfigMetadata = {
-		configClass,
-		propertyKey,
-		hasDefault,
-	};
-	Reflect.defineMetadata(
-		GUILD_CONFIG_METADATA_KEY,
-		metadata,
-		target,
-		`${String(methodKey)}_${parameterIndex}`,
-	);
-}
-
-/**
- * Get metadata about the config to retrieve
- */
-export function getGuildConfigMetadata(
-	target: object,
-	methodKey: string | symbol,
-	parameterIndex: number,
-): GuildConfigMetadata | undefined {
-	return Reflect.getMetadata(
-		GUILD_CONFIG_METADATA_KEY,
-		target,
-		`${String(methodKey)}_${parameterIndex}`,
-	);
-}
 
 /**
  * Extract guild ID from context (supports various context types)
@@ -74,10 +22,10 @@ export function extractGuildIdFromContext(context: unknown): string | null {
 		// Check common patterns
 		if (typeof first === "object" && first !== null) {
 			const obj = first as Record<string, unknown>;
-			
+
 			// Direct guildId property (interactions)
 			if (typeof obj.guildId === "string") return obj.guildId;
-			
+
 			// member.guild.id pattern
 			if (
 				obj.member &&
@@ -94,7 +42,7 @@ export function extractGuildIdFromContext(context: unknown): string | null {
 					if (typeof guild.id === "string") return guild.id;
 				}
 			}
-			
+
 			// guild.id pattern
 			if (obj.guild && typeof obj.guild === "object" && "id" in obj.guild) {
 				const guild = obj.guild as Record<string, unknown>;
@@ -110,28 +58,19 @@ export function extractGuildIdFromContext(context: unknown): string | null {
  * Decorator to inject a guild configuration value.
  * Automatically resolves the config from ConfigService based on guild ID from context.
  *
- * @param configClass - The configuration class (e.g., GeneralConfig)
- * @param configKeyDef - The configuration key definition from the config's key file
+ * @param configKey - The configuration key (e.g., GeneralConfig.WelcomeChannelId)
  *
  * @example
  * ```typescript
- * import { GeneralConfigKey } from "@modules/General/GeneralConfigKey";
- *
  * @On(BotEvents.GuildMemberAdd)
  * async run(
  *   @Context() [member]: ContextOf<typeof BotEvents.GuildMemberAdd>,
- *   @GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeChannelId) welcomeChannelId: string | undefined,
- *   @GuildConfig(GeneralConfig, GeneralConfigKey.Language) language: string, // No `?` because hasDefault = true
+ *   @GuildConfig(GeneralConfig.WelcomeChannelId) welcomeChannelId: string | undefined,
  * ) {
- *   // welcomeChannelId is string | undefined (no default)
- *   // language is string (has default value)
  * }
  * ```
  */
-export function GuildConfig<T extends object, K extends ConfigKeyDefinition>(
-	configClass: Constructor<T>,
-	configKeyDef: K,
-): ParameterDecorator {
+export function GuildConfig(configKey: unknown): ParameterDecorator {
 	return (
 		target: object,
 		methodKey: string | symbol | undefined,
@@ -145,14 +84,12 @@ export function GuildConfig<T extends object, K extends ConfigKeyDefinition>(
 			CommandParamType.GuildConfig,
 		);
 
-		// Store additional metadata for resolution
-		setGuildConfigMetadata(
+		// Store the configKey object itself for resolution
+		Reflect.defineMetadata(
+			GUILD_CONFIG_METADATA_KEY,
+			configKey,
 			target,
-			methodKey,
-			parameterIndex,
-			configClass,
-			configKeyDef.key,
-			configKeyDef.hasDefault,
+			`${String(methodKey)}_${parameterIndex}`,
 		);
 	};
 }
@@ -167,11 +104,17 @@ export async function resolveGuildConfig(
 	parameterIndex: number,
 	context: unknown,
 ): Promise<unknown> {
-	const metadata = getGuildConfigMetadata(target, methodKey, parameterIndex);
-	if (!metadata) {
-		throw new Error(
-			`No GuildConfig metadata found for parameter ${parameterIndex} of ${String(methodKey)}`,
+	const configKey = Reflect.getMetadata(
+		GUILD_CONFIG_METADATA_KEY,
+		target,
+		`${String(methodKey)}_${parameterIndex}`,
+	);
+
+	if (!configKey || !configKey.__isConfigKey) {
+		console.warn(
+			`Invalid GuildConfig metadata for parameter ${parameterIndex} of ${String(methodKey)}. Make sure to use a property initialized with configKey().`,
 		);
+		return undefined;
 	}
 
 	const guildId = extractGuildIdFromContext(context);
@@ -183,9 +126,15 @@ export async function resolveGuildConfig(
 	}
 
 	const container = DependencyContainer.getInstance();
-	const configService = container.resolve("ConfigService") as ConfigService;
+	const configService = container.resolve(ConfigService);
 
-	const config = configService.of(guildId, metadata.configClass);
-	// @ts-expect-error - Dynamic property access
-	return await config[metadata.propertyKey];
+	const config = configService.of(guildId, configKey.configClass);
+	const value = await (config as Record<string, unknown>)[configKey.propertyKey];
+	
+	// If value is null/undefined, use the default from configKey
+	if (value === null || value === undefined) {
+		return configKey.defaultValue;
+	}
+	
+	return value;
 }

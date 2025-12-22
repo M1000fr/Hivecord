@@ -93,7 +93,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 					(await this.configService.of(
 						interaction.guildId!,
 						GeneralConfig,
-					).generalLanguage) ?? "en";
+					).Language) ?? "en";
 				const t = I18nService.getFixedT(lng);
 				const config = await this.configHelper.buildModuleConfigEmbed(
 					client,
@@ -222,7 +222,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 						(await this.configService.of(
 							interaction.guildId!,
 							GeneralConfig,
-						).generalLanguage) ?? "en";
+						).Language) ?? "en";
 					const t = I18nService.getFixedT(lng);
 					const config =
 						await this.configHelper.buildModuleConfigEmbed(
