@@ -16,9 +16,9 @@ import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
+	MessageContextMenuCommandInteraction,
 	MessageFlags,
 	UserContextMenuCommandInteraction,
-	MessageContextMenuCommandInteraction,
 } from "discord.js";
 
 import { Injectable } from "@decorators/Injectable";
@@ -275,20 +275,25 @@ export class CommandService {
 				case CommandParamType.Context:
 					if (
 						interaction instanceof ChatInputCommandInteraction ||
-						interaction instanceof UserContextMenuCommandInteraction ||
-						interaction instanceof MessageContextMenuCommandInteraction
+						interaction instanceof
+							UserContextMenuCommandInteraction ||
+						interaction instanceof
+							MessageContextMenuCommandInteraction
 					) {
 						args[param.index] = [interaction];
 					}
 					break;
 				case CommandParamType.TargetUser:
-					if (interaction instanceof UserContextMenuCommandInteraction) {
+					if (
+						interaction instanceof UserContextMenuCommandInteraction
+					) {
 						args[param.index] = interaction.targetUser;
 					}
 					break;
 				case CommandParamType.TargetMessage:
 					if (
-						interaction instanceof MessageContextMenuCommandInteraction
+						interaction instanceof
+						MessageContextMenuCommandInteraction
 					) {
 						args[param.index] = interaction.targetMessage;
 					}

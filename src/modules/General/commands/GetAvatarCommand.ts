@@ -12,11 +12,12 @@ export class GetAvatarCommand {
 	) {
 		return interaction.reply({
 			embeds: [
-				new EmbedBuilder()
-					.setTitle(`Avatar ${user.username}`)
-					.setImage(
-						user.displayAvatarURL({ size: 4096, forceStatic: false }),
-					),
+				new EmbedBuilder().setTitle(`Avatar ${user.username}`).setImage(
+					user.displayAvatarURL({
+						size: 4096,
+						forceStatic: false,
+					}),
+				),
 			],
 		});
 	}

@@ -3,9 +3,9 @@ import "reflect-metadata";
 export * from "./Client";
 export * from "./Context";
 export * from "./GuildLanguage";
-export * from "./Translate";
-export * from "./TargetUser";
 export * from "./TargetMessage";
+export * from "./TargetUser";
+export * from "./Translate";
 
 export const COMMAND_PARAMS_METADATA_KEY = "lebot:command:params";
 

@@ -18,13 +18,13 @@ import { PrismaService } from "@modules/Core/services/PrismaService";
 import { Logger } from "@utils/Logger";
 import { createHash } from "crypto";
 import {
+	ApplicationCommandType,
 	Client,
 	Collection,
 	DiscordAPIError,
 	IntentsBitField,
 	PermissionsBitField,
 	type ApplicationCommandDataResolvable,
-	ApplicationCommandType,
 } from "discord.js";
 
 @Injectable()

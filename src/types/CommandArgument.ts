@@ -2,10 +2,10 @@ import type {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
-	UserContextMenuCommandInteraction,
+	Message,
 	MessageContextMenuCommandInteraction,
 	User,
-	Message,
+	UserContextMenuCommandInteraction,
 } from "discord.js";
 import type { GuildLanguageContext } from "./GuildLanguageContext";
 
@@ -16,7 +16,11 @@ export type CommandArgument =
 	| UserContextMenuCommandInteraction
 	| MessageContextMenuCommandInteraction
 	| GuildLanguageContext
-	| [ChatInputCommandInteraction | UserContextMenuCommandInteraction | MessageContextMenuCommandInteraction]
+	| [
+			| ChatInputCommandInteraction
+			| UserContextMenuCommandInteraction
+			| MessageContextMenuCommandInteraction,
+	  ]
 	| User
 	| Message
 	| undefined;
