@@ -10,6 +10,7 @@ import { CommandService } from "./services/CommandService";
 import { EntityService } from "./services/EntityService";
 import { I18nService } from "./services/I18nService";
 import { InfluxService } from "./services/InfluxService";
+import { PagerService } from "./services/PagerService";
 import { PermissionService } from "./services/PermissionService";
 import { PrismaService } from "./services/PrismaService";
 import { RedisService } from "./services/RedisService";
@@ -24,6 +25,7 @@ import { RedisService } from "./services/RedisService";
 		EntityService,
 		CommandService,
 		PermissionService,
+		PagerService,
 		GuildRepository,
 		UserRepository,
 		RoleRepository,
@@ -38,6 +40,7 @@ import { RedisService } from "./services/RedisService";
 		EntityService,
 		CommandService,
 		PermissionService,
+		PagerService,
 		GuildRepository,
 		UserRepository,
 		RoleRepository,
