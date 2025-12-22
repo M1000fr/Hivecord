@@ -11,7 +11,6 @@ export enum EConfigType {
 	Number = ApplicationCommandOptionType.Number,
 	Attachment = ApplicationCommandOptionType.Attachment,
 	// Custom types
-	CustomEmbed = 100,
 	RoleArray = 101,
 	StringChoice = 102,
 	StringArray = 103,
@@ -28,7 +27,7 @@ export interface ConfigPropertyOptions {
 	displayNameLocalizations?: LocalizationMap;
 	description: string;
 	descriptionLocalizations?: LocalizationMap;
-	type: EConfigType;
+	type: EConfigType | string; // Support both enum and custom type IDs
 	required?: boolean;
 	choices?: ConfigChoice[];
 	nonNull?: boolean;
