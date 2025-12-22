@@ -1,7 +1,7 @@
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
-import { SelectMenuPattern } from "@decorators/Interaction";
+import { SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
@@ -20,7 +20,7 @@ import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
 @ConfigInteraction()
 export class StringChoiceConfigInteractions extends BaseConfigInteractions {
-	@SelectMenuPattern("module_config_choice:*")
+	@SelectMenu("module_config_choice:*")
 	async handleChoiceSelection(
 		@Interaction() interaction: StringSelectMenuInteraction,
 	) {

@@ -4,11 +4,7 @@ import {
 	EConfigType,
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
-import {
-	ButtonPattern,
-	ModalPattern,
-	SelectMenuPattern,
-} from "@decorators/Interaction";
+import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -167,7 +163,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		await (interaction as any).update(view);
 	}
 
-	@ButtonPattern("module_config_array_add:*:*:*")
+	@Button("module_config_array_add:*:*:*")
 	async handleAddButton(@Interaction() interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
@@ -198,7 +194,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		await interaction.showModal(modal);
 	}
 
-	@ModalPattern("module_config_array_add_sub:*:*:*")
+	@Modal("module_config_array_add_sub:*:*:*")
 	async handleAddModal(@Interaction() interaction: ModalSubmitInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
@@ -225,7 +221,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		await this.refreshView(interaction, moduleName, propertyKey);
 	}
 
-	@ButtonPattern("module_config_array_remove:*:*:*")
+	@Button("module_config_array_remove:*:*:*")
 	async handleRemoveButton(@Interaction() interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
@@ -292,7 +288,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		});
 	}
 
-	@ButtonPattern("module_config_array_cancel:*:*:*")
+	@Button("module_config_array_cancel:*:*:*")
 	async handleCancelButton(@Interaction() interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
@@ -303,7 +299,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		await this.refreshView(interaction, moduleName, propertyKey);
 	}
 
-	@SelectMenuPattern("module_config_array_remove_sub:*:*:*")
+	@SelectMenu("module_config_array_remove_sub:*:*:*")
 	async handleRemoveSelect(
 		@Interaction() interaction: StringSelectMenuInteraction,
 	) {
@@ -334,7 +330,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		await this.refreshView(interaction, moduleName, propertyKey);
 	}
 
-	@ButtonPattern("module_config_array_edit:*:*:*")
+	@Button("module_config_array_edit:*:*:*")
 	async handleEditButton(@Interaction() interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
@@ -398,7 +394,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		});
 	}
 
-	@SelectMenuPattern("module_config_array_edit_sel:*:*:*")
+	@SelectMenu("module_config_array_edit_sel:*:*:*")
 	async handleEditSelect(
 		@Interaction() interaction: StringSelectMenuInteraction,
 	) {
@@ -443,7 +439,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		await interaction.showModal(modal);
 	}
 
-	@ModalPattern("module_config_array_edit_sub:*:*:*:*")
+	@Modal("module_config_array_edit_sub:*:*:*:*")
 	async handleEditModal(@Interaction() interaction: ModalSubmitInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;

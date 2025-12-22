@@ -1,6 +1,6 @@
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
-import { SelectMenuPattern } from "@decorators/Interaction";
+import { SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { BaseConfigInteractions } from "@modules/Configuration/interactions/config/BaseConfigInteractions";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
@@ -39,7 +39,7 @@ export class CustomEmbedConfigHandler
 		});
 	}
 
-	@SelectMenuPattern("module_config_custom_embed:*")
+	@SelectMenu("module_config_custom_embed:*")
 	async handleEmbedSelection(
 		@Interaction() interaction: StringSelectMenuInteraction,
 	) {

@@ -49,23 +49,18 @@ export function Button(customId: string) {
 		propertyKey: string,
 		_descriptor: PropertyDescriptor,
 	) {
-		InteractionRegistry.registerButton(
-			customId,
-			createHandler(target, propertyKey),
-		);
-	};
-}
-
-export function ButtonPattern(pattern: string) {
-	return function (
-		target: object,
-		propertyKey: string,
-		_descriptor: PropertyDescriptor,
-	) {
-		InteractionRegistry.registerButtonPattern(
-			pattern,
-			createHandler(target, propertyKey),
-		);
+		const isPattern = customId.includes("*");
+		if (isPattern) {
+			InteractionRegistry.registerButtonPattern(
+				customId,
+				createHandler(target, propertyKey),
+			);
+		} else {
+			InteractionRegistry.registerButton(
+				customId,
+				createHandler(target, propertyKey),
+			);
+		}
 	};
 }
 
@@ -75,23 +70,18 @@ export function SelectMenu(customId: string) {
 		propertyKey: string,
 		_descriptor: PropertyDescriptor,
 	) {
-		InteractionRegistry.registerSelectMenu(
-			customId,
-			createHandler(target, propertyKey),
-		);
-	};
-}
-
-export function SelectMenuPattern(pattern: string) {
-	return function (
-		target: object,
-		propertyKey: string,
-		_descriptor: PropertyDescriptor,
-	) {
-		InteractionRegistry.registerSelectMenuPattern(
-			pattern,
-			createHandler(target, propertyKey),
-		);
+		const isPattern = customId.includes("*");
+		if (isPattern) {
+			InteractionRegistry.registerSelectMenuPattern(
+				customId,
+				createHandler(target, propertyKey),
+			);
+		} else {
+			InteractionRegistry.registerSelectMenu(
+				customId,
+				createHandler(target, propertyKey),
+			);
+		}
 	};
 }
 
@@ -101,23 +91,18 @@ export function Modal(customId: string) {
 		propertyKey: string,
 		_descriptor: PropertyDescriptor,
 	) {
-		InteractionRegistry.registerModal(
-			customId,
-			createHandler(target, propertyKey),
-		);
-	};
-}
-
-export function ModalPattern(pattern: string) {
-	return function (
-		target: object,
-		propertyKey: string,
-		_descriptor: PropertyDescriptor,
-	) {
-		InteractionRegistry.registerModalPattern(
-			pattern,
-			createHandler(target, propertyKey),
-		);
+		const isPattern = customId.includes("*");
+		if (isPattern) {
+			InteractionRegistry.registerModalPattern(
+				customId,
+				createHandler(target, propertyKey),
+			);
+		} else {
+			InteractionRegistry.registerModal(
+				customId,
+				createHandler(target, propertyKey),
+			);
+		}
 	};
 }
 

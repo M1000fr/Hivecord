@@ -3,7 +3,7 @@ import {
 	EConfigType,
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
-import { SelectMenuPattern } from "@decorators/Interaction";
+import { SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
@@ -22,7 +22,7 @@ import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
 @ConfigInteraction()
 export class RoleChannelConfigInteractions extends BaseConfigInteractions {
-	@SelectMenuPattern("module_config_role:*")
+	@SelectMenu("module_config_role:*")
 	async handleRoleSelection(
 		@Interaction() interaction: RoleSelectMenuInteraction,
 	) {
@@ -55,7 +55,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 		}
 	}
 
-	@SelectMenuPattern("module_config_channel:*")
+	@SelectMenu("module_config_channel:*")
 	async handleChannelSelection(
 		@Interaction() interaction: ChannelSelectMenuInteraction,
 	) {
