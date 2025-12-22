@@ -251,9 +251,10 @@ export class CommandService {
 			| MessageContextMenuCommandInteraction,
 		langCtx?: GuildLanguageContext,
 	): CommandArgument[] {
+		const paramsMetadata =
+			Reflect.getMetadata(COMMAND_PARAMS_METADATA_KEY, target, method);
 		const params: CommandParameter[] =
-			Reflect.getMetadata(COMMAND_PARAMS_METADATA_KEY, target, method) ||
-			[];
+			Array.isArray(paramsMetadata) ? paramsMetadata : [];
 
 		if (params.length === 0) {
 			return [client, interaction, langCtx];
