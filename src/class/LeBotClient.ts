@@ -334,28 +334,29 @@ export class LeBotClient<
 	private validateInjectableClasses(
 		classes: Constructor[],
 		context: string,
-	): void {
+	): string[] {
+		const errors: string[] = [];
+		
 		for (const ClassConstructor of classes) {
 			const isInjectable = Reflect.hasMetadata(
 				INJECTABLE_METADATA_KEY,
 				ClassConstructor,
 			);
 			if (!isInjectable) {
-				this.logger.error(
-					`Class "${ClassConstructor.name}" in ${context} is missing @Injectable() decorator. ` +
-						`All providers, commands, and event controllers must be decorated with @Injectable().`,
-				);
-				throw new Error(
-					`Missing @Injectable() decorator on ${ClassConstructor.name} (${context})`,
+				errors.push(
+					`Class "${ClassConstructor.name}" in ${context} is missing @Injectable() decorator.`,
 				);
 			}
 		}
+		
+		return errors;
 	}
 
 	private async loadModules() {
 		const registeredModules = this.container.getRegisteredModules();
+		const allErrors: string[] = [];
 
-		for (const [name, { options, moduleClass }] of registeredModules) {
+		for (const [, { options }] of registeredModules) {
 			this.logger.log(`Loading module: ${options.name}`);
 
 			// Validate providers
@@ -364,28 +365,58 @@ export class LeBotClient<
 					(p): p is Constructor =>
 						typeof p === "function" && "prototype" in p,
 				);
-				this.validateInjectableClasses(
+				const errors = this.validateInjectableClasses(
 					providerClasses,
 					`module "${options.name}" providers`,
 				);
+				allErrors.push(...errors);
 			}
 
 			// Validate commands
 			if (options.commands) {
-				this.validateInjectableClasses(
+				const errors = this.validateInjectableClasses(
 					options.commands,
 					`module "${options.name}" commands`,
 				);
+				allErrors.push(...errors);
 			}
 
 			// Validate events
 			if (options.events) {
-				this.validateInjectableClasses(
+				const errors = this.validateInjectableClasses(
 					options.events,
 					`module "${options.name}" events`,
 				);
+				allErrors.push(...errors);
 			}
+		}
 
+		// If there are validation errors, display them all and stop
+		if (allErrors.length > 0) {
+			this.logger.error(
+				`\n${"=".repeat(80)}\n` +
+					`Found ${allErrors.length} missing @Injectable() decorator${allErrors.length > 1 ? "s" : ""}:\n` +
+					`${"=".repeat(80)}\n`,
+			);
+			
+			allErrors.forEach((error, index) => {
+				this.logger.error(`${index + 1}. ${error}`);
+			});
+			
+			this.logger.error(
+				`\n${"=".repeat(80)}\n` +
+					`All providers, commands, and event controllers must be decorated with @Injectable().\n` +
+					`Please add the @Injectable() decorator to the classes listed above.\n` +
+					`${"=".repeat(80)}\n`,
+			);
+			
+			throw new Error(
+				`Found ${allErrors.length} class${allErrors.length > 1 ? "es" : ""} missing @Injectable() decorator`,
+			);
+		}
+
+		// Continue with module loading
+		for (const [name, { options, moduleClass }] of registeredModules) {
 			let moduleInstance: IModuleInstance | undefined;
 
 			if (moduleClass) {
