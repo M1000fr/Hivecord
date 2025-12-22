@@ -4,6 +4,7 @@ export * from "./Client";
 export * from "./ConfigKey";
 export * from "./ConfigValue";
 export * from "./Context";
+export * from "./GuildConfig";
 export * from "./GuildId";
 export * from "./GuildLanguage";
 export * from "./Interaction";
@@ -24,6 +25,7 @@ export enum CommandParamType {
 	GuildId = "GUILD_ID",
 	ConfigKey = "CONFIG_KEY",
 	ConfigValue = "CONFIG_VALUE",
+	GuildConfig = "GUILD_CONFIG",
 }
 
 export interface CommandParameter {
