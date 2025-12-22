@@ -5,6 +5,7 @@ import {
 	CommandParamType,
 	type CommandParameter,
 } from "@decorators/params";
+import { resolveGuildConfig } from "@decorators/params/GuildConfig";
 import { DependencyContainer } from "@di/DependencyContainer";
 import { INJECTABLE_METADATA_KEY, type Constructor } from "@di/types";
 import { EPermission } from "@enums/EPermission";
@@ -310,6 +311,16 @@ export class LeBotClient<
 								param.type === CommandParamType.Context
 							) {
 								finalArgs[param.index] = args;
+							} else if (
+								param.type === CommandParamType.GuildConfig
+							) {
+								finalArgs[param.index] =
+									await resolveGuildConfig(
+										prototype,
+										methodName,
+										param.index,
+										args,
+									);
 							}
 						}
 

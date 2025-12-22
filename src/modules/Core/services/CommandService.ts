@@ -3,6 +3,7 @@ import {
 	CommandParamType,
 	type CommandParameter,
 } from "@decorators/params";
+import { resolveGuildConfig } from "@decorators/params/GuildConfig";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import type { ICommandInstance } from "@interfaces/ICommandInstance.ts";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
@@ -69,7 +70,7 @@ export class CommandService {
 		langCtx: GuildLanguageContext,
 		logSuffix?: string,
 	): Promise<void> {
-		const args = this.resolveArguments(
+		const args = await this.resolveArguments(
 			commandInstance,
 			method,
 			client,
@@ -243,7 +244,7 @@ export class CommandService {
 	 * @returns An array of arguments to be passed to the method.
 	 * @private
 	 */
-	private resolveArguments(
+	private async resolveArguments(
 		target: object,
 		method: string,
 		client: Client,
@@ -253,7 +254,7 @@ export class CommandService {
 			| UserContextMenuCommandInteraction
 			| MessageContextMenuCommandInteraction,
 		langCtx?: GuildLanguageContext,
-	): CommandArgument[] {
+	): Promise<CommandArgument[]> {
 		const paramsMetadata = Reflect.getMetadata(
 			COMMAND_PARAMS_METADATA_KEY,
 			target,
@@ -310,6 +311,15 @@ export class CommandService {
 						args[param.index] = interaction.targetMessage;
 					}
 					break;
+				case CommandParamType.GuildConfig: {
+					args[param.index] = await resolveGuildConfig(
+						target,
+						method,
+						param.index,
+						[interaction],
+					);
+					break;
+				}
 			}
 		}
 		return args;

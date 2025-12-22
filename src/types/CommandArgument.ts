@@ -24,4 +24,5 @@ export type CommandArgument =
 	| [AutocompleteInteraction]
 	| User
 	| Message
+	| unknown // Guild config values can be any type
 	| undefined;
