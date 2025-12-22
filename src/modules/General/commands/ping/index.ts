@@ -6,7 +6,13 @@ import type { LeBotClient } from "@src/class/LeBotClient";
 import { Command, CommandController } from "@src/decorators/commands/Command";
 import { CommandInteraction } from "@src/decorators/Interaction";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
-import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	ChatInputCommandInteraction,
+	EmbedBuilder,
+} from "discord.js";
 import { pingOptions } from "./pingOptions";
 
 @CommandController(pingOptions)
@@ -25,6 +31,18 @@ export default class PingCommand {
 			name: `Item ${i + 1}`,
 			description: `This is demo item number ${i + 1}`,
 		}));
+
+		// Exemple d'utilisation d'un bouton avec interaction handler
+		// Le bouton "ping_button" est géré par PingCommandInteractions.handlePingButton()
+		const demoButton = new ButtonBuilder()
+			.setCustomId("ping_button")
+			.setLabel("Click me!")
+			.setStyle(ButtonStyle.Primary)
+			.setEmoji("🏓");
+
+		const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			demoButton,
+		);
 
 		// Create a pager with the demo data
 		const pager = this.pagerService.create({
@@ -51,6 +69,7 @@ export default class PingCommand {
 
 				return {
 					embeds: [embed],
+					components: [buttonRow],
 				};
 			},
 		});
