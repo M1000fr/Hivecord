@@ -9,7 +9,9 @@ import { BotEvents } from "@enums/BotEvents";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { CustomEmbedService } from "@modules/CustomEmbed/services/CustomEmbedService";
 import { WelcomeImageService } from "@modules/General/services/WelcomeImageService";
+import { GuildLanguage } from "@src/decorators/params";
 import type { ContextOf } from "@src/types/ContextOf.ts";
+import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { Logger } from "@utils/Logger";
 import {
 	AttachmentBuilder,
@@ -34,11 +36,11 @@ export default class WelcomeEvent {
 		@Context()
 		[member]: ContextOf<typeof BotEvents.GuildMemberAdd>,
 
+		@GuildLanguage()
+		language: GuildLanguageContext,
+
 		@GuildConfig(GeneralConfig.WelcomeChannelId)
 		welcomeChannelId: string | undefined,
-
-		@GuildConfig(GeneralConfig.Language)
-		language: string,
 
 		@GuildConfig(GeneralConfig.WelcomeEmbedName)
 		welcomeEmbedName: string | undefined,
@@ -87,7 +89,7 @@ export default class WelcomeEvent {
 
 			const welcomeMessageImageTemplate = new MessageTemplate(
 				welcomeMessageImageConfig,
-				language,
+				language.locale,
 			);
 			Object.entries(commonContext).forEach(([key, value]) => {
 				if (value !== null && value !== undefined) {
@@ -133,7 +135,7 @@ export default class WelcomeEvent {
 			if (messageTemplateStr) {
 				const welcomeMessageTemplate = new MessageTemplate(
 					messageTemplateStr,
-					language,
+					language.locale,
 				);
 				Object.entries(commonContext).forEach(([key, value]) => {
 					if (value !== null && value !== undefined) {
