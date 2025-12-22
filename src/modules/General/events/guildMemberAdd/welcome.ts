@@ -27,11 +27,11 @@ export default class WelcomeEvent {
 		private readonly configService: ConfigService,
 	) {}
 
-	@On(BotEvents.MemberJoinProcessed)
+	@On(BotEvents.GuildMemberAdd)
 	async run(
 		@Client() client: LeBotClient<true>,
 		@Context()
-		[member, invite]: ContextOf<typeof BotEvents.MemberJoinProcessed>,
+		[member]: ContextOf<typeof BotEvents.GuildMemberAdd>,
 	) {
 		try {
 			const welcomeChannelId = await this.configService.of(
@@ -65,8 +65,6 @@ export default class WelcomeEvent {
 				user: member.user,
 				guild: member.guild,
 				member: member,
-				invite: invite,
-				// inviterTotalInvites: inviterTotalInvitesCount,
 			};
 
 			// Check for custom embed
