@@ -1,6 +1,6 @@
 import en from "@src/locales/en.json";
 import fr from "@src/locales/fr.json";
-import i18next, { type TFunction } from "i18next";
+import i18next from "i18next";
 
 export type { TFunction } from "i18next";
 

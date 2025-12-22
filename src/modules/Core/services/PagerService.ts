@@ -7,9 +7,7 @@ import { ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
 
 @Injectable()
 export class PagerService {
-	constructor(
-		private readonly redisService: RedisService,
-	) {}
+	constructor(private readonly redisService: RedisService) {}
 
 	/**
 	 * Create a new Pager instance with injected dependencies
@@ -69,12 +67,11 @@ export class PagerService {
 						totalPages,
 					);
 
-				const navigationRow =
-					Pager.createNavigationRow(
-						state.currentPage,
-						totalPages,
-						t,
-					);
+				const navigationRow = Pager.createNavigationRow(
+					state.currentPage,
+					totalPages,
+					t,
+				);
 				if (navigationRow) {
 					components.push(navigationRow);
 				}
@@ -105,12 +102,11 @@ export class PagerService {
 						totalPages,
 					);
 
-				const navigationRow =
-					Pager.createNavigationRow(
-						state.currentPage,
-						totalPages,
-						t,
-					);
+				const navigationRow = Pager.createNavigationRow(
+					state.currentPage,
+					totalPages,
+					t,
+				);
 				if (navigationRow) {
 					components.push(navigationRow);
 				}
