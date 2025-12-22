@@ -4,6 +4,7 @@ import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { ButtonPattern, ModalPattern } from "@decorators/Interaction";
+import { Interaction } from "@decorators/params";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -24,7 +25,7 @@ import { BaseConfigInteractions } from "./BaseConfigInteractions";
 @ConfigInteraction()
 export class StringConfigInteractions extends BaseConfigInteractions {
 	@ModalPattern("module_config_modal:*")
-	async handleTextModal(interaction: ModalSubmitInteraction) {
+	async handleTextModal(@Interaction() interaction: ModalSubmitInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts } = ctx;
@@ -46,7 +47,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 	}
 
 	@ButtonPattern("module_config_edit_text:*")
-	async handleEditTextButton(interaction: ButtonInteraction) {
+	async handleEditTextButton(@Interaction() interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts, userId } = ctx;

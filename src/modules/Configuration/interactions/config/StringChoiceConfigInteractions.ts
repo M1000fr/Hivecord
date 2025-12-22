@@ -2,6 +2,7 @@ import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { SelectMenuPattern } from "@decorators/Interaction";
+import { Interaction } from "@decorators/params";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -20,7 +21,7 @@ import { BaseConfigInteractions } from "./BaseConfigInteractions";
 @ConfigInteraction()
 export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 	@SelectMenuPattern("module_config_choice:*")
-	async handleChoiceSelection(interaction: StringSelectMenuInteraction) {
+	async handleChoiceSelection(@Interaction() interaction: StringSelectMenuInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts } = ctx;

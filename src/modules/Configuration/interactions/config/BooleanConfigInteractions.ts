@@ -3,13 +3,14 @@ import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { ButtonPattern } from "@decorators/Interaction";
+import { Interaction } from "@decorators/params";
 import { type ButtonInteraction, type RepliableInteraction } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
 @ConfigInteraction()
 export class BooleanConfigInteractions extends BaseConfigInteractions {
 	@ButtonPattern("module_config_bool:*")
-	async handleBooleanButton(interaction: ButtonInteraction) {
+	async handleBooleanButton(@Interaction() interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts } = ctx;

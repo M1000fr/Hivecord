@@ -2,6 +2,7 @@ import { EConfigType } from "@decorators/ConfigProperty";
 import { Inject } from "@decorators/Inject";
 import { Injectable } from "@decorators/Injectable";
 import { ButtonPattern, SelectMenuPattern } from "@decorators/Interaction";
+import { Interaction } from "@decorators/params";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
@@ -41,7 +42,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 	}
 
 	@SelectMenuPattern("module_config:*")
-	async handlePropertySelection(interaction: StringSelectMenuInteraction) {
+	async handlePropertySelection(@Interaction() interaction: StringSelectMenuInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts, userId } = ctx;
@@ -179,7 +180,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 	}
 
 	@ButtonPattern("module_config_cancel:*")
-	async handleCancelButton(interaction: ButtonInteraction) {
+	async handleCancelButton(@Interaction() interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 
@@ -190,7 +191,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 	}
 
 	@ButtonPattern("module_config_clear:*")
-	async handleClearButton(interaction: ButtonInteraction) {
+	async handleClearButton(@Interaction() interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts, userId } = ctx;

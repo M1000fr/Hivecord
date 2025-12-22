@@ -4,6 +4,7 @@ import {
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
 import { SelectMenuPattern } from "@decorators/Interaction";
+import { Interaction } from "@decorators/params";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -22,7 +23,7 @@ import { BaseConfigInteractions } from "./BaseConfigInteractions";
 @ConfigInteraction()
 export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 	@SelectMenuPattern("module_config_role:*")
-	async handleRoleSelection(interaction: RoleSelectMenuInteraction) {
+	async handleRoleSelection(@Interaction() interaction: RoleSelectMenuInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts } = ctx;
@@ -53,7 +54,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 	}
 
 	@SelectMenuPattern("module_config_channel:*")
-	async handleChannelSelection(interaction: ChannelSelectMenuInteraction) {
+	async handleChannelSelection(@Interaction() interaction: ChannelSelectMenuInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
 		const { client, parts } = ctx;
