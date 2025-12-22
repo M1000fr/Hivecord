@@ -1,9 +1,9 @@
+import {
+	CommandParamType,
+	registerCommandParameter,
+} from "@decorators/params/index";
 import { DependencyContainer } from "@di/DependencyContainer";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import {
-	registerCommandParameter,
-	CommandParamType,
-} from "@decorators/params/index";
 import "reflect-metadata";
 
 const GUILD_CONFIG_METADATA_KEY = "lebot:param:guild-config";
@@ -44,7 +44,11 @@ export function extractGuildIdFromContext(context: unknown): string | null {
 			}
 
 			// guild.id pattern
-			if (obj.guild && typeof obj.guild === "object" && "id" in obj.guild) {
+			if (
+				obj.guild &&
+				typeof obj.guild === "object" &&
+				"id" in obj.guild
+			) {
 				const guild = obj.guild as Record<string, unknown>;
 				if (typeof guild.id === "string") return guild.id;
 			}
@@ -129,12 +133,14 @@ export async function resolveGuildConfig(
 	const configService = container.resolve(ConfigService);
 
 	const config = configService.of(guildId, configKey.configClass);
-	const value = await (config as Record<string, unknown>)[configKey.propertyKey];
-	
+	const value = await (config as Record<string, unknown>)[
+		configKey.propertyKey
+	];
+
 	// If value is null/undefined, use the default from configKey
 	if (value === null || value === undefined) {
 		return configKey.defaultValue;
 	}
-	
+
 	return value;
 }

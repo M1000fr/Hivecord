@@ -61,8 +61,8 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		)) as string[];
 
 		const lng =
-			(await this.configService.of(guildId, GeneralConfig)
-				.Language) ?? "en";
+			(await this.configService.of(guildId, GeneralConfig).Language) ??
+			"en";
 		const t = i18next.getFixedT(lng);
 
 		const displayValue =

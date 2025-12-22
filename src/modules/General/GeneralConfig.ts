@@ -1,5 +1,9 @@
 import { ConfigContext } from "@decorators/ConfigContext";
-import { ConfigProperty, EConfigType, configKey } from "@decorators/ConfigProperty";
+import {
+	ConfigProperty,
+	EConfigType,
+	configKey,
+} from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 import { CUSTOM_EMBED_CONFIG_KEY } from "@src/modules/CustomEmbed/CustomEmbedConfigKey";

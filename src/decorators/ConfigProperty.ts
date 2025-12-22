@@ -51,7 +51,9 @@ export function configKey<T>(defaultValue?: T): T {
 export function ConfigProperty(options: ConfigPropertyOptions) {
 	return function (target: object, propertyKey: string) {
 		const isStatic = typeof target === "function";
-		const constructor = (isStatic ? target : target.constructor) as unknown as {
+		const constructor = (isStatic
+			? target
+			: target.constructor) as unknown as {
 			configProperties?: Record<string, ConfigPropertyOptions>;
 		};
 
@@ -62,7 +64,11 @@ export function ConfigProperty(options: ConfigPropertyOptions) {
 
 		// If the property was initialized with configKey(), attach metadata to it
 		const val = (target as Record<string, unknown>)[propertyKey];
-		if (val && typeof val === "object" && (val as Record<string, unknown>).__isConfigKey) {
+		if (
+			val &&
+			typeof val === "object" &&
+			(val as Record<string, unknown>).__isConfigKey
+		) {
 			const configKeyVal = val as unknown as {
 				configClass?: unknown;
 				propertyKey?: string;

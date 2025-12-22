@@ -30,10 +30,7 @@ export class ConfigService {
 		private readonly roleConfig: RoleConfigService,
 	) {}
 
-	of<T>(
-		guildId: string,
-		configClass: T,
-	): ConfigProxy<T> {
+	of<T>(guildId: string, configClass: T): ConfigProxy<T> {
 		const metadata = (configClass as unknown as IConfigClass)
 			.configProperties;
 
