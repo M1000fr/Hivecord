@@ -3,6 +3,7 @@ import "reflect-metadata";
 export * from "./Client";
 export * from "./Context";
 export * from "./GuildLanguage";
+export * from "./Interaction";
 export * from "./TargetMessage";
 export * from "./TargetUser";
 export * from "./Translate";
