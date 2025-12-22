@@ -1,6 +1,7 @@
 import { ConfigContext } from "@decorators/ConfigContext";
 import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
+import { CUSTOM_EMBED_CONFIG_TYPE } from "@modules/CustomEmbed/CustomEmbedConfigType";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 
 @ModuleConfig()
@@ -89,7 +90,7 @@ export class GeneralConfig {
 		descriptionLocalizations: {
 			fr: "Le nom de l'embed personnalisé à utiliser",
 		},
-		type: EConfigType.CustomEmbed,
+		type: CUSTOM_EMBED_CONFIG_TYPE,
 	})
 	generalWelcomeEmbedName: string = "";
 
