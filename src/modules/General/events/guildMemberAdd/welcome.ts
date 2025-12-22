@@ -4,6 +4,7 @@ import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
+import { GuildConfig } from "@decorators/params/GuildConfig";
 import { BotEvents } from "@enums/BotEvents";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { CustomEmbedService } from "@modules/CustomEmbed/services/CustomEmbedService";
@@ -17,6 +18,7 @@ import {
 } from "discord.js";
 import path from "path";
 import { GeneralConfig } from "../../GeneralConfig";
+import { GeneralConfigKey } from "../../GeneralConfigKey";
 
 @EventController()
 export default class WelcomeEvent {
@@ -32,18 +34,26 @@ export default class WelcomeEvent {
 		@Client() client: LeBotClient<true>,
 		@Context()
 		[member]: ContextOf<typeof BotEvents.GuildMemberAdd>,
+
+		@GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeChannelId)
+		welcomeChannelId: string | undefined,
+
+		@GuildConfig(GeneralConfig, GeneralConfigKey.Language)
+		language: string,
+
+		@GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeEmbedName)
+		welcomeEmbedName: string | undefined,
+
+		@GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeBackground)
+		configuredBackground: string | undefined,
+
+		@GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeMessageImage)
+		welcomeMessageImageConfig: string,
+
+		@GuildConfig(GeneralConfig, GeneralConfigKey.WelcomeMessage)
+		welcomeMessageConfig: string,
 	) {
 		try {
-			const welcomeChannelId = await this.configService.of(
-				member.guild.id,
-				GeneralConfig,
-			).generalWelcomeChannelId;
-
-			const language = await this.configService.of(
-				member.guild.id,
-				GeneralConfig,
-			).generalLanguage;
-
 			if (!welcomeChannelId) {
 				this.logger.warn(
 					`No welcome channel configured for guild ${member.guild.id}.`,
@@ -67,18 +77,6 @@ export default class WelcomeEvent {
 				member: member,
 			};
 
-			// Check for custom embed
-			const welcomeEmbedName = await this.configService.of(
-				member.guild.id,
-				GeneralConfig,
-			).generalWelcomeEmbedName;
-
-			// Get configured background
-			const configuredBackground = await this.configService.of(
-				member.guild.id,
-				GeneralConfig,
-			).generalWelcomeBackground;
-
 			const backgroundPath = configuredBackground
 				? path.join(process.cwd(), configuredBackground)
 				: null;
@@ -88,13 +86,8 @@ export default class WelcomeEvent {
 				size: 256,
 			});
 
-			const welcomeMessageImageConfig = await this.configService.of(
-				member.guild.id,
-				GeneralConfig,
-			).generalWelcomeMessageImage;
-
 			const welcomeMessageImageTemplate = new MessageTemplate(
-				welcomeMessageImageConfig || "Welcome!",
+				welcomeMessageImageConfig,
 				language,
 			);
 			Object.entries(commonContext).forEach(([key, value]) => {
@@ -110,11 +103,6 @@ export default class WelcomeEvent {
 				backgroundPath,
 				welcomeMessageImage,
 			);
-
-			const welcomeMessageConfig = await this.configService.of(
-				member.guild.id,
-				GeneralConfig,
-			).generalWelcomeMessage;
 
 			const attachment = new AttachmentBuilder(buffer, {
 				name: "welcome.gif",
