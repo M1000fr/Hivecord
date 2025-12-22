@@ -7,12 +7,9 @@ import { OptionRoute } from "@decorators/OptionRoute";
 import { Client, GuildLanguage } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { WelcomeRoleSyncService } from "@modules/General/services/WelcomeRoleSyncService";
+import type { CommandAutocompleteContext } from "@src/types/CommandAutocompleteContext";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
-import {
-	ChatInputCommandInteraction,
-	AutocompleteInteraction as DiscordAutocompleteInteraction,
-	PermissionFlagsBits,
-} from "discord.js";
+import { ChatInputCommandInteraction, PermissionFlagsBits } from "discord.js";
 import { syncOptions } from "./syncOptions";
 
 @CommandController(syncOptions)
@@ -24,7 +21,7 @@ export default class SyncCommand {
 	@Autocomplete({ optionName: "target" })
 	async autocompleteTarget(
 		@Client() client: LeBotClient,
-		@AutocompleteInteraction() interaction: DiscordAutocompleteInteraction,
+		@AutocompleteInteraction() [interaction]: CommandAutocompleteContext,
 		@GuildLanguage() lang: GuildLanguageContext,
 	) {
 		const focusedValue = interaction.options.getFocused().toLowerCase();

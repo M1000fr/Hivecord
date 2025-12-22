@@ -9,12 +9,10 @@ import {
 import { Client, GuildLanguage } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import type { CommandAutocompleteContext } from "@src/types/CommandAutocompleteContext.ts";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { ConfigHelper } from "@utils/ConfigHelper";
-import {
-	ChatInputCommandInteraction,
-	AutocompleteInteraction as DiscordAutocompleteInteraction,
-} from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { modulesOptions } from "./modulesOptions.ts";
 
 @Injectable()
@@ -28,7 +26,7 @@ export default class ModulesCommand {
 	@Autocomplete({ optionName: "module" })
 	async autocompleteModule(
 		@Client() client: LeBotClient<true>,
-		@AutocompleteInteraction() interaction: DiscordAutocompleteInteraction,
+		@AutocompleteInteraction() [interaction]: CommandAutocompleteContext,
 	) {
 		const focusedValue = interaction.options.getFocused().toLowerCase();
 

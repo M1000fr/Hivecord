@@ -11,12 +11,9 @@ import {
 	AutocompleteInteraction,
 	CommandInteraction,
 } from "@src/decorators/Interaction";
+import type { CommandAutocompleteContext } from "@src/types/CommandAutocompleteContext";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
-import {
-	ChatInputCommandInteraction,
-	AutocompleteInteraction as DiscordAutocompleteInteraction,
-	EmbedBuilder,
-} from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { embedOptions } from "./embedOptions";
 import { EmbedEditorMenus } from "./utils/EmbedEditorMenus";
 
@@ -31,7 +28,7 @@ export default class EmbedCommand {
 	@Autocomplete({ optionName: "name" })
 	async autocompleteName(
 		@Client() client: LeBotClient<true>,
-		@AutocompleteInteraction() interaction: DiscordAutocompleteInteraction,
+		@AutocompleteInteraction() [interaction]: CommandAutocompleteContext,
 	) {
 		const focusedValue = interaction.options.getFocused();
 		const embeds = await this.customEmbedService.list(interaction.guildId!);
