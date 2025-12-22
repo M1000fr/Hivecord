@@ -29,8 +29,12 @@ import { CoreModule } from "@modules/Core/CoreModule";
 	name: "General",
 	imports: [CoreModule, ConfigurationModule],
 	config: GeneralConfig,
-	commands: [PingCommand, GetAvatarCommand, CopyMessageCommand],
-	events: [
+	providers: [
+		// Commands
+		PingCommand,
+		GetAvatarCommand,
+		CopyMessageCommand,
+		// Events
 		ReadyEvent,
 		ResumeWelcomeSyncEvent,
 		CommandHandlerEvent,
@@ -43,8 +47,7 @@ import { CoreModule } from "@modules/Core/CoreModule";
 		GuildMemberRemoveSyncEvent,
 		ChannelSync,
 		GuildSync,
-	],
-	providers: [
+		// Services
 		SpacerService,
 		SyncService,
 		WelcomeImageService,

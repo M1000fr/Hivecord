@@ -14,9 +14,11 @@ import { CoreModule } from "@modules/Core/CoreModule";
 @Module({
 	name: "Configuration",
 	imports: [CoreModule],
-	commands: [ModulesCommand, ConfigCommand],
-	events: [],
 	providers: [
+		// Commands
+		ModulesCommand,
+		ConfigCommand,
+		// Services
 		BackupService,
 		ConfigService,
 		ModuleConfigInteractions,

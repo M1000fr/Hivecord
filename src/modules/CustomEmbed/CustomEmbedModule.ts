@@ -8,9 +8,10 @@ import { CustomEmbedService } from "./services/CustomEmbedService";
 @Module({
 	name: "CustomEmbed",
 	imports: [CoreModule],
-	commands: [EmbedCommand],
-	events: [],
 	providers: [
+		// Commands
+		EmbedCommand,
+		// Services
 		CustomEmbedService,
 		EmbedEditorInteractions,
 		CustomEmbedConfigHandler,

@@ -5,8 +5,11 @@ export type ProviderScope = "module" | "global";
 
 export type ProviderToken = Constructor | string | symbol;
 
+export type ProviderType = "service" | "command" | "event";
+
 export interface InjectableOptions {
 	scope?: ProviderScope;
+	type?: ProviderType;
 }
 
 export interface BaseProvider {
@@ -36,6 +39,7 @@ export type Provider =
 export interface ResolvedProvider {
 	token: ProviderToken;
 	scope: ProviderScope;
+	type?: ProviderType;
 	useClass?: Constructor;
 	useValue?: unknown;
 	useFactory?: (...args: unknown[]) => unknown;
@@ -46,3 +50,5 @@ export interface ResolvedProvider {
 export const INJECTABLE_METADATA_KEY = "lebot:injectable:options";
 export const INJECT_METADATA_KEY = "lebot:inject:tokens";
 export const MODULE_OPTIONS_METADATA_KEY = "lebot:module:options";
+export const PROVIDER_TYPE_METADATA_KEY = "lebot:provider:type";
+

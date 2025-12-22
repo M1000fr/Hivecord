@@ -1,12 +1,16 @@
 import { Injectable } from "@decorators/Injectable";
+import { PROVIDER_TYPE_METADATA_KEY } from "@di/types";
 import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
+import "reflect-metadata";
 
 export function CommandController(options: CommandOptions) {
 	return function (target: abstract new (...args: never[]) => object) {
 		// Apply @Injectable() automatically
 		Injectable()(target);
+		// Mark as command provider
+		Reflect.defineMetadata(PROVIDER_TYPE_METADATA_KEY, "command", target);
 		
 		const commandClass = target as unknown as ICommandClass;
 		commandClass.commandOptions = options;

@@ -15,6 +15,7 @@ import type { IModuleInstance } from "@interfaces/IModuleInstance.ts";
 import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
 import { PermissionService } from "@modules/Core/services/PermissionService";
 import { PrismaService } from "@modules/Core/services/PrismaService";
+import { getProvidersByType } from "@utils/getProvidersByType";
 import { Logger } from "@utils/Logger";
 import { createHash } from "crypto";
 import {
@@ -208,11 +209,14 @@ export class LeBotClient<
 	}
 
 	private loadCommands(options: ModuleOptions): void {
-		if (!options.commands) return;
-
 		const moduleName = options.name;
 
-		for (const CommandClass of options.commands) {
+		if (!options.providers) return;
+
+		// Extract commands from providers
+		const commandClasses = getProvidersByType(options.providers, "command");
+
+		for (const CommandClass of commandClasses) {
 			// Check if it's a context menu command
 			const contextMenuOptions = (
 				CommandClass as unknown as IContextMenuCommandClass
@@ -260,11 +264,14 @@ export class LeBotClient<
 	}
 
 	private loadEvents(options: ModuleOptions): void {
-		if (!options.events) return;
-
 		const moduleName = options.name;
 
-		for (const EventClass of options.events) {
+		if (!options.providers) return;
+
+		// Extract events from providers
+		const eventClasses = getProvidersByType(options.providers, "event");
+
+		for (const EventClass of eventClasses) {
 			const instance = this.container.resolve(
 				EventClass as unknown as Constructor<object>,
 				moduleName,
@@ -359,35 +366,20 @@ export class LeBotClient<
 		for (const [, { options }] of registeredModules) {
 			this.logger.log(`Loading module: ${options.name}`);
 
-			// Validate providers
+			// Validate all providers
 			if (options.providers) {
 				const providerClasses = options.providers.filter(
 					(p): p is Constructor =>
 						typeof p === "function" && "prototype" in p,
 				);
-				const errors = this.validateInjectableClasses(
-					providerClasses,
-					`module "${options.name}" providers`,
-				);
-				allErrors.push(...errors);
-			}
-
-			// Validate commands
-			if (options.commands) {
-				const errors = this.validateInjectableClasses(
-					options.commands,
-					`module "${options.name}" commands`,
-				);
-				allErrors.push(...errors);
-			}
-
-			// Validate events
-			if (options.events) {
-				const errors = this.validateInjectableClasses(
-					options.events,
-					`module "${options.name}" events`,
-				);
-				allErrors.push(...errors);
+				
+				if (providerClasses.length > 0) {
+					const errors = this.validateInjectableClasses(
+						providerClasses,
+						`module "${options.name}"`,
+					);
+					allErrors.push(...errors);
+				}
 			}
 		}
 
