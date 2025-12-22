@@ -35,18 +35,24 @@ export class ConfigHelper {
 			: str;
 	}
 
-	static getTypeName(type: EConfigType, t: TFunction): string {
+	static getTypeName(type: EConfigType | string, t: TFunction): string {
+		if (typeof type === "string") {
+			return type;
+		}
 		const key = `utils.config_helper.types.${EConfigType[type].toLowerCase()}`;
 		return t(key, { defaultValue: EConfigType[type] });
 	}
 
 	static formatValue(
 		value: string | string[],
-		type: EConfigType,
+		type: EConfigType | string,
 		t: TFunction,
 		options?: ConfigPropertyOptions,
 		locale?: string,
 	): string {
+		if (typeof type === "string") {
+			return this.truncate(String(value), 100);
+		}
 		if (type === EConfigType.Role) return `<@&${value}>`;
 		if (type === EConfigType.RoleArray && Array.isArray(value))
 			return value.map((v) => `<@&${v}>`).join(", ");
@@ -80,7 +86,7 @@ export class ConfigHelper {
 	async fetchValue(
 		guildId: string,
 		key: string,
-		type: EConfigType,
+		type: EConfigType | string,
 	): Promise<string | string[] | null> {
 		const snakeKey = ConfigHelper.toSnakeCase(key);
 		let value: string | string[] | null = null;
@@ -156,7 +162,7 @@ export class ConfigHelper {
 	async getCurrentValue(
 		guildId: string,
 		key: string,
-		type: EConfigType,
+		type: EConfigType | string,
 		t: TFunction,
 		options?: ConfigPropertyOptions,
 		locale?: string,

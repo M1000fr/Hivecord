@@ -112,7 +112,7 @@ export abstract class BaseConfigInteractions {
 		moduleName: string,
 		propertyKey: string,
 		value: string | string[],
-		type: EConfigType,
+		type: EConfigType | string,
 		silent = false,
 		deleteMessage = false,
 	) {
