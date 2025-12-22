@@ -1,5 +1,5 @@
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
-import { Interaction as InteractionDecorator } from "@decorators/params";
+import { Interaction as InteractionParam } from "@decorators/params";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
@@ -87,7 +87,7 @@ export class EmbedEditorInteractions {
 
 	@SelectMenu("embed_editor_menu")
 	async handleMainMenu(
-		@InteractionDecorator() interaction: StringSelectMenuInteraction,
+		@InteractionParam() interaction: StringSelectMenuInteraction,
 	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
@@ -127,7 +127,7 @@ export class EmbedEditorInteractions {
 
 	@SelectMenu("embed_editor_fields_menu")
 	async handleFieldsMenu(
-		@InteractionDecorator() interaction: StringSelectMenuInteraction,
+		@InteractionParam() interaction: StringSelectMenuInteraction,
 	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
@@ -211,7 +211,7 @@ export class EmbedEditorInteractions {
 	}
 
 	@Button("embed_editor_save")
-	async handleSave(@InteractionDecorator() interaction: ButtonInteraction) {
+	async handleSave(@InteractionParam() interaction: ButtonInteraction) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -231,7 +231,7 @@ export class EmbedEditorInteractions {
 	}
 
 	@Button("embed_editor_cancel")
-	async handleCancel(@InteractionDecorator() interaction: ButtonInteraction) {
+	async handleCancel(@InteractionParam() interaction: ButtonInteraction) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -247,7 +247,7 @@ export class EmbedEditorInteractions {
 
 	@Modal("modal_embed_title")
 	async handleTitleModal(
-		@InteractionDecorator() interaction: ModalSubmitInteraction,
+		@InteractionParam() interaction: ModalSubmitInteraction,
 	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
@@ -270,7 +270,7 @@ export class EmbedEditorInteractions {
 
 	@Modal("modal_embed_description")
 	async handleDescriptionModal(
-		@InteractionDecorator() interaction: ModalSubmitInteraction,
+		@InteractionParam() interaction: ModalSubmitInteraction,
 	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
@@ -291,7 +291,7 @@ export class EmbedEditorInteractions {
 
 	@Modal("modal_embed_author")
 	async handleAuthorModal(
-		@InteractionDecorator() interaction: ModalSubmitInteraction,
+		@InteractionParam() interaction: ModalSubmitInteraction,
 	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
@@ -319,7 +319,7 @@ export class EmbedEditorInteractions {
 
 	@Modal("modal_embed_footer")
 	async handleFooterModal(
-		@InteractionDecorator() interaction: ModalSubmitInteraction,
+		@InteractionParam() interaction: ModalSubmitInteraction,
 	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
@@ -347,7 +347,7 @@ export class EmbedEditorInteractions {
 
 	@Modal("modal_embed_images")
 	async handleImagesModal(
-		@InteractionDecorator() interaction: ModalSubmitInteraction,
+		@InteractionParam() interaction: ModalSubmitInteraction,
 	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
@@ -380,7 +380,7 @@ export class EmbedEditorInteractions {
 
 	@Modal("modal_embed_color")
 	async handleColorModal(
-		@InteractionDecorator() interaction: ModalSubmitInteraction,
+		@InteractionParam() interaction: ModalSubmitInteraction,
 	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
@@ -409,7 +409,7 @@ export class EmbedEditorInteractions {
 
 	@Modal("modal_embed_field")
 	async handleFieldModal(
-		@InteractionDecorator() interaction: ModalSubmitInteraction,
+		@InteractionParam() interaction: ModalSubmitInteraction,
 	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
