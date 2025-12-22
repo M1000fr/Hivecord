@@ -30,7 +30,6 @@ import { CoreModule } from "@modules/Core/CoreModule";
 	imports: [CoreModule, ConfigurationModule],
 	config: GeneralConfig,
 	commands: [PingCommand, GetAvatarCommand, CopyMessageCommand],
-	interactions: [PingCommandInteractions],
 	events: [
 		ReadyEvent,
 		ResumeWelcomeSyncEvent,
@@ -51,6 +50,7 @@ import { CoreModule } from "@modules/Core/CoreModule";
 		WelcomeImageService,
 		WelcomeRoleService,
 		WelcomeRoleSyncService,
+		PingCommandInteractions,
 	],
 	exports: [
 		SpacerService,

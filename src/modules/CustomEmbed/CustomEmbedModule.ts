@@ -10,8 +10,11 @@ import { CustomEmbedConfigHandler } from "@modules/CustomEmbed/handlers/CustomEm
 	imports: [CoreModule],
 	commands: [EmbedCommand],
 	events: [],
-	interactions: [EmbedEditorInteractions, CustomEmbedConfigHandler],
-	providers: [CustomEmbedService, CustomEmbedConfigHandler],
+	providers: [
+		CustomEmbedService,
+		EmbedEditorInteractions,
+		CustomEmbedConfigHandler,
+	],
 	exports: [CustomEmbedService],
 })
 export class CustomEmbedModule {}

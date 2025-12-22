@@ -16,14 +16,15 @@ import { CoreModule } from "@modules/Core/CoreModule";
 	imports: [CoreModule],
 	commands: [ModulesCommand, ConfigCommand],
 	events: [],
-	interactions: [
+	providers: [
+		BackupService,
+		ConfigService,
 		ModuleConfigInteractions,
 		BooleanConfigInteractions,
 		StringConfigInteractions,
 		RoleChannelConfigInteractions,
 		StringArrayConfigInteractions,
 	],
-	providers: [BackupService, ConfigService],
 	exports: [BackupService, ConfigService],
 })
 export class ConfigurationModule {}
