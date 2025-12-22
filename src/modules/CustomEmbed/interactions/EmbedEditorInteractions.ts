@@ -1,4 +1,5 @@
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
+import { Interaction as InteractionDecorator } from "@decorators/params";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
@@ -85,7 +86,9 @@ export class EmbedEditorInteractions {
 	}
 
 	@SelectMenu("embed_editor_menu")
-	async handleMainMenu(interaction: StringSelectMenuInteraction) {
+	async handleMainMenu(
+		@InteractionDecorator() interaction: StringSelectMenuInteraction,
+	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -123,7 +126,9 @@ export class EmbedEditorInteractions {
 	}
 
 	@SelectMenu("embed_editor_fields_menu")
-	async handleFieldsMenu(interaction: StringSelectMenuInteraction) {
+	async handleFieldsMenu(
+		@InteractionDecorator() interaction: StringSelectMenuInteraction,
+	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -206,7 +211,7 @@ export class EmbedEditorInteractions {
 	}
 
 	@Button("embed_editor_save")
-	async handleSave(interaction: ButtonInteraction) {
+	async handleSave(@InteractionDecorator() interaction: ButtonInteraction) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -226,7 +231,7 @@ export class EmbedEditorInteractions {
 	}
 
 	@Button("embed_editor_cancel")
-	async handleCancel(interaction: ButtonInteraction) {
+	async handleCancel(@InteractionDecorator() interaction: ButtonInteraction) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -241,7 +246,9 @@ export class EmbedEditorInteractions {
 	}
 
 	@Modal("modal_embed_title")
-	async handleTitleModal(interaction: ModalSubmitInteraction) {
+	async handleTitleModal(
+		@InteractionDecorator() interaction: ModalSubmitInteraction,
+	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -262,7 +269,9 @@ export class EmbedEditorInteractions {
 	}
 
 	@Modal("modal_embed_description")
-	async handleDescriptionModal(interaction: ModalSubmitInteraction) {
+	async handleDescriptionModal(
+		@InteractionDecorator() interaction: ModalSubmitInteraction,
+	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -281,7 +290,9 @@ export class EmbedEditorInteractions {
 	}
 
 	@Modal("modal_embed_author")
-	async handleAuthorModal(interaction: ModalSubmitInteraction) {
+	async handleAuthorModal(
+		@InteractionDecorator() interaction: ModalSubmitInteraction,
+	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -307,7 +318,9 @@ export class EmbedEditorInteractions {
 	}
 
 	@Modal("modal_embed_footer")
-	async handleFooterModal(interaction: ModalSubmitInteraction) {
+	async handleFooterModal(
+		@InteractionDecorator() interaction: ModalSubmitInteraction,
+	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -333,7 +346,9 @@ export class EmbedEditorInteractions {
 	}
 
 	@Modal("modal_embed_images")
-	async handleImagesModal(interaction: ModalSubmitInteraction) {
+	async handleImagesModal(
+		@InteractionDecorator() interaction: ModalSubmitInteraction,
+	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -364,7 +379,9 @@ export class EmbedEditorInteractions {
 	}
 
 	@Modal("modal_embed_color")
-	async handleColorModal(interaction: ModalSubmitInteraction) {
+	async handleColorModal(
+		@InteractionDecorator() interaction: ModalSubmitInteraction,
+	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
@@ -391,7 +408,9 @@ export class EmbedEditorInteractions {
 	}
 
 	@Modal("modal_embed_field")
-	async handleFieldModal(interaction: ModalSubmitInteraction) {
+	async handleFieldModal(
+		@InteractionDecorator() interaction: ModalSubmitInteraction,
+	) {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
