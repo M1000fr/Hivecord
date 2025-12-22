@@ -1,14 +1,14 @@
-import { DependencyContainer } from "@di/DependencyContainer";
-import { RedisService } from "@modules/Core/services/RedisService";
+import type { TFunction } from "@modules/Core/services/I18nService";
+import { I18nService } from "@modules/Core/services/I18nService";
+import type { RedisService } from "@modules/Core/services/RedisService";
 import { PagerRegistry } from "@registers/PagerRegistry";
+import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
-	ButtonInteraction,
 	ButtonStyle,
 	EmbedBuilder,
 	InteractionCollector,
-	StringSelectMenuInteraction,
 	type BaseMessageOptions,
 	type ChannelSelectMenuBuilder,
 	type CollectedInteraction,
@@ -37,7 +37,7 @@ export interface PagerOptions<T> {
 		totalPages: number,
 	) => Promise<{
 		embeds: EmbedBuilder[];
-		components: ActionRowBuilder<PagerComponentBuilder>[];
+		components?: ActionRowBuilder<PagerComponentBuilder>[];
 		files?: BaseMessageOptions["files"];
 	}>;
 	filter?: (interaction: Interaction) => boolean;
@@ -48,6 +48,7 @@ export interface PagerOptions<T> {
 	) => Promise<void>;
 	type?: string; // Unique identifier for the pager type (required for persistence)
 	userId?: string; // User ID allowed to interact (for persistence)
+	languageContext: GuildLanguageContext;
 }
 
 export class Pager<T> {
@@ -60,7 +61,7 @@ export class Pager<T> {
 		totalPages: number,
 	) => Promise<{
 		embeds: EmbedBuilder[];
-		components: ActionRowBuilder<PagerComponentBuilder>[];
+		components?: ActionRowBuilder<PagerComponentBuilder>[];
 		files?: BaseMessageOptions["files"];
 	}>;
 	private filter: (interaction: Interaction) => boolean;
@@ -71,8 +72,11 @@ export class Pager<T> {
 	) => Promise<void>;
 	private type?: string;
 	private userId?: string;
+	private t: TFunction;
+	private locale: string; // Stored for Redis serialization
+	private redisService: RedisService;
 
-	constructor(options: PagerOptions<T>) {
+	constructor(options: PagerOptions<T>, redisService: RedisService) {
 		this.items = options.items;
 		this.itemsPerPage = options.itemsPerPage;
 		this.renderPage = options.renderPage!;
@@ -81,6 +85,11 @@ export class Pager<T> {
 		this.onComponent = options.onComponent;
 		this.type = options.type;
 		this.userId = options.userId;
+		this.redisService = redisService;
+
+		this.locale = options.languageContext.locale || "en";
+		this.t =
+			options.languageContext.t || I18nService.getFixedT(this.locale);
 
 		if (this.type && !this.renderPage) {
 			const definition = PagerRegistry.get(this.type);
@@ -105,25 +114,26 @@ export class Pager<T> {
 				totalPages,
 			);
 
-			const navigationRow = new ActionRowBuilder<ButtonBuilder>();
+			const finalComponents = components ? [...components] : [];
 
 			if (totalPages > 1) {
+				const navigationRow = new ActionRowBuilder<ButtonBuilder>();
 				navigationRow.addComponents(
 					new ButtonBuilder()
 						.setCustomId("pager_prev")
-						.setLabel("Previous")
+						.setLabel(this.t("utils.pager.previous"))
 						.setStyle(ButtonStyle.Secondary)
 						.setDisabled(this.currentPage === 0),
 					new ButtonBuilder()
 						.setCustomId("pager_next")
-						.setLabel("Next")
+						.setLabel(this.t("utils.pager.next"))
 						.setStyle(ButtonStyle.Secondary)
 						.setDisabled(this.currentPage === totalPages - 1),
 				);
-				components.push(navigationRow);
+				finalComponents.push(navigationRow);
 			}
 
-			return { embeds, components, files: files || [] };
+			return { embeds, components: finalComponents, files: files || [] };
 		};
 
 		const initialContent = await getPageContent();
@@ -138,9 +148,7 @@ export class Pager<T> {
 
 		// If persistent, save state and return (don't start collector)
 		if (this.type) {
-			const redisService =
-				DependencyContainer.getInstance().resolve(RedisService);
-			const redis = redisService.client;
+			const redis = this.redisService.client;
 			const state = {
 				items: this.items,
 				itemsPerPage: this.itemsPerPage,
@@ -148,6 +156,7 @@ export class Pager<T> {
 				type: this.type,
 				userId: this.userId,
 				totalPages: totalPages,
+				locale: this.locale,
 			};
 			await redis.set(`pager:${message.id}`, JSON.stringify(state));
 			// Set expiry if needed, e.g. 1 hour
@@ -163,9 +172,8 @@ export class Pager<T> {
 		collector.on("collect", async (i) => {
 			if (this.userId && i.user.id !== this.userId) {
 				await i.reply({
-					content:
-						"❌ You are not allowed to interact with this pager.",
-					flags: [64],
+					content: this.t("utils.pager.not_allowed"),
+					ephemeral: true,
 				});
 				return;
 			}
@@ -195,133 +203,33 @@ export class Pager<T> {
 		return collector;
 	}
 
-	static async handleInteraction(
-		interaction: ButtonInteraction | StringSelectMenuInteraction,
-	) {
-		const redisService =
-			DependencyContainer.getInstance().resolve(RedisService);
-		const redis = redisService.client;
-		const key = `pager:${interaction.message.id}`;
+	/**
+	 * Create navigation buttons for pager
+	 * @param currentPage Current page index
+	 * @param totalPages Total number of pages
+	 * @param t Translation function
+	 * @returns ActionRow with navigation buttons or null if only one page
+	 */
+	static createNavigationRow(
+		currentPage: number,
+		totalPages: number,
+		t: TFunction,
+	): ActionRowBuilder<ButtonBuilder> | null {
+		if (totalPages <= 1) return null;
 
-		const data = await redis.get(key);
-
-		if (!data) return false; // Not a pager interaction
-
-		const state = JSON.parse(data);
-
-		// Check ownership
-		if (state.userId && interaction.user.id !== state.userId) {
-			await interaction.reply({
-				content: "❌ You are not allowed to interact with this pager.",
-				flags: [64], // Ephemeral
-			});
-			return true;
-		}
-
-		const definition = PagerRegistry.get(state.type);
-		if (!definition) {
-			console.error(`Pager type ${state.type} not found in registry`);
-			return false;
-		}
-
-		const totalPages = Math.ceil(state.items.length / state.itemsPerPage);
-
-		if (interaction.customId === "pager_prev") {
-			if (state.currentPage > 0) {
-				state.currentPage--;
-				await redis.set(key, JSON.stringify(state));
-				await redis.expire(key, 3600);
-
-				const start = state.currentPage * state.itemsPerPage;
-				const end = start + state.itemsPerPage;
-				const pageItems = state.items.slice(start, end);
-
-				const { embeds, components, files } =
-					await definition.renderPage(
-						pageItems,
-						state.currentPage,
-						totalPages,
-					);
-
-				const navigationRow = new ActionRowBuilder<ButtonBuilder>();
-				if (totalPages > 1) {
-					navigationRow.addComponents(
-						new ButtonBuilder()
-							.setCustomId("pager_prev")
-							.setLabel("Previous")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(state.currentPage === 0),
-						new ButtonBuilder()
-							.setCustomId("pager_next")
-							.setLabel("Next")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(state.currentPage === totalPages - 1),
-					);
-					components.push(navigationRow);
-				}
-
-				await interaction.update({
-					embeds,
-					components,
-					files: files || [],
-				});
-			} else {
-				await interaction.deferUpdate();
-			}
-			return true;
-		} else if (interaction.customId === "pager_next") {
-			if (state.currentPage < totalPages - 1) {
-				state.currentPage++;
-				await redis.set(key, JSON.stringify(state));
-				await redis.expire(key, 3600);
-
-				const start = state.currentPage * state.itemsPerPage;
-				const end = start + state.itemsPerPage;
-				const pageItems = state.items.slice(start, end);
-
-				const { embeds, components, files } =
-					await definition.renderPage(
-						pageItems,
-						state.currentPage,
-						totalPages,
-					);
-
-				const navigationRow = new ActionRowBuilder<ButtonBuilder>();
-				if (totalPages > 1) {
-					navigationRow.addComponents(
-						new ButtonBuilder()
-							.setCustomId("pager_prev")
-							.setLabel("Previous")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(state.currentPage === 0),
-						new ButtonBuilder()
-							.setCustomId("pager_next")
-							.setLabel("Next")
-							.setStyle(ButtonStyle.Secondary)
-							.setDisabled(state.currentPage === totalPages - 1),
-					);
-					components.push(navigationRow);
-				}
-
-				await interaction.update({
-					embeds,
-					components,
-					files: files || [],
-				});
-			} else {
-				await interaction.deferUpdate();
-			}
-			return true;
-		} else {
-			// Custom component
-			if (definition.onComponent) {
-				await definition.onComponent(
-					interaction,
-					state.items,
-					state.currentPage,
-				);
-			}
-			return true;
-		}
+		const navigationRow = new ActionRowBuilder<ButtonBuilder>();
+		navigationRow.addComponents(
+			new ButtonBuilder()
+				.setCustomId("pager_prev")
+				.setLabel(t("utils.pager.previous"))
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(currentPage === 0),
+			new ButtonBuilder()
+				.setCustomId("pager_next")
+				.setLabel(t("utils.pager.next"))
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(currentPage === totalPages - 1),
+		);
+		return navigationRow;
 	}
 }
