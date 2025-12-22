@@ -1,16 +1,44 @@
 import { DependencyContainer } from "@di/DependencyContainer";
 import type { Constructor } from "@di/types";
 import { InteractionRegistry } from "@registers/InteractionRegistry";
+import {
+	COMMAND_PARAMS_METADATA_KEY,
+	type CommandParameter,
+	CommandParamType,
+	registerCommandParameter,
+} from "@decorators/params/index.ts";
 
 function createHandler(target: object, propertyKey: string) {
 	return async (interaction: unknown) => {
 		const container = DependencyContainer.getInstance();
 		const instance = container.resolve(
 			target.constructor as Constructor,
-		) as Record<string, (interaction: unknown) => Promise<void>>;
+		) as Record<string, (...args: unknown[]) => Promise<void>>;
 		const method = instance[propertyKey];
 		if (method) {
-			await method.call(instance, interaction);
+			const params: CommandParameter[] =
+				Reflect.getMetadata(
+					COMMAND_PARAMS_METADATA_KEY,
+					target,
+					propertyKey,
+				) || [];
+
+			const args: unknown[] = [];
+			for (const param of params) {
+				switch (param.type) {
+					case CommandParamType.Client:
+						args[param.index] = container.resolve("Client");
+						break;
+					case CommandParamType.Interaction:
+						args[param.index] = interaction;
+						break;
+					// Ajoutez d'autres cas si nécessaire
+					default:
+						break;
+				}
+			}
+
+			await method.call(instance, ...args);
 		}
 	};
 }
@@ -92,8 +120,6 @@ export function ModalPattern(pattern: string) {
 		);
 	};
 }
-
-import { CommandParamType, registerCommandParameter } from "@decorators/params";
 
 export function CommandInteraction(): ParameterDecorator {
 	return (
