@@ -1,6 +1,6 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { Autocomplete } from "@decorators/Autocomplete";
-import { Command, CommandController } from "@decorators/Command";
+import { Autocomplete } from "@src/decorators/commands/Autocomplete.ts";
+import { Command, CommandController } from "@src/decorators/commands/Command.ts";
 import { Injectable } from "@decorators/Injectable";
 import {
 	AutocompleteInteraction,

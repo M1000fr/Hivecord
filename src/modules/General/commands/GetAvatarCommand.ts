@@ -1,4 +1,4 @@
-import { UserCommand } from "@decorators/UserCommand";
+import { UserCommand } from "@decorators/commands/UserCommand";
 import { Context } from "@decorators/params/Context";
 import { TargetUser } from "@decorators/params/TargetUser";
 import type { UserCommandContext } from "@src/types/UserCommandContext";

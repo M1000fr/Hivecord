@@ -1,4 +1,4 @@
-import { MessageCommand } from "@decorators/MessageCommand";
+import { MessageCommand } from "@decorators/commands/MessageCommand";
 import { Context } from "@decorators/params/Context";
 import { TargetMessage } from "@decorators/params/TargetMessage";
 import type { MessageCommandContext } from "@src/types/MessageCommandContext";

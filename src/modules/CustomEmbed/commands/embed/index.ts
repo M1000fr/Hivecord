@@ -1,8 +1,8 @@
-import { Autocomplete } from "@decorators/Autocomplete";
-import { CommandController } from "@decorators/Command";
+import { Autocomplete } from "@src/decorators/commands/Autocomplete";
+import { CommandController } from "@src/decorators/commands/Command";
 import { Injectable } from "@decorators/Injectable";
 import { Client, GuildLanguage } from "@decorators/params/index.ts";
-import { Subcommand } from "@decorators/Subcommand";
+import { Subcommand } from "@src/decorators/commands/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { CustomEmbedService } from "../../services/CustomEmbedService";

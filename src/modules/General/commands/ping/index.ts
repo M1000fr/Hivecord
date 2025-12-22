@@ -1,4 +1,4 @@
-import { Command, CommandController } from "@decorators/Command";
+import { Command, CommandController } from "@src/decorators/commands/Command";
 import { Inject } from "@decorators/Inject";
 import { Client, GuildLanguage } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
