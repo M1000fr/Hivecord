@@ -20,10 +20,11 @@ import {
 export function RegisterConfigType(
 	definition: ConfigTypeDefinition,
 ): ClassDecorator {
-	return function (target: Function) {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+	return function <TFunction extends Function>(target: TFunction): TFunction {
 		ConfigTypeRegistry.register(definition);
 		return target;
-	};
+	} as ClassDecorator;
 }
 
 /**

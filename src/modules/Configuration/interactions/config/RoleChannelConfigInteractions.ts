@@ -75,7 +75,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 	}
 
 	private buildSelectComponent(
-		type: EConfigType,
+		type: EConfigType | string,
 		moduleName: string,
 		selectedProperty: string,
 		userId: string,

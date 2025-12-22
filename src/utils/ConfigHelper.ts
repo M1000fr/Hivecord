@@ -108,7 +108,7 @@ export class ConfigHelper {
 		guildId: string,
 		key: string,
 		value: string | string[],
-		type: EConfigType,
+		type: EConfigType | string,
 	): Promise<void> {
 		const snakeKey = ConfigHelper.toSnakeCase(key);
 		if (type === EConfigType.Role)
@@ -141,7 +141,7 @@ export class ConfigHelper {
 	async deleteValue(
 		guildId: string,
 		key: string,
-		type: EConfigType,
+		type: EConfigType | string,
 	): Promise<void> {
 		const snakeKey = ConfigHelper.toSnakeCase(key);
 		if (type === EConfigType.Role || type === EConfigType.RoleArray)

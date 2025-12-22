@@ -16,7 +16,7 @@ import {
 
 interface ConfigValue {
 	value: string | string[];
-	type: EConfigType;
+	type: EConfigType | string;
 }
 
 interface ModuleConfig {
@@ -100,7 +100,7 @@ class ConfigExtractor {
 		configService: ConfigService,
 		guildId: string,
 		key: string,
-		type: EConfigType,
+		type: EConfigType | string,
 	): Promise<string | string[] | null> {
 		if (type === EConfigType.Role) {
 			// Check if it's a multi-role configuration
