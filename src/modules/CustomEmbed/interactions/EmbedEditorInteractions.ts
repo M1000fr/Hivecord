@@ -1,6 +1,5 @@
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { CustomEmbedService } from "../services/CustomEmbedService";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import {
@@ -15,6 +14,7 @@ import {
 } from "discord.js";
 import { EmbedEditorMenus } from "../commands/embed/utils/EmbedEditorMenus";
 import { EmbedEditorModals } from "../commands/embed/utils/EmbedEditorModals";
+import { CustomEmbedService } from "../services/CustomEmbedService";
 
 interface EmbedEditorSession {
 	userId?: string;

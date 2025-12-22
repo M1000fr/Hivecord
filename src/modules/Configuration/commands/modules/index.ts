@@ -1,6 +1,4 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { Autocomplete } from "@src/decorators/commands/Autocomplete.ts";
-import { Command, CommandController } from "@src/decorators/commands/Command.ts";
 import { Injectable } from "@decorators/Injectable";
 import {
 	AutocompleteInteraction,
@@ -9,6 +7,11 @@ import {
 import { Client, GuildLanguage } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { Autocomplete } from "@src/decorators/commands/Autocomplete.ts";
+import {
+	Command,
+	CommandController,
+} from "@src/decorators/commands/Command.ts";
 import type { CommandAutocompleteContext } from "@src/types/CommandAutocompleteContext.ts";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { ConfigHelper } from "@utils/ConfigHelper";

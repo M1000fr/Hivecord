@@ -1,8 +1,8 @@
 import { ConfigContext } from "@decorators/ConfigContext";
 import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
-import { CUSTOM_EMBED_CONFIG_TYPE } from "@modules/CustomEmbed/CustomEmbedConfigType";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
+import { CUSTOM_EMBED_CONFIG_TYPE } from "@modules/CustomEmbed/CustomEmbedConfigType";
 
 @ModuleConfig()
 export class GeneralConfig {

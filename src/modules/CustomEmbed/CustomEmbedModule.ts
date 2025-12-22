@@ -1,9 +1,9 @@
 import { Module } from "@decorators/Module";
 import { CoreModule } from "@modules/Core/CoreModule";
+import { CustomEmbedConfigHandler } from "@modules/CustomEmbed/handlers/CustomEmbedConfigHandler";
 import EmbedCommand from "./commands/embed/index";
 import { EmbedEditorInteractions } from "./interactions/EmbedEditorInteractions";
 import { CustomEmbedService } from "./services/CustomEmbedService";
-import { CustomEmbedConfigHandler } from "@modules/CustomEmbed/handlers/CustomEmbedConfigHandler";
 
 @Module({
 	name: "CustomEmbed",

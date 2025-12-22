@@ -1,9 +1,9 @@
-import { Command, CommandController } from "@src/decorators/commands/Command";
 import { Inject } from "@decorators/Inject";
 import { Client, GuildLanguage } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { PagerService } from "@modules/Core/services/PagerService";
 import type { LeBotClient } from "@src/class/LeBotClient";
+import { Command, CommandController } from "@src/decorators/commands/Command";
 import { CommandInteraction } from "@src/decorators/Interaction";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";

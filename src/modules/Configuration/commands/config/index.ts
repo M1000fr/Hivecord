@@ -1,11 +1,11 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { CommandController } from "@src/decorators/commands/Command";
 import { Injectable } from "@decorators/Injectable";
 import { Client, GuildLanguage } from "@decorators/params/index.ts";
-import { Subcommand } from "@src/decorators/commands/Subcommand";
 import { EPermission } from "@enums/EPermission";
 import { BackupService } from "@modules/Configuration/services/BackupService";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { CommandController } from "@src/decorators/commands/Command";
+import { Subcommand } from "@src/decorators/commands/Subcommand";
 import { CommandInteraction } from "@src/decorators/Interaction";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import {
