@@ -2,7 +2,7 @@ import { ConfigContext } from "@decorators/ConfigContext";
 import { ConfigProperty, EConfigType } from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
-import { CUSTOM_EMBED_CONFIG_KEY } from "@modules/CustomEmbed/CustomEmbedConfigType";
+import { CUSTOM_EMBED_CONFIG_KEY } from "@src/modules/CustomEmbed/CustomEmbedConfigKey";
 
 @ModuleConfig()
 export class GeneralConfig {

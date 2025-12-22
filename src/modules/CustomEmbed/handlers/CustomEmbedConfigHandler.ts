@@ -19,7 +19,7 @@ import {
 	type RepliableInteraction,
 	type StringSelectMenuInteraction,
 } from "discord.js";
-import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbedConfigType";
+import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbedConfigKey";
 
 @Injectable()
 export class CustomEmbedConfigHandler
