@@ -175,8 +175,6 @@ export class ConfigService {
 		await this.notifyUpdate(guildId, key, channelId);
 	}
 
-
-
 	async deleteChannel(
 		guildId: string,
 		key: string,

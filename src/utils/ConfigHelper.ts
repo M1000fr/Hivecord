@@ -3,9 +3,9 @@ import {
 	EConfigType,
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
+import { ChannelConfigService } from "@modules/Configuration/services/ChannelConfigService";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { RoleConfigService } from "@modules/Configuration/services/RoleConfigService";
-import { ChannelConfigService } from "@modules/Configuration/services/ChannelConfigService";
 import {
 	ActionRowBuilder,
 	EmbedBuilder,
