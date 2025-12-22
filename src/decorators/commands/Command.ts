@@ -1,10 +1,14 @@
+import { Injectable } from "@decorators/Injectable";
 import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 
 export function CommandController(options: CommandOptions) {
-	return function (target: unknown) {
-		const commandClass = target as ICommandClass;
+	return function (target: abstract new (...args: never[]) => object) {
+		// Apply @Injectable() automatically
+		Injectable()(target);
+		
+		const commandClass = target as unknown as ICommandClass;
 		commandClass.commandOptions = options;
 	};
 }

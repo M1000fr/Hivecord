@@ -1,5 +1,6 @@
 import type { QueryApi, WriteApi } from "@influxdata/influxdb-client";
 import { InfluxDB, Point } from "@influxdata/influxdb-client";
+import { Injectable } from "@decorators/Injectable";
 import { Logger } from "@utils/Logger";
 import { AsyncLocalStorage } from "async_hooks";
 
@@ -8,6 +9,7 @@ interface TraceContext {
 	parentMetric: string;
 }
 
+@Injectable()
 export class InfluxService {
 	private static instance: InfluxDB;
 	private static writeApi: WriteApi;

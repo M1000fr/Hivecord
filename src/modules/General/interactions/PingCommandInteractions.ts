@@ -1,7 +1,9 @@
 import { Button } from "@decorators/Interaction";
+import { Injectable } from "@decorators/Injectable";
 import { Interaction } from "@decorators/params";
 import { ButtonInteraction, MessageFlags } from "discord.js";
 
+@Injectable()
 export class PingCommandInteractions {
 	@Button("ping_button")
 	async handlePingButton(@Interaction() interaction: ButtonInteraction) {

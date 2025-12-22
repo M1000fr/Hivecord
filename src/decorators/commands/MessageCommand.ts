@@ -1,3 +1,4 @@
+import { Injectable } from "@decorators/Injectable";
 import type { IContextMenuCommandClass } from "@interfaces/IContextMenuCommandClass";
 
 export interface MessageCommandOptions {
@@ -6,8 +7,11 @@ export interface MessageCommandOptions {
 }
 
 export function MessageCommand(options: MessageCommandOptions) {
-	return function (target: unknown) {
-		const commandClass = target as IContextMenuCommandClass;
+	return function (target: abstract new (...args: never[]) => object) {
+		// Apply @Injectable() automatically
+		Injectable()(target);
+		
+		const commandClass = target as unknown as IContextMenuCommandClass;
 		commandClass.contextMenuOptions = {
 			...options,
 			type: "message",
