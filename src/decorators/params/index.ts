@@ -1,7 +1,10 @@
 import "reflect-metadata";
 
 export * from "./Client";
+export * from "./ConfigKey";
+export * from "./ConfigValue";
 export * from "./Context";
+export * from "./GuildId";
 export * from "./GuildLanguage";
 export * from "./Interaction";
 export * from "./TargetMessage";
@@ -18,6 +21,9 @@ export enum CommandParamType {
 	Context = "CONTEXT",
 	TargetUser = "TARGET_USER",
 	TargetMessage = "TARGET_MESSAGE",
+	GuildId = "GUILD_ID",
+	ConfigKey = "CONFIG_KEY",
+	ConfigValue = "CONFIG_VALUE",
 }
 
 export interface CommandParameter {
