@@ -162,6 +162,11 @@
 			"types": {},
 			"configure_property": "⚙️ Configurer : {{property}}",
 			"available_variables": "Variables disponibles"
+		},
+		"pager": {
+			"previous": "Précédent",
+			"next": "Suivant",
+			"not_allowed": "❌ Vous n'êtes pas autorisé à interagir avec ce paginateur."
 		}
 	}
 }
