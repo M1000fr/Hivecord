@@ -1,2 +1,0 @@
-bun check:errors
-bunx prettier --write . --log-level warn
