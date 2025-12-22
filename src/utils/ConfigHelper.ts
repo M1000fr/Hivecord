@@ -4,6 +4,8 @@ import {
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { RoleConfigService } from "@modules/Configuration/services/RoleConfigService";
+import { ChannelConfigService } from "@modules/Configuration/services/ChannelConfigService";
 import {
 	ActionRowBuilder,
 	EmbedBuilder,
@@ -17,7 +19,11 @@ import { Injectable } from "@decorators/Injectable";
 
 @Injectable()
 export class ConfigHelper {
-	constructor(private readonly configService: ConfigService) {}
+	constructor(
+		private readonly configService: ConfigService,
+		private readonly roleConfig: RoleConfigService,
+		private readonly channelConfig: ChannelConfigService,
+	) {}
 
 	static toSnakeCase(str: string): string {
 		return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
@@ -106,7 +112,7 @@ export class ConfigHelper {
 				value as string,
 			);
 		if (type === EConfigType.RoleArray)
-			return this.configService.setRoleList(
+			return this.roleConfig.setList(
 				guildId,
 				snakeKey,
 				value as string[],

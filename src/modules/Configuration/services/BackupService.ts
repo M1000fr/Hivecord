@@ -4,6 +4,7 @@ import {
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { RoleConfigService } from "@modules/Configuration/services/RoleConfigService";
 import { Injectable } from "@src/decorators/Injectable";
 import { Logger } from "@utils/Logger";
 import {
@@ -123,6 +124,7 @@ class ConfigExtractor {
 class ConfigRestorer {
 	static async restoreModuleConfig(
 		configService: ConfigService,
+		roleConfig: RoleConfigService,
 		moduleConfig: ModuleConfig,
 		guildId: string,
 	): Promise<void> {
@@ -136,7 +138,7 @@ class ConfigRestorer {
 					if (value.length === 1 && value[0]) {
 						await configService.setRole(guildId, key, value[0]);
 					} else if (value.length > 1) {
-						await configService.setRoleList(guildId, key, value);
+						await roleConfig.setList(guildId, key, value);
 					}
 				}
 			} else if (type === EConfigType.Channel) {
@@ -157,7 +159,10 @@ export class BackupService {
 	private readonly logger = new Logger("BackupService");
 	private static readonly BACKUP_VERSION = 3;
 
-	constructor(private readonly configService: ConfigService) {}
+	constructor(
+		private readonly configService: ConfigService,
+		private readonly roleConfig: RoleConfigService,
+	) {}
 
 	async createBackup(
 		client: LeBotClient<true>,
@@ -222,6 +227,7 @@ export class BackupService {
 				this.logger.log(`Restoring ${moduleConfig.moduleName}...`);
 				await ConfigRestorer.restoreModuleConfig(
 					this.configService,
+					this.roleConfig,
 					moduleConfig,
 					guildId,
 				);

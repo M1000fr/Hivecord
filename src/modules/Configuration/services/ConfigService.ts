@@ -175,31 +175,7 @@ export class ConfigService {
 		await this.notifyUpdate(guildId, key, channelId);
 	}
 
-	async getChannelList(guildId: string, key: string): Promise<string[]> {
-		return this.channelConfig.getList(guildId, key);
-	}
 
-	async addChannelToList(
-		guildId: string,
-		key: string,
-		channelId: string,
-		channelType: ChannelType = ChannelType.TEXT,
-	): Promise<void> {
-		await this.channelConfig.addToList(
-			guildId,
-			key,
-			channelId,
-			channelType,
-		);
-	}
-
-	async removeChannelFromList(
-		guildId: string,
-		key: string,
-		channelId: string,
-	): Promise<void> {
-		await this.channelConfig.removeFromList(guildId, key, channelId);
-	}
 
 	async deleteChannel(
 		guildId: string,
@@ -226,30 +202,6 @@ export class ConfigService {
 
 	async getRoleList(guildId: string, key: string): Promise<string[]> {
 		return this.roleConfig.getList(guildId, key);
-	}
-
-	async setRoleList(
-		guildId: string,
-		key: string,
-		roleIds: string[],
-	): Promise<void> {
-		await this.roleConfig.setList(guildId, key, roleIds);
-	}
-
-	async addRoleToList(
-		guildId: string,
-		key: string,
-		roleId: string,
-	): Promise<void> {
-		await this.roleConfig.addToList(guildId, key, roleId);
-	}
-
-	async removeRoleFromList(
-		guildId: string,
-		key: string,
-		roleId: string,
-	): Promise<void> {
-		await this.roleConfig.removeFromList(guildId, key, roleId);
 	}
 
 	async deleteRole(
