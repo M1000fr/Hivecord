@@ -169,7 +169,7 @@ export class CommandService {
 		}
 
 		// 2. Try Option Routes
-		if (commandClass.optionRoutes) {
+		if (commandClass.optionRoutes && commandClass.optionRoutes instanceof Map) {
 			for (const [optionName, valueMap] of commandClass.optionRoutes) {
 				const optionValue = interaction.options.get(optionName)?.value;
 				const route =
