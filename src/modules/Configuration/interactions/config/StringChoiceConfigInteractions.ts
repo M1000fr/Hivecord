@@ -1,3 +1,4 @@
+import { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
@@ -56,12 +57,20 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 			GeneralConfig,
 		).Language;
 		const t = I18nService.getFixedT(lng);
+
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, selectedProperty);
+
 		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guild!,
 			selectedProperty,
 			propertyOptions.type,
 			t,
 			propertyOptions,
+			lng,
+			defaultValue,
 		);
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,
@@ -69,6 +78,13 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 			currentValue,
 			{ locale: lng, t },
 		);
+
+		const rawValue = await this.configHelper.fetchValue(
+			interaction.guild!,
+			selectedProperty,
+			propertyOptions.type,
+		);
+		const valueToUse = rawValue ?? defaultValue;
 
 		const choices = propertyOptions.choices || [];
 		const selectMenu = new StringSelectMenuBuilder()
@@ -89,7 +105,7 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 					return new StringSelectMenuOptionBuilder()
 						.setLabel(label)
 						.setValue(choice.value)
-						.setDefault(currentValue === choice.value); // This might not work if currentValue is formatted
+						.setDefault(valueToUse === choice.value);
 				}),
 			);
 

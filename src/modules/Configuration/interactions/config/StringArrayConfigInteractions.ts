@@ -61,14 +61,26 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			EConfigType.StringArray,
 		)) as string[];
 
+		const module = (guild.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, propertyKey) as
+			| string[]
+			| undefined;
+
+		const valuesToUse =
+			currentValues && currentValues.length > 0
+				? currentValues
+				: defaultValue || [];
+
 		const lng =
 			(await this.configService.of(guild, GeneralConfig).Language) ??
 			"en";
 		const t = i18next.getFixedT(lng);
 
 		const displayValue =
-			currentValues.length > 0
-				? currentValues.map((v) => `\n- ${v}`).join()
+			valuesToUse.length > 0
+				? valuesToUse.map((v) => `\n- ${v}`).join()
 				: t("common.none", "None");
 
 		const embed = this.buildPropertyEmbed(
@@ -92,7 +104,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 				.setStyle(ButtonStyle.Success),
 		);
 
-		if (currentValues.length > 0) {
+		if (valuesToUse.length > 0) {
 			row.addComponents(
 				new ButtonBuilder()
 					.setCustomId(
@@ -210,7 +222,19 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			EConfigType.StringArray,
 		)) as string[];
 
-		const newValues = [...currentValues, newValue];
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, propertyKey) as
+			| string[]
+			| undefined;
+
+		const valuesToUse =
+			currentValues && currentValues.length > 0
+				? currentValues
+				: defaultValue || [];
+
+		const newValues = [...valuesToUse, newValue];
 
 		await this.configHelper.saveValue(
 			interaction.guild!,
@@ -236,7 +260,19 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			EConfigType.StringArray,
 		)) as string[];
 
-		if (currentValues.length === 0) {
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, propertyKey) as
+			| string[]
+			| undefined;
+
+		const valuesToUse =
+			currentValues && currentValues.length > 0
+				? currentValues
+				: defaultValue || [];
+
+		if (valuesToUse.length === 0) {
 			await this.respondToInteraction(
 				interaction,
 				"No values to remove.",
@@ -255,9 +291,9 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			)
 			.setPlaceholder("Select values to remove")
 			.setMinValues(1)
-			.setMaxValues(Math.min(currentValues.length, 25));
+			.setMaxValues(Math.min(valuesToUse.length, 25));
 
-		currentValues.slice(0, 25).forEach((value, index) => {
+		valuesToUse.slice(0, 25).forEach((value, index) => {
 			select.addOptions(
 				new StringSelectMenuOptionBuilder()
 					.setLabel(ConfigHelper.truncate(value, 100))
@@ -317,7 +353,19 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			EConfigType.StringArray,
 		)) as string[];
 
-		const newValues = currentValues.filter(
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, propertyKey) as
+			| string[]
+			| undefined;
+
+		const valuesToUse =
+			currentValues && currentValues.length > 0
+				? currentValues
+				: defaultValue || [];
+
+		const newValues = valuesToUse.filter(
 			(_, index) => !selectedIndices.includes(index),
 		);
 

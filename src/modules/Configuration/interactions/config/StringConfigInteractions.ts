@@ -79,6 +79,12 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				propertyKey,
 				EConfigType.String,
 			)) || "";
+		
+		const { module } = this.getPropertyContext(client, moduleName, propertyKey);
+		const defaultValue = this.getDefaultValue(module, propertyKey);
+		
+		const valueToUse = (rawValue || defaultValue || "") as string;
+
 		const labelText = ConfigHelper.truncate(
 			propertyOptions.description,
 			45,
@@ -92,7 +98,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			placeholder: "Enter text value",
 		});
 
-		if (rawValue && typeof rawValue === "string") input.setValue(rawValue);
+		if (valueToUse && typeof valueToUse === "string") input.setValue(valueToUse);
 
 		const modal = new ModalBuilder({
 			customId: ConfigHelper.buildCustomId([
@@ -127,16 +133,21 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			GeneralConfig,
 		).Language;
 		const t = I18nService.getFixedT(lng);
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, selectedProperty);
+
 		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guild!,
 			selectedProperty,
 			propertyOptions.type,
 			t,
+			propertyOptions,
+			lng,
+			defaultValue,
 		);
 
-		const module = (interaction.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
 		const configContexts = (
 			module?.options.config as unknown as IConfigClass
 		)?.configContexts;

@@ -28,11 +28,20 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 			GeneralConfig,
 		).Language;
 		const t = I18nService.getFixedT(lng);
+
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, selectedProperty);
+
 		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guild,
 			selectedProperty,
 			propertyOptions.type,
 			t,
+			propertyOptions,
+			lng,
+			defaultValue,
 		);
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,

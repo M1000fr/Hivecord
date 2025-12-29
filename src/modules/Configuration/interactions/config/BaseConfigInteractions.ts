@@ -234,6 +234,21 @@ export abstract class BaseConfigInteractions {
 		return { module, propertyOptions };
 	}
 
+	protected getDefaultValue(
+		module: { options: { config?: unknown } } | undefined,
+		propertyKey: string,
+	): string | string[] | undefined {
+		if (!module?.options?.config) return undefined;
+		const configClass = module.options.config as Record<string, unknown>;
+		const propertyValue = configClass[propertyKey];
+		return propertyValue &&
+			typeof propertyValue === "object" &&
+			"__isConfigKey" in propertyValue
+			? (propertyValue as unknown as { defaultValue: unknown })
+					.defaultValue as string | string[]
+			: undefined;
+	}
+
 	protected createConfigButton(
 		action: string,
 		moduleName: string,
@@ -271,7 +286,7 @@ export abstract class BaseConfigInteractions {
 				}),
 			)
 			.setDescription(
-				`${propertyOptions.description}\n\n**${lang.t("utils.config_helper.current")}:** ${currentValue}`,
+				`${propertyOptions.description}\n\n**${lang.t("common.current")}:** ${currentValue}`,
 			)
 			.setColor("#5865F2")
 			.setTimestamp();

@@ -54,7 +54,13 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 			EConfigType.Boolean,
 		);
 
-		const isTrue = String(currentValue) === "true";
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, selectedProperty);
+		const valueToCheck = currentValue ?? defaultValue;
+
+		const isTrue = String(valueToCheck) === "true";
 		const newValue = !isTrue;
 
 		await this.updateConfig(

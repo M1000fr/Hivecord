@@ -170,10 +170,21 @@ export class ConfigHelper {
 		t: TFunction,
 		options?: ConfigPropertyOptions,
 		locale?: string,
+		defaultValue?: string | string[],
 	): Promise<string> {
 		try {
-			const value = await this.fetchValue(guild, key, type);
-			return value
+			let value = await this.fetchValue(guild, key, type);
+
+			if (
+				value === null ||
+				(Array.isArray(value) && value.length === 0)
+			) {
+				if (defaultValue !== undefined) {
+					value = defaultValue;
+				}
+			}
+
+			return value && (!Array.isArray(value) || value.length > 0)
 				? ConfigHelper.formatValue(value, type, t, options, locale)
 				: t("utils.config_helper.not_set");
 		} catch {
@@ -222,6 +233,20 @@ export class ConfigHelper {
 				opt.displayNameLocalizations?.[language as Locale] ||
 				opt.displayName ||
 				key;
+
+			const configClass = module.options.config as unknown as Record<
+				string,
+				unknown
+			>;
+			const propertyValue = configClass[key];
+			const defaultValue =
+				propertyValue &&
+				typeof propertyValue === "object" &&
+				"__isConfigKey" in propertyValue
+					? (propertyValue as unknown as { defaultValue: unknown })
+							.defaultValue
+					: undefined;
+
 			const description =
 				opt.descriptionLocalizations?.[language as Locale] ||
 				opt.description;
@@ -233,11 +258,12 @@ export class ConfigHelper {
 				t,
 				opt,
 				language,
+				defaultValue as string | string[],
 			);
 
 			embed.addFields({
 				name: `${idx + 1}. ${displayName}`,
-				value: `${description}\n${t("utils.config_helper.type")}: \`${ConfigHelper.getTypeName(opt.type as EConfigType, t)}\`\n${t("utils.config_helper.current")}: ${currentValue}`,
+				value: `${description}\n${t("common.type")}: \`${ConfigHelper.getTypeName(opt.type as EConfigType, t)}\`\n${t("common.current")}: ${currentValue}`,
 				inline: true,
 			});
 		}

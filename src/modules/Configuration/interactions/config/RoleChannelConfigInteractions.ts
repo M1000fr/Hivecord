@@ -1,3 +1,4 @@
+import { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import {
 	EConfigType,
@@ -141,11 +142,20 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			GeneralConfig,
 		).Language;
 		const t = I18nService.getFixedT(lng);
+
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, selectedProperty);
+
 		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guild!,
 			selectedProperty,
 			propertyOptions.type,
 			t,
+			propertyOptions,
+			lng,
+			defaultValue,
 		);
 
 		const rawValue = await this.configHelper.fetchValue(
@@ -153,6 +163,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			selectedProperty,
 			propertyOptions.type,
 		);
+		const valueToUse = rawValue ?? defaultValue;
 
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,
@@ -165,7 +176,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			moduleName,
 			selectedProperty,
 			interaction.user.id,
-			rawValue,
+			valueToUse,
 		);
 
 		const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] =

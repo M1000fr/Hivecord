@@ -32,7 +32,7 @@ export class GeneralConfig {
 		],
 		nonNull: true,
 	})
-	static Language = configKey("en");
+	static Language = configKey("fr");
 
 	@ConfigContext([
 		ConfigContextVariable.User,

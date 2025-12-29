@@ -41,30 +41,54 @@ export class ConfigService {
 				const key = toConfigKey(prop);
 				const options = metadata?.[prop];
 
+				// Get default value
+				const propertyValue = (configClass as Record<string, unknown>)[
+					prop
+				];
+				const defaultValue =
+					propertyValue &&
+					typeof propertyValue === "object" &&
+					"__isConfigKey" in propertyValue
+						? (propertyValue as unknown as { defaultValue: unknown })
+								.defaultValue
+						: undefined;
+
 				if (!options) {
-					return this.get(guild, key);
+					return this.get(guild, key).then((v) => v ?? defaultValue);
 				}
 
 				switch (options.type) {
 					case EConfigType.Channel:
-						return this.channelConfig.get(guild, key);
+						return this.channelConfig
+							.get(guild, key)
+							.then((v) => v ?? defaultValue);
 					case EConfigType.Role:
-						return this.roleConfig.get(guild, key);
+						return this.roleConfig
+							.get(guild, key)
+							.then((v) => v ?? defaultValue);
 					case EConfigType.RoleArray:
-						return this.roleConfig.getList(guild, key);
+						return this.roleConfig
+							.getList(guild, key)
+							.then((v) =>
+								v && v.length > 0 ? v : (defaultValue ?? []),
+							);
 					case EConfigType.StringArray:
-						return this.getMany(guild, key);
+						return this.getMany(guild, key).then((v) =>
+							v && v.length > 0 ? v : (defaultValue ?? []),
+						);
 					case EConfigType.Integer:
 					case EConfigType.Number:
 						return this.get(guild, key).then((v) =>
-							v !== null ? Number(v) : null,
+							v !== null ? Number(v) : defaultValue,
 						);
 					case EConfigType.Boolean:
 						return this.get(guild, key).then((v) =>
-							v !== null ? v === "true" : null,
+							v !== null ? v === "true" : defaultValue,
 						);
 					default:
-						return this.get(guild, key);
+						return this.get(guild, key).then(
+							(v) => v ?? defaultValue,
+						);
 				}
 			},
 		});
