@@ -40,9 +40,7 @@ export class CommandService {
 	 * @returns GuildLanguageContext containing locale and translation function.
 	 * @private
 	 */
-	private async getI18n(
-		guild: Guild | null,
-	): Promise<GuildLanguageContext> {
+	private async getI18n(guild: Guild | null): Promise<GuildLanguageContext> {
 		const locale = await this.configService.of(guild!, GeneralConfig)
 			.Language;
 		const t = I18nService.getFixedT(locale);

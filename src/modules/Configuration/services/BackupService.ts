@@ -7,13 +7,13 @@ import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { RoleConfigService } from "@modules/Configuration/services/RoleConfigService";
 import { Injectable } from "@src/decorators/Injectable";
 import { Logger } from "@utils/Logger";
-import { Guild } from "discord.js";
 import {
 	createCipheriv,
 	createDecipheriv,
 	randomBytes,
 	scryptSync,
 } from "crypto";
+import { Guild } from "discord.js";
 
 interface ConfigValue {
 	value: string | string[];

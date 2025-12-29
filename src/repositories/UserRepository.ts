@@ -1,6 +1,6 @@
 import { Repository } from "@decorators/Repository";
-import { BaseRepository } from "./BaseRepository";
 import { User } from "discord.js";
+import { BaseRepository } from "./BaseRepository";
 
 @Repository()
 export class UserRepository extends BaseRepository {

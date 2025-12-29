@@ -244,8 +244,8 @@ export abstract class BaseConfigInteractions {
 		return propertyValue &&
 			typeof propertyValue === "object" &&
 			"__isConfigKey" in propertyValue
-			? (propertyValue as unknown as { defaultValue: unknown })
-					.defaultValue as string | string[]
+			? ((propertyValue as unknown as { defaultValue: unknown })
+					.defaultValue as string | string[])
 			: undefined;
 	}
 

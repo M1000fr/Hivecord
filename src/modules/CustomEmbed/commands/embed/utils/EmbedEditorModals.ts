@@ -63,15 +63,13 @@ export class EmbedEditorModals {
 						.setRequired(false)
 						.setValue(data?.title || ""),
 				),
-			new LabelBuilder()
-				.setLabel(t("common.url"))
-				.setTextInputComponent(
-					new TextInputBuilder()
-						.setCustomId("url")
-						.setStyle(TextInputStyle.Short)
-						.setRequired(false)
-						.setValue(data?.url || ""),
-				),
+			new LabelBuilder().setLabel(t("common.url")).setTextInputComponent(
+				new TextInputBuilder()
+					.setCustomId("url")
+					.setStyle(TextInputStyle.Short)
+					.setRequired(false)
+					.setValue(data?.url || ""),
+			),
 		);
 		return modal;
 	}
@@ -115,15 +113,13 @@ export class EmbedEditorModals {
 			);
 
 		modal.addLabelComponents(
-			new LabelBuilder()
-				.setLabel(t("common.name"))
-				.setTextInputComponent(
-					new TextInputBuilder()
-						.setCustomId("name")
-						.setStyle(TextInputStyle.Short)
-						.setRequired(false)
-						.setValue(data?.author?.name || ""),
-				),
+			new LabelBuilder().setLabel(t("common.name")).setTextInputComponent(
+				new TextInputBuilder()
+					.setCustomId("name")
+					.setStyle(TextInputStyle.Short)
+					.setRequired(false)
+					.setValue(data?.author?.name || ""),
+			),
 			new LabelBuilder()
 				.setLabel(t("common.icon_url"))
 				.setTextInputComponent(
@@ -150,15 +146,13 @@ export class EmbedEditorModals {
 			);
 
 		modal.addLabelComponents(
-			new LabelBuilder()
-				.setLabel(t("common.text"))
-				.setTextInputComponent(
-					new TextInputBuilder()
-						.setCustomId("text")
-						.setStyle(TextInputStyle.Short)
-						.setRequired(false)
-						.setValue(data?.footer?.text || ""),
-				),
+			new LabelBuilder().setLabel(t("common.text")).setTextInputComponent(
+				new TextInputBuilder()
+					.setCustomId("text")
+					.setStyle(TextInputStyle.Short)
+					.setRequired(false)
+					.setValue(data?.footer?.text || ""),
+			),
 			new LabelBuilder()
 				.setLabel(t("common.icon_url"))
 				.setTextInputComponent(
@@ -258,15 +252,13 @@ export class EmbedEditorModals {
 			);
 
 		modal.addLabelComponents(
-			new LabelBuilder()
-				.setLabel(t("common.name"))
-				.setTextInputComponent(
-					new TextInputBuilder()
-						.setCustomId("name")
-						.setStyle(TextInputStyle.Short)
-						.setRequired(true)
-						.setValue(data?.field?.name || ""),
-				),
+			new LabelBuilder().setLabel(t("common.name")).setTextInputComponent(
+				new TextInputBuilder()
+					.setCustomId("name")
+					.setStyle(TextInputStyle.Short)
+					.setRequired(true)
+					.setValue(data?.field?.name || ""),
+			),
 			new LabelBuilder()
 				.setLabel(t("common.value"))
 				.setTextInputComponent(

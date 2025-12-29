@@ -1,7 +1,7 @@
 import { Repository } from "@decorators/Repository";
 import { ChannelType } from "@prisma/client/enums";
-import { BaseRepository } from "./BaseRepository";
 import type { GuildBasedChannel } from "discord.js";
+import { BaseRepository } from "./BaseRepository";
 
 @Repository()
 export class ChannelRepository extends BaseRepository {

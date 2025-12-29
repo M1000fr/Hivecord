@@ -1,6 +1,6 @@
 import { Repository } from "@decorators/Repository";
-import { BaseRepository } from "./BaseRepository";
 import { Guild } from "discord.js";
+import { BaseRepository } from "./BaseRepository";
 
 @Repository()
 export class GuildRepository extends BaseRepository {

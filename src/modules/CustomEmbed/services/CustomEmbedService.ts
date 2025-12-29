@@ -3,7 +3,7 @@ import { EntityService } from "@modules/Core/services/EntityService";
 import { RedisService } from "@modules/Core/services/RedisService";
 import { Injectable } from "@src/decorators/Injectable";
 import { CustomEmbedRepository } from "@src/repositories";
-import { EmbedBuilder, type APIEmbed, Guild, User } from "discord.js";
+import { EmbedBuilder, Guild, User, type APIEmbed } from "discord.js";
 
 const EDITOR_TTL = 3600; // 1 hour
 
@@ -19,10 +19,7 @@ export class CustomEmbedService {
 	 * Get a raw embed JSON by name
 	 */
 	async get(guild: Guild, name: string): Promise<APIEmbed | null> {
-		const embed = await this.customEmbedRepository.findByName(
-			guild,
-			name,
-		);
+		const embed = await this.customEmbedRepository.findByName(guild, name);
 		if (!embed) return null;
 		return JSON.parse(embed.data);
 	}
@@ -101,7 +98,13 @@ export class CustomEmbedService {
 		const key = `embed:editor:${sessionId}`;
 		await redis.set(
 			key,
-			JSON.stringify({ guildId: guild.id, name, data, meta, userId: user?.id }),
+			JSON.stringify({
+				guildId: guild.id,
+				name,
+				data,
+				meta,
+				userId: user?.id,
+			}),
 			"EX",
 			EDITOR_TTL,
 		);

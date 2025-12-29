@@ -44,11 +44,7 @@ export class RoleConfigService {
 		});
 	}
 
-	async setList(
-		guild: Guild,
-		key: string,
-		roles: Role[],
-	): Promise<void> {
+	async setList(guild: Guild, key: string, roles: Role[]): Promise<void> {
 		for (const role of roles) {
 			await this.entityService.ensureRole(role);
 		}
@@ -70,11 +66,7 @@ export class RoleConfigService {
 		await this.cache.invalidate(guild.id, key);
 	}
 
-	async addToList(
-		guild: Guild,
-		key: string,
-		role: Role,
-	): Promise<void> {
+	async addToList(guild: Guild, key: string, role: Role): Promise<void> {
 		await this.entityService.ensureRole(role);
 		await this.prisma.roleListConfiguration.upsert({
 			where: { key_roleId: { key, roleId: role.id } },

@@ -79,10 +79,14 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				propertyKey,
 				EConfigType.String,
 			)) || "";
-		
-		const { module } = this.getPropertyContext(client, moduleName, propertyKey);
+
+		const { module } = this.getPropertyContext(
+			client,
+			moduleName,
+			propertyKey,
+		);
 		const defaultValue = this.getDefaultValue(module, propertyKey);
-		
+
 		const valueToUse = (rawValue || defaultValue || "") as string;
 
 		const labelText = ConfigHelper.truncate(
@@ -98,7 +102,8 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			placeholder: "Enter text value",
 		});
 
-		if (valueToUse && typeof valueToUse === "string") input.setValue(valueToUse);
+		if (valueToUse && typeof valueToUse === "string")
+			input.setValue(valueToUse);
 
 		const modal = new ModalBuilder({
 			customId: ConfigHelper.buildCustomId([

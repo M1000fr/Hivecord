@@ -50,10 +50,7 @@ export default class EmbedCommand {
 	) {
 		await interaction.deferReply();
 		const name = interaction.options.getString("name", true);
-		let data = await this.customEmbedService.get(
-			interaction.guild!,
-			name,
-		);
+		let data = await this.customEmbedService.get(interaction.guild!, name);
 
 		if (!data) {
 			// Default template for new embed

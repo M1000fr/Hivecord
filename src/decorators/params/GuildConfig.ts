@@ -25,7 +25,11 @@ export function extractGuildFromContext(context: unknown): Guild | null {
 			const obj = first as Record<string, unknown>;
 
 			// Direct guild property (interactions)
-			if (obj.guild && typeof obj.guild === "object" && "id" in obj.guild) {
+			if (
+				obj.guild &&
+				typeof obj.guild === "object" &&
+				"id" in obj.guild
+			) {
 				return obj.guild as Guild;
 			}
 

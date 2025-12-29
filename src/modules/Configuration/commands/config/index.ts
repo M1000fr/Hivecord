@@ -90,10 +90,7 @@ export default class ConfigCommand {
 			const buffer = Buffer.from(arrayBuffer);
 
 			// Restore the backup
-			await this.backupService.restoreBackup(
-				buffer,
-				interaction.guild!,
-			);
+			await this.backupService.restoreBackup(buffer, interaction.guild!);
 
 			await interaction.editReply({
 				content: lang.t(

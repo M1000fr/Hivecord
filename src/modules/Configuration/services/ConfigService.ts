@@ -1,8 +1,8 @@
 import {
-	EConfigType,
-	toConfigKey,
 	type ConfigKey,
+	EConfigType,
 	type IConfigClass,
+	toConfigKey,
 } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
 import { EntityService } from "@modules/Core/services/EntityService";
@@ -49,8 +49,11 @@ export class ConfigService {
 					propertyValue &&
 					typeof propertyValue === "object" &&
 					"__isConfigKey" in propertyValue
-						? (propertyValue as unknown as { defaultValue: unknown })
-								.defaultValue
+						? (
+								propertyValue as unknown as {
+									defaultValue: unknown;
+								}
+							).defaultValue
 						: undefined;
 
 				if (!options) {
@@ -150,11 +153,7 @@ export class ConfigService {
 		);
 	}
 
-	async setMany(
-		guild: Guild,
-		key: string,
-		values: string[],
-	): Promise<void> {
+	async setMany(guild: Guild, key: string, values: string[]): Promise<void> {
 		await this.entityService.ensureGuild(guild);
 
 		await this.prisma.configuration.deleteMany({
@@ -228,11 +227,7 @@ export class ConfigService {
 		return this.roleConfig.getList(guild, key);
 	}
 
-	async deleteRole(
-		guild: Guild,
-		key: string,
-		roleId: string,
-	): Promise<void> {
+	async deleteRole(guild: Guild, key: string, roleId: string): Promise<void> {
 		await this.roleConfig.delete(guild, key, roleId);
 		await this.notifyUpdate(guild.id, key, null);
 	}
@@ -250,7 +245,9 @@ export class ConfigService {
 			roleConfigs,
 			roleListConfigs,
 		] = await Promise.all([
-			this.prisma.configuration.findMany({ where: { guildId: guild.id } }),
+			this.prisma.configuration.findMany({
+				where: { guildId: guild.id },
+			}),
 			this.prisma.channelConfiguration.findMany({
 				where: { Channel: { guildId: guild.id } },
 			}),
