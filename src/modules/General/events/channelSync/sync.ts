@@ -6,8 +6,16 @@ import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
 import { EntityService } from "@modules/Core/services/EntityService";
 import { PrismaService } from "@modules/Core/services/PrismaService";
+import { $Enums } from "@src/prisma/client/client";
 import type { ContextOf } from "@src/types/ContextOf.ts";
 import { Logger } from "@utils/Logger";
+import { ChannelType } from "discord.js";
+
+const CHANNEL_TYPE_MAP: Record<number, $Enums.ChannelType> = {
+	[ChannelType.GuildText]: $Enums.ChannelType.TEXT,
+	[ChannelType.GuildVoice]: $Enums.ChannelType.VOICE,
+	[ChannelType.GuildCategory]: $Enums.ChannelType.CATEGORY,
+};
 
 @EventController()
 export default class ChannelSync {
@@ -42,9 +50,17 @@ export default class ChannelSync {
 		if (channel.isDMBased()) return;
 
 		try {
-			await this.prisma.channel.update({
+			await this.prisma.channel.upsert({
 				where: { id: channel.id },
-				data: { deletedAt: new Date() },
+				update: { deletedAt: new Date() },
+				create: {
+					id: channel.id,
+					guildId: channel.guild.id,
+					type:
+						CHANNEL_TYPE_MAP[channel.type] ??
+						$Enums.ChannelType.TEXT,
+					deletedAt: new Date(),
+				},
 			});
 		} catch (error) {
 			this.logger.error(
