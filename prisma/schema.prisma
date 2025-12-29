@@ -13,6 +13,13 @@ enum ChannelType {
     CATEGORY
 }
 
+enum SanctionType {
+    WARN
+    MUTE
+    KICK
+    BAN
+}
+
 model User {
     id     String    @id
     leftAt DateTime?
@@ -20,56 +27,18 @@ model User {
     Groups            UserGroup[]
     SanctionsReceived Sanction[]  @relation("UserSanctions")
     SanctionsApplied  Sanction[]  @relation("ModeratorSanctions")
-
-    TempVoiceChannels TempVoiceChannel[]
-    TempVoiceAllowed  TempVoiceAllowedUser[]
-    TempVoiceBlocked  TempVoiceBlockedUser[]
-
-    InvitedBy      Invitation[] @relation("InvitedBy")
-    InvitedMembers Invitation[] @relation("Inviter")
-
-    TicketsCreated Ticket[]
-
-    UserAchievements UserAchievement[]
-    UserStats        UserStats[]
 }
 
 model Guild {
     id   String @id
     name String
 
-    Invitations       Invitation[]
-    Channels          Channel[]
-    Roles             Role[]
-    Groups            Group[]
-    Sanctions         Sanction[]
-    Configurations    Configuration[]
-    TempVoiceChannels TempVoiceChannel[]
-
-    Achievements     Achievement[]
-    UserStats        UserStats[]
-    SanctionReasons   SanctionReason[]
-    CustomEmbeds      CustomEmbed[]
-    Tickets           Ticket[]
-}
-
-model Invitation {
-    id        Int      @id @default(autoincrement())
-    guildId   String
-    inviterId String
-    invitedId String
-    code      String
-    active    Boolean  @default(true)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    Inviter User  @relation("Inviter", fields: [inviterId], references: [id])
-    Invited User  @relation("InvitedBy", fields: [invitedId], references: [id])
-    Guild   Guild @relation(fields: [guildId], references: [id])
-
-    @@index([inviterId])
-    @@index([invitedId])
-    @@index([guildId])
+    Channels       Channel[]
+    Roles          Role[]
+    Groups         Group[]
+    Sanctions      Sanction[]
+    Configurations Configuration[]
+    CustomEmbeds   CustomEmbed[]
 }
 
 model Channel {
@@ -79,9 +48,8 @@ model Channel {
     type      ChannelType
     deletedAt DateTime?
 
-    SingleChannelConfigs ChannelConfiguration[]       @relation("SingleChannelConfigs")
+    SingleChannelConfigs ChannelConfiguration[]     @relation("SingleChannelConfigs")
     ListChannelConfigs   ChannelListConfiguration[] @relation("ListChannelConfigs")
-    Ticket               Ticket?
 }
 
 model Role {
@@ -91,7 +59,7 @@ model Role {
     deletedAt DateTime?
 
     Groups            Group[]
-    SingleRoleConfigs RoleConfiguration[]       @relation("SingleRoleConfigs")
+    SingleRoleConfigs RoleConfiguration[]     @relation("SingleRoleConfigs")
     ListRoleConfigs   RoleListConfiguration[] @relation("ListRoleConfigs")
 }
 
@@ -131,13 +99,6 @@ model Group {
 
     UserGroups  UserGroup[]
     Permissions GroupPermission[]
-}
-
-enum SanctionType {
-    WARN
-    MUTE
-    KICK
-    BAN
 }
 
 model Sanction {
@@ -194,50 +155,6 @@ model RoleListConfiguration {
     @@id([key, roleId])
 }
 
-model TempVoiceChannel {
-    id        String   @id
-    guildId   String
-    Guild     Guild    @relation(fields: [guildId], references: [id])
-    ownerId   String
-    createdAt DateTime @default(now())
-    isLocked  Boolean  @default(false)
-
-    Owner        User                   @relation(fields: [ownerId], references: [id])
-    AllowedUsers TempVoiceAllowedUser[]
-    BlockedUsers TempVoiceBlockedUser[]
-}
-
-model TempVoiceAllowedUser {
-    id          Int    @id @default(autoincrement())
-    tempVoiceId String
-    userId      String
-
-    TempVoiceChannel TempVoiceChannel @relation(fields: [tempVoiceId], references: [id], onDelete: Cascade)
-    User             User             @relation(fields: [userId], references: [id])
-}
-
-model TempVoiceBlockedUser {
-    id          Int    @id @default(autoincrement())
-    tempVoiceId String
-    userId      String
-
-    TempVoiceChannel TempVoiceChannel @relation(fields: [tempVoiceId], references: [id], onDelete: Cascade)
-    User             User             @relation(fields: [userId], references: [id])
-}
-
-model SanctionReason {
-    id       Int          @id @default(autoincrement())
-    guildId  String
-    Guild    Guild        @relation(fields: [guildId], references: [id])
-    key      String?
-    text     String
-    type     SanctionType
-    duration String?
-    isSystem Boolean      @default(false)
-
-    @@unique([guildId, key])
-}
-
 model CustomEmbed {
     guildId   String
     Guild     Guild    @relation(fields: [guildId], references: [id])
@@ -253,101 +170,4 @@ model BotState {
     key       String   @id
     value     String
     updatedAt DateTime @updatedAt
-}
-
-model Ticket {
-    id        Int       @id @default(autoincrement())
-    guildId   String
-    Guild     Guild     @relation(fields: [guildId], references: [id], onDelete: Cascade)
-    channelId String    @unique
-    Channel   Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
-    creatorId String
-    Creator   User      @relation(fields: [creatorId], references: [id])
-
-    category  String?
-    active    Boolean   @default(true)
-    createdAt DateTime  @default(now())
-    closedAt  DateTime?
-
-    @@index([guildId])
-    @@index([creatorId])
-}
-
-enum AchievementCategory {
-    GLOBAL
-    ROTATED
-}
-
-enum AchievementType {
-    MESSAGE_COUNT
-    VOICE_DURATION
-    INVITE_COUNT
-    MESSAGE_RATE
-    STREAK_DAYS
-    CHANNEL_DIVERSITY
-    REACTION_COUNT
-    STREAM_DURATION
-    WORD_COUNT_AVG
-    MEDIA_COUNT
-    MENTION_REACH
-    COMMAND_USAGE
-    VOICE_PEAK_TIME
-}
-
-model Achievement {
-    id          String              @id
-    guildId     String
-    Guild       Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
-    
-    name        String
-    description String
-    category    AchievementCategory
-    
-    type        AchievementType
-    threshold   Int
-    
-    isActive    Boolean             @default(true)
-    updatedAt   DateTime            @updatedAt
-    
-    UserAchievements UserAchievement[]
-
-    @@unique([guildId, id])
-}
-
-model UserAchievement {
-    id            Int         @id @default(autoincrement())
-    userId        String
-    achievementId String
-    guildId       String
-    unlockedAt    DateTime    @default(now())
-
-    User        User        @relation(fields: [userId], references: [id])
-    Achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-
-    @@unique([userId, achievementId, guildId])
-}
-
-model UserStats {
-    userId  String
-    guildId String
-    
-    messageCount   Int @default(0)
-    voiceDuration  Int @default(0)
-    inviteCount    Int @default(0)
-    
-    // New stats
-    dailyStreak       Int       @default(0)
-    lastDailyActivity DateTime?
-    reactionCount     Int       @default(0)
-    streamDuration    Int       @default(0)
-    totalWords        Int       @default(0)
-    mediaCount        Int       @default(0)
-    commandCount      Int       @default(0)
-
-    updatedAt DateTime @updatedAt
-
-    User    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    Guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
-
-    @@id([userId, guildId])
 }
