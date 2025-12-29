@@ -36,8 +36,31 @@ export class ChannelConfigService {
 
 		await this.prisma.channelConfiguration.upsert({
 			where: { key },
-			update: { channelId },
-			create: { key, channelId },
+			update: {
+				Channel: {
+					connectOrCreate: {
+						where: { id: channelId },
+						create: {
+							id: channelId,
+							guildId,
+							type: channelType,
+						},
+					},
+				},
+			},
+			create: {
+				key,
+				Channel: {
+					connectOrCreate: {
+						where: { id: channelId },
+						create: {
+							id: channelId,
+							guildId,
+							type: channelType,
+						},
+					},
+				},
+			},
 		});
 
 		await this.cache.invalidate(guildId, key);
@@ -72,8 +95,31 @@ export class ChannelConfigService {
 
 		await this.prisma.channelListConfiguration.upsert({
 			where: { key_channelId: { key, channelId } },
-			update: {},
-			create: { key, channelId },
+			update: {
+				Channel: {
+					connectOrCreate: {
+						where: { id: channelId },
+						create: {
+							id: channelId,
+							guildId,
+							type: channelType,
+						},
+					},
+				},
+			},
+			create: {
+				key,
+				Channel: {
+					connectOrCreate: {
+						where: { id: channelId },
+						create: {
+							id: channelId,
+							guildId,
+							type: channelType,
+						},
+					},
+				},
+			},
 		});
 
 		await this.cache.invalidate(guildId, key);
