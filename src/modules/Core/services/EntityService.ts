@@ -9,7 +9,7 @@ import {
 import {
 	ChannelType as DiscordChannelType,
 	Guild,
-	GuildChannel,
+	type GuildBasedChannel,
 	Role,
 	User,
 } from "discord.js";
@@ -24,42 +24,19 @@ export class EntityService {
 	) {}
 
 	async ensureGuild(guild: Guild) {
-		if (!guild || !guild.id) {
-			throw new Error(
-				`Invalid guild provided to ensureGuild: ${JSON.stringify(guild)}`,
-			);
-		}
-		await this.guildRepository.upsert(guild.id, guild.name ?? "Unknown");
-	}
-
-	async ensureGuildById(guildId: string) {
-		if (!guildId) {
-			throw new Error(
-				`Invalid guildId provided to ensureGuildById: ${guildId}`,
-			);
-		}
-		await this.guildRepository.upsert(guildId, "Unknown");
+		await this.guildRepository.upsert(guild);
 	}
 
 	async ensureUser(user: User) {
-		await this.userRepository.upsert(user.id);
-	}
-
-	async ensureUserById(userId: string) {
-		await this.userRepository.upsert(userId);
+		await this.userRepository.upsert(user);
 	}
 
 	async ensureRole(role: Role) {
 		await this.ensureGuild(role.guild);
-		await this.roleRepository.upsert(role.id, role.guild.id);
+		await this.roleRepository.upsert(role);
 	}
 
-	async ensureRoleById(guildId: string, roleId: string) {
-		await this.ensureGuildById(guildId);
-		await this.roleRepository.upsert(roleId, guildId);
-	}
-
-	async ensureChannel(channel: GuildChannel) {
+	async ensureChannel(channel: GuildBasedChannel) {
 		await this.ensureGuild(channel.guild);
 
 		let type: ChannelType;
@@ -73,15 +50,6 @@ export class EntityService {
 			type = ChannelType.TEXT;
 		}
 
-		await this.channelRepository.upsert(channel.id, channel.guild.id, type);
-	}
-
-	async ensureChannelById(
-		guildId: string,
-		channelId: string,
-		type: ChannelType = ChannelType.TEXT,
-	) {
-		await this.ensureGuildById(guildId);
-		await this.channelRepository.upsert(channelId, guildId, type);
+		await this.channelRepository.upsert(channel, type);
 	}
 }

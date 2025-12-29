@@ -17,6 +17,7 @@ import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	Client,
+	Guild,
 	MessageContextMenuCommandInteraction,
 	MessageFlags,
 	UserContextMenuCommandInteraction,
@@ -40,9 +41,9 @@ export class CommandService {
 	 * @private
 	 */
 	private async getI18n(
-		guildId: string | null,
+		guild: Guild | null,
 	): Promise<GuildLanguageContext> {
-		const locale = await this.configService.of(guildId!, GeneralConfig)
+		const locale = await this.configService.of(guild!, GeneralConfig)
 			.Language;
 		const t = I18nService.getFixedT(locale);
 		return { locale, t };
@@ -108,7 +109,7 @@ export class CommandService {
 
 		const method = autocompletes?.get(focusedOption.name);
 		if (method) {
-			const langCtx = await this.getI18n(interaction.guildId);
+			const langCtx = await this.getI18n(interaction.guild);
 			await this.invoke(
 				client,
 				interaction,
@@ -131,7 +132,7 @@ export class CommandService {
 		interaction: ChatInputCommandInteraction,
 		commandInstance: object,
 	): Promise<void> {
-		const langCtx = await this.getI18n(interaction.guildId);
+		const langCtx = await this.getI18n(interaction.guild);
 		const commandClass = commandInstance.constructor as ICommandClass;
 
 		// 1. Try Subcommands
@@ -380,7 +381,7 @@ export class CommandService {
 			| MessageContextMenuCommandInteraction,
 		commandInstance: object,
 	): Promise<void> {
-		const langCtx = await this.getI18n(interaction.guildId);
+		const langCtx = await this.getI18n(interaction.guild);
 
 		// Look for a method decorated with the command decorator
 		// For context menus, we'll use a convention: look for an 'execute' method

@@ -3,15 +3,19 @@ import {
 	EConfigType,
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
+import { Inject } from "@decorators/Inject";
 import { ChannelConfigService } from "@modules/Configuration/services/ChannelConfigService";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { RoleConfigService } from "@modules/Configuration/services/RoleConfigService";
 import {
 	ActionRowBuilder,
 	EmbedBuilder,
+	Guild,
 	Locale,
+	Role,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
+	User,
 } from "discord.js";
 import type { TFunction } from "i18next";
 
@@ -23,6 +27,7 @@ export class ConfigHelper {
 		private readonly configService: ConfigService,
 		private readonly roleConfig: RoleConfigService,
 		private readonly channelConfig: ChannelConfigService,
+		@Inject(LeBotClient) private readonly client: LeBotClient<true>,
 	) {}
 
 	static toSnakeCase(str: string): string {
@@ -84,7 +89,7 @@ export class ConfigHelper {
 	}
 
 	async fetchValue(
-		guildId: string,
+		guild: Guild,
 		key: string,
 		type: EConfigType | string,
 	): Promise<string | string[] | null> {
@@ -92,63 +97,62 @@ export class ConfigHelper {
 		let value: string | string[] | null = null;
 
 		if (type === EConfigType.Role)
-			value = await this.configService.getRole(guildId, snakeKey);
+			value = await this.configService.getRole(guild, snakeKey);
 		else if (type === EConfigType.RoleArray)
-			value = await this.configService.getRoleList(guildId, snakeKey);
+			value = await this.configService.getRoleList(guild, snakeKey);
 		else if (type === EConfigType.StringArray) {
-			value = await this.configService.getMany(guildId, snakeKey);
+			value = await this.configService.getMany(guild, snakeKey);
 		} else if (type === EConfigType.Channel)
-			value = await this.configService.getChannel(guildId, snakeKey);
-		else value = await this.configService.get(guildId, snakeKey);
+			value = await this.configService.getChannel(guild, snakeKey);
+		else value = await this.configService.get(guild, snakeKey);
 
 		return value;
 	}
 
 	async saveValue(
-		guildId: string,
+		guild: Guild,
 		key: string,
 		value: string | string[],
 		type: EConfigType | string,
 	): Promise<void> {
 		const snakeKey = ConfigHelper.toSnakeCase(key);
-		if (type === EConfigType.Role)
-			return this.configService.setRole(
-				guildId,
-				snakeKey,
-				value as string,
-			);
-		if (type === EConfigType.RoleArray)
-			return this.roleConfig.setList(
-				guildId,
-				snakeKey,
-				value as string[],
-			);
+		if (type === EConfigType.Role) {
+			const role = await guild.roles.fetch(value as string);
+			if (role) return this.configService.setRole(guild, snakeKey, role);
+		}
+		if (type === EConfigType.RoleArray) {
+			const roles: Role[] = [];
+			for (const id of value as string[]) {
+				const role = await guild.roles.fetch(id);
+				if (role) roles.push(role);
+			}
+			return this.roleConfig.setList(guild, snakeKey, roles);
+		}
 		if (type === EConfigType.StringArray)
 			return this.configService.setMany(
-				guildId,
+				guild,
 				snakeKey,
 				value as string[],
 			);
-		if (type === EConfigType.Channel)
-			return this.configService.setChannel(
-				guildId,
-				snakeKey,
-				value as string,
-			);
-		return this.configService.set(guildId, snakeKey, value as string);
+		if (type === EConfigType.Channel) {
+			const channel = await guild.channels.fetch(value as string);
+			if (channel)
+				return this.configService.setChannel(guild, snakeKey, channel);
+		}
+		return this.configService.set(guild, snakeKey, value as string);
 	}
 
 	async deleteValue(
-		guildId: string,
+		guild: Guild,
 		key: string,
 		type: EConfigType | string,
 	): Promise<void> {
 		const snakeKey = ConfigHelper.toSnakeCase(key);
 		if (type === EConfigType.Role || type === EConfigType.RoleArray)
-			return this.configService.clearRoleList(guildId, snakeKey);
+			return this.configService.clearRoleList(guild, snakeKey);
 		if (type === EConfigType.Channel)
-			return this.configService.clearChannelList(guildId, snakeKey);
-		return this.configService.delete(guildId, snakeKey);
+			return this.configService.clearChannelList(guild, snakeKey);
+		return this.configService.delete(guild, snakeKey);
 	}
 
 	static buildCustomId(parts: string[]): string {
@@ -160,7 +164,7 @@ export class ConfigHelper {
 	}
 
 	async getCurrentValue(
-		guildId: string,
+		guild: Guild,
 		key: string,
 		type: EConfigType | string,
 		t: TFunction,
@@ -168,7 +172,7 @@ export class ConfigHelper {
 		locale?: string,
 	): Promise<string> {
 		try {
-			const value = await this.fetchValue(guildId, key, type);
+			const value = await this.fetchValue(guild, key, type);
 			return value
 				? ConfigHelper.formatValue(value, type, t, options, locale)
 				: t("utils.config_helper.not_set");
@@ -179,9 +183,9 @@ export class ConfigHelper {
 
 	async buildModuleConfigEmbed(
 		client: LeBotClient<true>,
-		guildId: string,
+		guild: Guild,
 		moduleName: string,
-		userId: string,
+		user: User,
 		t: TFunction,
 		locale: string,
 	) {
@@ -223,7 +227,7 @@ export class ConfigHelper {
 				opt.description;
 
 			const currentValue = await this.getCurrentValue(
-				guildId,
+				guild,
 				key,
 				opt.type,
 				t,
@@ -243,7 +247,7 @@ export class ConfigHelper {
 				ConfigHelper.buildCustomId([
 					"module_config",
 					moduleName.toLowerCase(),
-					userId,
+					user.id,
 				]),
 			)
 			.setPlaceholder(t("utils.config_helper.select_placeholder"))

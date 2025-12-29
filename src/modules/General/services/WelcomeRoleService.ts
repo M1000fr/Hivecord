@@ -41,7 +41,7 @@ export class WelcomeRoleService {
 	async addWelcomeRoles(member: GuildMember) {
 		try {
 			const roleIds = await this.configService.of(
-				member.guild.id,
+				member.guild,
 				GeneralConfig,
 			).WelcomeRoles;
 			if (!roleIds || roleIds.length === 0) return;

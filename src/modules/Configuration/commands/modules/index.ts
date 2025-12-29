@@ -83,9 +83,9 @@ export default class ModulesCommand {
 
 		const config = await this.configHelper.buildModuleConfigEmbed(
 			lebot,
-			interaction.guildId!,
+			interaction.guild!,
 			moduleName,
-			interaction.user.id,
+			interaction.user,
 			lang.t,
 			lang.locale,
 		);

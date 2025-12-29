@@ -7,6 +7,7 @@ import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { RoleConfigService } from "@modules/Configuration/services/RoleConfigService";
 import { Injectable } from "@src/decorators/Injectable";
 import { Logger } from "@utils/Logger";
+import { Guild } from "discord.js";
 import {
 	createCipheriv,
 	createDecipheriv,
@@ -73,7 +74,7 @@ class ConfigExtractor {
 		configClass: {
 			configProperties?: Record<string, ConfigPropertyOptions>;
 		},
-		guildId: string,
+		guild: Guild,
 	): Promise<ModuleConfig> {
 		const configProperties = configClass?.configProperties || {};
 		const configurations: Record<string, ConfigValue> = {};
@@ -84,7 +85,7 @@ class ConfigExtractor {
 
 			const value = await this.getConfigValue(
 				configService,
-				guildId,
+				guild,
 				snakeCaseKey,
 				opt.type,
 			);
@@ -98,22 +99,22 @@ class ConfigExtractor {
 
 	private static async getConfigValue(
 		configService: ConfigService,
-		guildId: string,
+		guild: Guild,
 		key: string,
 		type: EConfigType | string,
 	): Promise<string | string[] | null> {
 		if (type === EConfigType.Role) {
 			// Check if it's a multi-role configuration
-			const roles = await configService.getRoleList(guildId, key);
+			const roles = await configService.getRoleList(guild, key);
 			if (roles.length > 0) return roles;
 
-			const role = await configService.getRole(guildId, key);
+			const role = await configService.getRole(guild, key);
 			return role ? [role] : null;
 		}
 		if (type === EConfigType.Channel) {
-			return await configService.getChannel(guildId, key);
+			return await configService.getChannel(guild, key);
 		}
-		return await configService.get(guildId, key);
+		return await configService.get(guild, key);
 	}
 
 	private static toSnakeCase(str: string): string {
@@ -126,7 +127,7 @@ class ConfigRestorer {
 		configService: ConfigService,
 		roleConfig: RoleConfigService,
 		moduleConfig: ModuleConfig,
-		guildId: string,
+		guild: Guild,
 	): Promise<void> {
 		for (const [key, configValue] of Object.entries(
 			moduleConfig.configurations,
@@ -136,18 +137,29 @@ class ConfigRestorer {
 			if (type === EConfigType.Role) {
 				if (Array.isArray(value)) {
 					if (value.length === 1 && value[0]) {
-						await configService.setRole(guildId, key, value[0]);
+						const role = await guild.roles.fetch(value[0]);
+						if (role) {
+							await configService.setRole(guild, key, role);
+						}
 					} else if (value.length > 1) {
-						await roleConfig.setList(guildId, key, value);
+						const roles = [];
+						for (const id of value) {
+							const role = await guild.roles.fetch(id);
+							if (role) roles.push(role);
+						}
+						await roleConfig.setList(guild, key, roles);
 					}
 				}
 			} else if (type === EConfigType.Channel) {
 				if (typeof value === "string") {
-					await configService.setChannel(guildId, key, value);
+					const channel = await guild.channels.fetch(value);
+					if (channel) {
+						await configService.setChannel(guild, key, channel);
+					}
 				}
 			} else {
 				if (typeof value === "string") {
-					await configService.set(guildId, key, value);
+					await configService.set(guild, key, value);
 				}
 			}
 		}
@@ -166,7 +178,7 @@ export class BackupService {
 
 	async createBackup(
 		client: LeBotClient<true>,
-		guildId: string,
+		guild: Guild,
 	): Promise<Buffer> {
 		this.logger.log("Creating modular configuration backup...");
 
@@ -181,7 +193,7 @@ export class BackupService {
 					this.configService,
 					moduleName,
 					configClass,
-					guildId,
+					guild,
 				);
 
 				if (Object.keys(moduleConfig.configurations).length > 0) {
@@ -205,7 +217,7 @@ export class BackupService {
 		return Buffer.from(encrypted, "utf-8");
 	}
 
-	async restoreBackup(buffer: Buffer, guildId: string): Promise<void> {
+	async restoreBackup(buffer: Buffer, guild: Guild): Promise<void> {
 		this.logger.log("Restoring modular configuration backup...");
 
 		try {
@@ -229,7 +241,7 @@ export class BackupService {
 					this.configService,
 					this.roleConfig,
 					moduleConfig,
-					guildId,
+					guild,
 				);
 				this.logger.log(
 					`Restored ${Object.keys(moduleConfig.configurations).length} configs for ${moduleConfig.moduleName}`,

@@ -4,14 +4,15 @@ import {
 } from "@decorators/params/index";
 import { DependencyContainer } from "@di/DependencyContainer";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { Guild } from "discord.js";
 import "reflect-metadata";
 
 const GUILD_CONFIG_METADATA_KEY = "lebot:param:guild-config";
 
 /**
- * Extract guild ID from context (supports various context types)
+ * Extract guild from context (supports various context types)
  */
-export function extractGuildIdFromContext(context: unknown): string | null {
+export function extractGuildFromContext(context: unknown): Guild | null {
 	if (!context) return null;
 
 	// Handle array context (event context)
@@ -23,8 +24,10 @@ export function extractGuildIdFromContext(context: unknown): string | null {
 		if (typeof first === "object" && first !== null) {
 			const obj = first as Record<string, unknown>;
 
-			// Direct guildId property (interactions)
-			if (typeof obj.guildId === "string") return obj.guildId;
+			// Direct guild property (interactions)
+			if (obj.guild && typeof obj.guild === "object" && "id" in obj.guild) {
+				return obj.guild as Guild;
+			}
 
 			// member.guild.id pattern
 			if (
@@ -38,19 +41,8 @@ export function extractGuildIdFromContext(context: unknown): string | null {
 					typeof member.guild === "object" &&
 					"id" in member.guild
 				) {
-					const guild = member.guild as Record<string, unknown>;
-					if (typeof guild.id === "string") return guild.id;
+					return member.guild as Guild;
 				}
-			}
-
-			// guild.id pattern
-			if (
-				obj.guild &&
-				typeof obj.guild === "object" &&
-				"id" in obj.guild
-			) {
-				const guild = obj.guild as Record<string, unknown>;
-				if (typeof guild.id === "string") return guild.id;
 			}
 		}
 	}
@@ -121,10 +113,10 @@ export async function resolveGuildConfig(
 		return undefined;
 	}
 
-	const guildId = extractGuildIdFromContext(context);
-	if (!guildId) {
+	const guild = extractGuildFromContext(context);
+	if (!guild) {
 		console.warn(
-			`Could not extract guild ID from context for @GuildConfig in ${String(methodKey)}`,
+			`Could not extract guild from context for @GuildConfig in ${String(methodKey)}`,
 		);
 		return undefined;
 	}
@@ -132,7 +124,7 @@ export async function resolveGuildConfig(
 	const container = DependencyContainer.getInstance();
 	const configService = container.resolve(ConfigService);
 
-	const config = configService.of(guildId, configKey.configClass);
+	const config = configService.of(guild, configKey.configClass);
 	const value = await (config as Record<string, unknown>)[
 		configKey.propertyKey
 	];

@@ -1,25 +1,25 @@
 import { Repository } from "@decorators/Repository";
 import { BaseRepository } from "./BaseRepository";
+import { Role } from "discord.js";
 
 @Repository()
 export class RoleRepository extends BaseRepository {
 	async upsert(
-		roleId: string,
-		guildId: string,
+		role: Role,
 		deletedAt: Date | null = null,
 	) {
 		return this.prisma.role.upsert({
-			where: { id: roleId },
-			update: { guildId, deletedAt },
-			create: { id: roleId, guildId },
+			where: { id: role.id },
+			update: { guildId: role.guild.id, deletedAt },
+			create: { id: role.id, guildId: role.guild.id },
 		});
 	}
 
-	async delete(roleId: string, guildId: string) {
+	async delete(role: Role) {
 		return this.prisma.role.upsert({
-			where: { id: roleId },
+			where: { id: role.id },
 			update: { deletedAt: new Date() },
-			create: { id: roleId, guildId, deletedAt: new Date() },
+			create: { id: role.id, guildId: role.guild.id, deletedAt: new Date() },
 		});
 	}
 }

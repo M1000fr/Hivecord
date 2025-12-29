@@ -16,6 +16,6 @@ export class SyncService {
 	}
 
 	async syncGuildRecord(guild: Guild) {
-		await this.guildRepository.upsert(guild.id, guild.name);
+		await this.guildRepository.upsert(guild);
 	}
 }

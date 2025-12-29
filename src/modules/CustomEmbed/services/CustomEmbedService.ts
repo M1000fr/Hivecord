@@ -3,7 +3,7 @@ import { EntityService } from "@modules/Core/services/EntityService";
 import { RedisService } from "@modules/Core/services/RedisService";
 import { Injectable } from "@src/decorators/Injectable";
 import { CustomEmbedRepository } from "@src/repositories";
-import { EmbedBuilder, type APIEmbed } from "discord.js";
+import { EmbedBuilder, type APIEmbed, Guild, User } from "discord.js";
 
 const EDITOR_TTL = 3600; // 1 hour
 
@@ -18,9 +18,9 @@ export class CustomEmbedService {
 	/**
 	 * Get a raw embed JSON by name
 	 */
-	async get(guildId: string, name: string): Promise<APIEmbed | null> {
+	async get(guild: Guild, name: string): Promise<APIEmbed | null> {
 		const embed = await this.customEmbedRepository.findByName(
-			guildId,
+			guild,
 			name,
 		);
 		if (!embed) return null;
@@ -30,34 +30,34 @@ export class CustomEmbedService {
 	/**
 	 * Save an embed
 	 */
-	async save(guildId: string, name: string, data: APIEmbed): Promise<void> {
-		await this.entityService.ensureGuildById(guildId);
-		await this.customEmbedRepository.upsert(guildId, name, data);
+	async save(guild: Guild, name: string, data: APIEmbed): Promise<void> {
+		await this.entityService.ensureGuild(guild);
+		await this.customEmbedRepository.upsert(guild, name, data);
 	}
 
 	/**
 	 * Delete an embed
 	 */
-	async delete(guildId: string, name: string): Promise<void> {
-		await this.customEmbedRepository.delete(guildId, name);
+	async delete(guild: Guild, name: string): Promise<void> {
+		await this.customEmbedRepository.delete(guild, name);
 	}
 
 	/**
 	 * List all embeds
 	 */
-	async list(guildId: string): Promise<string[]> {
-		return this.customEmbedRepository.listNames(guildId);
+	async list(guild: Guild): Promise<string[]> {
+		return this.customEmbedRepository.listNames(guild);
 	}
 
 	/**
 	 * Render an embed with context
 	 */
 	async render(
-		guildId: string,
+		guild: Guild,
 		name: string,
 		context: Record<string, unknown>,
 	): Promise<EmbedBuilder | null> {
-		const data = await this.get(guildId, name);
+		const data = await this.get(guild, name);
 		if (!data) return null;
 
 		const template = new MessageTemplate("");
@@ -90,18 +90,18 @@ export class CustomEmbedService {
 
 	async setEditorSession(
 		sessionId: string,
-		guildId: string,
+		guild: Guild,
 		name: string,
 		data: APIEmbed,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		meta?: Record<string, any>,
-		userId?: string,
+		user?: User,
 	): Promise<void> {
 		const redis = this.redis.client;
 		const key = `embed:editor:${sessionId}`;
 		await redis.set(
 			key,
-			JSON.stringify({ guildId, name, data, meta, userId }),
+			JSON.stringify({ guildId: guild.id, name, data, meta, userId: user?.id }),
 			"EX",
 			EDITOR_TTL,
 		);

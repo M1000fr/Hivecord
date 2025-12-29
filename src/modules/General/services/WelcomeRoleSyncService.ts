@@ -101,7 +101,7 @@ export class WelcomeRoleSyncService {
 	private async processGuild(guild: Guild) {
 		this.logger.log(`Processing guild ${guild.name} (${guild.id})...`);
 
-		const roleIds = await this.configService.of(guild.id, GeneralConfig)
+		const roleIds = await this.configService.of(guild, GeneralConfig)
 			.WelcomeRoles;
 		if (!roleIds || roleIds.length === 0) {
 			return;

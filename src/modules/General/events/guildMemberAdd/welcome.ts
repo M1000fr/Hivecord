@@ -115,7 +115,7 @@ export default class WelcomeEvent {
 
 			if (welcomeEmbedName) {
 				const customEmbed = await this.customEmbedService.render(
-					member.guild.id,
+					member.guild,
 					welcomeEmbedName,
 					commonContext,
 				);

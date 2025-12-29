@@ -120,7 +120,7 @@ export abstract class BaseConfigInteractions {
 
 		try {
 			await this.configHelper.saveValue(
-				interaction.guildId,
+				interaction.guild!,
 				propertyKey,
 				value,
 				type,
@@ -130,15 +130,15 @@ export abstract class BaseConfigInteractions {
 			if (mainMessage) {
 				const lng =
 					(await this.configService.of(
-						interaction.guildId,
+						interaction.guild!,
 						GeneralConfig,
 					).Language) ?? "en";
 				const t = I18nService.getFixedT(lng);
 				const config = await this.configHelper.buildModuleConfigEmbed(
 					client,
-					interaction.guildId,
+					interaction.guild!,
 					moduleName,
-					interaction.user.id,
+					interaction.user,
 					t,
 					lng,
 				);

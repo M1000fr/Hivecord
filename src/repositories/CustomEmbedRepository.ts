@@ -1,32 +1,32 @@
 import { Repository } from "@decorators/Repository";
-import type { APIEmbed } from "discord.js";
+import type { APIEmbed, Guild } from "discord.js";
 import { BaseRepository } from "./BaseRepository";
 
 @Repository()
 export class CustomEmbedRepository extends BaseRepository {
-	async findByName(guildId: string, name: string) {
+	async findByName(guild: Guild, name: string) {
 		return this.prisma.customEmbed.findUnique({
-			where: { guildId_name: { guildId, name } },
+			where: { guildId_name: { guildId: guild.id, name } },
 		});
 	}
 
-	async upsert(guildId: string, name: string, data: APIEmbed) {
+	async upsert(guild: Guild, name: string, data: APIEmbed) {
 		return this.prisma.customEmbed.upsert({
-			where: { guildId_name: { guildId, name } },
+			where: { guildId_name: { guildId: guild.id, name } },
 			update: { data: JSON.stringify(data) },
-			create: { guildId, name, data: JSON.stringify(data) },
+			create: { guildId: guild.id, name, data: JSON.stringify(data) },
 		});
 	}
 
-	async delete(guildId: string, name: string) {
+	async delete(guild: Guild, name: string) {
 		return this.prisma.customEmbed.delete({
-			where: { guildId_name: { guildId, name } },
+			where: { guildId_name: { guildId: guild.id, name } },
 		});
 	}
 
-	async listNames(guildId: string) {
+	async listNames(guild: Guild) {
 		const embeds = await this.prisma.customEmbed.findMany({
-			where: { guildId },
+			where: { guildId: guild.id },
 			select: { name: true },
 		});
 		return embeds.map((e) => e.name);

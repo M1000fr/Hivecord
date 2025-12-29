@@ -71,8 +71,9 @@ export class EmbedEditorInteractions {
 		interaction: MessageComponentInteraction | ModalSubmitInteraction,
 		session: EmbedEditorSession,
 	) {
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		const lng =
-			(await this.configService.of(session.guildId, GeneralConfig)
+			(await this.configService.of(guild, GeneralConfig)
 				.Language) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const embed = new EmbedBuilder(session.data);
@@ -94,8 +95,9 @@ export class EmbedEditorInteractions {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		const lng =
-			(await this.configService.of(session.guildId, GeneralConfig)
+			(await this.configService.of(guild, GeneralConfig)
 				.Language) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const value = interaction.values[0];
@@ -134,8 +136,9 @@ export class EmbedEditorInteractions {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		const lng =
-			(await this.configService.of(session.guildId, GeneralConfig)
+			(await this.configService.of(guild, GeneralConfig)
 				.Language) ?? "en";
 		const t = I18nService.getFixedT(lng);
 		const value = interaction.values[0];
@@ -156,13 +159,14 @@ export class EmbedEditorInteractions {
 			});
 
 			// Clear editing index in session
+			const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 			await this.customEmbedService.setEditorSession(
 				interaction.message.id,
-				session.guildId,
+				guild,
 				session.name,
 				session.data,
 				{ ...session.meta, editingFieldIndex: undefined },
-				session.userId,
+				interaction.user,
 			);
 
 			const modal = EmbedEditorModals.getModal(t, "field_add");
@@ -180,13 +184,14 @@ export class EmbedEditorInteractions {
 			const field = session.data.fields?.[index];
 			if (field) {
 				// Set editing index in session
+				const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 				await this.customEmbedService.setEditorSession(
 					interaction.message.id,
-					session.guildId,
+					guild,
 					session.name,
 					session.data,
 					{ ...session.meta, editingFieldIndex: index },
-					session.userId,
+					interaction.user,
 				);
 
 				const modal = EmbedEditorModals.getModal(t, "field_edit", {
@@ -198,13 +203,14 @@ export class EmbedEditorInteractions {
 			const index = parseInt(value.split("_")[2] || "0");
 			if (session.data.fields) {
 				session.data.fields.splice(index, 1);
+				const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 				await this.customEmbedService.setEditorSession(
 					interaction.message.id,
-					session.guildId,
+					guild,
 					session.name,
 					session.data,
 					session.meta,
-					session.userId,
+					interaction.user,
 				);
 				// Go back to main menu
 				await this.updateEditorMessage(interaction, session);
@@ -217,8 +223,9 @@ export class EmbedEditorInteractions {
 		const session = await this.getSession(interaction);
 		if (!session) return;
 
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		await this.customEmbedService.save(
-			session.guildId,
+			guild,
 			session.name,
 			session.data,
 		);
@@ -259,13 +266,14 @@ export class EmbedEditorInteractions {
 		session.data.url =
 			interaction.fields.getTextInputValue("url") || undefined;
 
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		await this.customEmbedService.setEditorSession(
 			interaction.message!.id,
-			session.guildId,
+			guild,
 			session.name,
 			session.data,
 			session.meta,
-			session.userId,
+			interaction.user,
 		);
 		await this.updateEditorMessage(interaction, session);
 	}
@@ -280,13 +288,14 @@ export class EmbedEditorInteractions {
 		session.data.description =
 			interaction.fields.getTextInputValue("description") || undefined;
 
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		await this.customEmbedService.setEditorSession(
 			interaction.message!.id,
-			session.guildId,
+			guild,
 			session.name,
 			session.data,
 			session.meta,
-			session.userId,
+			interaction.user,
 		);
 		await this.updateEditorMessage(interaction, session);
 	}
@@ -308,13 +317,14 @@ export class EmbedEditorInteractions {
 			delete session.data.author;
 		}
 
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		await this.customEmbedService.setEditorSession(
 			interaction.message!.id,
-			session.guildId,
+			guild,
 			session.name,
 			session.data,
 			session.meta,
-			session.userId,
+			interaction.user,
 		);
 		await this.updateEditorMessage(interaction, session);
 	}
@@ -336,13 +346,14 @@ export class EmbedEditorInteractions {
 			delete session.data.footer;
 		}
 
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		await this.customEmbedService.setEditorSession(
 			interaction.message!.id,
-			session.guildId,
+			guild,
 			session.name,
 			session.data,
 			session.meta,
-			session.userId,
+			interaction.user,
 		);
 		await this.updateEditorMessage(interaction, session);
 	}
@@ -369,13 +380,14 @@ export class EmbedEditorInteractions {
 			delete session.data.thumbnail;
 		}
 
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		await this.customEmbedService.setEditorSession(
 			interaction.message!.id,
-			session.guildId,
+			guild,
 			session.name,
 			session.data,
 			session.meta,
-			session.userId,
+			interaction.user,
 		);
 		await this.updateEditorMessage(interaction, session);
 	}
@@ -398,13 +410,14 @@ export class EmbedEditorInteractions {
 			delete session.data.color;
 		}
 
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		await this.customEmbedService.setEditorSession(
 			interaction.message!.id,
-			session.guildId,
+			guild,
 			session.name,
 			session.data,
 			session.meta,
-			session.userId,
+			interaction.user,
 		);
 		await this.updateEditorMessage(interaction, session);
 	}
@@ -439,13 +452,14 @@ export class EmbedEditorInteractions {
 		}
 
 		// Clear editing index
+		const guild = interaction.guild ?? await interaction.client.guilds.fetch(session.guildId);
 		await this.customEmbedService.setEditorSession(
 			interaction.message!.id,
-			session.guildId,
+			guild,
 			session.name,
 			session.data,
 			{ ...session.meta, editingFieldIndex: undefined },
-			session.userId,
+			interaction.user,
 		);
 
 		await this.updateEditorMessage(interaction, session);

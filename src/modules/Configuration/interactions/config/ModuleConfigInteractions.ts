@@ -47,7 +47,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 	) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
-		const { client, parts, userId } = ctx;
+		const { client, parts } = ctx;
 		const moduleName = parts[1];
 
 		if (moduleName) {
@@ -91,15 +91,15 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 			try {
 				const lng =
 					(await this.configService.of(
-						interaction.guildId!,
+						interaction.guild!,
 						GeneralConfig,
 					).Language) ?? "en";
 				const t = I18nService.getFixedT(lng);
 				const config = await this.configHelper.buildModuleConfigEmbed(
 					client,
-					interaction.guildId!,
+					interaction.guild!,
 					moduleName,
-					userId,
+					interaction.user,
 					t,
 					lng,
 				);
@@ -196,7 +196,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 	async handleClearButton(@Interaction() interaction: ButtonInteraction) {
 		const ctx = await this.getInteractionContext(interaction);
 		if (!ctx) return;
-		const { client, parts, userId } = ctx;
+		const { client, parts } = ctx;
 		const moduleName = parts[1];
 		const propertyKey = parts[2];
 
@@ -211,7 +211,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 		if (propertyOptions) {
 			try {
 				await this.configHelper.deleteValue(
-					interaction.guildId!,
+					interaction.guild!,
 					propertyKey,
 					propertyOptions.type,
 				);
@@ -220,16 +220,16 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 				if (mainMessage) {
 					const lng =
 						(await this.configService.of(
-							interaction.guildId!,
+							interaction.guild!,
 							GeneralConfig,
 						).Language) ?? "en";
 					const t = I18nService.getFixedT(lng);
 					const config =
 						await this.configHelper.buildModuleConfigEmbed(
 							client,
-							interaction.guildId!,
+							interaction.guild!,
 							moduleName,
-							userId,
+							interaction.user,
 							t,
 							lng,
 						);

@@ -14,6 +14,7 @@ import {
 	ButtonBuilder,
 	ButtonInteraction,
 	ButtonStyle,
+	Guild,
 	ModalBuilder,
 	ModalSubmitInteraction,
 	StringSelectMenuBuilder,
@@ -35,7 +36,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		moduleName: string,
 	) {
 		const view = await this.buildView(
-			interaction.guildId!,
+			interaction.guild!,
 			interaction.user.id,
 			propertyOptions,
 			propertyKey,
@@ -48,20 +49,20 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 	}
 
 	private async buildView(
-		guildId: string,
+		guild: Guild,
 		userId: string,
 		propertyOptions: ConfigPropertyOptions,
 		propertyKey: string,
 		moduleName: string,
 	) {
 		const currentValues = (await this.configHelper.fetchValue(
-			guildId,
+			guild,
 			propertyKey,
 			EConfigType.StringArray,
 		)) as string[];
 
 		const lng =
-			(await this.configService.of(guildId, GeneralConfig).Language) ??
+			(await this.configService.of(guild, GeneralConfig).Language) ??
 			"en";
 		const t = i18next.getFixedT(lng);
 
@@ -152,7 +153,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		if (!propertyOptions) return;
 
 		const view = await this.buildView(
-			interaction.guildId!,
+			interaction.guild!,
 			interaction.user.id,
 			propertyOptions,
 			propertyKey,
@@ -204,7 +205,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const newValue = interaction.fields.getTextInputValue("value");
 
 		const currentValues = (await this.configHelper.fetchValue(
-			interaction.guildId!,
+			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
 		)) as string[];
@@ -212,7 +213,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const newValues = [...currentValues, newValue];
 
 		await this.configHelper.saveValue(
-			interaction.guildId!,
+			interaction.guild!,
 			propertyKey,
 			newValues,
 			EConfigType.StringArray,
@@ -230,7 +231,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const propertyKey = parts[2]!;
 
 		const currentValues = (await this.configHelper.fetchValue(
-			interaction.guildId!,
+			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
 		)) as string[];
@@ -311,7 +312,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const selectedIndices = interaction.values.map(Number);
 
 		const currentValues = (await this.configHelper.fetchValue(
-			interaction.guildId!,
+			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
 		)) as string[];
@@ -321,7 +322,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		);
 
 		await this.configHelper.saveValue(
-			interaction.guildId!,
+			interaction.guild!,
 			propertyKey,
 			newValues,
 			EConfigType.StringArray,
@@ -339,7 +340,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const propertyKey = parts[2]!;
 
 		const currentValues = (await this.configHelper.fetchValue(
-			interaction.guildId!,
+			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
 		)) as string[];
@@ -407,7 +408,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		if (!index) return;
 
 		const currentValues = (await this.configHelper.fetchValue(
-			interaction.guildId!,
+			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
 		)) as string[];
@@ -450,7 +451,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const newValue = interaction.fields.getTextInputValue("value");
 
 		const currentValues = (await this.configHelper.fetchValue(
-			interaction.guildId!,
+			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
 		)) as string[];
@@ -458,7 +459,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		if (index >= 0 && index < currentValues.length) {
 			currentValues[index] = newValue;
 			await this.configHelper.saveValue(
-				interaction.guildId!,
+				interaction.guild!,
 				propertyKey,
 				currentValues,
 				EConfigType.StringArray,

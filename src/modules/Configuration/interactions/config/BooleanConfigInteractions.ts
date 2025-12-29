@@ -49,7 +49,7 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 		}
 
 		const currentValue = await this.configHelper.fetchValue(
-			interaction.guildId,
+			interaction.guild!,
 			selectedProperty,
 			EConfigType.Boolean,
 		);

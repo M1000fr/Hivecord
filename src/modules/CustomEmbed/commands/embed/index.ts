@@ -31,7 +31,7 @@ export default class EmbedCommand {
 		@AutocompleteInteraction() [interaction]: CommandAutocompleteContext,
 	) {
 		const focusedValue = interaction.options.getFocused();
-		const embeds = await this.customEmbedService.list(interaction.guildId!);
+		const embeds = await this.customEmbedService.list(interaction.guild!);
 		const filtered = embeds.filter((choice) =>
 			choice.toLowerCase().includes(focusedValue.toLowerCase()),
 		);
@@ -51,7 +51,7 @@ export default class EmbedCommand {
 		await interaction.deferReply();
 		const name = interaction.options.getString("name", true);
 		let data = await this.customEmbedService.get(
-			interaction.guildId!,
+			interaction.guild!,
 			name,
 		);
 
@@ -87,11 +87,11 @@ export default class EmbedCommand {
 		// Save to session
 		await this.customEmbedService.setEditorSession(
 			response.id,
-			interaction.guildId!,
+			interaction.guild!,
 			name,
 			data,
 			undefined,
-			interaction.user.id,
+			interaction.user,
 		);
 	}
 
@@ -104,7 +104,7 @@ export default class EmbedCommand {
 		await interaction.deferReply();
 		const name = interaction.options.getString("name", true);
 		const data = await this.customEmbedService.get(
-			interaction.guildId!,
+			interaction.guild!,
 			name,
 		);
 
@@ -139,11 +139,11 @@ export default class EmbedCommand {
 		// Save to session
 		await this.customEmbedService.setEditorSession(
 			response.id,
-			interaction.guildId!,
+			interaction.guild!,
 			name,
 			data,
 			undefined,
-			interaction.user.id,
+			interaction.user,
 		);
 	}
 
@@ -155,7 +155,7 @@ export default class EmbedCommand {
 	) {
 		await interaction.deferReply();
 		const name = interaction.options.getString("name", true);
-		await this.customEmbedService.delete(interaction.guildId!, name);
+		await this.customEmbedService.delete(interaction.guild!, name);
 		await interaction.editReply({
 			content: lang.t("modules.configuration.commands.embed.deleted", {
 				name,
@@ -170,7 +170,7 @@ export default class EmbedCommand {
 		@GuildLanguage() lang: GuildLanguageContext,
 	) {
 		await interaction.deferReply();
-		const embeds = await this.customEmbedService.list(interaction.guildId!);
+		const embeds = await this.customEmbedService.list(interaction.guild!);
 
 		await interaction.editReply({
 			content: lang.t("modules.configuration.commands.embed.list", {
@@ -192,7 +192,7 @@ export default class EmbedCommand {
 		const context = {};
 
 		const embed = await this.customEmbedService.render(
-			interaction.guildId!,
+			interaction.guild!,
 			name,
 			context,
 		);

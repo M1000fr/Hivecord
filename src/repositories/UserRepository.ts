@@ -1,19 +1,20 @@
 import { Repository } from "@decorators/Repository";
 import { BaseRepository } from "./BaseRepository";
+import { User } from "discord.js";
 
 @Repository()
 export class UserRepository extends BaseRepository {
-	async upsert(userId: string) {
+	async upsert(user: User) {
 		return this.prisma.user.upsert({
-			where: { id: userId },
+			where: { id: user.id },
 			update: { leftAt: null },
-			create: { id: userId },
+			create: { id: user.id },
 		});
 	}
 
-	async findById(userId: string) {
+	async findById(user: User) {
 		return this.prisma.user.findUnique({
-			where: { id: userId },
+			where: { id: user.id },
 		});
 	}
 }

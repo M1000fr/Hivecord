@@ -71,12 +71,12 @@ export class CustomEmbedConfigHandler
 		moduleName: string,
 	) {
 		const lng = await this.configService.of(
-			interaction.guildId!,
+			interaction.guild!,
 			GeneralConfig,
 		).Language;
 		const t = I18nService.getFixedT(lng);
 		const currentValue = await this.configHelper.getCurrentValue(
-			interaction.guildId!,
+			interaction.guild!,
 			selectedProperty,
 			propertyOptions.type,
 			t,

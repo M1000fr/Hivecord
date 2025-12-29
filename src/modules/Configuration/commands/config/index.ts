@@ -35,7 +35,7 @@ export default class ConfigCommand {
 		try {
 			const buffer = await this.backupService.createBackup(
 				lebot,
-				interaction.guildId!,
+				interaction.guild!,
 			);
 			const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
 			const filename = `config-backup-${timestamp}.enc`;
@@ -92,7 +92,7 @@ export default class ConfigCommand {
 			// Restore the backup
 			await this.backupService.restoreBackup(
 				buffer,
-				interaction.guildId!,
+				interaction.guild!,
 			);
 
 			await interaction.editReply({
