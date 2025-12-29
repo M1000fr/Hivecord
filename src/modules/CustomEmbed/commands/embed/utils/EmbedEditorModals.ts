@@ -55,11 +55,7 @@ export class EmbedEditorModals {
 
 		modal.addLabelComponents(
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.title.label",
-					),
-				)
+				.setLabel(t("common.title"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("title")
@@ -68,11 +64,7 @@ export class EmbedEditorModals {
 						.setValue(data?.title || ""),
 				),
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.title.url_label",
-					),
-				)
+				.setLabel(t("common.url"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("url")
@@ -98,11 +90,7 @@ export class EmbedEditorModals {
 
 		modal.addLabelComponents(
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.description.label",
-					),
-				)
+				.setLabel(t("common.description"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("description")
@@ -128,11 +116,7 @@ export class EmbedEditorModals {
 
 		modal.addLabelComponents(
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.author.name_label",
-					),
-				)
+				.setLabel(t("common.name"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("name")
@@ -141,11 +125,7 @@ export class EmbedEditorModals {
 						.setValue(data?.author?.name || ""),
 				),
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.author.icon_label",
-					),
-				)
+				.setLabel(t("common.icon_url"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("icon_url")
@@ -171,11 +151,7 @@ export class EmbedEditorModals {
 
 		modal.addLabelComponents(
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.footer.text_label",
-					),
-				)
+				.setLabel(t("common.text"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("text")
@@ -184,11 +160,7 @@ export class EmbedEditorModals {
 						.setValue(data?.footer?.text || ""),
 				),
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.footer.icon_label",
-					),
-				)
+				.setLabel(t("common.icon_url"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("icon_url")
@@ -214,11 +186,7 @@ export class EmbedEditorModals {
 
 		modal.addLabelComponents(
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.images.image_label",
-					),
-				)
+				.setLabel(t("common.image_url"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("image")
@@ -232,11 +200,7 @@ export class EmbedEditorModals {
 						.setValue(data?.image?.url || ""),
 				),
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.images.thumbnail_label",
-					),
-				)
+				.setLabel(t("common.thumbnail_url"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("thumbnail")
@@ -262,11 +226,7 @@ export class EmbedEditorModals {
 
 		modal.addLabelComponents(
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.color.label",
-					),
-				)
+				.setLabel(t("common.color"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("color")
@@ -299,11 +259,7 @@ export class EmbedEditorModals {
 
 		modal.addLabelComponents(
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.field.name_label",
-					),
-				)
+				.setLabel(t("common.name"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("name")
@@ -312,11 +268,7 @@ export class EmbedEditorModals {
 						.setValue(data?.field?.name || ""),
 				),
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.field.value_label",
-					),
-				)
+				.setLabel(t("common.value"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("value")
@@ -325,17 +277,17 @@ export class EmbedEditorModals {
 						.setValue(data?.field?.value || ""),
 				),
 			new LabelBuilder()
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.modals.field.inline_label",
-					),
-				)
+				.setLabel(t("common.inline"))
 				.setTextInputComponent(
 					new TextInputBuilder()
 						.setCustomId("inline")
 						.setStyle(TextInputStyle.Short)
 						.setRequired(false)
-						.setValue(data?.field?.inline ? "true" : "false"),
+						.setValue(
+							data?.field?.inline !== undefined
+								? data.field.inline.toString()
+								: "false",
+						),
 				),
 		);
 		return modal;

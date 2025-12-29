@@ -19,9 +19,7 @@ export class EmbedEditorMenus {
 				)
 				.addOptions([
 					{
-						label: t(
-							"modules.configuration.utils.embed_editor.menu.title_url.label",
-						),
+						label: t("common.title_url"),
 						value: "edit_title",
 						description: t(
 							"modules.configuration.utils.embed_editor.menu.title_url.description",
@@ -29,9 +27,7 @@ export class EmbedEditorMenus {
 						emoji: "📝",
 					},
 					{
-						label: t(
-							"modules.configuration.utils.embed_editor.menu.description.label",
-						),
+						label: t("common.description"),
 						value: "edit_description",
 						description: t(
 							"modules.configuration.utils.embed_editor.menu.description.description",
@@ -39,9 +35,7 @@ export class EmbedEditorMenus {
 						emoji: "📄",
 					},
 					{
-						label: t(
-							"modules.configuration.utils.embed_editor.menu.author.label",
-						),
+						label: t("common.author"),
 						value: "edit_author",
 						description: t(
 							"modules.configuration.utils.embed_editor.menu.author.description",
@@ -49,9 +43,7 @@ export class EmbedEditorMenus {
 						emoji: "👤",
 					},
 					{
-						label: t(
-							"modules.configuration.utils.embed_editor.menu.footer.label",
-						),
+						label: t("common.footer"),
 						value: "edit_footer",
 						description: t(
 							"modules.configuration.utils.embed_editor.menu.footer.description",
@@ -59,9 +51,7 @@ export class EmbedEditorMenus {
 						emoji: "🦶",
 					},
 					{
-						label: t(
-							"modules.configuration.utils.embed_editor.menu.images.label",
-						),
+						label: t("common.images"),
 						value: "edit_images",
 						description: t(
 							"modules.configuration.utils.embed_editor.menu.images.description",
@@ -69,9 +59,7 @@ export class EmbedEditorMenus {
 						emoji: "🖼️",
 					},
 					{
-						label: t(
-							"modules.configuration.utils.embed_editor.menu.color.label",
-						),
+						label: t("common.color"),
 						value: "edit_color",
 						description: t(
 							"modules.configuration.utils.embed_editor.menu.color.description",
@@ -79,9 +67,7 @@ export class EmbedEditorMenus {
 						emoji: "🎨",
 					},
 					{
-						label: t(
-							"modules.configuration.utils.embed_editor.menu.fields.label",
-						),
+						label: t("common.fields"),
 						value: "edit_fields",
 						description: t(
 							"modules.configuration.utils.embed_editor.menu.fields.description",
@@ -96,18 +82,12 @@ export class EmbedEditorMenus {
 		return new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder()
 				.setCustomId("embed_editor_save")
-				.setLabel(
-					t("modules.configuration.utils.embed_editor.buttons.save"),
-				)
+				.setLabel(t("common.save"))
 				.setStyle(ButtonStyle.Success)
 				.setEmoji("💾"),
 			new ButtonBuilder()
 				.setCustomId("embed_editor_cancel")
-				.setLabel(
-					t(
-						"modules.configuration.utils.embed_editor.buttons.cancel",
-					),
-				)
+				.setLabel(t("common.cancel"))
 				.setStyle(ButtonStyle.Secondary)
 				.setEmoji("❌"),
 		);
@@ -116,9 +96,7 @@ export class EmbedEditorMenus {
 	static getFieldsSubMenu(t: TFunction, fields: APIEmbed["fields"] = []) {
 		const options = [
 			{
-				label: t(
-					"modules.configuration.utils.embed_editor.fields.back.label",
-				),
+				label: t("common.back"),
 				value: "back",
 				description: t(
 					"modules.configuration.utils.embed_editor.fields.back.description",
@@ -126,9 +104,7 @@ export class EmbedEditorMenus {
 				emoji: "⬅️",
 			},
 			{
-				label: t(
-					"modules.configuration.utils.embed_editor.fields.add.label",
-				),
+				label: t("common.add"),
 				value: "field_add",
 				description: t(
 					"modules.configuration.utils.embed_editor.fields.add.description",
@@ -140,10 +116,9 @@ export class EmbedEditorMenus {
 		if (fields && fields.length > 0) {
 			fields.forEach((field, index) => {
 				options.push({
-					label: t(
-						"modules.configuration.utils.embed_editor.fields.edit.label",
-						{ name: field.name.substring(0, 20) },
-					),
+					label: t("common.edit", {
+						name: field.name.substring(0, 20),
+					}),
 					value: `field_edit_${index}`,
 					description: t(
 						"modules.configuration.utils.embed_editor.fields.edit.description",
@@ -151,10 +126,9 @@ export class EmbedEditorMenus {
 					emoji: "✏️",
 				});
 				options.push({
-					label: t(
-						"modules.configuration.utils.embed_editor.fields.remove.label",
-						{ name: field.name.substring(0, 20) },
-					),
+					label: t("common.remove", {
+						name: field.name.substring(0, 20),
+					}),
 					value: `field_remove_${index}`,
 					description: t(
 						"modules.configuration.utils.embed_editor.fields.remove.description",

@@ -121,12 +121,12 @@ export class Pager<T> {
 				navigationRow.addComponents(
 					new ButtonBuilder()
 						.setCustomId("pager_prev")
-						.setLabel(this.t("utils.pager.previous"))
+						.setLabel(this.t("common.previous"))
 						.setStyle(ButtonStyle.Secondary)
 						.setDisabled(this.currentPage === 0),
 					new ButtonBuilder()
 						.setCustomId("pager_next")
-						.setLabel(this.t("utils.pager.next"))
+						.setLabel(this.t("common.next"))
 						.setStyle(ButtonStyle.Secondary)
 						.setDisabled(this.currentPage === totalPages - 1),
 				);
@@ -221,12 +221,12 @@ export class Pager<T> {
 		navigationRow.addComponents(
 			new ButtonBuilder()
 				.setCustomId("pager_prev")
-				.setLabel(t("utils.pager.previous"))
+				.setLabel(t("common.previous"))
 				.setStyle(ButtonStyle.Secondary)
 				.setDisabled(currentPage === 0),
 			new ButtonBuilder()
 				.setCustomId("pager_next")
-				.setLabel(t("utils.pager.next"))
+				.setLabel(t("common.next"))
 				.setStyle(ButtonStyle.Secondary)
 				.setDisabled(currentPage === totalPages - 1),
 		);

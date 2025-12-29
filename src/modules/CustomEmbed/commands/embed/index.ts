@@ -209,7 +209,7 @@ export default class EmbedCommand {
 		}
 
 		await interaction.editReply({
-			content: lang.t("modules.configuration.commands.embed.preview", {
+			content: lang.t("common.preview", {
 				name,
 			}),
 			embeds: [embed],

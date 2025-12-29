@@ -6,7 +6,36 @@
 		},
 		"user": "Utilisateur",
 		"no_reason": "Aucune raison fournie",
-		"none": "Aucun"
+		"none": "Aucun",
+		"cancel": "Annuler",
+		"save": "Sauvegarder",
+		"add": "Ajouter",
+		"back": "Retour",
+		"edit": "Modifier",
+		"remove": "Supprimer",
+		"author": "Auteur",
+		"color": "Couleur",
+		"description": "Description",
+		"fields": "Champs",
+		"footer": "Pied de page",
+		"images": "Images",
+		"title": "Titre",
+		"name": "Nom",
+		"value": "Valeur",
+		"text": "Texte",
+		"image": "Image",
+		"thumbnail": "Miniature",
+		"url": "URL",
+		"type": "Type",
+		"current": "Actuel",
+		"previous": "Précédent",
+		"next": "Suivant",
+		"preview": "Aperçu",
+		"title_url": "Titre & URL",
+		"icon_url": "URL de l'icône",
+		"image_url": "URL de l'image",
+		"thumbnail_url": "URL de la miniature",
+		"inline": "En ligne (true/false)"
 	},
 	"commands": {
 		"not_implemented": "Cette commande n'est pas encore implémentée."
@@ -26,7 +55,6 @@
 					"list": "Liste des embeds :\n{{embeds}}",
 					"new_embed_desc": "Description du nouvel embed",
 					"new_embed_title": "Nouvel Embed",
-					"preview": "Aperçu",
 					"editor_intro": "Éditeur d'embed pour `{{name}}`",
 					"not_found": "❌ Embed `{{name}}` introuvable."
 				},
@@ -40,96 +68,69 @@
 			},
 			"utils": {
 				"embed_editor": {
-					"buttons": {
-						"cancel": "Annuler",
-						"save": "Sauvegarder"
-					},
+					"buttons": {},
 					"fields": {
 						"add": {
-							"description": "Ajouter un nouveau champ",
-							"label": "Ajouter un champ"
+							"description": "Ajouter un nouveau champ"
 						},
 						"back": {
-							"description": "Retour",
-							"label": "Retour"
+							"description": "Retour"
 						},
 						"edit": {
-							"description": "Modifier ce champ",
-							"label": "Modifier"
+							"description": "Modifier ce champ"
 						},
 						"placeholder": "Sélectionnez une action de champ...",
 						"remove": {
-							"description": "Supprimer ce champ",
-							"label": "Supprimer"
+							"description": "Supprimer ce champ"
 						}
 					},
 					"menu": {
 						"author": {
-							"description": "Modifier l'auteur",
-							"label": "Auteur"
+							"description": "Modifier l'auteur"
 						},
 						"color": {
-							"description": "Modifier la couleur",
-							"label": "Couleur"
+							"description": "Modifier la couleur"
 						},
 						"description": {
-							"description": "Modifier la description",
-							"label": "Description"
+							"description": "Modifier la description"
 						},
 						"fields": {
-							"description": "Modifier les champs",
-							"label": "Champs"
+							"description": "Modifier les champs"
 						},
 						"footer": {
-							"description": "Modifier le pied de page",
-							"label": "Pied de page"
+							"description": "Modifier le pied de page"
 						},
 						"images": {
-							"description": "Modifier les images",
-							"label": "Images"
+							"description": "Modifier les images"
 						},
 						"placeholder": "Sélectionnez un élément à modifier...",
 						"title_url": {
-							"description": "Modifier le titre et l'URL",
-							"label": "Titre & URL"
+							"description": "Modifier le titre et l'URL"
 						}
 					},
 					"modals": {
 						"author": {
-							"icon_label": "URL de l'icône",
-							"name_label": "Nom",
 							"title": "Modifier l'auteur"
 						},
 						"color": {
-							"label": "Couleur (Hex)",
 							"placeholder": "#FFFFFF",
 							"title": "Modifier la couleur"
 						},
 						"description": {
-							"label": "Description",
 							"title": "Modifier la description"
 						},
 						"field": {
-							"inline_label": "En ligne (true/false)",
-							"name_label": "Nom",
-							"title": "Modifier le champ",
-							"value_label": "Valeur"
+							"title": "Modifier le champ"
 						},
 						"footer": {
-							"icon_label": "URL de l'icône",
-							"text_label": "Texte",
 							"title": "Modifier le pied de page"
 						},
 						"images": {
-							"image_label": "URL de l'image",
 							"image_placeholder": "https://...",
-							"thumbnail_label": "URL de la miniature",
 							"title": "Modifier les images"
 						},
 						"title": {
-							"label": "Titre",
-							"title": "Modifier le titre",
-							"url_label": "URL"
+							"title": "Modifier le titre"
 						}
 					}
 				}
@@ -155,8 +156,6 @@
 		"config_helper": {
 			"title": "⚙️ Configuration : {{module}}",
 			"description": "Sélectionnez une propriété à configurer pour le module **{{module}}**.",
-			"type": "Type",
-			"current": "Actuel",
 			"not_set": "Non défini",
 			"select_placeholder": "Sélectionnez une propriété...",
 			"types": {},
@@ -164,8 +163,6 @@
 			"available_variables": "Variables disponibles"
 		},
 		"pager": {
-			"previous": "Précédent",
-			"next": "Suivant",
 			"not_allowed": "❌ Vous n'êtes pas autorisé à interagir avec ce paginateur."
 		}
 	}
