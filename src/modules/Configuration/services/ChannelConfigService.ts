@@ -2,7 +2,7 @@ import { Injectable } from "@decorators/Injectable";
 import { EntityService } from "@modules/Core/services/EntityService";
 import { PrismaService } from "@modules/Core/services/PrismaService";
 import { ChannelType } from "@prisma/client/enums";
-import type { Guild, GuildBasedChannel } from "discord.js";
+import type { Channel, Guild, GuildBasedChannel } from "discord.js";
 import { ConfigCacheService } from "./ConfigCacheService";
 
 @Injectable()
@@ -121,11 +121,11 @@ export class ChannelConfigService {
 	async removeFromList(
 		guild: Guild,
 		key: string,
-		channelId: string,
+		channel: Channel,
 	): Promise<void> {
 		try {
 			await this.prisma.channelListConfiguration.delete({
-				where: { key_channelId: { key, channelId } },
+				where: { key_channelId: { key, channelId: channel.id } },
 			});
 			await this.cache.invalidate(guild.id, key);
 		} catch {
@@ -133,11 +133,7 @@ export class ChannelConfigService {
 		}
 	}
 
-	async delete(
-		guild: Guild,
-		key: string,
-		_channelId: string,
-	): Promise<void> {
+	async delete(guild: Guild, key: string, _channel: Channel): Promise<void> {
 		try {
 			await this.prisma.channelConfiguration.delete({
 				where: { key },

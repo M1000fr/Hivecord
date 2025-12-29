@@ -10,7 +10,7 @@ import { PrismaService } from "@modules/Core/services/PrismaService";
 import { ChannelType } from "@prisma/client/enums";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 import { Logger } from "@utils/Logger";
-import { Guild, type GuildBasedChannel, Role } from "discord.js";
+import { type Channel, Guild, type GuildBasedChannel, Role } from "discord.js";
 import { ChannelConfigService } from "./ChannelConfigService";
 import { ConfigCacheService } from "./ConfigCacheService";
 import { RoleConfigService } from "./RoleConfigService";
@@ -180,9 +180,9 @@ export class ConfigService {
 	async deleteChannel(
 		guild: Guild,
 		key: string,
-		channelId: string,
+		channel: Channel,
 	): Promise<void> {
-		await this.channelConfig.delete(guild, key, channelId);
+		await this.channelConfig.delete(guild, key, channel);
 		await this.notifyUpdate(guild.id, key, null);
 	}
 
