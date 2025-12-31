@@ -3,7 +3,10 @@ import { Client, GuildLanguage } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { PagerService } from "@modules/Core/services/PagerService";
 import type { LeBotClient } from "@src/class/LeBotClient";
-import { SlashCommand, SlashCommandController } from "@src/decorators/commands/SlashCommand";
+import {
+	SlashCommand,
+	SlashCommandController,
+} from "@src/decorators/commands/SlashCommand";
 import { CommandInteraction } from "@src/decorators/Interaction";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import {

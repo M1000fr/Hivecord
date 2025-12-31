@@ -22,7 +22,9 @@ export interface SubcommandOptions {
 	permission?: EPermission;
 }
 
-export function SlashCommand(optionsOrPermission?: EPermission | SubcommandOptions) {
+export function SlashCommand(
+	optionsOrPermission?: EPermission | SubcommandOptions,
+) {
 	return function (
 		target: object,
 		propertyKey: string,
