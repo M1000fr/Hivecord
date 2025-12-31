@@ -3,7 +3,7 @@ import { Client, GuildLanguage } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { PagerService } from "@modules/Core/services/PagerService";
 import type { LeBotClient } from "@src/class/LeBotClient";
-import { Command, CommandController } from "@src/decorators/commands/Command";
+import { SlashCommand, SlashCommandController } from "@src/decorators/commands/SlashCommand";
 import { CommandInteraction } from "@src/decorators/Interaction";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import {
@@ -15,11 +15,11 @@ import {
 } from "discord.js";
 import { pingOptions } from "./pingOptions";
 
-@CommandController(pingOptions)
+@SlashCommandController(pingOptions)
 export default class PingCommand {
 	constructor(@Inject(PagerService) private pagerService: PagerService) {}
 
-	@Command(EPermission.Ping)
+	@SlashCommand(EPermission.Ping)
 	async default(
 		@Client() client: LeBotClient,
 		@GuildLanguage() lang: GuildLanguageContext,

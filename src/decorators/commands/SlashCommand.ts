@@ -5,7 +5,7 @@ import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import "reflect-metadata";
 
-export function CommandController(options: CommandOptions) {
+export function SlashCommandController(options: CommandOptions) {
 	return function (target: abstract new (...args: never[]) => object) {
 		// Apply @Injectable() automatically
 		Injectable()(target);
@@ -22,7 +22,7 @@ export interface SubcommandOptions {
 	permission?: EPermission;
 }
 
-export function Command(optionsOrPermission?: EPermission | SubcommandOptions) {
+export function SlashCommand(optionsOrPermission?: EPermission | SubcommandOptions) {
 	return function (
 		target: object,
 		propertyKey: string,

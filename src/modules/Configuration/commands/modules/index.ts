@@ -9,9 +9,9 @@ import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { Autocomplete } from "@src/decorators/commands/Autocomplete.ts";
 import {
-	Command,
-	CommandController,
-} from "@src/decorators/commands/Command.ts";
+	SlashCommand,
+	SlashCommandController,
+} from "@src/decorators/commands/SlashCommand.ts";
 import type { CommandAutocompleteContext } from "@src/types/CommandAutocompleteContext.ts";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { ConfigHelper } from "@utils/ConfigHelper";
@@ -19,7 +19,7 @@ import { ChatInputCommandInteraction } from "discord.js";
 import { modulesOptions } from "./modulesOptions.ts";
 
 @Injectable()
-@CommandController(modulesOptions)
+@SlashCommandController(modulesOptions)
 export default class ModulesCommand {
 	constructor(
 		private readonly configService: ConfigService,
@@ -45,7 +45,7 @@ export default class ModulesCommand {
 		await interaction.respond(modules);
 	}
 
-	@Command(EPermission.ConfigureModules)
+	@SlashCommand(EPermission.ConfigureModules)
 	async run(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,

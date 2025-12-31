@@ -4,7 +4,7 @@ import { Client, GuildLanguage } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { BackupService } from "@modules/Configuration/services/BackupService";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { CommandController } from "@src/decorators/commands/Command";
+import { SlashCommandController } from "@src/decorators/commands/SlashCommand";
 import { Subcommand } from "@src/decorators/commands/Subcommand";
 import { CommandInteraction } from "@src/decorators/Interaction";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
@@ -16,7 +16,7 @@ import {
 import { configOptions } from "./configOptions";
 
 @Injectable()
-@CommandController(configOptions)
+@SlashCommandController(configOptions)
 export default class ConfigCommand {
 	constructor(
 		private readonly configService: ConfigService,

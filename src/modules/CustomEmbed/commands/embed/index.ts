@@ -4,7 +4,7 @@ import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import type { LeBotClient } from "@src/class/LeBotClient";
 import { Autocomplete } from "@src/decorators/commands/Autocomplete";
-import { CommandController } from "@src/decorators/commands/Command";
+import { SlashCommandController } from "@src/decorators/commands/SlashCommand";
 import { Subcommand } from "@src/decorators/commands/Subcommand";
 import {
 	AutocompleteInteraction,
@@ -18,7 +18,7 @@ import { embedOptions } from "./embedOptions";
 import { EmbedEditorMenus } from "./utils/EmbedEditorMenus";
 
 @Injectable()
-@CommandController(embedOptions)
+@SlashCommandController(embedOptions)
 export default class EmbedCommand {
 	constructor(
 		private readonly configService: ConfigService,
