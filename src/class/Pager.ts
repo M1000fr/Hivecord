@@ -9,9 +9,10 @@ import {
 	ButtonStyle,
 	EmbedBuilder,
 	InteractionCollector,
+	type AnySelectMenuInteraction,
 	type BaseMessageOptions,
+	type ButtonInteraction,
 	type ChannelSelectMenuBuilder,
-	type CollectedInteraction,
 	type Interaction,
 	type MentionableSelectMenuBuilder,
 	type RepliableInteraction,
@@ -19,6 +20,8 @@ import {
 	type StringSelectMenuBuilder,
 	type UserSelectMenuBuilder,
 } from "discord.js";
+
+type AnyComponentInteraction = ButtonInteraction | AnySelectMenuInteraction;
 
 type PagerComponentBuilder =
 	| ButtonBuilder
@@ -43,8 +46,8 @@ export interface PagerOptions<T> {
 	filter?: (interaction: Interaction) => boolean;
 	time?: number;
 	onComponent?: (
-		interaction: CollectedInteraction,
-		collector: InteractionCollector<CollectedInteraction>,
+		interaction: AnyComponentInteraction,
+		collector: InteractionCollector<AnyComponentInteraction>,
 	) => Promise<void>;
 	type?: string; // Unique identifier for the pager type (required for persistence)
 	userId?: string; // User ID allowed to interact (for persistence)
@@ -67,8 +70,8 @@ export class Pager<T> {
 	private filter: (interaction: Interaction) => boolean;
 	private time: number;
 	private onComponent?: (
-		interaction: CollectedInteraction,
-		collector: InteractionCollector<CollectedInteraction>,
+		interaction: AnyComponentInteraction,
+		collector: InteractionCollector<AnyComponentInteraction>,
 	) => Promise<void>;
 	private type?: string;
 	private userId?: string;
@@ -188,10 +191,7 @@ export class Pager<T> {
 				await i.update(content);
 			} else {
 				if (this.onComponent) {
-					await this.onComponent(
-						i as unknown as CollectedInteraction,
-						collector as unknown as InteractionCollector<CollectedInteraction>,
-					);
+					await this.onComponent(i, collector);
 				}
 			}
 		});

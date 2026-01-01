@@ -3,6 +3,7 @@ import {
 	EmbedBuilder,
 	type BaseMessageOptions,
 	type Interaction,
+	type MessageActionRowComponentBuilder,
 } from "discord.js";
 
 export type PagerRenderer<T = unknown> = (
@@ -11,8 +12,7 @@ export type PagerRenderer<T = unknown> = (
 	totalPages: number,
 ) => Promise<{
 	embeds: EmbedBuilder[];
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	components: ActionRowBuilder<any>[];
+	components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
 	files?: BaseMessageOptions["files"];
 }>;
 
@@ -25,6 +25,15 @@ export type PagerComponentHandler = (
 export interface PagerDefinition {
 	renderPage: PagerRenderer;
 	onComponent?: PagerComponentHandler;
+}
+
+export interface PagerState<T = unknown> {
+	type: string;
+	items: T[];
+	itemsPerPage: number;
+	currentPage: number;
+	userId?: string;
+	locale?: string;
 }
 
 export class PagerRegistry {

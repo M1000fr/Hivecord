@@ -2,7 +2,7 @@ import { Pager, type PagerOptions } from "@class/Pager";
 import { Injectable } from "@decorators/Injectable";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { RedisService } from "@modules/Core/services/RedisService";
-import { PagerRegistry } from "@registers/PagerRegistry";
+import { PagerRegistry, type PagerState } from "@registers/PagerRegistry";
 import { ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
 
 @Injectable()
@@ -29,7 +29,7 @@ export class PagerService {
 
 		if (!data) return false; // Not a pager interaction
 
-		const state = JSON.parse(data);
+		const state = JSON.parse(data) as PagerState;
 		const locale = state.locale || "fr";
 		const t = I18nService.getFixedT(locale);
 
