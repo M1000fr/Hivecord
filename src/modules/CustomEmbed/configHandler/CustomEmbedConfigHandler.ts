@@ -5,8 +5,9 @@ import { BaseSelectConfigHandler } from "@class/BaseSelectConfigHandler";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { CustomEmbedRepository } from "@src/repositories";
-import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbedConfigKey";
 import { type Guild, StringSelectMenuInteraction } from "discord.js";
+
+export const CUSTOM_EMBED_CONFIG_KEY = "CustomEmbed";
 
 @ConfigType({
 	id: CUSTOM_EMBED_CONFIG_KEY,
