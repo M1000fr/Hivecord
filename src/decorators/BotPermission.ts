@@ -23,7 +23,10 @@ export function BotPermission(...permissions: PermissionResolvable[]) {
 				if (arg instanceof Guild) {
 					guild = arg;
 				} else if (arg && typeof arg === "object") {
-					const typedArg = arg as { guild?: unknown; reply?: unknown };
+					const typedArg = arg as {
+						guild?: unknown;
+						reply?: unknown;
+					};
 					if (typedArg.guild instanceof Guild) {
 						guild = typedArg.guild;
 						if (typeof typedArg.reply === "function") {

@@ -95,7 +95,10 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 		const filter = (m: Message) =>
 			m.author.id === interaction.user.id && m.attachments.size > 0;
 
-		if (!interaction.channel || !("createMessageCollector" in interaction.channel))
+		if (
+			!interaction.channel ||
+			!("createMessageCollector" in interaction.channel)
+		)
 			return;
 		const collector = interaction.channel.createMessageCollector({
 			filter,

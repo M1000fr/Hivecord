@@ -42,13 +42,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 	async handleEditTextButton(@Interaction() interaction: ButtonInteraction) {
 		const ctx = await this.getHandleContext(interaction);
 		if (!ctx) return;
-		const {
-			moduleName,
-			propertyKey,
-			parts,
-			module,
-			propertyOptions,
-		} = ctx;
+		const { moduleName, propertyKey, parts, module, propertyOptions } = ctx;
 		const messageId = parts[3] || "";
 
 		await this.getLanguageContext(interaction);
