@@ -13,7 +13,7 @@ import {
 	type StringSelectMenuInteraction,
 } from "discord.js";
 import { AttachmentConfigInteractions } from "./AttachmentConfigInteractions";
-import { BaseConfigInteractions } from "./BaseConfigInteractions";
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import { BooleanConfigInteractions } from "./BooleanConfigInteractions";
 import { RoleChannelConfigInteractions } from "./RoleChannelConfigInteractions";
 import { StringArrayConfigInteractions } from "./StringArrayConfigInteractions";
@@ -240,10 +240,6 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 						});
 					}
 				}
-				await this.respondToInteraction(
-					interaction,
-					"Configuration cleared.",
-				);
 				if (interaction.message?.deletable) {
 					await interaction.message.delete().catch(() => {});
 				}

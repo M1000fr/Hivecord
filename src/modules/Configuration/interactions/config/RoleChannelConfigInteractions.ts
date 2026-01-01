@@ -19,7 +19,7 @@ import {
 	type RepliableInteraction,
 	type RoleSelectMenuInteraction,
 } from "discord.js";
-import { BaseConfigInteractions } from "./BaseConfigInteractions";
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 
 @ConfigInteraction()
 export class RoleChannelConfigInteractions extends BaseConfigInteractions {

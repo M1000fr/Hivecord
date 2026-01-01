@@ -5,7 +5,7 @@ import { EConfigType } from "@decorators/ConfigProperty";
 import { Button } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { type ButtonInteraction, type RepliableInteraction } from "discord.js";
-import { BaseConfigInteractions } from "./BaseConfigInteractions";
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 
 @ConfigInteraction()
 export class BooleanConfigInteractions extends BaseConfigInteractions {

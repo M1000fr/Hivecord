@@ -17,7 +17,7 @@ import {
 	type RepliableInteraction,
 	type StringSelectMenuInteraction,
 } from "discord.js";
-import { BaseConfigInteractions } from "./BaseConfigInteractions";
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 
 @ConfigInteraction()
 export class StringChoiceConfigInteractions extends BaseConfigInteractions {

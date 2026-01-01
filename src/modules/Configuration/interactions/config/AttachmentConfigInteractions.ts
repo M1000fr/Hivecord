@@ -12,7 +12,7 @@ import {
 	type MessageActionRowComponentBuilder,
 	type RepliableInteraction,
 } from "discord.js";
-import { BaseConfigInteractions } from "./BaseConfigInteractions";
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 
 @ConfigInteraction()
 export class AttachmentConfigInteractions extends BaseConfigInteractions {

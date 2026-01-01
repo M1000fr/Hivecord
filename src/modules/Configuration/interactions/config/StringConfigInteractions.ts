@@ -20,7 +20,7 @@ import {
 	TextInputBuilder,
 	TextInputStyle,
 } from "discord.js";
-import { BaseConfigInteractions } from "./BaseConfigInteractions";
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 
 @ConfigInteraction()
 export class StringConfigInteractions extends BaseConfigInteractions {

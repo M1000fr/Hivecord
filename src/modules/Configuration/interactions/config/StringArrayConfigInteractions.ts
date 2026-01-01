@@ -25,7 +25,7 @@ import {
 	type RepliableInteraction,
 } from "discord.js";
 import i18next from "i18next";
-import { BaseConfigInteractions } from "./BaseConfigInteractions";
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 
 @ConfigInteraction()
 export class StringArrayConfigInteractions extends BaseConfigInteractions {
