@@ -6,9 +6,11 @@ import {
 	RoleRepository,
 	UserRepository,
 } from "@src/repositories";
+import { CommandDeploymentService } from "./services/CommandDeploymentService";
 import { CommandService } from "./services/CommandService";
 import { I18nService } from "./services/I18nService";
 import { InfluxService } from "./services/InfluxService";
+import { ModuleLoader } from "./services/ModuleLoader";
 import { PagerService } from "./services/PagerService";
 import { PermissionService } from "./services/PermissionService";
 import { PrismaService } from "./services/PrismaService";
@@ -29,6 +31,8 @@ import { RedisService } from "./services/RedisService";
 		RoleRepository,
 		ChannelRepository,
 		CustomEmbedRepository,
+		CommandDeploymentService,
+		ModuleLoader,
 	],
 	exports: [
 		PrismaService,
@@ -43,6 +47,8 @@ import { RedisService } from "./services/RedisService";
 		RoleRepository,
 		ChannelRepository,
 		CustomEmbedRepository,
+		CommandDeploymentService,
+		ModuleLoader,
 	],
 })
 export class CoreModule {}
