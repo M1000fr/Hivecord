@@ -14,6 +14,5 @@ export interface ICommandClass {
 		>
 	>;
 	subcommands?: Map<string, { method: string; permission?: EPermission }>;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	new (...args: any[]): any;
+	new (...args: unknown[]): object;
 }

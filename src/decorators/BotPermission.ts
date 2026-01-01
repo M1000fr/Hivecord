@@ -22,15 +22,11 @@ export function BotPermission(...permissions: PermissionResolvable[]) {
 			for (const arg of args) {
 				if (arg instanceof Guild) {
 					guild = arg;
-				} else {
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					const typedArg = arg as any;
-					if (typedArg?.guild instanceof Guild) {
+				} else if (arg && typeof arg === "object") {
+					const typedArg = arg as { guild?: unknown; reply?: unknown };
+					if (typedArg.guild instanceof Guild) {
 						guild = typedArg.guild;
-						if (
-							"reply" in typedArg &&
-							typeof typedArg.reply === "function"
-						) {
+						if (typeof typedArg.reply === "function") {
 							interaction = arg as ChatInputCommandInteraction;
 						}
 					}

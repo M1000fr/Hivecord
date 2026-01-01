@@ -1,4 +1,4 @@
-import { PROVIDER_TYPE_METADATA_KEY } from "@di/types";
+import { type Constructor, PROVIDER_TYPE_METADATA_KEY } from "@di/types";
 import "reflect-metadata";
 import { Injectable } from "./Injectable";
 
@@ -16,17 +16,17 @@ export interface ConfigTypeMetadata {
  * @param metadata The configuration type metadata
  */
 export function ConfigType(metadata: ConfigTypeMetadata): ClassDecorator {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return (target: any) => {
+	return (target: object) => {
+		const ctor = target as Constructor;
 		// Apply Injectable decorator with global scope
 		const injectableDecorator = Injectable({ scope: "global" });
-		injectableDecorator(target);
+		injectableDecorator(ctor);
 
-		Reflect.defineMetadata(CONFIG_TYPE_METADATA_KEY, metadata, target);
+		Reflect.defineMetadata(CONFIG_TYPE_METADATA_KEY, metadata, ctor);
 		Reflect.defineMetadata(
 			PROVIDER_TYPE_METADATA_KEY,
 			"config-handler",
-			target,
+			ctor,
 		);
 	};
 }

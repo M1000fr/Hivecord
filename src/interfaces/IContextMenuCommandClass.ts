@@ -7,6 +7,5 @@ export interface ContextMenuOptions {
 export interface IContextMenuCommandClass {
 	contextMenuOptions?: ContextMenuOptions;
 	execute?: string;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	new (...args: any[]): any;
+	new (...args: unknown[]): object;
 }
