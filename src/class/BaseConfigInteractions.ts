@@ -26,6 +26,7 @@ import {
 	type StringSelectMenuInteraction,
 	type UserSelectMenuInteraction,
 } from "discord.js";
+import type { TFunction } from "i18next";
 
 export type ConfigInteraction =
 	| ButtonInteraction
@@ -137,10 +138,7 @@ export abstract class BaseConfigInteractions {
 
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
-				const lng = await this.configService.getLanguage(
-					interaction.guild!,
-				);
-				const t = I18nService.getFixedT(lng);
+				const { lng, t } = await this.getLanguageContext(interaction);
 				const config = await this.configHelper.buildModuleConfigEmbed(
 					client,
 					interaction.guild!,
@@ -199,6 +197,155 @@ export abstract class BaseConfigInteractions {
 		}
 	}
 
+	protected async deleteConfig(
+		client: LeBotClient<true>,
+		interaction: RepliableInteraction,
+		moduleName: string,
+		propertyKey: string,
+		type: EConfigType | string,
+	) {
+		if (!interaction.guildId) return;
+
+		try {
+			await this.configHelper.deleteValue(
+				interaction.guild!,
+				propertyKey,
+				type,
+			);
+
+			const mainMessage = await this.getMainMessage(interaction);
+			if (mainMessage) {
+				const { lng, t } = await this.getLanguageContext(interaction);
+				const config = await this.configHelper.buildModuleConfigEmbed(
+					client,
+					interaction.guild!,
+					moduleName,
+					interaction.user,
+					t,
+					lng,
+				);
+				if (config) {
+					try {
+						await mainMessage.edit({
+							embeds: [config.embed],
+							components: [config.row],
+						});
+					} catch (error) {
+						console.warn(
+							"Failed to update config UI message:",
+							error,
+						);
+					}
+				}
+			}
+
+			if (
+				interaction.isMessageComponent() ||
+				interaction.isModalSubmit()
+			) {
+				await interaction.deferUpdate().catch(() => {});
+				if (interaction.message?.deletable) {
+					await interaction.message.delete().catch(() => {});
+				}
+			}
+		} catch (error) {
+			console.error("Failed to delete config:", error);
+			await this.respondToInteraction(
+				interaction,
+				"❌ Failed to clear configuration.",
+				true,
+			);
+		}
+	}
+
+	protected async getShowContext(
+		interaction: RepliableInteraction,
+		moduleName: string,
+		selectedProperty: string,
+		propertyOptions: ConfigPropertyOptions,
+	) {
+		const lng = await this.configService.getLanguage(interaction.guild!);
+		const t = I18nService.getFixedT(lng);
+
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, selectedProperty);
+
+		const currentValue = await this.configHelper.getCurrentValue(
+			interaction.guild!,
+			selectedProperty,
+			propertyOptions.type,
+			t,
+			propertyOptions,
+			lng,
+			defaultValue,
+		);
+
+		const configContexts = (
+			module?.options.config as unknown as {
+				configContexts?: Record<string, ConfigContextVariable[]>;
+			}
+		)?.configContexts;
+
+		const embed = this.buildPropertyEmbed(
+			propertyOptions,
+			selectedProperty,
+			currentValue,
+			{ locale: lng, t },
+			configContexts,
+		);
+
+		const messageId = interaction.isMessageComponent()
+			? interaction.message.id
+			: "";
+
+		return {
+			lng,
+			t,
+			module,
+			defaultValue,
+			currentValue,
+			configContexts,
+			embed,
+			messageId,
+		};
+	}
+
+	protected createClearButton(
+		moduleName: string,
+		propertyKey: string,
+		userId: string,
+		t: TFunction,
+		messageId: string,
+	) {
+		return this.createConfigButton(
+			"module_config_clear",
+			moduleName,
+			propertyKey,
+			userId,
+			t("common.clear"),
+			ButtonStyle.Danger,
+			[messageId],
+		);
+	}
+
+	protected createCancelButton(
+		moduleName: string,
+		propertyKey: string,
+		userId: string,
+		t: TFunction,
+	) {
+		return this.createConfigButton(
+			"module_config_cancel",
+			moduleName,
+			propertyKey,
+			userId,
+			t("common.cancel"),
+			ButtonStyle.Secondary,
+		);
+	}
+
 	protected async validateUser(
 		interaction: ConfigInteraction,
 		userId: string,
@@ -224,6 +371,41 @@ export abstract class BaseConfigInteractions {
 		}
 
 		return { client, parts, userId };
+	}
+
+	protected async getHandleContext(interaction: ConfigInteraction) {
+		const baseCtx = await this.getInteractionContext(interaction);
+		if (!baseCtx) return null;
+
+		const { client, parts, userId } = baseCtx;
+		const moduleName = parts[1];
+		const propertyKey = parts[2];
+
+		if (!moduleName || !propertyKey) return null;
+
+		const { module, propertyOptions } = this.getPropertyContext(
+			client,
+			moduleName,
+			propertyKey,
+		);
+
+		if (!propertyOptions) return null;
+
+		return {
+			client,
+			parts,
+			userId,
+			moduleName,
+			propertyKey,
+			module,
+			propertyOptions,
+		};
+	}
+
+	protected async getLanguageContext(interaction: RepliableInteraction) {
+		const lng = await this.configService.getLanguage(interaction.guild!);
+		const t = I18nService.getFixedT(lng);
+		return { lng, t };
 	}
 
 	protected getPropertyContext(

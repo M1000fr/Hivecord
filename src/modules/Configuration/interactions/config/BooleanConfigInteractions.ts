@@ -2,7 +2,6 @@ import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
-import { EConfigType } from "@decorators/ConfigProperty";
 import { Button } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { type ButtonInteraction, type RepliableInteraction } from "discord.js";
@@ -11,21 +10,19 @@ import { type ButtonInteraction, type RepliableInteraction } from "discord.js";
 export class BooleanConfigInteractions extends BaseConfigInteractions {
 	@Button("module_config_bool:*")
 	async handleBooleanButton(@Interaction() interaction: ButtonInteraction) {
-		const ctx = await this.getInteractionContext(interaction);
+		const ctx = await this.getHandleContext(interaction);
 		if (!ctx) return;
-		const { client, parts } = ctx;
-		const moduleName = parts[1];
-		const propertyKey = parts[2];
+		const { client, moduleName, propertyKey, propertyOptions, parts } = ctx;
 		const value = parts[3];
 
-		if (moduleName && propertyKey && value) {
+		if (value) {
 			await this.updateConfig(
 				client,
 				interaction,
 				moduleName,
 				propertyKey,
 				value,
-				EConfigType.Boolean,
+				propertyOptions.type,
 			);
 		}
 	}
@@ -36,30 +33,14 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		if (!interaction.guildId) {
-			const payload = {
-				content: "This interaction can only be used in a server.",
-			};
-			if (interaction.replied || interaction.deferred) {
-				await interaction.followUp(payload);
-			} else {
-				await interaction.reply(payload);
-			}
-			return;
-		}
-
-		const currentValue = await this.configHelper.fetchValue(
-			interaction.guild!,
+		const { currentValue, defaultValue } = await this.getShowContext(
+			interaction,
+			moduleName,
 			selectedProperty,
-			EConfigType.Boolean,
+			propertyOptions,
 		);
 
-		const module = (interaction.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
-		const defaultValue = this.getDefaultValue(module, selectedProperty);
 		const valueToCheck = currentValue ?? defaultValue;
-
 		const isTrue = String(valueToCheck) === "true";
 		const newValue = !isTrue;
 
@@ -69,7 +50,7 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
 			moduleName,
 			selectedProperty,
 			String(newValue),
-			EConfigType.Boolean,
+			propertyOptions.type,
 		);
 	}
 }

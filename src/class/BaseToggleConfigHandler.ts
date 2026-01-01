@@ -1,8 +1,5 @@
-import type { LeBotClient } from "@class/LeBotClient";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
-import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { I18nService } from "@modules/Core/services/I18nService";
 import { InteractionRegistry } from "@registers/InteractionRegistry";
 import type { ConfigHelper } from "@utils/ConfigHelper";
 import {
@@ -45,41 +42,12 @@ export abstract class BaseToggleConfigHandler extends BaseConfigTypeHandler {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng = await this.configService.getLanguage(interaction.guild!);
-		const t = I18nService.getFixedT(lng);
-
-		const module = (interaction.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
-		const defaultValue = this.getDefaultValue(module, selectedProperty);
-
-		const currentValue = await this.configHelper.getCurrentValue(
-			interaction.guild!,
+		const { t, embed, messageId } = await this.getShowContext(
+			interaction,
+			moduleName,
 			selectedProperty,
-			propertyOptions.type,
-			t,
 			propertyOptions,
-			lng,
-			defaultValue,
 		);
-
-		const configContexts = (
-			module?.options.config as unknown as {
-				configContexts?: Record<string, ConfigContextVariable[]>;
-			}
-		)?.configContexts;
-
-		const embed = this.buildPropertyEmbed(
-			propertyOptions,
-			selectedProperty,
-			currentValue,
-			{ locale: lng, t },
-			configContexts,
-		);
-
-		const messageId = interaction.isMessageComponent()
-			? interaction.message.id
-			: "";
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			this.createConfigButton(
@@ -95,26 +63,22 @@ export abstract class BaseToggleConfigHandler extends BaseConfigTypeHandler {
 
 		if (!propertyOptions.nonNull) {
 			row.addComponents(
-				this.createConfigButton(
-					"module_config_clear",
+				this.createClearButton(
 					moduleName,
 					selectedProperty,
 					interaction.user.id,
-					t("common.clear"),
-					ButtonStyle.Danger,
-					[messageId],
+					t,
+					messageId,
 				),
 			);
 		}
 
 		row.addComponents(
-			this.createConfigButton(
-				"module_config_cancel",
+			this.createCancelButton(
 				moduleName,
 				selectedProperty,
 				interaction.user.id,
-				t("common.cancel"),
-				ButtonStyle.Secondary,
+				t,
 			),
 		);
 
@@ -125,28 +89,12 @@ export abstract class BaseToggleConfigHandler extends BaseConfigTypeHandler {
 	}
 
 	async handleToggle(interaction: ButtonInteraction) {
-		const ctx = await this.getInteractionContext(interaction);
+		const ctx = await this.getHandleContext(interaction);
 		if (!ctx) return;
 
-		const { client, parts } = ctx;
-		const moduleName = parts[1];
-		const propertyKey = parts[2];
+		const { client, moduleName, propertyKey, module, propertyOptions } =
+			ctx;
 
-		if (!moduleName || !propertyKey) return;
-
-		const { propertyOptions } = this.getPropertyContext(
-			client,
-			moduleName,
-			propertyKey,
-		);
-
-		if (!propertyOptions) return;
-
-		const { module } = this.getPropertyContext(
-			client,
-			moduleName,
-			propertyKey,
-		);
 		const defaultValue = this.getDefaultValue(module, propertyKey);
 
 		const rawValue = await this.configHelper.fetchValue(

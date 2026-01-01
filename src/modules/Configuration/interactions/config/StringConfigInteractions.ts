@@ -1,11 +1,7 @@
-import { LeBotClient } from "@class/LeBotClient";
-import { type IConfigClass } from "@decorators/ConfigContext";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
-import { EConfigType } from "@decorators/ConfigProperty";
 import { Button, Modal } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
-import { I18nService } from "@modules/Core/services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
@@ -25,66 +21,44 @@ import {
 export class StringConfigInteractions extends BaseConfigInteractions {
 	@Modal("module_config_modal:*")
 	async handleTextModal(@Interaction() interaction: ModalSubmitInteraction) {
-		const ctx = await this.getInteractionContext(interaction);
+		const ctx = await this.getHandleContext(interaction);
 		if (!ctx) return;
-		const { client, parts } = ctx;
-		const moduleName = parts[1];
-		const propertyKey = parts[2];
+		const { client, moduleName, propertyKey, propertyOptions } = ctx;
 
-		if (moduleName && propertyKey) {
-			await this.updateConfig(
-				client,
-				interaction,
-				moduleName,
-				propertyKey,
-				interaction.fields.getTextInputValue("value"),
-				EConfigType.String,
-				false,
-				true,
-			);
-		}
+		await this.updateConfig(
+			client,
+			interaction,
+			moduleName,
+			propertyKey,
+			interaction.fields.getTextInputValue("value"),
+			propertyOptions.type,
+			false,
+			true,
+		);
 	}
 
 	@Button("module_config_edit_text:*")
 	async handleEditTextButton(@Interaction() interaction: ButtonInteraction) {
-		const ctx = await this.getInteractionContext(interaction);
+		const ctx = await this.getHandleContext(interaction);
 		if (!ctx) return;
-		const { client, parts, userId } = ctx;
-		const moduleName = parts[1];
-		const propertyKey = parts[2];
+		const {
+			client,
+			moduleName,
+			propertyKey,
+			parts,
+			module,
+			propertyOptions,
+		} = ctx;
 		const messageId = parts[3] || "";
 
-		if (!moduleName || !propertyKey) return;
-
-		const { propertyOptions } = this.getPropertyContext(
-			client,
-			moduleName,
-			propertyKey,
-		);
-
-		if (!propertyOptions) {
-			const payload = { content: "Property not found." };
-			if (interaction.replied || interaction.deferred) {
-				await interaction.followUp(payload);
-			} else {
-				await interaction.reply(payload);
-			}
-			return;
-		}
-
-		const rawValue =
-			(await this.configHelper.fetchValue(
-				interaction.guild!,
-				propertyKey,
-				EConfigType.String,
-			)) || "";
-
-		const { module } = this.getPropertyContext(
-			client,
-			moduleName,
-			propertyKey,
-		);
+		const { t } = await this.getLanguageContext(interaction);
 		const defaultValue = this.getDefaultValue(module, propertyKey);
+
+		const rawValue = await this.configHelper.fetchValue(
+			interaction.guild!,
+			propertyKey,
+			propertyOptions.type,
+		);
 
 		const valueToUse = (rawValue || defaultValue || "") as string;
 
@@ -105,12 +79,12 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 			input.setValue(valueToUse);
 
 		const modal = new ModalBuilder({
-			customId: ConfigHelper.buildCustomId([
+			customId: CustomIdHelper.build([
 				"module_config_modal",
 				moduleName,
 				propertyKey,
 				messageId,
-				userId,
+				interaction.user.id,
 			]),
 			title: ConfigHelper.truncate(
 				`Configure: ${propertyOptions.displayName || propertyKey}`,
@@ -132,38 +106,12 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng = await this.configService.getLanguage(interaction.guild!);
-		const t = I18nService.getFixedT(lng);
-		const module = (interaction.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
-		const defaultValue = this.getDefaultValue(module, selectedProperty);
-
-		const currentValue = await this.configHelper.getCurrentValue(
-			interaction.guild!,
+		const { t, embed, messageId } = await this.getShowContext(
+			interaction,
+			moduleName,
 			selectedProperty,
-			propertyOptions.type,
-			t,
 			propertyOptions,
-			lng,
-			defaultValue,
 		);
-
-		const configContexts = (
-			module?.options.config as unknown as IConfigClass
-		)?.configContexts;
-
-		const embed = this.buildPropertyEmbed(
-			propertyOptions,
-			selectedProperty,
-			currentValue,
-			{ locale: lng, t },
-			configContexts,
-		);
-
-		const messageId = interaction.isMessageComponent()
-			? interaction.message.id
-			: "";
 
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			this.createConfigButton(
@@ -171,7 +119,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				moduleName,
 				selectedProperty,
 				interaction.user.id,
-				"Edit Value",
+				t("common.edit"),
 				ButtonStyle.Primary,
 				[messageId],
 			),
@@ -179,26 +127,22 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 
 		if (!propertyOptions.nonNull) {
 			row.addComponents(
-				this.createConfigButton(
-					"module_config_clear",
+				this.createClearButton(
 					moduleName,
 					selectedProperty,
 					interaction.user.id,
-					"Default Value",
-					ButtonStyle.Danger,
-					[messageId],
+					t,
+					messageId,
 				),
 			);
 		}
 
 		row.addComponents(
-			this.createConfigButton(
-				"module_config_cancel",
+			this.createCancelButton(
 				moduleName,
 				selectedProperty,
 				interaction.user.id,
-				"Cancel",
-				ButtonStyle.Secondary,
+				t,
 			),
 		);
 
