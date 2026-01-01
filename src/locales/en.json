@@ -8,6 +8,7 @@
 		"no_reason": "No reason provided",
 		"none": "None",
 		"cancel": "Cancel",
+		"clear": "Clear",
 		"save": "Save",
 		"add": "Add",
 		"back": "Back",
@@ -158,6 +159,8 @@
 			"description": "Select a property to configure for the **{{module}}** module.",
 			"not_set": "Not set",
 			"select_placeholder": "Select a property...",
+			"select_value_placeholder": "Select a value...",
+			"no_options_found": "No options found",
 			"types": {},
 			"configure_property": "⚙️ Configure: {{property}}",
 			"available_variables": "Available Variables"

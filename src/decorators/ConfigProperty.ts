@@ -82,12 +82,14 @@ export function ConfigProperty(options: ConfigPropertyOptions) {
 }
 
 /**
- * Converts a camelCase property name to snake_case for config keys
- * @param key - The property name in camelCase
+ * Converts a camelCase or PascalCase property name to snake_case for config keys
+ * @param key - The property name
  * @returns The config key in snake_case
  */
 export function toConfigKey(key: string): string {
-	return key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+	return key.replace(/[A-Z]/g, (letter, index) =>
+		index === 0 ? letter.toLowerCase() : `_${letter.toLowerCase()}`,
+	);
 }
 
 export type ConfigKey<T> = string & { __type: T };

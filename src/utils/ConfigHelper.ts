@@ -7,6 +7,7 @@ import { Inject } from "@decorators/Inject";
 import { ChannelConfigService } from "@modules/Configuration/services/ChannelConfigService";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { RoleConfigService } from "@modules/Configuration/services/RoleConfigService";
+import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
 import {
 	ActionRowBuilder,
 	EmbedBuilder,
@@ -31,7 +32,9 @@ export class ConfigHelper {
 	) {}
 
 	static toSnakeCase(str: string): string {
-		return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+		return str.replace(/[A-Z]/g, (letter, index) =>
+			index === 0 ? letter.toLowerCase() : `_${letter.toLowerCase()}`,
+		);
 	}
 
 	static truncate(str: string, maxLength: number): string {
@@ -42,20 +45,27 @@ export class ConfigHelper {
 
 	static getTypeName(type: EConfigType | string, t: TFunction): string {
 		if (typeof type === "string") {
+			const customType = ConfigTypeRegistry.get(type);
+			if (customType) return customType.name;
 			return type;
 		}
 		const key = `utils.config_helper.types.${EConfigType[type].toLowerCase()}`;
 		return t(key, { defaultValue: EConfigType[type] });
 	}
 
-	static formatValue(
+	static async formatValue(
 		value: string | string[],
 		type: EConfigType | string,
 		t: TFunction,
 		options?: ConfigPropertyOptions,
 		locale?: string,
-	): string {
+		guildId?: string,
+	): Promise<string> {
 		if (typeof type === "string") {
+			const customType = ConfigTypeRegistry.get(type);
+			if (customType?.handler.formatValue && guildId) {
+				return customType.handler.formatValue(guildId, value);
+			}
 			return this.truncate(String(value), 100);
 		}
 		if (type === EConfigType.Role) return `<@&${value}>`;
@@ -185,7 +195,14 @@ export class ConfigHelper {
 			}
 
 			return value && (!Array.isArray(value) || value.length > 0)
-				? ConfigHelper.formatValue(value, type, t, options, locale)
+				? await ConfigHelper.formatValue(
+						value,
+						type,
+						t,
+						options,
+						locale,
+						guild.id,
+				  )
 				: t("utils.config_helper.not_set");
 		} catch {
 			return t("utils.config_helper.not_set");
