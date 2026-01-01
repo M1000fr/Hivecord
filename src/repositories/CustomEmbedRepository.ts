@@ -12,9 +12,25 @@ export class CustomEmbedRepository extends BaseRepository {
 
 	async upsert(guild: Guild, name: string, data: APIEmbed) {
 		return this.prisma.customEmbed.upsert({
-			where: { guildId_name: { guildId: guild.id, name } },
-			update: { data: JSON.stringify(data) },
-			create: { guildId: guild.id, name, data: JSON.stringify(data) },
+			where: {
+				guildId_name: { guildId: guild.id, name },
+			},
+			update: {
+				data: JSON.stringify(data),
+			},
+			create: {
+				name,
+				data: JSON.stringify(data),
+				Guild: {
+					connectOrCreate: {
+						where: { id: guild.id },
+						create: {
+							id: guild.id,
+							name: guild.name,
+						},
+					},
+				},
+			},
 		});
 	}
 

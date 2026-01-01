@@ -7,7 +7,18 @@ export class RoleRepository extends BaseRepository {
 	async upsert(role: Role, deletedAt: Date | null = null) {
 		return this.prisma.role.upsert({
 			where: { id: role.id },
-			update: { guildId: role.guild.id, deletedAt },
+			update: {
+				Guild: {
+					connectOrCreate: {
+						where: { id: role.guild.id },
+						create: {
+							id: role.guild.id,
+							name: role.guild.name,
+						},
+					},
+				},
+				deletedAt,
+			},
 			create: { id: role.id, guildId: role.guild.id },
 		});
 	}

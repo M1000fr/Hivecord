@@ -11,9 +11,35 @@ export class ChannelRepository extends BaseRepository {
 		deletedAt: Date | null = null,
 	) {
 		return this.prisma.channel.upsert({
-			where: { id: channel.id },
-			update: { type, guildId: channel.guild.id, deletedAt },
-			create: { id: channel.id, type, guildId: channel.guild.id },
+			where: {
+				id: channel.id,
+			},
+			update: {
+				type,
+				deletedAt,
+				Guild: {
+					connectOrCreate: {
+						where: { id: channel.guild.id },
+						create: {
+							id: channel.guild.id,
+							name: channel.guild.name,
+						},
+					},
+				},
+			},
+			create: {
+				id: channel.id,
+				type,
+				Guild: {
+					connectOrCreate: {
+						where: { id: channel.guild.id },
+						create: {
+							id: channel.guild.id,
+							name: channel.guild.name,
+						},
+					},
+				},
+			},
 		});
 	}
 }
