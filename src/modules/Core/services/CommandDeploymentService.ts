@@ -7,6 +7,7 @@ import { Logger } from "@utils/Logger";
 import { createHash } from "crypto";
 import {
 	type ApplicationCommandDataResolvable,
+	type PermissionResolvable,
 	PermissionsBitField,
 } from "discord.js";
 
@@ -31,7 +32,7 @@ export class CommandDeploymentService {
 			const options = { ...c.options } as Record<string, unknown>;
 			if (options.defaultMemberPermissions) {
 				options.defaultMemberPermissions = PermissionsBitField.resolve(
-					options.defaultMemberPermissions as import("discord.js").PermissionResolvable,
+					options.defaultMemberPermissions as PermissionResolvable,
 				).toString();
 			}
 			return options;
