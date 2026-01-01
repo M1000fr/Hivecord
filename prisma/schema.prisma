@@ -43,13 +43,13 @@ model Guild {
 }
 
 model Member {
-    id String @id
-
     guildId String
     Guild   Guild  @relation(fields: [guildId], references: [id])
 
     userId String
     User   User   @relation(fields: [userId], references: [id])
+
+    @@id([guildId, userId])
 }
 
 model Channel {
