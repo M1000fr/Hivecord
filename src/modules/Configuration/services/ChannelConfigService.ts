@@ -1,6 +1,5 @@
 import { Injectable } from "@decorators/Injectable";
-import { EntityService } from "@modules/Core/services/EntityService";
-import { PrismaService } from "@modules/Core/services/PrismaService";
+import { ChannelRepository, ConfigurationRepository } from "@src/repositories";
 import { ChannelType } from "@prisma/client/enums";
 import type { Channel, Guild, GuildBasedChannel } from "discord.js";
 import { ConfigCacheService } from "./ConfigCacheService";
@@ -8,16 +7,15 @@ import { ConfigCacheService } from "./ConfigCacheService";
 @Injectable()
 export class ChannelConfigService {
 	constructor(
-		private readonly entityService: EntityService,
-		private readonly prisma: PrismaService,
+		private readonly channelRepository: ChannelRepository,
+		private readonly configurationRepository: ConfigurationRepository,
 		private readonly cache: ConfigCacheService,
 	) {}
 
 	async get(guild: Guild, key: string): Promise<string | null> {
 		return this.cache.get(guild.id, "channel", key, async () => {
-			const config = await this.prisma.channelConfiguration.findUnique({
-				where: { key },
-			});
+			const config =
+				await this.configurationRepository.getChannelConfig(key);
 			return config?.channelId ?? null;
 		});
 	}
@@ -28,51 +26,20 @@ export class ChannelConfigService {
 		channel: GuildBasedChannel,
 		channelType: ChannelType = ChannelType.TEXT,
 	): Promise<void> {
-		await this.entityService.ensureGuild(guild);
-		await this.entityService.ensureChannel(channel);
+		await this.channelRepository.upsert(channel, channelType);
 
-		await this.prisma.channelConfiguration.upsert({
-			where: { key },
-			update: {
-				Channel: {
-					connectOrCreate: {
-						where: { id: channel.id },
-						create: {
-							id: channel.id,
-							guildId: guild.id,
-							type: channelType,
-						},
-					},
-				},
-			},
-			create: {
-				key,
-				Channel: {
-					connectOrCreate: {
-						where: { id: channel.id },
-						create: {
-							id: channel.id,
-							guildId: guild.id,
-							type: channelType,
-						},
-					},
-				},
-			},
-		});
+		await this.configurationRepository.upsertChannelConfig(key, channel.id);
 
 		await this.cache.invalidate(guild.id, key);
 	}
 
 	async getList(guild: Guild, key: string): Promise<string[]> {
 		return this.cache.get(guild.id, "channels", key, async () => {
-			const configs = await this.prisma.channelListConfiguration.findMany(
-				{
-					where: {
-						key,
-						Channel: { guildId: guild.id },
-					},
-				},
-			);
+			const configs =
+				await this.configurationRepository.getChannelListConfigs(
+					guild.id,
+					key,
+				);
 			return configs.map((c) => c.channelId);
 		});
 	}
@@ -83,37 +50,12 @@ export class ChannelConfigService {
 		channel: GuildBasedChannel,
 		channelType: ChannelType = ChannelType.TEXT,
 	): Promise<void> {
-		await this.entityService.ensureGuild(guild);
-		await this.entityService.ensureChannel(channel);
+		await this.channelRepository.upsert(channel, channelType);
 
-		await this.prisma.channelListConfiguration.upsert({
-			where: { key_channelId: { key, channelId: channel.id } },
-			update: {
-				Channel: {
-					connectOrCreate: {
-						where: { id: channel.id },
-						create: {
-							id: channel.id,
-							guildId: guild.id,
-							type: channelType,
-						},
-					},
-				},
-			},
-			create: {
-				key,
-				Channel: {
-					connectOrCreate: {
-						where: { id: channel.id },
-						create: {
-							id: channel.id,
-							guildId: guild.id,
-							type: channelType,
-						},
-					},
-				},
-			},
-		});
+		await this.configurationRepository.upsertChannelListConfig(
+			key,
+			channel.id,
+		);
 
 		await this.cache.invalidate(guild.id, key);
 	}
@@ -124,9 +66,10 @@ export class ChannelConfigService {
 		channel: Channel,
 	): Promise<void> {
 		try {
-			await this.prisma.channelListConfiguration.delete({
-				where: { key_channelId: { key, channelId: channel.id } },
-			});
+			await this.configurationRepository.deleteChannelListConfig(
+				key,
+				channel.id,
+			);
 			await this.cache.invalidate(guild.id, key);
 		} catch {
 			// Ignore if not found
@@ -135,9 +78,7 @@ export class ChannelConfigService {
 
 	async delete(guild: Guild, key: string, _channel: Channel): Promise<void> {
 		try {
-			await this.prisma.channelConfiguration.delete({
-				where: { key },
-			});
+			await this.configurationRepository.deleteChannelConfig(key);
 			await this.cache.invalidate(guild.id, key);
 		} catch {
 			// Ignore if not found
@@ -145,12 +86,7 @@ export class ChannelConfigService {
 	}
 
 	async clearList(guild: Guild, key: string): Promise<void> {
-		await this.prisma.channelListConfiguration.deleteMany({
-			where: {
-				key,
-				Channel: { guildId: guild.id },
-			},
-		});
+		await this.configurationRepository.clearChannelList(guild.id, key);
 
 		await this.cache.invalidate(guild.id, key);
 	}

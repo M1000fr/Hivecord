@@ -4,7 +4,7 @@ import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
-import { EntityService } from "@modules/Core/services/EntityService";
+import { UserRepository } from "@src/repositories";
 import type { ContextOf } from "@src/types/ContextOf.ts";
 import { Logger } from "@utils/Logger";
 
@@ -12,7 +12,7 @@ import { Logger } from "@utils/Logger";
 export default class GuildMemberRegisterEvent {
 	private logger = new Logger("RegisterNewMemberEvent");
 
-	constructor(private readonly entityService: EntityService) {}
+	constructor(private readonly userRepository: UserRepository) {}
 
 	@On(BotEvents.GuildMemberAdd)
 	async run(
@@ -20,7 +20,7 @@ export default class GuildMemberRegisterEvent {
 		@Context() [member]: ContextOf<typeof BotEvents.GuildMemberAdd>,
 	) {
 		try {
-			await this.entityService.ensureUser(member.user);
+			await this.userRepository.upsert(member.user);
 		} catch (error) {
 			this.logger.error(
 				`Failed to register new member ${member.user.tag} (${member.id}): ${error}`,

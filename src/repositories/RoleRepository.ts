@@ -19,7 +19,19 @@ export class RoleRepository extends BaseRepository {
 				},
 				deletedAt,
 			},
-			create: { id: role.id, guildId: role.guild.id },
+			create: {
+				id: role.id,
+				Guild: {
+					connectOrCreate: {
+						where: { id: role.guild.id },
+						create: {
+							id: role.guild.id,
+							name: role.guild.name,
+						},
+					},
+				},
+				deletedAt,
+			},
 		});
 	}
 
@@ -29,7 +41,15 @@ export class RoleRepository extends BaseRepository {
 			update: { deletedAt: new Date() },
 			create: {
 				id: role.id,
-				guildId: role.guild.id,
+				Guild: {
+					connectOrCreate: {
+						where: { id: role.guild.id },
+						create: {
+							id: role.guild.id,
+							name: role.guild.name,
+						},
+					},
+				},
 				deletedAt: new Date(),
 			},
 		});

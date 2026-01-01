@@ -5,8 +5,7 @@ import {
 	toConfigKey,
 } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
-import { EntityService } from "@modules/Core/services/EntityService";
-import { PrismaService } from "@modules/Core/services/PrismaService";
+import { ConfigurationRepository, GuildRepository } from "@src/repositories";
 import { ChannelType } from "@prisma/client/enums";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 import { Logger } from "@utils/Logger";
@@ -24,8 +23,8 @@ export class ConfigService {
 	private logger = new Logger("ConfigService");
 
 	constructor(
-		private readonly entityService: EntityService,
-		private readonly prisma: PrismaService,
+		private readonly guildRepository: GuildRepository,
+		private readonly configurationRepository: ConfigurationRepository,
 		private readonly cache: ConfigCacheService,
 		private readonly channelConfig: ChannelConfigService,
 		private readonly roleConfig: RoleConfigService,
@@ -114,24 +113,16 @@ export class ConfigService {
 		key: ConfigKey<T> | string,
 	): Promise<T> {
 		return this.cache.get(guild.id, "value", key, async () => {
-			const config = await this.prisma.configuration.findFirst({
-				where: { guildId: guild.id, key },
-			});
+			const config = await this.configurationRepository.get(guild, key);
 			const value = config?.value ?? null;
 			return value as T;
 		});
 	}
 
 	async set(guild: Guild, key: string, value: string): Promise<void> {
-		await this.entityService.ensureGuild(guild);
+		await this.guildRepository.upsert(guild);
 
-		// Ensure only one value exists for this key
-		await this.prisma.configuration.deleteMany({
-			where: { guildId: guild.id, key },
-		});
-		await this.prisma.configuration.create({
-			data: { guildId: guild.id, key, value },
-		});
+		await this.configurationRepository.set(guild, key, value);
 
 		await this.cache.invalidate(guild.id, key);
 		await this.notifyUpdate(guild.id, key, value);
@@ -143,10 +134,10 @@ export class ConfigService {
 			"list",
 			key,
 			async () => {
-				const configs = await this.prisma.configuration.findMany({
-					where: { guildId: guild.id, key },
-					orderBy: { id: "asc" },
-				});
+				const configs = await this.configurationRepository.getMany(
+					guild,
+					key,
+				);
 				return configs.map((c) => c.value);
 			},
 			true,
@@ -154,21 +145,9 @@ export class ConfigService {
 	}
 
 	async setMany(guild: Guild, key: string, values: string[]): Promise<void> {
-		await this.entityService.ensureGuild(guild);
+		await this.guildRepository.upsert(guild);
 
-		await this.prisma.configuration.deleteMany({
-			where: { guildId: guild.id, key },
-		});
-
-		if (values.length > 0) {
-			await this.prisma.configuration.createMany({
-				data: values.map((value) => ({
-					guildId: guild.id,
-					key,
-					value,
-				})),
-			});
-		}
+		await this.configurationRepository.setMany(guild, key, values);
 
 		await this.cache.invalidate(guild.id, key);
 		await this.notifyUpdate(guild.id, key, JSON.stringify(values), true);
@@ -176,9 +155,7 @@ export class ConfigService {
 
 	async delete(guild: Guild, key: string): Promise<void> {
 		try {
-			await this.prisma.configuration.deleteMany({
-				where: { guildId: guild.id, key },
-			});
+			await this.configurationRepository.delete(guild, key);
 			await this.cache.invalidate(guild.id, key);
 			await this.notifyUpdate(guild.id, key, null);
 		} catch {
@@ -238,29 +215,13 @@ export class ConfigService {
 	}
 
 	async getAll(guild: Guild): Promise<Record<string, string>> {
-		const [
+		const {
 			configs,
 			channelConfigs,
 			channelListConfigs,
 			roleConfigs,
 			roleListConfigs,
-		] = await Promise.all([
-			this.prisma.configuration.findMany({
-				where: { guildId: guild.id },
-			}),
-			this.prisma.channelConfiguration.findMany({
-				where: { Channel: { guildId: guild.id } },
-			}),
-			this.prisma.channelListConfiguration.findMany({
-				where: { Channel: { guildId: guild.id } },
-			}),
-			this.prisma.roleConfiguration.findMany({
-				where: { Role: { guildId: guild.id } },
-			}),
-			this.prisma.roleListConfiguration.findMany({
-				where: { Role: { guildId: guild.id } },
-			}),
-		]);
+		} = await this.configurationRepository.getAllConfigs(guild.id);
 
 		return {
 			...Object.fromEntries(configs.map((c) => [c.key, c.value])),

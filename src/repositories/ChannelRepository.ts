@@ -42,4 +42,17 @@ export class ChannelRepository extends BaseRepository {
 			},
 		});
 	}
+
+	async delete(channel: GuildBasedChannel) {
+		return this.prisma.channel.upsert({
+			where: { id: channel.id },
+			update: { deletedAt: new Date() },
+			create: {
+				id: channel.id,
+				guildId: channel.guild.id,
+				type: ChannelType.TEXT, // Default type if not exists
+				deletedAt: new Date(),
+			},
+		});
+	}
 }

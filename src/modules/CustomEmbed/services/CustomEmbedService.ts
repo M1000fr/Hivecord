@@ -1,8 +1,7 @@
 import { MessageTemplate } from "@class/MessageTemplate";
-import { EntityService } from "@modules/Core/services/EntityService";
 import { RedisService } from "@modules/Core/services/RedisService";
 import { Injectable } from "@src/decorators/Injectable";
-import { CustomEmbedRepository } from "@src/repositories";
+import { CustomEmbedRepository, GuildRepository } from "@src/repositories";
 import { EmbedBuilder, Guild, User, type APIEmbed } from "discord.js";
 
 const EDITOR_TTL = 3600; // 1 hour
@@ -10,7 +9,7 @@ const EDITOR_TTL = 3600; // 1 hour
 @Injectable()
 export class CustomEmbedService {
 	constructor(
-		private readonly entityService: EntityService,
+		private readonly guildRepository: GuildRepository,
 		private readonly customEmbedRepository: CustomEmbedRepository,
 		private readonly redis: RedisService,
 	) {}
@@ -28,7 +27,7 @@ export class CustomEmbedService {
 	 * Save an embed
 	 */
 	async save(guild: Guild, name: string, data: APIEmbed): Promise<void> {
-		await this.entityService.ensureGuild(guild);
+		await this.guildRepository.upsert(guild);
 		await this.customEmbedRepository.upsert(guild, name, data);
 	}
 

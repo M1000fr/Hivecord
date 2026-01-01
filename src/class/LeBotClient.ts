@@ -15,7 +15,7 @@ import type { IContextMenuCommandClass } from "@interfaces/IContextMenuCommandCl
 import type { IModuleInstance } from "@interfaces/IModuleInstance.ts";
 import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
 import { PermissionService } from "@modules/Core/services/PermissionService";
-import { PrismaService } from "@modules/Core/services/PrismaService";
+import { BotStateRepository } from "@src/repositories";
 import { getProvidersByType } from "@utils/getProvidersByType";
 import { Logger } from "@utils/Logger";
 import { createHash } from "crypto";
@@ -46,7 +46,7 @@ export class LeBotClient<
 	private logger = new Logger("LeBotClient");
 
 	constructor(
-		public readonly prismaService: PrismaService,
+		public readonly botStateRepository: BotStateRepository,
 		private readonly permissionService: PermissionService,
 	) {
 		super({
@@ -127,9 +127,7 @@ export class LeBotClient<
 				.update(JSON.stringify(commandsData))
 				.digest("hex");
 			const dbKey = `commands_hash:${debugGuildId || "global"}`;
-			const storedState = await this.prismaService.botState.findUnique({
-				where: { key: dbKey },
-			});
+			const storedState = await this.botStateRepository.get(dbKey);
 			const storedHash = storedState?.value;
 
 			if (hash === storedHash) {
@@ -195,11 +193,7 @@ export class LeBotClient<
 			}
 
 			// Update hash in DB
-			await this.prismaService.botState.upsert({
-				where: { key: dbKey },
-				update: { value: hash },
-				create: { key: dbKey, value: hash },
-			});
+			await this.botStateRepository.upsert(dbKey, hash);
 
 			this.logger.log(
 				`Successfully reloaded ${commandsData.length} application (/) commands.`,

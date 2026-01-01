@@ -1,6 +1,6 @@
 import { Injectable } from "@decorators/Injectable";
 import { Logger } from "@utils/Logger";
-import { PrismaService } from "./PrismaService";
+import { PermissionRepository } from "@src/repositories";
 import { RedisService } from "./RedisService";
 
 const CACHE_TTL = 60; // 60 seconds
@@ -10,7 +10,7 @@ export class PermissionService {
 	private logger = new Logger("PermissionService");
 
 	constructor(
-		private readonly prismaService: PrismaService,
+		private readonly permissionRepository: PermissionRepository,
 		private readonly redis: RedisService,
 	) {}
 
@@ -34,16 +34,8 @@ export class PermissionService {
 			if (cached) {
 				permissions = JSON.parse(cached);
 			} else {
-				const groups = await this.prismaService.group.findMany({
-					where: { roleId },
-					include: {
-						Permissions: {
-							include: {
-								Permissions: true,
-							},
-						},
-					},
-				});
+				const groups =
+					await this.permissionRepository.findGroupsByRoleId(roleId);
 
 				permissions = groups.flatMap((g) =>
 					g.Permissions.map((gp) => gp.Permissions.name),
@@ -102,13 +94,9 @@ export class PermissionService {
 		const finalPermissions = Array.from(permissionsToRegister);
 
 		const existingPermissions =
-			await this.prismaService.permission.findMany({
-				where: {
-					name: {
-						in: finalPermissions,
-					},
-				},
-			});
+			await this.permissionRepository.findPermissionsByNames(
+				finalPermissions,
+			);
 
 		const existingPermissionNames = existingPermissions.map((p) => p.name);
 		const newPermissions = finalPermissions.filter(
@@ -116,10 +104,9 @@ export class PermissionService {
 		);
 
 		if (newPermissions.length > 0) {
-			await this.prismaService.permission.createMany({
-				data: newPermissions.map((name) => ({ name })),
-				skipDuplicates: true,
-			});
+			await this.permissionRepository.createManyPermissions(
+				newPermissions.map((name) => ({ name })),
+			);
 			this.logger.log(
 				`Registered ${newPermissions.length} new permissions (including wildcards).`,
 			);
@@ -127,10 +114,7 @@ export class PermissionService {
 	}
 
 	async getAllPermissions(): Promise<string[]> {
-		const permissions = await this.prismaService.permission.findMany({
-			select: { name: true },
-			orderBy: { name: "asc" },
-		});
+		const permissions = await this.permissionRepository.findAllPermissions();
 		return permissions.map((p) => p.name);
 	}
 }

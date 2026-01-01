@@ -4,22 +4,18 @@ import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
-import { PrismaService } from "@modules/Core/services/PrismaService";
+import { UserRepository } from "@src/repositories";
 import type { ContextOf } from "@src/types/ContextOf.ts";
 
 @EventController()
 export default class GuildMemberRemoveSyncEvent {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly userRepository: UserRepository) {}
 
 	@On(BotEvents.GuildMemberRemove)
 	async run(
 		@Client() client: LeBotClient<true>,
 		@Context() [member]: ContextOf<typeof BotEvents.GuildMemberRemove>,
 	) {
-		await this.prisma.user.upsert({
-			where: { id: member.user.id },
-			create: { id: member.user.id },
-			update: {},
-		});
+		await this.userRepository.upsert(member.user);
 	}
 }

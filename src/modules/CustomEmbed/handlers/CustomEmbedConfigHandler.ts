@@ -5,7 +5,7 @@ import { Interaction } from "@decorators/params";
 import { BaseConfigInteractions } from "@modules/Configuration/interactions/config/BaseConfigInteractions";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
-import { PrismaService } from "@modules/Core/services/PrismaService";
+import { CustomEmbedRepository } from "@src/repositories";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import type { ConfigTypeHandler } from "@registers/ConfigTypeRegistry";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
@@ -29,7 +29,7 @@ export class CustomEmbedConfigHandler
 	constructor(
 		configHelper: ConfigHelper,
 		configService: ConfigService,
-		private readonly prisma: PrismaService,
+		private readonly customEmbedRepository: CustomEmbedRepository,
 	) {
 		super(configHelper, configService);
 		ConfigTypeRegistry.register({
@@ -89,14 +89,9 @@ export class CustomEmbedConfigHandler
 		);
 
 		// Fetch custom embeds for this guild
-		const customEmbeds = await this.prisma.customEmbed.findMany({
-			where: {
-				guildId: interaction.guildId!,
-			},
-			select: {
-				name: true,
-			},
-		});
+		const customEmbeds = await this.customEmbedRepository.listNames(
+			interaction.guild!,
+		);
 
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(
@@ -120,11 +115,11 @@ export class CustomEmbedConfigHandler
 			);
 		} else {
 			selectMenu.addOptions(
-				customEmbeds.map((ce) => {
+				customEmbeds.map((name) => {
 					return new StringSelectMenuOptionBuilder()
-						.setLabel(ce.name)
-						.setValue(ce.name)
-						.setDefault(currentValue === ce.name);
+						.setLabel(name)
+						.setValue(name)
+						.setDefault(currentValue === name);
 				}),
 			);
 		}

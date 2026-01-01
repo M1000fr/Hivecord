@@ -7,7 +7,6 @@ import {
 	UserRepository,
 } from "@src/repositories";
 import { CommandService } from "./services/CommandService";
-import { EntityService } from "./services/EntityService";
 import { I18nService } from "./services/I18nService";
 import { InfluxService } from "./services/InfluxService";
 import { PagerService } from "./services/PagerService";
@@ -22,7 +21,6 @@ import { RedisService } from "./services/RedisService";
 		RedisService,
 		InfluxService,
 		I18nService,
-		EntityService,
 		CommandService,
 		PermissionService,
 		PagerService,
@@ -37,7 +35,6 @@ import { RedisService } from "./services/RedisService";
 		RedisService,
 		InfluxService,
 		I18nService,
-		EntityService,
 		CommandService,
 		PermissionService,
 		PagerService,

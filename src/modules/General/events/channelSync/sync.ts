@@ -4,8 +4,7 @@ import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
-import { EntityService } from "@modules/Core/services/EntityService";
-import { PrismaService } from "@modules/Core/services/PrismaService";
+import { ChannelRepository } from "@src/repositories";
 import { $Enums } from "@src/prisma/client/client";
 import type { ContextOf } from "@src/types/ContextOf.ts";
 import { Logger } from "@utils/Logger";
@@ -21,10 +20,7 @@ const CHANNEL_TYPE_MAP: Record<number, $Enums.ChannelType> = {
 export default class ChannelSync {
 	private logger = new Logger("ChannelSync");
 
-	constructor(
-		private readonly entityService: EntityService,
-		private readonly prisma: PrismaService,
-	) {}
+	constructor(private readonly channelRepository: ChannelRepository) {}
 
 	@On(BotEvents.ChannelCreate)
 	async onCreate(
@@ -34,7 +30,10 @@ export default class ChannelSync {
 		if (channel.isDMBased()) return;
 
 		try {
-			await this.entityService.ensureChannel(channel);
+			await this.channelRepository.upsert(
+				channel,
+				CHANNEL_TYPE_MAP[channel.type] ?? $Enums.ChannelType.TEXT,
+			);
 		} catch (error) {
 			this.logger.error(
 				`Failed to sync created channel ${channel.id}: ${error}`,
@@ -50,18 +49,7 @@ export default class ChannelSync {
 		if (channel.isDMBased()) return;
 
 		try {
-			await this.prisma.channel.upsert({
-				where: { id: channel.id },
-				update: { deletedAt: new Date() },
-				create: {
-					id: channel.id,
-					guildId: channel.guild.id,
-					type:
-						CHANNEL_TYPE_MAP[channel.type] ??
-						$Enums.ChannelType.TEXT,
-					deletedAt: new Date(),
-				},
-			});
+			await this.channelRepository.delete(channel);
 		} catch (error) {
 			this.logger.error(
 				`Failed to delete channel ${channel.id} from database: ${error}`,
@@ -78,7 +66,10 @@ export default class ChannelSync {
 		if (newChannel.isDMBased()) return;
 
 		try {
-			await this.entityService.ensureChannel(newChannel);
+			await this.channelRepository.upsert(
+				newChannel,
+				CHANNEL_TYPE_MAP[newChannel.type] ?? $Enums.ChannelType.TEXT,
+			);
 		} catch (error) {
 			this.logger.error(
 				`Failed to sync updated channel ${newChannel.id}: ${error}`,
