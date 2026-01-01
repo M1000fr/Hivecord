@@ -1,11 +1,7 @@
 {
 	"common": {
 		"unknown": "Inconnu",
-		"pagination": {
-			"page_info": "Page {{current}}/{{total}}"
-		},
 		"user": "Utilisateur",
-		"no_reason": "Aucune raison fournie",
 		"none": "Aucun",
 		"cancel": "Annuler",
 		"clear": "Effacer",
@@ -39,19 +35,9 @@
 		"inline": "En ligne (true/false)",
 		"toggle": "Basculer"
 	},
-	"commands": {
-		"not_implemented": "Cette commande n'est pas encore implémentée."
-	},
 	"modules": {
 		"configuration": {
 			"commands": {
-				"config": {
-					"restore_failed": "Échec de la restauration de la configuration.",
-					"restore_success": "Configuration restaurée avec succès.",
-					"backup_success": "Sauvegarde créée avec succès !",
-					"backup_failed": "Échec de la création de la sauvegarde.",
-					"invalid_file": "Type de fichier invalide. Veuillez télécharger un fichier .enc."
-				},
 				"embed": {
 					"deleted": "Embed supprimé.",
 					"list": "Liste des embeds :\n{{embeds}}",
@@ -64,9 +50,7 @@
 					"build_failed": "Échec de la construction de la configuration du module.",
 					"not_found": "Module **{{module}}** introuvable.",
 					"no_config": "Le module **{{module}}** n'a pas d'options de configuration."
-				},
-				"backup": {},
-				"restore": {}
+				}
 			},
 			"utils": {
 				"embed_editor": {
@@ -135,21 +119,6 @@
 							"title": "Modifier le titre"
 						}
 					}
-				}
-			}
-		},
-		"general": {
-			"commands": {
-				"ping": {
-					"response": "Pong !"
-				},
-				"sync": {
-					"autocomplete": {
-						"welcome_roles": "Rôles de bienvenue"
-					},
-					"in_progress": "Une synchronisation est déjà en cours.",
-					"started": "Synchronisation des rôles de bienvenue démarrée.",
-					"failed": "Échec du démarrage de la synchronisation."
 				}
 			}
 		}

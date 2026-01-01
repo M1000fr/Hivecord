@@ -1,11 +1,7 @@
 {
 	"common": {
 		"unknown": "Unknown",
-		"pagination": {
-			"page_info": "Page {{current}}/{{total}}"
-		},
 		"user": "User",
-		"no_reason": "No reason provided",
 		"none": "None",
 		"cancel": "Cancel",
 		"clear": "Clear",
@@ -39,19 +35,9 @@
 		"inline": "Inline (true/false)",
 		"toggle": "Toggle"
 	},
-	"commands": {
-		"not_implemented": "This command is not yet implemented."
-	},
 	"modules": {
 		"configuration": {
 			"commands": {
-				"config": {
-					"restore_failed": "Failed to restore configuration.",
-					"restore_success": "Configuration restored successfully.",
-					"backup_success": "Backup created successfully!",
-					"backup_failed": "Failed to create backup.",
-					"invalid_file": "Invalid file type. Please upload a .enc file."
-				},
 				"embed": {
 					"deleted": "Embed deleted.",
 					"list": "Embed List :\n{{embeds}}",
@@ -135,21 +121,6 @@
 							"title": "Edit Title"
 						}
 					}
-				}
-			}
-		},
-		"general": {
-			"commands": {
-				"ping": {
-					"response": "Pong!"
-				},
-				"sync": {
-					"autocomplete": {
-						"welcome_roles": "Welcome Roles"
-					},
-					"in_progress": "A synchronization is already in progress.",
-					"started": "Welcome roles synchronization started.",
-					"failed": "Failed to start synchronization."
 				}
 			}
 		}
