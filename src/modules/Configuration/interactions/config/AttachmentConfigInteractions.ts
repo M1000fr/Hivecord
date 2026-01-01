@@ -4,7 +4,6 @@ import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { I18nService } from "@modules/Core/services/I18nService";
-import { GeneralConfig } from "@modules/General/GeneralConfig";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,

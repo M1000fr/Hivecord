@@ -38,7 +38,9 @@ export abstract class BaseSelectConfigHandler extends BaseConfigTypeHandler {
 		InteractionRegistry.registerSelectMenuPattern(
 			`${this.customIdPrefix}:*`,
 			(interaction) =>
-				this.handleSelection(interaction as StringSelectMenuInteraction),
+				this.handleSelection(
+					interaction as StringSelectMenuInteraction,
+				),
 		);
 	}
 

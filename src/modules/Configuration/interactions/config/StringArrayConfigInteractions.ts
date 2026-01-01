@@ -6,7 +6,6 @@ import {
 } from "@decorators/ConfigProperty";
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
-import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 
@@ -26,7 +25,6 @@ import {
 	TextInputStyle,
 	type RepliableInteraction,
 } from "discord.js";
-import i18next from "i18next";
 
 @ConfigInteraction()
 export class StringArrayConfigInteractions extends BaseConfigInteractions {

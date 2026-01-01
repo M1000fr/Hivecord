@@ -7,8 +7,8 @@ import { InteractionRegistry } from "@registers/InteractionRegistry";
 import type { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
-	type ButtonBuilder,
 	ButtonStyle,
+	type ButtonBuilder,
 	type ButtonInteraction,
 	type RepliableInteraction,
 } from "discord.js";

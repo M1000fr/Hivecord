@@ -9,8 +9,8 @@ import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ActionRowBuilder,
 	type ButtonBuilder,
-	ButtonStyle,
 	type ButtonInteraction,
+	ButtonStyle,
 	LabelBuilder,
 	ModalBuilder,
 	type ModalSubmitInteraction,

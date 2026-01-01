@@ -6,7 +6,6 @@ import { Button, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
-import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
 import { ConfigHelper } from "@utils/ConfigHelper";
 import {
