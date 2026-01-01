@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import type { LeBotClient } from "@class/LeBotClient";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import {
@@ -7,8 +7,8 @@ import {
 } from "@enums/ConfigContextVariable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
-import { GeneralConfig } from "@modules/General/GeneralConfig";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import type { ConfigHelper } from "@utils/ConfigHelper";
+import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ButtonBuilder,
 	ButtonStyle,
@@ -62,7 +62,7 @@ export abstract class BaseConfigInteractions {
 		if (interaction.isMessageComponent() || interaction.isModalSubmit()) {
 			customId = interaction.customId;
 		}
-		const parts = ConfigHelper.parseCustomId(customId);
+		const parts = CustomIdHelper.parse(customId);
 		if (parts[0] === "module_config") {
 			if (
 				interaction.isMessageComponent() ||
@@ -129,10 +129,10 @@ export abstract class BaseConfigInteractions {
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
 				const lng =
-					(await this.configService.of(
+					(await this.configService.get(
 						interaction.guild!,
-						GeneralConfig,
-					).Language) ?? "en";
+						"language",
+					)) ?? "en";
 				const t = I18nService.getFixedT(lng);
 				const config = await this.configHelper.buildModuleConfigEmbed(
 					client,
@@ -209,7 +209,7 @@ export abstract class BaseConfigInteractions {
 
 	protected async getInteractionContext(interaction: ConfigInteraction) {
 		const client = interaction.client as LeBotClient<true>;
-		const parts = ConfigHelper.parseCustomId(interaction.customId);
+		const parts = CustomIdHelper.parse(interaction.customId);
 		const userId = parts[parts.length - 1];
 
 		if (!userId || !(await this.validateUser(interaction, userId))) {
@@ -260,7 +260,7 @@ export abstract class BaseConfigInteractions {
 	) {
 		return new ButtonBuilder()
 			.setCustomId(
-				ConfigHelper.buildCustomId([
+				CustomIdHelper.build([
 					action,
 					moduleName,
 					propertyKey,

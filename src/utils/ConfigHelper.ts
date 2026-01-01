@@ -8,6 +8,7 @@ import { ChannelConfigService } from "@modules/Configuration/services/ChannelCon
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { RoleConfigService } from "@modules/Configuration/services/RoleConfigService";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
+import { CustomIdHelper } from "./CustomIdHelper";
 import {
 	ActionRowBuilder,
 	EmbedBuilder,
@@ -166,11 +167,11 @@ export class ConfigHelper {
 	}
 
 	static buildCustomId(parts: string[]): string {
-		return parts.join(":");
+		return CustomIdHelper.build(parts);
 	}
 
 	static parseCustomId(customId: string): string[] {
-		return customId.split(":");
+		return CustomIdHelper.parse(customId);
 	}
 
 	async getCurrentValue(

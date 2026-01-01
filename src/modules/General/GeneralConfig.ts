@@ -6,7 +6,7 @@ import {
 } from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
-import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbed/configHandler/CustomEmbedConfigHandler";
+import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbed/CustomEmbedConfigKey";
 
 @ModuleConfig()
 export class GeneralConfig {

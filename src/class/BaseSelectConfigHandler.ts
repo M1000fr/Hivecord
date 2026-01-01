@@ -1,10 +1,10 @@
-import { LeBotClient } from "@class/LeBotClient";
+import type { LeBotClient } from "@class/LeBotClient";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
-import { GeneralConfig } from "@modules/General/GeneralConfig";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import type { ConfigHelper } from "@utils/ConfigHelper";
+import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -51,10 +51,9 @@ export abstract class BaseSelectConfigHandler extends BaseConfigTypeHandler {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng = await this.configService.of(
-			interaction.guild!,
-			GeneralConfig,
-		).Language;
+		const lng =
+			(await this.configService.get(interaction.guild!, "language")) ??
+			"en";
 		const t = I18nService.getFixedT(lng);
 		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guild!,
@@ -84,7 +83,7 @@ export abstract class BaseSelectConfigHandler extends BaseConfigTypeHandler {
 
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(
-				ConfigHelper.buildCustomId([
+				CustomIdHelper.build([
 					this.customIdPrefix,
 					moduleName,
 					selectedProperty,

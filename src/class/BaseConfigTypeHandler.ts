@@ -3,11 +3,9 @@ import {
 	type ConfigTypeMetadata,
 } from "@decorators/ConfigType";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import {
-	type ConfigTypeHandler,
-	ConfigTypeRegistry,
-} from "@registers/ConfigTypeRegistry";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import type { ConfigTypeHandler } from "@registers/ConfigTypeRegistry";
+import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
+import type { ConfigHelper } from "@utils/ConfigHelper";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";
 import {
 	ButtonInteraction,
@@ -16,7 +14,7 @@ import {
 	StringSelectMenuInteraction,
 } from "discord.js";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
-import { LeBotClient } from "@class/LeBotClient";
+import type { LeBotClient } from "@class/LeBotClient";
 
 export abstract class BaseConfigTypeHandler
 	extends BaseConfigInteractions
