@@ -1,5 +1,6 @@
 import {
 	type ConfigKey,
+	type ConfigKeyMetadata,
 	EConfigType,
 	type IConfigClass,
 	toConfigKey,
@@ -53,11 +54,8 @@ export class ConfigService {
 					propertyValue &&
 					typeof propertyValue === "object" &&
 					"__isConfigKey" in propertyValue
-						? (
-								propertyValue as unknown as {
-									defaultValue: unknown;
-								}
-							).defaultValue
+						? (propertyValue as unknown as ConfigKeyMetadata)
+								.defaultValue
 						: undefined;
 
 				if (!options) {

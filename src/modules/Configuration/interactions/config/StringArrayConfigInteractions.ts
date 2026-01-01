@@ -3,6 +3,7 @@ import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import {
 	EConfigType,
 	type ConfigPropertyOptions,
+	type IConfigClass,
 } from "@decorators/ConfigProperty";
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
@@ -154,9 +155,9 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const module = client.modules.get(moduleName);
 		if (!module || !module.options.config) return;
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const configProperties = (module.options.config as any)
-			.configProperties;
+		const configProperties = (
+			module.options.config as unknown as IConfigClass
+		).configProperties;
 		const propertyOptions = configProperties?.[propertyKey];
 
 		if (!propertyOptions) return;
@@ -169,8 +170,9 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			moduleName,
 		);
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		await (interaction as any).update(view);
+		if (interaction.isMessageComponent()) {
+			await interaction.update(view);
+		}
 	}
 
 	@Button("module_config_array_add:*:*:*")

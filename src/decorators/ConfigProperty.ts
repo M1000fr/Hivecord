@@ -37,6 +37,11 @@ export interface IConfigClass {
 	configProperties?: Record<string, ConfigPropertyOptions>;
 }
 
+export interface ConfigKeyMetadata<T = unknown> {
+	__isConfigKey: true;
+	defaultValue?: T;
+}
+
 /**
  * Helper to define a config key with a default value.
  * Returns the default value at compile time but an object with metadata at runtime.

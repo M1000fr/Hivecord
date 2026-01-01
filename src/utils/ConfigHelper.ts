@@ -2,6 +2,8 @@ import { LeBotClient } from "@class/LeBotClient";
 import {
 	EConfigType,
 	type ConfigPropertyOptions,
+	type IConfigClass,
+	type ConfigKeyMetadata,
 } from "@decorators/ConfigProperty";
 import { Inject } from "@decorators/Inject";
 import { ChannelConfigService } from "@modules/Configuration/services/ChannelConfigService";
@@ -230,11 +232,8 @@ export class ConfigHelper {
 		if (!module?.options.config) return null;
 
 		const configProperties =
-			(
-				module.options.config as unknown as {
-					configProperties: Record<string, ConfigPropertyOptions>;
-				}
-			).configProperties || {};
+			(module.options.config as unknown as IConfigClass)
+				.configProperties || {};
 
 		const embed = new EmbedBuilder()
 			.setTitle(
@@ -269,7 +268,7 @@ export class ConfigHelper {
 				propertyValue &&
 				typeof propertyValue === "object" &&
 				"__isConfigKey" in propertyValue
-					? (propertyValue as unknown as { defaultValue: unknown })
+					? (propertyValue as unknown as ConfigKeyMetadata)
 							.defaultValue
 					: undefined;
 

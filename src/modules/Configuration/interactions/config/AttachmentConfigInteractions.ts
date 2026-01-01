@@ -95,9 +95,9 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 		const filter = (m: Message) =>
 			m.author.id === interaction.user.id && m.attachments.size > 0;
 
-		if (!interaction.channel) return;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const collector = (interaction.channel as any).createMessageCollector({
+		if (!interaction.channel || !("createMessageCollector" in interaction.channel))
+			return;
+		const collector = interaction.channel.createMessageCollector({
 			filter,
 			time: 60000,
 			max: 1,

@@ -43,7 +43,6 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		const ctx = await this.getHandleContext(interaction);
 		if (!ctx) return;
 		const {
-			client,
 			moduleName,
 			propertyKey,
 			parts,
@@ -52,7 +51,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		} = ctx;
 		const messageId = parts[3] || "";
 
-		const { t } = await this.getLanguageContext(interaction);
+		await this.getLanguageContext(interaction);
 		const defaultValue = this.getDefaultValue(module, propertyKey);
 
 		const rawValue = await this.configHelper.fetchValue(
