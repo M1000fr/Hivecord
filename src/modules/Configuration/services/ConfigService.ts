@@ -10,6 +10,7 @@ import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 import { ConfigurationRepository, GuildRepository } from "@src/repositories";
 import { Logger } from "@utils/Logger";
 import { type Channel, Guild, type GuildBasedChannel, Role } from "discord.js";
+import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ChannelConfigService } from "./ChannelConfigService";
 import { ConfigCacheService } from "./ConfigCacheService";
 import { RoleConfigService } from "./RoleConfigService";
@@ -29,6 +30,10 @@ export class ConfigService {
 		private readonly channelConfig: ChannelConfigService,
 		private readonly roleConfig: RoleConfigService,
 	) {}
+
+	async getLanguage(guild: Guild): Promise<string> {
+		return (await this.of(guild, GeneralConfig).Language) || "fr";
+	}
 
 	of<T>(guild: Guild, configClass: T): ConfigProxy<T> {
 		const metadata = (configClass as unknown as IConfigClass)

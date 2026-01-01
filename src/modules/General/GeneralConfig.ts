@@ -124,6 +124,20 @@ export class GeneralConfig {
 	})
 	static WelcomeBackground = configKey("");
 
+	@ConfigProperty({
+		displayName: "Test Toggle",
+		description: "A test toggle property",
+		type: "test_toggle",
+	})
+	static TestToggle = configKey(false);
+
+	@ConfigProperty({
+		displayName: "Test String",
+		description: "A test string property",
+		type: "test_string",
+	})
+	static TestString = configKey("Test");
+
 	// Instance properties for ConfigProxy compatibility
 	Language!: string;
 	WelcomeMessageImage!: string;
@@ -132,4 +146,6 @@ export class GeneralConfig {
 	WelcomeEmbedName!: string;
 	WelcomeRoles!: string[];
 	WelcomeBackground!: string;
+	TestToggle!: boolean;
+	TestString!: string;
 }

@@ -181,7 +181,7 @@ export class ConfigHelper {
 		t: TFunction,
 		options?: ConfigPropertyOptions,
 		locale?: string,
-		defaultValue?: string | string[],
+		defaultValue?: unknown,
 	): Promise<string> {
 		try {
 			let value = await this.fetchValue(guild, key, type);
@@ -191,20 +191,28 @@ export class ConfigHelper {
 				(Array.isArray(value) && value.length === 0)
 			) {
 				if (defaultValue !== undefined) {
-					value = defaultValue;
+					value = defaultValue as string | string[];
 				}
 			}
 
-			return value && (!Array.isArray(value) || value.length > 0)
-				? await ConfigHelper.formatValue(
-						value,
-						type,
-						t,
-						options,
-						locale,
-						guild.id,
-					)
-				: t("utils.config_helper.not_set");
+			const isSet =
+				value !== null &&
+				value !== undefined &&
+				value !== "" &&
+				(!Array.isArray(value) || value.length > 0);
+
+			if (isSet) {
+				return await ConfigHelper.formatValue(
+					value as string | string[],
+					type,
+					t,
+					options,
+					locale,
+					guild.id,
+				);
+			}
+
+			return t("utils.config_helper.not_set");
 		} catch {
 			return t("utils.config_helper.not_set");
 		}
@@ -246,7 +254,7 @@ export class ConfigHelper {
 			configProperties,
 		).entries()) {
 			const opt = options;
-			const language = locale || "en";
+			const language = locale || "fr";
 			const displayName =
 				opt.displayNameLocalizations?.[language as Locale] ||
 				opt.displayName ||
@@ -276,7 +284,7 @@ export class ConfigHelper {
 				t,
 				opt,
 				language,
-				defaultValue as string | string[],
+				defaultValue,
 			);
 
 			embed.addFields({
@@ -298,7 +306,7 @@ export class ConfigHelper {
 			.addOptions(
 				Object.entries(configProperties).map(([key, options], idx) => {
 					const opt = options;
-					const language = locale || "en";
+					const language = locale || "fr";
 					const displayName =
 						opt.displayNameLocalizations?.[language as Locale] ||
 						opt.displayName ||

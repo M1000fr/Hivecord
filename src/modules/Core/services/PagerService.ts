@@ -30,7 +30,7 @@ export class PagerService {
 		if (!data) return false; // Not a pager interaction
 
 		const state = JSON.parse(data);
-		const locale = state.locale || "en";
+		const locale = state.locale || "fr";
 		const t = I18nService.getFixedT(locale);
 
 		// Check ownership

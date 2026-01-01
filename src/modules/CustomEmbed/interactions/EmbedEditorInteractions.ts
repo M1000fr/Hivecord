@@ -3,7 +3,6 @@ import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { Interaction as InteractionParam } from "@decorators/params";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
-import { GeneralConfig } from "@modules/General/GeneralConfig";
 import {
 	type APIEmbed,
 	type ButtonInteraction,
@@ -74,9 +73,7 @@ export class EmbedEditorInteractions {
 		const guild =
 			interaction.guild ??
 			(await interaction.client.guilds.fetch(session.guildId));
-		const lng =
-			(await this.configService.of(guild, GeneralConfig).Language) ??
-			"en";
+		const lng = await this.configService.getLanguage(guild);
 		const t = I18nService.getFixedT(lng);
 		const embed = new EmbedBuilder(session.data);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,9 +97,7 @@ export class EmbedEditorInteractions {
 		const guild =
 			interaction.guild ??
 			(await interaction.client.guilds.fetch(session.guildId));
-		const lng =
-			(await this.configService.of(guild, GeneralConfig).Language) ??
-			"en";
+		const lng = await this.configService.getLanguage(guild);
 		const t = I18nService.getFixedT(lng);
 		const value = interaction.values[0];
 		if (!value) return;
@@ -143,9 +138,7 @@ export class EmbedEditorInteractions {
 		const guild =
 			interaction.guild ??
 			(await interaction.client.guilds.fetch(session.guildId));
-		const lng =
-			(await this.configService.of(guild, GeneralConfig).Language) ??
-			"en";
+		const lng = await this.configService.getLanguage(guild);
 		const t = I18nService.getFixedT(lng);
 		const value = interaction.values[0];
 		if (!value) return;

@@ -87,7 +87,7 @@ export class Pager<T> {
 		this.userId = options.userId;
 		this.redisService = redisService;
 
-		this.locale = options.languageContext.locale || "en";
+		this.locale = options.languageContext.locale || "fr";
 		this.t =
 			options.languageContext.t || I18nService.getFixedT(this.locale);
 
