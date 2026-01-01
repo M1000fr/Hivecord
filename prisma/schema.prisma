@@ -21,11 +21,12 @@ enum SanctionType {
 }
 
 model User {
-    id     String    @id
+    id String @id
 
     Groups            UserGroup[]
     SanctionsReceived Sanction[]  @relation("UserSanctions")
     SanctionsApplied  Sanction[]  @relation("ModeratorSanctions")
+    UserAsMembers     Member[]
 }
 
 model Guild {
@@ -38,14 +39,27 @@ model Guild {
     Sanctions      Sanction[]
     Configurations Configuration[]
     CustomEmbeds   CustomEmbed[]
+    Members        Member[]
+}
+
+model Member {
+    id String @id
+
+    guildId String
+    Guild   Guild  @relation(fields: [guildId], references: [id])
+
+    userId String
+    User   User   @relation(fields: [userId], references: [id])
 }
 
 model Channel {
-    id        String      @id
-    guildId   String
-    Guild     Guild       @relation(fields: [guildId], references: [id])
+    id String @id
+
     type      ChannelType
     deletedAt DateTime?
+
+    guildId String
+    Guild   Guild  @relation(fields: [guildId], references: [id])
 
     SingleChannelConfigs ChannelConfiguration[]     @relation("SingleChannelConfigs")
     ListChannelConfigs   ChannelListConfiguration[] @relation("ListChannelConfigs")
@@ -53,9 +67,10 @@ model Channel {
 
 model Role {
     id        String    @id
-    guildId   String
-    Guild     Guild     @relation(fields: [guildId], references: [id])
     deletedAt DateTime?
+
+    guildId String
+    Guild   Guild  @relation(fields: [guildId], references: [id])
 
     Groups            Group[]
     SingleRoleConfigs RoleConfiguration[]     @relation("SingleRoleConfigs")
@@ -88,10 +103,11 @@ model GroupPermission {
 }
 
 model Group {
-    id      Int    @id @default(autoincrement())
+    id   Int    @id @default(autoincrement())
+    name String
+
     guildId String
     Guild   Guild  @relation(fields: [guildId], references: [id])
-    name    String
 
     roleId String
     Role   Role   @relation(fields: [roleId], references: [id])
@@ -102,8 +118,6 @@ model Group {
 
 model Sanction {
     id          Int          @id @default(autoincrement())
-    guildId     String
-    Guild       Guild        @relation(fields: [guildId], references: [id])
     userId      String
     moderatorId String
     type        SanctionType
@@ -112,28 +126,34 @@ model Sanction {
     expiresAt   DateTime?
     active      Boolean      @default(true)
 
+    guildId String
+    Guild   Guild  @relation(fields: [guildId], references: [id])
+
     User      User @relation("UserSanctions", fields: [userId], references: [id])
     Moderator User @relation("ModeratorSanctions", fields: [moderatorId], references: [id])
 }
 
 model Configuration {
-    id      Int    @id @default(autoincrement())
+    id    Int    @id @default(autoincrement())
+    key   String
+    value String
+
     guildId String
     Guild   Guild  @relation(fields: [guildId], references: [id])
-    key     String
-    value   String
 
     @@index([guildId, key])
 }
 
 model ChannelConfiguration {
-    key       String  @id
+    key String @id
+
     channelId String
     Channel   Channel @relation("SingleChannelConfigs", fields: [channelId], references: [id])
 }
 
 model ChannelListConfiguration {
-    key       String
+    key String
+
     channelId String
     Channel   Channel @relation("ListChannelConfigs", fields: [channelId], references: [id])
 
@@ -141,13 +161,15 @@ model ChannelListConfiguration {
 }
 
 model RoleConfiguration {
-    key    String @id
+    key String @id
+
     roleId String
     Role   Role   @relation("SingleRoleConfigs", fields: [roleId], references: [id])
 }
 
 model RoleListConfiguration {
-    key    String
+    key String
+
     roleId String
     Role   Role   @relation("ListRoleConfigs", fields: [roleId], references: [id])
 
@@ -155,12 +177,13 @@ model RoleListConfiguration {
 }
 
 model CustomEmbed {
-    guildId   String
-    Guild     Guild    @relation(fields: [guildId], references: [id])
     name      String
     data      String   @db.Text // JSON content
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    guildId String
+    Guild   Guild  @relation(fields: [guildId], references: [id])
 
     @@id([guildId, name])
 }
