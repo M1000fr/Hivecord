@@ -28,6 +28,7 @@ import {
 	PermissionsBitField,
 	type ApplicationCommandDataResolvable,
 } from "discord.js";
+import { BaseConfigTypeHandler } from "./BaseConfigTypeHandler";
 
 @Injectable()
 export class LeBotClient<
@@ -267,7 +268,15 @@ export class LeBotClient<
 		);
 
 		for (const HandlerClass of handlerClasses) {
-			this.container.resolve(HandlerClass);
+			const instance = this.container.resolve(HandlerClass);
+
+			if (
+				instance instanceof BaseConfigTypeHandler &&
+				typeof instance.registerInteractions === "function"
+			) {
+				instance.registerInteractions();
+			}
+
 			this.logger.log(
 				`Registered config handler: ${HandlerClass.name} for module ${options.name}`,
 			);

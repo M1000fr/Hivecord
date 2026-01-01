@@ -1,5 +1,7 @@
 import { Module } from "@decorators/Module";
 import ModulesCommand from "./commands/modules/index";
+import { BooleanConfigHandler } from "./configHandler/BooleanConfigHandler";
+import { StringConfigHandler } from "./configHandler/StringConfigHandler";
 import { BooleanConfigInteractions } from "./interactions/config/BooleanConfigInteractions";
 import { ModuleConfigInteractions } from "./interactions/config/ModuleConfigInteractions";
 import { RoleChannelConfigInteractions } from "./interactions/config/RoleChannelConfigInteractions";
@@ -22,6 +24,9 @@ import { CoreModule } from "@modules/Core/CoreModule";
 		StringConfigInteractions,
 		RoleChannelConfigInteractions,
 		StringArrayConfigInteractions,
+		// Config Handlers
+		BooleanConfigHandler,
+		StringConfigHandler,
 	],
 	exports: [ConfigService],
 })

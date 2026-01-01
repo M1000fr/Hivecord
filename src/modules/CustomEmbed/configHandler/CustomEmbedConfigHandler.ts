@@ -1,11 +1,9 @@
 import { BaseSelectConfigHandler } from "@class/BaseSelectConfigHandler";
 import { ConfigType } from "@decorators/ConfigType";
-import { SelectMenu } from "@decorators/Interaction";
-import { Interaction } from "@decorators/params";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { CustomEmbedRepository } from "@src/repositories";
 import { ConfigHelper } from "@utils/ConfigHelper";
-import { type Guild, StringSelectMenuInteraction } from "discord.js";
+import { type Guild } from "discord.js";
 import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbedConfigKey";
 
 @ConfigType({
@@ -28,12 +26,5 @@ export class CustomEmbedConfigHandler extends BaseSelectConfigHandler {
 	async getOptions(guild: Guild) {
 		const names = await this.customEmbedRepository.listNames(guild);
 		return names.map((name) => ({ label: name, value: name }));
-	}
-
-	@SelectMenu("module_config_custom_embed:*")
-	async handleEmbedSelection(
-		@Interaction() interaction: StringSelectMenuInteraction,
-	) {
-		await this.handleSelection(interaction);
 	}
 }

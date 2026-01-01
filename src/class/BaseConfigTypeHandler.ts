@@ -75,4 +75,10 @@ export abstract class BaseConfigTypeHandler
 	async formatValue?(guildId: string, value: unknown): Promise<string> {
 		return String(value);
 	}
+
+	/**
+	 * Register interactions for this handler.
+	 * Called automatically by LeBotClient after instantiation.
+	 */
+	registerInteractions?(): void;
 }

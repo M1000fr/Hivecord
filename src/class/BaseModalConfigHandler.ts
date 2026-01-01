@@ -3,6 +3,7 @@ import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
+import { InteractionRegistry } from "@registers/InteractionRegistry";
 import type { ConfigHelper } from "@utils/ConfigHelper";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
@@ -29,6 +30,18 @@ export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
 	 * The prefix used for custom IDs of this handler
 	 */
 	abstract get customIdPrefix(): string;
+
+	override registerInteractions() {
+		InteractionRegistry.registerButtonPattern(
+			`${this.customIdPrefix}_edit:*`,
+			(interaction) => this.handleEdit(interaction as ButtonInteraction),
+		);
+		InteractionRegistry.registerModalPattern(
+			`${this.customIdPrefix}_modal:*`,
+			(interaction) =>
+				this.handleModal(interaction as ModalSubmitInteraction),
+		);
+	}
 
 	/**
 	 * Get the title for the modal
@@ -60,20 +73,24 @@ export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng =
-			(await this.configService.get(interaction.guild!, "language")) ??
-			"en";
+		const lng = await this.configService.getLanguage(interaction.guild!);
 		const t = I18nService.getFixedT(lng);
+
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, selectedProperty);
+
 		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guild!,
 			selectedProperty,
 			propertyOptions.type,
 			t,
+			propertyOptions,
+			lng,
+			defaultValue,
 		);
 
-		const module = (interaction.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
 		const configContexts = (
 			module?.options.config as unknown as {
 				configContexts?: Record<string, ConfigContextVariable[]>;
@@ -88,6 +105,10 @@ export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
 			configContexts,
 		);
 
+		const messageId = interaction.isMessageComponent()
+			? interaction.message.id
+			: "";
+
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			this.createConfigButton(
 				`${this.customIdPrefix}_edit`,
@@ -96,6 +117,7 @@ export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
 				interaction.user.id,
 				t("common.edit"),
 				ButtonStyle.Primary,
+				[messageId],
 			),
 		);
 
@@ -108,6 +130,7 @@ export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
 					interaction.user.id,
 					t("common.clear"),
 					ButtonStyle.Danger,
+					[messageId],
 				),
 			);
 		}
@@ -136,6 +159,7 @@ export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
 		const { parts } = ctx;
 		const moduleName = parts[1];
 		const propertyKey = parts[2];
+		const messageId = parts[3] || "";
 
 		if (!moduleName || !propertyKey) return;
 
@@ -147,17 +171,23 @@ export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
 
 		if (!propertyOptions) return;
 
-		const lng =
-			(await this.configService.get(interaction.guild!, "language")) ??
-			"en";
+		const lng = await this.configService.getLanguage(interaction.guild!);
 		const t = I18nService.getFixedT(lng);
 
-		const rawValue =
-			(await this.configHelper.fetchValue(
-				interaction.guild!,
-				propertyKey,
-				propertyOptions.type,
-			)) || "";
+		const { module } = this.getPropertyContext(
+			interaction.client as LeBotClient<true>,
+			moduleName,
+			propertyKey,
+		);
+		const defaultValue = this.getDefaultValue(module, propertyKey);
+
+		const rawValue = await this.configHelper.fetchValue(
+			interaction.guild!,
+			propertyKey,
+			propertyOptions.type,
+		);
+
+		const valueToUse = rawValue ?? defaultValue ?? "";
 
 		const modal = new ModalBuilder()
 			.setCustomId(
@@ -165,6 +195,7 @@ export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
 					`${this.customIdPrefix}_modal`,
 					moduleName,
 					propertyKey,
+					messageId,
 					interaction.user.id,
 				]),
 			)
@@ -173,7 +204,7 @@ export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
 		const input = new TextInputBuilder()
 			.setCustomId("value")
 			.setStyle(this.getTextInputStyle())
-			.setValue(String(rawValue))
+			.setValue(String(valueToUse))
 			.setRequired(true);
 
 		const label = new LabelBuilder()

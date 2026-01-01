@@ -3,6 +3,7 @@ import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
+import { InteractionRegistry } from "@registers/InteractionRegistry";
 import type { ConfigHelper } from "@utils/ConfigHelper";
 import {
 	ActionRowBuilder,
@@ -23,26 +24,45 @@ export abstract class BaseToggleConfigHandler extends BaseConfigTypeHandler {
 	 */
 	abstract get customIdPrefix(): string;
 
+	override registerInteractions() {
+		InteractionRegistry.registerButtonPattern(
+			`${this.customIdPrefix}_toggle:*`,
+			(interaction) =>
+				this.handleToggle(interaction as ButtonInteraction),
+		);
+	}
+
+	override async formatValue(
+		_guildId: string,
+		value: string | string[],
+	): Promise<string> {
+		return String(value) === "true" ? "`✅`" : "`❌`";
+	}
+
 	async show(
 		interaction: RepliableInteraction,
 		propertyOptions: ConfigPropertyOptions,
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng =
-			(await this.configService.get(interaction.guild!, "language")) ??
-			"en";
+		const lng = await this.configService.getLanguage(interaction.guild!);
 		const t = I18nService.getFixedT(lng);
+
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, selectedProperty);
+
 		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guild!,
 			selectedProperty,
 			propertyOptions.type,
 			t,
+			propertyOptions,
+			lng,
+			defaultValue,
 		);
 
-		const module = (interaction.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
 		const configContexts = (
 			module?.options.config as unknown as {
 				configContexts?: Record<string, ConfigContextVariable[]>;
@@ -57,6 +77,10 @@ export abstract class BaseToggleConfigHandler extends BaseConfigTypeHandler {
 			configContexts,
 		);
 
+		const messageId = interaction.isMessageComponent()
+			? interaction.message.id
+			: "";
+
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			this.createConfigButton(
 				`${this.customIdPrefix}_toggle`,
@@ -65,8 +89,23 @@ export abstract class BaseToggleConfigHandler extends BaseConfigTypeHandler {
 				interaction.user.id,
 				t("common.toggle"),
 				ButtonStyle.Primary,
+				[messageId],
 			),
 		);
+
+		if (!propertyOptions.nonNull) {
+			row.addComponents(
+				this.createConfigButton(
+					"module_config_clear",
+					moduleName,
+					selectedProperty,
+					interaction.user.id,
+					t("common.clear"),
+					ButtonStyle.Danger,
+					[messageId],
+				),
+			);
+		}
 
 		row.addComponents(
 			this.createConfigButton(
@@ -103,13 +142,21 @@ export abstract class BaseToggleConfigHandler extends BaseConfigTypeHandler {
 
 		if (!propertyOptions) return;
 
+		const { module } = this.getPropertyContext(
+			client,
+			moduleName,
+			propertyKey,
+		);
+		const defaultValue = this.getDefaultValue(module, propertyKey);
+
 		const rawValue = await this.configHelper.fetchValue(
 			interaction.guild!,
 			propertyKey,
 			propertyOptions.type,
 		);
 
-		const newValue = rawValue === "true" ? "false" : "true";
+		const valueToUse = rawValue ?? defaultValue;
+		const newValue = String(valueToUse) === "true" ? "false" : "true";
 
 		await this.updateConfig(
 			client,
@@ -118,6 +165,8 @@ export abstract class BaseToggleConfigHandler extends BaseConfigTypeHandler {
 			propertyKey,
 			newValue,
 			propertyOptions.type,
+			false,
+			true,
 		);
 	}
 }

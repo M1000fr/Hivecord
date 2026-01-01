@@ -3,6 +3,7 @@ import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
+import { InteractionRegistry } from "@registers/InteractionRegistry";
 import type { ConfigHelper } from "@utils/ConfigHelper";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
@@ -33,6 +34,14 @@ export abstract class BaseSelectConfigHandler extends BaseConfigTypeHandler {
 	 */
 	abstract get customIdPrefix(): string;
 
+	override registerInteractions() {
+		InteractionRegistry.registerSelectMenuPattern(
+			`${this.customIdPrefix}:*`,
+			(interaction) =>
+				this.handleSelection(interaction as StringSelectMenuInteraction),
+		);
+	}
+
 	/**
 	 * Get the options to display in the select menu
 	 */
@@ -51,20 +60,24 @@ export abstract class BaseSelectConfigHandler extends BaseConfigTypeHandler {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng =
-			(await this.configService.get(interaction.guild!, "language")) ??
-			"en";
+		const lng = await this.configService.getLanguage(interaction.guild!);
 		const t = I18nService.getFixedT(lng);
+
+		const module = (interaction.client as LeBotClient).modules.get(
+			moduleName.toLowerCase(),
+		);
+		const defaultValue = this.getDefaultValue(module, selectedProperty);
+
 		const currentValue = await this.configHelper.getCurrentValue(
 			interaction.guild!,
 			selectedProperty,
 			propertyOptions.type,
 			t,
+			propertyOptions,
+			lng,
+			defaultValue,
 		);
 
-		const module = (interaction.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
 		const configContexts = (
 			module?.options.config as unknown as {
 				configContexts?: Record<string, ConfigContextVariable[]>;
@@ -81,12 +94,17 @@ export abstract class BaseSelectConfigHandler extends BaseConfigTypeHandler {
 
 		const options = await this.getOptions(interaction.guild!);
 
+		const messageId = interaction.isMessageComponent()
+			? interaction.message.id
+			: "";
+
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(
 				CustomIdHelper.build([
 					this.customIdPrefix,
 					moduleName,
 					selectedProperty,
+					messageId,
 					interaction.user.id,
 				]),
 			)
@@ -134,6 +152,7 @@ export abstract class BaseSelectConfigHandler extends BaseConfigTypeHandler {
 					interaction.user.id,
 					t("common.clear"),
 					ButtonStyle.Danger,
+					[messageId],
 				),
 			);
 		}
