@@ -4,7 +4,6 @@ import { Interaction as InteractionParam } from "@decorators/params";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
 import {
-	type APIEmbed,
 	type ButtonInteraction,
 	EmbedBuilder,
 	type Interaction,
@@ -16,15 +15,7 @@ import {
 import { EmbedEditorMenus } from "../commands/embed/utils/EmbedEditorMenus";
 import { EmbedEditorModals } from "../commands/embed/utils/EmbedEditorModals";
 import { CustomEmbedService } from "../services/CustomEmbedService";
-
-interface EmbedEditorSession {
-	userId?: string;
-	guildId: string;
-	data: APIEmbed;
-	name: string;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	meta?: Record<string, any>;
-}
+import type { EmbedEditorSession } from "../types";
 
 @Injectable()
 export class EmbedEditorInteractions {
@@ -76,15 +67,16 @@ export class EmbedEditorInteractions {
 		const lng = await this.configService.getLanguage(guild);
 		const t = I18nService.getFixedT(lng);
 		const embed = new EmbedBuilder(session.data);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		await (interaction as any).update({
-			content: `**Embed Editor**: Editing \`${session.name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
-			embeds: [embed],
-			components: [
-				EmbedEditorMenus.getMainMenu(t),
-				EmbedEditorMenus.getControlButtons(t),
-			],
-		});
+		if (interaction.isMessageComponent() || interaction.isModalSubmit()) {
+			await (interaction as MessageComponentInteraction).update({
+				content: `**Embed Editor**: Editing \`${session.name}\`\nUse the menu below to edit properties. Click **Save** when finished.`,
+				embeds: [embed],
+				components: [
+					EmbedEditorMenus.getMainMenu(t),
+					EmbedEditorMenus.getControlButtons(t),
+				],
+			});
+		}
 	}
 
 	@SelectMenu("embed_editor_menu")

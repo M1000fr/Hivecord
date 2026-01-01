@@ -3,6 +3,7 @@ import { RedisService } from "@modules/Core/services/RedisService";
 import { Injectable } from "@src/decorators/Injectable";
 import { CustomEmbedRepository, GuildRepository } from "@src/repositories";
 import { EmbedBuilder, Guild, User, type APIEmbed } from "discord.js";
+import type { EmbedEditorMeta, EmbedEditorSession } from "../types";
 
 const EDITOR_TTL = 3600; // 1 hour
 
@@ -70,14 +71,9 @@ export class CustomEmbedService {
 
 	// --- Editor Session Management (Redis) ---
 
-	async getEditorSession(sessionId: string): Promise<{
-		guildId: string;
-		name: string;
-		data: APIEmbed;
-		userId?: string;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		meta?: Record<string, any>;
-	} | null> {
+	async getEditorSession(
+		sessionId: string,
+	): Promise<EmbedEditorSession | null> {
 		const redis = this.redis.client;
 		const key = `embed:editor:${sessionId}`;
 		const data = await redis.get(key);
@@ -89,8 +85,7 @@ export class CustomEmbedService {
 		guild: Guild,
 		name: string,
 		data: APIEmbed,
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		meta?: Record<string, any>,
+		meta?: EmbedEditorMeta,
 		user?: User,
 	): Promise<void> {
 		const redis = this.redis.client;
