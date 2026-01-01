@@ -36,7 +36,8 @@
 		"icon_url": "URL de l'icône",
 		"image_url": "URL de l'image",
 		"thumbnail_url": "URL de la miniature",
-		"inline": "En ligne (true/false)"
+		"inline": "En ligne (true/false)",
+		"toggle": "Basculer"
 	},
 	"commands": {
 		"not_implemented": "Cette commande n'est pas encore implémentée."
@@ -163,7 +164,8 @@
 			"no_options_found": "Aucune option trouvée",
 			"types": {},
 			"configure_property": "⚙️ Configurer : {{property}}",
-			"available_variables": "Variables disponibles"
+			"available_variables": "Variables disponibles",
+			"modal_title": "Modifier la valeur"
 		},
 		"pager": {
 			"not_allowed": "❌ Vous n'êtes pas autorisé à interagir avec ce paginateur."

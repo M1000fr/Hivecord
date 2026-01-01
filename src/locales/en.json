@@ -36,7 +36,8 @@
 		"icon_url": "Icon URL",
 		"image_url": "Image URL",
 		"thumbnail_url": "Thumbnail URL",
-		"inline": "Inline (true/false)"
+		"inline": "Inline (true/false)",
+		"toggle": "Toggle"
 	},
 	"commands": {
 		"not_implemented": "This command is not yet implemented."
@@ -163,7 +164,8 @@
 			"no_options_found": "No options found",
 			"types": {},
 			"configure_property": "⚙️ Configure: {{property}}",
-			"available_variables": "Available Variables"
+			"available_variables": "Available Variables",
+			"modal_title": "Edit Value"
 		},
 		"pager": {
 			"not_allowed": "❌ You are not allowed to interact with this pager."
