@@ -1,3 +1,5 @@
+import { BaseConfigTypeHandler } from "@class/BaseConfigTypeHandler";
+import type { LeBotClient } from "@class/LeBotClient";
 import { Injectable } from "@decorators/Injectable";
 import { EVENT_METADATA_KEY } from "@decorators/On";
 import {
@@ -22,8 +24,6 @@ import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { getProvidersByType } from "@utils/getProvidersByType";
 import { Logger } from "@utils/Logger";
 import { ApplicationCommandType } from "discord.js";
-import { BaseConfigTypeHandler } from "@class/BaseConfigTypeHandler";
-import type { LeBotClient } from "@class/LeBotClient";
 
 @Injectable()
 export class ModuleLoader {
