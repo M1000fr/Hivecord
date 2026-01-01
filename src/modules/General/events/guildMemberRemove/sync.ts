@@ -17,9 +17,9 @@ export default class GuildMemberRemoveSyncEvent {
 		@Context() [member]: ContextOf<typeof BotEvents.GuildMemberRemove>,
 	) {
 		await this.prisma.user.upsert({
-			where: { id: member.id },
-			update: { leftAt: new Date() },
-			create: { id: member.id, leftAt: new Date() },
+			where: { id: member.user.id },
+			create: { id: member.user.id },
+			update: {},
 		});
 	}
 }

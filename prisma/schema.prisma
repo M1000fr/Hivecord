@@ -22,7 +22,6 @@ enum SanctionType {
 
 model User {
     id     String    @id
-    leftAt DateTime?
 
     Groups            UserGroup[]
     SanctionsReceived Sanction[]  @relation("UserSanctions")

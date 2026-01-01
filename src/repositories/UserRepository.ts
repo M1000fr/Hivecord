@@ -7,7 +7,7 @@ export class UserRepository extends BaseRepository {
 	async upsert(user: User) {
 		return this.prisma.user.upsert({
 			where: { id: user.id },
-			update: { leftAt: null },
+			update: {},
 			create: { id: user.id },
 		});
 	}
