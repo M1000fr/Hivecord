@@ -3,6 +3,7 @@ import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
+import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -66,8 +67,9 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 			.addOptions(
 				choices.map((choice) => {
 					const label =
-						choice.nameLocalizations?.[t.language as Locale] ||
-						choice.name;
+						choice.nameLocalizations?.[
+							interaction.locale as Locale
+						] || choice.name;
 					return new StringSelectMenuOptionBuilder()
 						.setLabel(label)
 						.setValue(String(choice.value))

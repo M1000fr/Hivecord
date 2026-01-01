@@ -3,6 +3,7 @@ import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { Button, Modal } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { ConfigHelper } from "@utils/ConfigHelper";
+import { CustomIdHelper } from "@utils/CustomIdHelper";
 
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import {
