@@ -7,6 +7,7 @@ import {
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
+import { I18nService } from "@modules/Core/services/I18nService";
 import { ConfigHelper } from "@utils/ConfigHelper";
 
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
@@ -73,10 +74,8 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 				? currentValues
 				: defaultValue || [];
 
-		const lng =
-			(await this.configService.of(guild, GeneralConfig).Language) ??
-			"en";
-		const t = i18next.getFixedT(lng);
+		const lng = await this.configService.getLanguage(guild);
+		const t = I18nService.getFixedT(lng);
 
 		const displayValue =
 			valuesToUse.length > 0

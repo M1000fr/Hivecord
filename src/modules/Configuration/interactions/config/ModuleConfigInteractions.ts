@@ -89,11 +89,9 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 			}
 
 			try {
-				const lng =
-					(await this.configService.of(
-						interaction.guild!,
-						GeneralConfig,
-					).Language) ?? "en";
+				const lng = await this.configService.getLanguage(
+					interaction.guild!,
+				);
 				const t = I18nService.getFixedT(lng);
 				const config = await this.configHelper.buildModuleConfigEmbed(
 					client,
@@ -218,11 +216,9 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 
 				const mainMessage = await this.getMainMessage(interaction);
 				if (mainMessage) {
-					const lng =
-						(await this.configService.of(
-							interaction.guild!,
-							GeneralConfig,
-						).Language) ?? "en";
+					const lng = await this.configService.getLanguage(
+						interaction.guild!,
+					);
 					const t = I18nService.getFixedT(lng);
 					const config =
 						await this.configHelper.buildModuleConfigEmbed(

@@ -86,6 +86,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		userId: string,
 		defaultValue?: string | string[] | null,
+		messageId: string = "",
 	) {
 		const isRole =
 			type === EConfigType.Role || type === EConfigType.RoleArray;
@@ -93,6 +94,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			isRole ? "module_config_role" : "module_config_channel",
 			moduleName,
 			selectedProperty,
+			messageId,
 			userId,
 		]);
 		const placeholder = isRole ? "Select role(s)" : "Select a channel";
@@ -137,10 +139,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng = await this.configService.of(
-			interaction.guild!,
-			GeneralConfig,
-		).Language;
+		const lng = await this.configService.getLanguage(interaction.guild!);
 		const t = I18nService.getFixedT(lng);
 
 		const module = (interaction.client as LeBotClient).modules.get(
@@ -165,6 +164,10 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 		);
 		const valueToUse = rawValue ?? defaultValue;
 
+		const messageId = interaction.isMessageComponent()
+			? interaction.message.id
+			: "";
+
 		const embed = this.buildPropertyEmbed(
 			propertyOptions,
 			selectedProperty,
@@ -177,6 +180,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			selectedProperty,
 			interaction.user.id,
 			valueToUse,
+			messageId,
 		);
 
 		const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] =
@@ -201,6 +205,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 				interaction.user.id,
 				"Clear Selection",
 				ButtonStyle.Danger,
+				[messageId],
 			);
 			buttonRow.addComponents(clearButton);
 		}

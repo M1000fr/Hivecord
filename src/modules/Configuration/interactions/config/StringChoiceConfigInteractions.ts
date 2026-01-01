@@ -52,10 +52,7 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng = await this.configService.of(
-			interaction.guild!,
-			GeneralConfig,
-		).Language;
+		const lng = await this.configService.getLanguage(interaction.guild!);
 		const t = I18nService.getFixedT(lng);
 
 		const module = (interaction.client as LeBotClient).modules.get(
@@ -86,6 +83,10 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 		);
 		const valueToUse = rawValue ?? defaultValue;
 
+		const messageId = interaction.isMessageComponent()
+			? interaction.message.id
+			: "";
+
 		const choices = propertyOptions.choices || [];
 		const selectMenu = new StringSelectMenuBuilder()
 			.setCustomId(
@@ -93,6 +94,7 @@ export class StringChoiceConfigInteractions extends BaseConfigInteractions {
 					"module_config_choice",
 					moduleName,
 					selectedProperty,
+					messageId,
 					interaction.user.id,
 				]),
 			)

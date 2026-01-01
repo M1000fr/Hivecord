@@ -63,46 +63,55 @@ export abstract class BaseConfigInteractions {
 			customId = interaction.customId;
 		}
 		const parts = CustomIdHelper.parse(customId);
+
+		// If it's the main config message itself
 		if (parts[0] === "module_config") {
-			if (
-				interaction.isMessageComponent() ||
-				interaction.isModalSubmit()
-			) {
+			if (interaction.isMessageComponent()) {
 				if (interaction.message instanceof Message)
 					return interaction.message;
 			}
 			return null;
 		}
 
-		if (interaction.isModalSubmit()) {
-			if (parts[0] === "module_config_modal" && parts[3]) {
-				try {
-					return (
-						(await interaction.channel?.messages.fetch(parts[3])) ??
-						null
-					);
-				} catch {
-					// Ignore
+		// Try to get messageId from parts[3] (standardized position: action:module:prop:messageId:userId)
+		const messageId = parts[3];
+		if (messageId && /^\d{17,20}$/.test(messageId)) {
+			try {
+				const message =
+					await interaction.channel?.messages.fetch(messageId);
+				if (message) return message;
+			} catch {
+				// Ignore
+			}
+		}
+
+		// Fallback for components: check reference
+		if (interaction.isMessageComponent()) {
+			const message = interaction.message;
+			if (message instanceof Message) {
+				const refId = message.reference?.messageId;
+				if (refId) {
+					try {
+						return (
+							(await interaction.channel?.messages.fetch(
+								refId,
+							)) || null
+						);
+					} catch {
+						// Ignore
+					}
 				}
 			}
-			if (interaction.message instanceof Message)
-				return interaction.message;
-			return null;
 		}
 
-		if (interaction.isMessageComponent() || interaction.isModalSubmit()) {
-			const message = interaction.message;
-			if (!message) return null;
-
-			const refId = message.reference?.messageId;
-			if (!refId) return null;
-
-			return (
-				(await interaction.channel?.messages
-					.fetch(refId)
-					.catch(() => null)) || null
-			);
+		// Last fallback: if it's a modal and we have a message attached
+		if (
+			interaction.isModalSubmit() &&
+			interaction.message instanceof Message
+		) {
+			return interaction.message;
 		}
+
 		return null;
 	}
 
@@ -128,11 +137,9 @@ export abstract class BaseConfigInteractions {
 
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
-				const lng =
-					(await this.configService.get(
-						interaction.guild!,
-						"language",
-					)) ?? "en";
+				const lng = await this.configService.getLanguage(
+					interaction.guild!,
+				);
 				const t = I18nService.getFixedT(lng);
 				const config = await this.configHelper.buildModuleConfigEmbed(
 					client,

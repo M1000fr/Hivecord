@@ -133,10 +133,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		selectedProperty: string,
 		moduleName: string,
 	) {
-		const lng = await this.configService.of(
-			interaction.guild!,
-			GeneralConfig,
-		).Language;
+		const lng = await this.configService.getLanguage(interaction.guild!);
 		const t = I18nService.getFixedT(lng);
 		const module = (interaction.client as LeBotClient).modules.get(
 			moduleName.toLowerCase(),
@@ -190,6 +187,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 					interaction.user.id,
 					"Default Value",
 					ButtonStyle.Danger,
+					[messageId],
 				),
 			);
 		}

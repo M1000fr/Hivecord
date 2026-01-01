@@ -23,10 +23,7 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 		moduleName: string,
 	) {
 		if (!interaction.guild || !interaction.channel) return;
-		const lng = await this.configService.of(
-			interaction.guild,
-			GeneralConfig,
-		).Language;
+		const lng = await this.configService.getLanguage(interaction.guild);
 		const t = I18nService.getFixedT(lng);
 
 		const module = (interaction.client as LeBotClient).modules.get(
@@ -55,6 +52,10 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 				"\n\n**Please reply to this message with the file you want to upload.**\nSupported formats: Images, GIFs, Videos, Audio.",
 		);
 
+		const messageId = interaction.isMessageComponent()
+			? interaction.message.id
+			: "";
+
 		const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] =
 			[];
 
@@ -69,6 +70,7 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 					interaction.user.id,
 					"Clear File",
 					ButtonStyle.Danger,
+					[messageId],
 				),
 			);
 		}
