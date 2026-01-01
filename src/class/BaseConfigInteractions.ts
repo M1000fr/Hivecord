@@ -25,7 +25,7 @@ import {
 	type StringSelectMenuInteraction,
 	type UserSelectMenuInteraction,
 } from "discord.js";
-import type { GuildLanguageContext } from "../../../../types/GuildLanguageContext";
+import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 
 export type ConfigInteraction =
 	| ButtonInteraction

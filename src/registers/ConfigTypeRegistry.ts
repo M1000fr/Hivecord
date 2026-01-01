@@ -77,9 +77,7 @@ export class ConfigTypeRegistry {
 	 */
 	static register(definition: ConfigTypeDefinition): void {
 		if (this.types.has(definition.id)) {
-			throw new Error(
-				`Configuration type '${definition.id}' is already registered`,
-			);
+			return;
 		}
 		this.types.set(definition.id, definition);
 	}

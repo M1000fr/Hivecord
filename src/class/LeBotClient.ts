@@ -258,6 +258,22 @@ export class LeBotClient<
 		}
 	}
 
+	private loadConfigHandlers(options: ModuleOptions): void {
+		if (!options.providers) return;
+
+		const handlerClasses = getProvidersByType(
+			options.providers,
+			"config-handler",
+		);
+
+		for (const HandlerClass of handlerClasses) {
+			this.container.resolve(HandlerClass);
+			this.logger.log(
+				`Registered config handler: ${HandlerClass.name} for module ${options.name}`,
+			);
+		}
+	}
+
 	private loadEvents(options: ModuleOptions): void {
 		const moduleName = options.name;
 
@@ -432,6 +448,7 @@ export class LeBotClient<
 
 			this.loadCommands(options);
 			this.loadEvents(options);
+			this.loadConfigHandlers(options);
 		}
 
 		for (const module of this.modules.values()) {

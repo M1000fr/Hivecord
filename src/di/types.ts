@@ -5,7 +5,7 @@ export type ProviderScope = "module" | "global";
 
 export type ProviderToken = Constructor | string | symbol;
 
-export type ProviderType = "service" | "command" | "event";
+export type ProviderType = "service" | "command" | "event" | "config-handler";
 
 export interface InjectableOptions {
 	scope?: ProviderScope;
