@@ -8,7 +8,6 @@ import { ChannelConfigService } from "@modules/Configuration/services/ChannelCon
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { RoleConfigService } from "@modules/Configuration/services/RoleConfigService";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
-import { CustomIdHelper } from "./CustomIdHelper";
 import {
 	ActionRowBuilder,
 	EmbedBuilder,
@@ -20,6 +19,7 @@ import {
 	User,
 } from "discord.js";
 import type { TFunction } from "i18next";
+import { CustomIdHelper } from "./CustomIdHelper";
 
 import { Injectable } from "@decorators/Injectable";
 
@@ -203,7 +203,7 @@ export class ConfigHelper {
 						options,
 						locale,
 						guild.id,
-				  )
+					)
 				: t("utils.config_helper.not_set");
 		} catch {
 			return t("utils.config_helper.not_set");

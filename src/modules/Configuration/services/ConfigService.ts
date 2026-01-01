@@ -5,9 +5,9 @@ import {
 	toConfigKey,
 } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
-import { ConfigurationRepository, GuildRepository } from "@src/repositories";
 import { ChannelType } from "@prisma/client/enums";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
+import { ConfigurationRepository, GuildRepository } from "@src/repositories";
 import { Logger } from "@utils/Logger";
 import { type Channel, Guild, type GuildBasedChannel, Role } from "discord.js";
 import { ChannelConfigService } from "./ChannelConfigService";

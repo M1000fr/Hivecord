@@ -1,6 +1,6 @@
 import { Injectable } from "@decorators/Injectable";
-import { Logger } from "@utils/Logger";
 import { PermissionRepository } from "@src/repositories";
+import { Logger } from "@utils/Logger";
 import { RedisService } from "./RedisService";
 
 const CACHE_TTL = 60; // 60 seconds
@@ -114,7 +114,8 @@ export class PermissionService {
 	}
 
 	async getAllPermissions(): Promise<string[]> {
-		const permissions = await this.permissionRepository.findAllPermissions();
+		const permissions =
+			await this.permissionRepository.findAllPermissions();
 		return permissions.map((p) => p.name);
 	}
 }

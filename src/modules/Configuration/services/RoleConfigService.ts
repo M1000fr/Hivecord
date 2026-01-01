@@ -13,7 +13,8 @@ export class RoleConfigService {
 
 	async get(guild: Guild, key: string): Promise<string | null> {
 		return this.cache.get(guild.id, "role", key, async () => {
-			const config = await this.configurationRepository.getRoleConfig(key);
+			const config =
+				await this.configurationRepository.getRoleConfig(key);
 			return config?.roleId ?? null;
 		});
 	}

@@ -1,6 +1,6 @@
 import { Injectable } from "@decorators/Injectable";
-import { ChannelRepository, ConfigurationRepository } from "@src/repositories";
 import { ChannelType } from "@prisma/client/enums";
+import { ChannelRepository, ConfigurationRepository } from "@src/repositories";
 import type { Channel, Guild, GuildBasedChannel } from "discord.js";
 import { ConfigCacheService } from "./ConfigCacheService";
 

@@ -1,3 +1,4 @@
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
@@ -12,7 +13,6 @@ import {
 	type MessageActionRowComponentBuilder,
 	type RepliableInteraction,
 } from "discord.js";
-import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 
 @ConfigInteraction()
 export class AttachmentConfigInteractions extends BaseConfigInteractions {

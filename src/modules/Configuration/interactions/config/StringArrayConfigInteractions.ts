@@ -9,6 +9,7 @@ import { Interaction } from "@decorators/params";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
 
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -25,7 +26,6 @@ import {
 	type RepliableInteraction,
 } from "discord.js";
 import i18next from "i18next";
-import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 
 @ConfigInteraction()
 export class StringArrayConfigInteractions extends BaseConfigInteractions {

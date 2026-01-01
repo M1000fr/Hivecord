@@ -1,5 +1,5 @@
-import "reflect-metadata";
 import { PROVIDER_TYPE_METADATA_KEY } from "@di/types";
+import "reflect-metadata";
 import { Injectable } from "./Injectable";
 
 export const CONFIG_TYPE_METADATA_KEY = Symbol("config_type");

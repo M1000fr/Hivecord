@@ -1,10 +1,10 @@
+import { BaseSelectConfigHandler } from "@class/BaseSelectConfigHandler";
 import { ConfigType } from "@decorators/ConfigType";
 import { SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
-import { BaseSelectConfigHandler } from "@class/BaseSelectConfigHandler";
-import { ConfigHelper } from "@utils/ConfigHelper";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { CustomEmbedRepository } from "@src/repositories";
+import { ConfigHelper } from "@utils/ConfigHelper";
 import { type Guild, StringSelectMenuInteraction } from "discord.js";
 import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbedConfigKey";
 
@@ -37,4 +37,3 @@ export class CustomEmbedConfigHandler extends BaseSelectConfigHandler {
 		await this.handleSelection(interaction);
 	}
 }
-

@@ -1,3 +1,4 @@
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { Inject } from "@decorators/Inject";
 import { Injectable } from "@decorators/Injectable";
@@ -13,7 +14,6 @@ import {
 	type StringSelectMenuInteraction,
 } from "discord.js";
 import { AttachmentConfigInteractions } from "./AttachmentConfigInteractions";
-import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import { BooleanConfigInteractions } from "./BooleanConfigInteractions";
 import { RoleChannelConfigInteractions } from "./RoleChannelConfigInteractions";
 import { StringArrayConfigInteractions } from "./StringArrayConfigInteractions";

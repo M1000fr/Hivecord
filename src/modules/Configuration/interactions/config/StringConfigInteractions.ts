@@ -9,6 +9,7 @@ import { I18nService } from "@modules/Core/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ConfigHelper } from "@utils/ConfigHelper";
 
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -20,7 +21,6 @@ import {
 	TextInputBuilder,
 	TextInputStyle,
 } from "discord.js";
-import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 
 @ConfigInteraction()
 export class StringConfigInteractions extends BaseConfigInteractions {

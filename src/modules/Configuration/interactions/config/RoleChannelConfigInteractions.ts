@@ -1,3 +1,4 @@
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import {
@@ -19,7 +20,6 @@ import {
 	type RepliableInteraction,
 	type RoleSelectMenuInteraction,
 } from "discord.js";
-import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 
 @ConfigInteraction()
 export class RoleChannelConfigInteractions extends BaseConfigInteractions {

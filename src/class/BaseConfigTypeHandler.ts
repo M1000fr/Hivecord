@@ -1,3 +1,5 @@
+import type { LeBotClient } from "@class/LeBotClient";
+import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import {
 	CONFIG_TYPE_METADATA_KEY,
 	type ConfigTypeMetadata,
@@ -6,15 +8,13 @@ import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import type { ConfigTypeHandler } from "@registers/ConfigTypeRegistry";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
 import type { ConfigHelper } from "@utils/ConfigHelper";
-import { BaseConfigInteractions } from "./BaseConfigInteractions";
 import {
 	ButtonInteraction,
 	ChatInputCommandInteraction,
 	type RepliableInteraction,
 	StringSelectMenuInteraction,
 } from "discord.js";
-import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
-import type { LeBotClient } from "@class/LeBotClient";
+import { BaseConfigInteractions } from "./BaseConfigInteractions";
 
 export abstract class BaseConfigTypeHandler
 	extends BaseConfigInteractions

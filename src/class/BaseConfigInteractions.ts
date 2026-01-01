@@ -7,6 +7,7 @@ import {
 } from "@enums/ConfigContextVariable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
+import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import type { ConfigHelper } from "@utils/ConfigHelper";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
@@ -25,7 +26,6 @@ import {
 	type StringSelectMenuInteraction,
 	type UserSelectMenuInteraction,
 } from "discord.js";
-import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 
 export type ConfigInteraction =
 	| ButtonInteraction
