@@ -24,6 +24,11 @@ export class Bootstrap {
 
 		await AppModule.init(container);
 
+		// Initialize Guild.config extension
+		const { GuildConfigRegister } =
+			await import("@registers/GuildConfigRegister");
+		GuildConfigRegister.init();
+
 		const client = container.resolve(LeBotClient);
 
 		const end = performance.now();

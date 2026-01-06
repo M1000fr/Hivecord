@@ -1,9 +1,9 @@
 import {
+	type ConfigKey,
+	type ConfigKeyMetadata,
 	EConfigType,
 	type IConfigClass,
 	toConfigKey,
-	type ConfigKeyMetadata,
-	type ConfigKey,
 } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
@@ -45,7 +45,8 @@ export class ConfigService {
 	}
 
 	of<T>(guild: Guild, configClass: T): ConfigProxy<T> {
-		const metadata = (configClass as unknown as IConfigClass).configProperties;
+		const metadata = (configClass as unknown as IConfigClass)
+			.configProperties;
 
 		return new Proxy({} as ConfigProxy<T>, {
 			get: (_target, prop) => {

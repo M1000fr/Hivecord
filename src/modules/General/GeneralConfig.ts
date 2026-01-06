@@ -6,6 +6,7 @@ import {
 } from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
+import type { ConfigProxy } from "@modules/Configuration/services/ConfigService";
 import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbed/CustomEmbedConfigKey";
 
 @ModuleConfig()
@@ -130,4 +131,10 @@ export class GeneralConfig {
 		emoji: "🎨",
 	})
 	static WelcomeBackground = configKey("");
+}
+
+declare module "../../interfaces/IGuildConfig" {
+	interface IGuildConfig {
+		general: ConfigProxy<typeof GeneralConfig>;
+	}
 }
