@@ -1,10 +1,8 @@
-import { EPermission } from "@enums/EPermission";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 
 export interface OptionRouteOptions {
 	option: string;
 	value: string | number | boolean;
-	permission?: EPermission;
 }
 
 export function OptionRoute(options: OptionRouteOptions) {
@@ -28,7 +26,6 @@ export function OptionRoute(options: OptionRouteOptions) {
 		// Register the value -> method mapping
 		optionMap.set(options.value, {
 			method: propertyKey,
-			permission: options.permission,
 		});
 	};
 }

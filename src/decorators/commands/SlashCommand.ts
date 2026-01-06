@@ -1,6 +1,5 @@
 import { Injectable } from "@decorators/Injectable";
 import { PROVIDER_TYPE_METADATA_KEY } from "@di/types";
-import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import "reflect-metadata";
@@ -19,12 +18,9 @@ export function SlashCommandController(options: CommandOptions) {
 
 export interface SubcommandOptions {
 	index: string;
-	permission?: EPermission;
 }
 
-export function SlashCommand(
-	optionsOrPermission?: EPermission | SubcommandOptions,
-) {
+export function SlashCommand(options?: SubcommandOptions) {
 	return function (
 		target: object,
 		propertyKey: string,
@@ -32,28 +28,20 @@ export function SlashCommand(
 	) {
 		const constructor = target.constructor as ICommandClass;
 
-		if (
-			typeof optionsOrPermission === "object" &&
-			"index" in optionsOrPermission
-		) {
+		if (options && "index" in options) {
 			if (!constructor.subcommands) {
 				constructor.subcommands = new Map();
 			}
-			const parts = optionsOrPermission.index.split(" ");
+			const parts = options.index.split(" ");
 			const key =
 				parts.length > 1
 					? `${parts[0]}:${parts[1]}`
 					: (parts[0] as string);
 			constructor.subcommands.set(key, {
 				method: propertyKey,
-				permission: optionsOrPermission.permission,
 			});
 		} else {
 			constructor.defaultCommand = propertyKey;
-			if (optionsOrPermission) {
-				constructor.defaultCommandPermission =
-					optionsOrPermission as EPermission;
-			}
 		}
 	};
 }

@@ -1,8 +1,11 @@
 import { Inject } from "@decorators/Inject";
 import { Client } from "@decorators/params/index.ts";
+import { UseInterceptors } from "@decorators/UseInterceptors";
 import { EPermission } from "@enums/EPermission";
+import { CommandPermissionInterceptor } from "@interceptors/CommandPermissionInterceptor";
 import { PagerService } from "@modules/Core/services/PagerService";
 import type { LeBotClient } from "@src/class/LeBotClient";
+import { CommandPermission } from "@src/decorators/commands/CommandPermission";
 import {
 	SlashCommand,
 	SlashCommandController,
@@ -21,7 +24,9 @@ import { pingOptions } from "./pingOptions";
 export default class PingCommand {
 	constructor(@Inject(PagerService) private pagerService: PagerService) {}
 
-	@SlashCommand(EPermission.Ping)
+	@UseInterceptors(CommandPermissionInterceptor)
+	@CommandPermission(EPermission.Ping)
+	@SlashCommand()
 	async default(
 		@Client() client: LeBotClient,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,

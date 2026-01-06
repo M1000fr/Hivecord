@@ -1,10 +1,8 @@
-import { EPermission } from "@enums/EPermission";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 
 export interface SubcommandOptions {
 	name?: string;
 	group?: string;
-	permission?: EPermission;
 }
 
 export function Subcommand(options?: SubcommandOptions) {
@@ -24,7 +22,6 @@ export function Subcommand(options?: SubcommandOptions) {
 
 		constructor.subcommands.set(group ? `${group}:${name}` : name, {
 			method: propertyKey,
-			permission: options?.permission,
 		});
 	};
 }

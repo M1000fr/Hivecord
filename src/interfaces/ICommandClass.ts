@@ -1,18 +1,13 @@
-import { EPermission } from "@enums/EPermission";
 import type { CommandOptions } from "./CommandOptions";
 
 export interface ICommandClass {
 	commandOptions?: CommandOptions;
 	autocompletes?: Map<string, string>;
 	defaultCommand?: string;
-	defaultCommandPermission?: EPermission;
 	optionRoutes?: Map<
 		string,
-		Map<
-			string | number | boolean,
-			{ method: string; permission?: EPermission }
-		>
+		Map<string | number | boolean, { method: string }>
 	>;
-	subcommands?: Map<string, { method: string; permission?: EPermission }>;
+	subcommands?: Map<string, { method: string }>;
 	new (...args: unknown[]): object;
 }

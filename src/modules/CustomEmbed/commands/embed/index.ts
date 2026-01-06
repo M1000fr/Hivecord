@@ -1,9 +1,12 @@
 import { Injectable } from "@decorators/Injectable";
 import { Client } from "@decorators/params/index.ts";
+import { UseInterceptors } from "@decorators/UseInterceptors";
 import { EPermission } from "@enums/EPermission";
+import { CommandPermissionInterceptor } from "@interceptors/CommandPermissionInterceptor";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import type { LeBotClient } from "@src/class/LeBotClient";
 import { Autocomplete } from "@src/decorators/commands/Autocomplete";
+import { CommandPermission } from "@src/decorators/commands/CommandPermission";
 import { SlashCommandController } from "@src/decorators/commands/SlashCommand";
 import { Subcommand } from "@src/decorators/commands/Subcommand";
 import {
@@ -18,6 +21,8 @@ import { embedOptions } from "./embedOptions";
 import { EmbedEditorMenus } from "./utils/EmbedEditorMenus";
 
 @Injectable()
+@UseInterceptors(CommandPermissionInterceptor)
+@CommandPermission(EPermission.ConfigureModules)
 @SlashCommandController(embedOptions)
 export default class EmbedCommand {
 	constructor(
@@ -42,7 +47,7 @@ export default class EmbedCommand {
 		);
 	}
 
-	@Subcommand({ permission: EPermission.ConfigureModules })
+	@Subcommand()
 	async builder(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
@@ -92,7 +97,7 @@ export default class EmbedCommand {
 		);
 	}
 
-	@Subcommand({ permission: EPermission.ConfigureModules })
+	@Subcommand()
 	async edit(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
@@ -144,7 +149,7 @@ export default class EmbedCommand {
 		);
 	}
 
-	@Subcommand({ permission: EPermission.ConfigureModules })
+	@Subcommand()
 	async delete(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
@@ -160,7 +165,7 @@ export default class EmbedCommand {
 		});
 	}
 
-	@Subcommand({ permission: EPermission.ConfigureModules })
+	@Subcommand()
 	async list(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
@@ -176,7 +181,7 @@ export default class EmbedCommand {
 		});
 	}
 
-	@Subcommand({ permission: EPermission.ConfigureModules })
+	@Subcommand()
 	async preview(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
