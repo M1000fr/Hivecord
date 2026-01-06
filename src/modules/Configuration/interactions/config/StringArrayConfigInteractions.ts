@@ -7,7 +7,7 @@ import {
 } from "@decorators/ConfigProperty";
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
-import { I18nService } from "@modules/Core/services/I18nService";
+import { I18nService } from "@modules/Shared/services/I18nService";
 import { ConfigFormatterService } from "@utils/ConfigFormatterService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 

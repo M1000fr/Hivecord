@@ -62,7 +62,7 @@ The `@Repository` decorator is a specialized utility for data access classes. It
 
 ```typescript
 import { Repository } from "@decorators/Repository";
-import { PrismaService } from "@modules/Core/services/PrismaService";
+import { PrismaService } from "@modules/Shared/services/PrismaService";
 
 @Repository()
 export class UserRepository {

@@ -1,6 +1,6 @@
 import { DependencyContainer } from "@di/DependencyContainer";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { I18nService } from "@modules/Core/services/I18nService";
+import { I18nService } from "@modules/Shared/services/I18nService";
 import { Guild } from "discord.js";
 
 /**

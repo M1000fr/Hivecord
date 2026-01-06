@@ -1,5 +1,5 @@
 import { Injectable } from "@decorators/Injectable";
-import { RedisService } from "@modules/Core/services/RedisService";
+import { RedisService } from "@modules/Database/services/RedisService";
 
 const CACHE_TTL = 60; // 60 seconds
 

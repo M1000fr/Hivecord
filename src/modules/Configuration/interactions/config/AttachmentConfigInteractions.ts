@@ -3,7 +3,7 @@ import { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
-import { I18nService } from "@modules/Core/services/I18nService";
+import { I18nService } from "@modules/Shared/services/I18nService";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,

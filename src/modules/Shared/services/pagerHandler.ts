@@ -5,7 +5,7 @@ import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
-import { PagerService } from "@modules/Core/services/PagerService";
+import { PagerService } from "@modules/Shared/services/PagerService";
 import type { ContextOf } from "@src/types/ContextOf.ts";
 import { DiscordAPIError } from "discord.js";
 

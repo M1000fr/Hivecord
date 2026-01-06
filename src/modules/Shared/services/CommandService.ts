@@ -11,7 +11,7 @@ import type { ICommandInstance } from "@interfaces/ICommandInstance.ts";
 import type { IExecutionContext } from "@interfaces/IExecutionContext";
 import type { IInterceptor } from "@interfaces/IInterceptor";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { I18nService } from "@modules/Core/services/I18nService";
+import { I18nService } from "@modules/Shared/services/I18nService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import type { CommandArgument } from "@src/types/CommandArgument";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";

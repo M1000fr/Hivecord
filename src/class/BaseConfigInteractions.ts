@@ -6,7 +6,7 @@ import {
 	ConfigContextVariable,
 } from "@enums/ConfigContextVariable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { I18nService } from "@modules/Core/services/I18nService";
+import { I18nService } from "@modules/Shared/services/I18nService";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
 import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";

@@ -12,9 +12,11 @@ import { ConfigCacheService } from "./services/ConfigCacheService";
 import { ConfigService } from "./services/ConfigService";
 import { RoleConfigService } from "./services/RoleConfigService";
 
+import { DatabaseModule } from "@modules/Database/DatabaseModule";
+
 @Module({
 	name: "Configuration",
-	imports: [],
+	imports: [DatabaseModule],
 	providers: [
 		// Services
 		ConfigCacheService,

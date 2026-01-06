@@ -20,11 +20,11 @@ The decorator accepts a configuration object with the following properties:
 import { Module } from "@decorators/Module";
 import { ExampleService } from "./services/ExampleService";
 import { ExampleCommand } from "./commands/ExampleCommand";
-import { CoreModule } from "@modules/Core/CoreModule";
+import { DatabaseModule } from "@modules/Database/DatabaseModule";
 
 @Module({
     name: "Example",
-    imports: [CoreModule],
+    imports: [DatabaseModule],
     providers: [
         ExampleService,
         ExampleCommand

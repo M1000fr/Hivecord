@@ -1,5 +1,5 @@
 import { Repository } from "@decorators/Repository";
-import { PrismaService } from "@modules/Core/services/PrismaService";
+import { PrismaService } from "@modules/Database/services/PrismaService";
 import { Role } from "discord.js";
 import { SoftDeletableRepository } from "./SoftDeletableRepository";
 

@@ -1,4 +1,4 @@
-import { I18nService } from "@modules/Core/services/I18nService";
+import { I18nService } from "@modules/Shared/services/I18nService";
 
 export class MessageTemplate {
 	private template: string;
