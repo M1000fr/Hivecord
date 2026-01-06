@@ -1,91 +1,90 @@
 import { Injectable } from "@decorators/Injectable";
 import { ConfigurationRepository, RoleRepository } from "@src/repositories";
-import { Guild, Role } from "discord.js";
+import { Role } from "discord.js";
 import { ConfigCacheService } from "./ConfigCacheService";
+import { GenericConfigService } from "./GenericConfigService";
 
+/**
+ * Configuration list item for role configs
+ */
+interface RoleConfigListItem {
+	roleId: string;
+	[key: string]: unknown;
+}
+
+/**
+ * Configuration service for Role-based configs.
+ * Extends GenericConfigService with Role-specific behavior.
+ */
 @Injectable()
-export class RoleConfigService {
+export class RoleConfigService extends GenericConfigService<Role> {
+	protected entityType = "role" as const;
+	protected listType = "roles" as const;
+
 	constructor(
 		private readonly roleRepository: RoleRepository,
 		private readonly configurationRepository: ConfigurationRepository,
-		private readonly cache: ConfigCacheService,
-	) {}
-
-	async get(guild: Guild, key: string): Promise<string | null> {
-		return this.cache.get(guild.id, "role", key, async () => {
-			const config =
-				await this.configurationRepository.getRoleConfig(key);
-			return config?.roleId ?? null;
-		});
+		cache: ConfigCacheService,
+	) {
+		super(cache);
 	}
 
-	async set(guild: Guild, key: string, role: Role): Promise<void> {
+	protected async persistEntity(role: Role): Promise<void> {
 		await this.roleRepository.upsert(role);
-		await this.configurationRepository.upsertRoleConfig(key, role.id);
-
-		await this.cache.invalidate(guild.id, key);
 	}
 
-	async getList(guild: Guild, key: string): Promise<string[]> {
-		return this.cache.get(guild.id, "roles", key, async () => {
-			const configs =
-				await this.configurationRepository.getRoleListConfigs(
-					guild.id,
-					key,
-				);
-			return configs.map((c) => c.roleId);
-		});
+	protected extractId(role: Role): string {
+		return role.id;
 	}
 
-	async setList(guild: Guild, key: string, roles: Role[]): Promise<void> {
-		for (const role of roles) {
-			await this.roleRepository.upsert(role);
-		}
-
-		await this.configurationRepository.setRoleList(
-			guild.id,
-			key,
-			roles.map((r) => r.id),
-		);
-
-		await this.cache.invalidate(guild.id, key);
+	protected extractListItemId(item: RoleConfigListItem): string {
+		return item.roleId;
 	}
 
-	async addToList(guild: Guild, key: string, role: Role): Promise<void> {
-		await this.roleRepository.upsert(role);
-		await this.configurationRepository.upsertRoleListConfig(key, role.id);
-
-		await this.cache.invalidate(guild.id, key);
+	protected async getConfigValue(key: string): Promise<string | null> {
+		const config =
+			await this.configurationRepository.getRoleConfig(key);
+		return config?.roleId ?? null;
 	}
 
-	async removeFromList(
-		guild: Guild,
+	protected async setConfigValue(key: string, value: string): Promise<void> {
+		await this.configurationRepository.upsertRoleConfig(key, value);
+	}
+
+	protected async getConfigListValues(
+		guildId: string,
 		key: string,
-		roleId: string,
+	): Promise<RoleConfigListItem[]> {
+		return this.configurationRepository.getRoleListConfigs(guildId, key);
+	}
+
+	protected async setConfigListValues(
+		guildId: string,
+		key: string,
+		values: string[],
 	): Promise<void> {
-		try {
-			await this.configurationRepository.deleteRoleListConfig(
-				key,
-				roleId,
-			);
-			await this.cache.invalidate(guild.id, key);
-		} catch {
-			// Ignore if not found
-		}
+		await this.configurationRepository.setRoleList(guildId, key, values);
 	}
 
-	async delete(guild: Guild, key: string, _roleId: string): Promise<void> {
-		try {
-			await this.configurationRepository.deleteRoleConfig(key);
-			await this.cache.invalidate(guild.id, key);
-		} catch {
-			// Ignore if not found
-		}
+	protected async addConfigListItem(key: string, value: string): Promise<void> {
+		await this.configurationRepository.upsertRoleListConfig(key, value);
 	}
 
-	async clearList(guild: Guild, key: string): Promise<void> {
-		await this.configurationRepository.clearRoleList(guild.id, key);
+	protected async removeConfigListItem(
+		key: string,
+		value: string,
+	): Promise<void> {
+		await this.configurationRepository.deleteRoleListConfig(key, value);
+	}
 
-		await this.cache.invalidate(guild.id, key);
+	protected async deleteConfigValue(key: string): Promise<void> {
+		await this.configurationRepository.deleteRoleConfig(key);
+	}
+
+	protected async clearConfigList(
+		guildId: string,
+		key: string,
+	): Promise<void> {
+		await this.configurationRepository.clearRoleList(guildId, key);
 	}
 }

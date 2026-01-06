@@ -11,7 +11,7 @@ import { ChannelType } from "@prisma/client/enums";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 import { ConfigurationRepository, GuildRepository } from "@src/repositories";
 import { Logger } from "@utils/Logger";
-import { type Channel, Guild, type GuildBasedChannel, Role } from "discord.js";
+import { Guild, type GuildBasedChannel, Role } from "discord.js";
 import { ChannelConfigService } from "./ChannelConfigService";
 import { ConfigCacheService } from "./ConfigCacheService";
 import { RoleConfigService } from "./RoleConfigService";
@@ -183,15 +183,32 @@ export class ConfigService {
 	async deleteChannel(
 		guild: Guild,
 		key: string,
-		channel: Channel,
 	): Promise<void> {
-		await this.channelConfig.delete(guild, key, channel);
+		await this.channelConfig.delete(guild, key);
 		await this.notifyUpdate(guild.id, key, null);
 	}
 
 	async clearChannelList(guild: Guild, key: string): Promise<void> {
 		await this.channelConfig.clearList(guild, key);
 		await this.notifyUpdate(guild.id, key, null);
+	}
+
+	async getChannelList(guild: Guild, key: string): Promise<string[]> {
+		return this.channelConfig.getList(guild, key);
+	}
+
+	async setChannelList(
+		guild: Guild,
+		key: string,
+		channels: GuildBasedChannel[],
+	): Promise<void> {
+		await this.channelConfig.setList(guild, key, channels);
+		await this.notifyUpdate(
+			guild.id,
+			key,
+			JSON.stringify(channels.map((c) => c.id)),
+			true,
+		);
 	}
 
 	async getRole(guild: Guild, key: string): Promise<string | null> {
@@ -207,8 +224,18 @@ export class ConfigService {
 		return this.roleConfig.getList(guild, key);
 	}
 
-	async deleteRole(guild: Guild, key: string, roleId: string): Promise<void> {
-		await this.roleConfig.delete(guild, key, roleId);
+	async setRoleList(guild: Guild, key: string, roles: Role[]): Promise<void> {
+		await this.roleConfig.setList(guild, key, roles);
+		await this.notifyUpdate(
+			guild.id,
+			key,
+			JSON.stringify(roles.map((r) => r.id)),
+			true,
+		);
+	}
+
+	async deleteRole(guild: Guild, key: string): Promise<void> {
+		await this.roleConfig.delete(guild, key);
 		await this.notifyUpdate(guild.id, key, null);
 	}
 

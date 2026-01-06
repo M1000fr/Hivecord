@@ -1,93 +1,116 @@
 import { Injectable } from "@decorators/Injectable";
 import { ChannelType } from "@prisma/client/enums";
 import { ChannelRepository, ConfigurationRepository } from "@src/repositories";
-import type { Channel, Guild, GuildBasedChannel } from "discord.js";
+import type { Guild, GuildBasedChannel } from "discord.js";
 import { ConfigCacheService } from "./ConfigCacheService";
+import { GenericConfigService } from "./GenericConfigService";
 
+/**
+ * Configuration list item for channel configs
+ */
+interface ChannelConfigListItem {
+	channelId: string;
+	[key: string]: unknown;
+}
+
+/**
+ * Configuration service for Channel-based configs.
+ * Extends GenericConfigService with Channel-specific behavior.
+ */
 @Injectable()
-export class ChannelConfigService {
+export class ChannelConfigService extends GenericConfigService<GuildBasedChannel> {
+	protected entityType = "channel" as const;
+	protected listType = "channels" as const;
+	private defaultChannelType: ChannelType = ChannelType.TEXT;
+
 	constructor(
 		private readonly channelRepository: ChannelRepository,
 		private readonly configurationRepository: ConfigurationRepository,
-		private readonly cache: ConfigCacheService,
-	) {}
-
-	async get(guild: Guild, key: string): Promise<string | null> {
-		return this.cache.get(guild.id, "channel", key, async () => {
-			const config =
-				await this.configurationRepository.getChannelConfig(key);
-			return config?.channelId ?? null;
-		});
+		cache: ConfigCacheService,
+	) {
+		super(cache);
 	}
 
-	async set(
+	override async set(
 		guild: Guild,
 		key: string,
 		channel: GuildBasedChannel,
-		channelType: ChannelType = ChannelType.TEXT,
+		channelType?: ChannelType,
 	): Promise<void> {
-		await this.channelRepository.upsert(channel, channelType);
-
-		await this.configurationRepository.upsertChannelConfig(key, channel.id);
-
-		await this.cache.invalidate(guild.id, key);
+		if (channelType) {
+			this.defaultChannelType = channelType;
+		}
+		await super.set(guild, key, channel);
 	}
 
-	async getList(guild: Guild, key: string): Promise<string[]> {
-		return this.cache.get(guild.id, "channels", key, async () => {
-			const configs =
-				await this.configurationRepository.getChannelListConfigs(
-					guild.id,
-					key,
-				);
-			return configs.map((c) => c.channelId);
-		});
-	}
-
-	async addToList(
+	override async addToList(
 		guild: Guild,
 		key: string,
 		channel: GuildBasedChannel,
-		channelType: ChannelType = ChannelType.TEXT,
+		channelType?: ChannelType,
 	): Promise<void> {
-		await this.channelRepository.upsert(channel, channelType);
-
-		await this.configurationRepository.upsertChannelListConfig(
-			key,
-			channel.id,
-		);
-
-		await this.cache.invalidate(guild.id, key);
+		if (channelType) {
+			this.defaultChannelType = channelType;
+		}
+		await super.addToList(guild, key, channel);
 	}
 
-	async removeFromList(
-		guild: Guild,
+	protected async persistEntity(channel: GuildBasedChannel): Promise<void> {
+		await this.channelRepository.upsert(channel, this.defaultChannelType);
+	}
+
+	protected extractId(channel: GuildBasedChannel): string {
+		return channel.id;
+	}
+
+	protected extractListItemId(item: ChannelConfigListItem): string {
+		return item.channelId;
+	}
+
+	protected async getConfigValue(key: string): Promise<string | null> {
+		const config =
+			await this.configurationRepository.getChannelConfig(key);
+		return config?.channelId ?? null;
+	}
+
+	protected async setConfigValue(key: string, value: string): Promise<void> {
+		await this.configurationRepository.upsertChannelConfig(key, value);
+	}
+
+	protected async getConfigListValues(
+		guildId: string,
 		key: string,
-		channel: Channel,
+	): Promise<ChannelConfigListItem[]> {
+		return this.configurationRepository.getChannelListConfigs(guildId, key);
+	}
+
+	protected async setConfigListValues(
+		guildId: string,
+		key: string,
+		values: string[],
 	): Promise<void> {
-		try {
-			await this.configurationRepository.deleteChannelListConfig(
-				key,
-				channel.id,
-			);
-			await this.cache.invalidate(guild.id, key);
-		} catch {
-			// Ignore if not found
-		}
+		await this.configurationRepository.setChannelList(guildId, key, values);
 	}
 
-	async delete(guild: Guild, key: string, _channel: Channel): Promise<void> {
-		try {
-			await this.configurationRepository.deleteChannelConfig(key);
-			await this.cache.invalidate(guild.id, key);
-		} catch {
-			// Ignore if not found
-		}
+	protected async addConfigListItem(key: string, value: string): Promise<void> {
+		await this.configurationRepository.upsertChannelListConfig(key, value);
 	}
 
-	async clearList(guild: Guild, key: string): Promise<void> {
-		await this.configurationRepository.clearChannelList(guild.id, key);
+	protected async removeConfigListItem(
+		key: string,
+		value: string,
+	): Promise<void> {
+		await this.configurationRepository.deleteChannelListConfig(key, value);
+	}
 
-		await this.cache.invalidate(guild.id, key);
+	protected async deleteConfigValue(key: string): Promise<void> {
+		await this.configurationRepository.deleteChannelConfig(key);
+	}
+
+	protected async clearConfigList(
+		guildId: string,
+		key: string,
+	): Promise<void> {
+		await this.configurationRepository.clearChannelList(guildId, key);
 	}
 }

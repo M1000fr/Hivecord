@@ -129,9 +129,9 @@ export class ConfigurationRepository extends BaseRepository {
 					Role: { guildId },
 				},
 			});
-			for (const roleId of roleIds) {
-				await tx.roleListConfiguration.create({
-					data: { key, roleId },
+			if (roleIds.length > 0) {
+				await tx.roleListConfiguration.createMany({
+					data: roleIds.map((roleId) => ({ key, roleId })),
 				});
 			}
 		});
@@ -166,6 +166,22 @@ export class ConfigurationRepository extends BaseRepository {
 			where: { key_channelId: { key, channelId } },
 			update: {},
 			create: { key, channelId },
+		});
+	}
+
+	async setChannelList(guildId: string, key: string, channelIds: string[]) {
+		return this.prisma.$transaction(async (tx) => {
+			await tx.channelListConfiguration.deleteMany({
+				where: {
+					key,
+					Channel: { guildId },
+				},
+			});
+			if (channelIds.length > 0) {
+				await tx.channelListConfiguration.createMany({
+					data: channelIds.map((channelId) => ({ key, channelId })),
+				});
+			}
 		});
 	}
 
