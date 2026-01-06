@@ -7,10 +7,6 @@ import {
 	CommandParamType,
 	type CommandParameter,
 } from "@decorators/params";
-import {
-	extractGuildFromContext,
-	resolveGuildConfig,
-} from "@decorators/params/GuildConfig";
 import { DependencyContainer } from "@di/DependencyContainer";
 import { INJECTABLE_METADATA_KEY, type Constructor } from "@di/types";
 import type { CommandOptions } from "@interfaces/CommandOptions.ts";
@@ -18,9 +14,7 @@ import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import type { IContextMenuCommandClass } from "@interfaces/IContextMenuCommandClass.ts";
 import type { IModuleInstance } from "@interfaces/IModuleInstance.ts";
 import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { I18nService } from "@modules/Core/services/I18nService";
-import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
+
 import { getProvidersByType } from "@utils/getProvidersByType";
 import { Logger } from "@utils/Logger";
 import { ApplicationCommandType } from "discord.js";
@@ -237,37 +231,6 @@ export class ModuleLoader {
 								param.type === CommandParamType.Context
 							) {
 								finalArgs[param.index] = args;
-							} else if (
-								param.type === CommandParamType.Translate
-							) {
-								const guild = extractGuildFromContext(args);
-								const configService =
-									this.container.resolve<ConfigService>(
-										ConfigService,
-									);
-								const locale = guild
-									? await configService.getLanguage(guild)
-									: "fr";
-								const t = I18nService.getFixedT(locale);
-								finalArgs[param.index] = {
-									locale,
-									t,
-								} as GuildLanguageContext;
-							} else if (
-								param.type === CommandParamType.GuildId
-							) {
-								const guild = extractGuildFromContext(args);
-								finalArgs[param.index] = guild?.id;
-							} else if (
-								param.type === CommandParamType.GuildConfig
-							) {
-								finalArgs[param.index] =
-									await resolveGuildConfig(
-										prototype,
-										methodName,
-										param.index,
-										args,
-									);
 							}
 						}
 

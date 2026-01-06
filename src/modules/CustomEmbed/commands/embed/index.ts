@@ -1,5 +1,5 @@
 import { Injectable } from "@decorators/Injectable";
-import { Client, GuildLanguage } from "@decorators/params/index.ts";
+import { Client } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import type { LeBotClient } from "@src/class/LeBotClient";
@@ -11,7 +11,7 @@ import {
 	CommandInteraction,
 } from "@src/decorators/Interaction";
 import type { CommandAutocompleteContext } from "@src/types/CommandAutocompleteContext";
-import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
+
 import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { CustomEmbedService } from "../../services/CustomEmbedService";
 import { embedOptions } from "./embedOptions";
@@ -46,9 +46,9 @@ export default class EmbedCommand {
 	async builder(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
-		@GuildLanguage() lang: GuildLanguageContext,
 	) {
 		await interaction.deferReply();
+		const lang = await interaction.guild!.i18n();
 		const name = interaction.options.getString("name", true);
 		let data = await this.customEmbedService.get(interaction.guild!, name);
 
@@ -96,9 +96,9 @@ export default class EmbedCommand {
 	async edit(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
-		@GuildLanguage() lang: GuildLanguageContext,
 	) {
 		await interaction.deferReply();
+		const lang = await interaction.guild!.i18n();
 		const name = interaction.options.getString("name", true);
 		const data = await this.customEmbedService.get(
 			interaction.guild!,
@@ -148,9 +148,9 @@ export default class EmbedCommand {
 	async delete(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
-		@GuildLanguage() lang: GuildLanguageContext,
 	) {
 		await interaction.deferReply();
+		const lang = await interaction.guild!.i18n();
 		const name = interaction.options.getString("name", true);
 		await this.customEmbedService.delete(interaction.guild!, name);
 		await interaction.editReply({
@@ -164,9 +164,9 @@ export default class EmbedCommand {
 	async list(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
-		@GuildLanguage() lang: GuildLanguageContext,
 	) {
 		await interaction.deferReply();
+		const lang = await interaction.guild!.i18n();
 		const embeds = await this.customEmbedService.list(interaction.guild!);
 
 		await interaction.editReply({
@@ -180,9 +180,9 @@ export default class EmbedCommand {
 	async preview(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
-		@GuildLanguage() lang: GuildLanguageContext,
 	) {
 		await interaction.deferReply();
+		const lang = await interaction.guild!.i18n();
 		const name = interaction.options.getString("name", true);
 
 		// Dummy context

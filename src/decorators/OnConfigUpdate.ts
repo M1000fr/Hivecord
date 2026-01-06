@@ -36,9 +36,6 @@ export function OnConfigUpdate(propertyName: string) {
 					const args: unknown[] = [];
 					for (const param of params) {
 						switch (param.type) {
-							case CommandParamType.GuildId:
-								args[param.index] = guildId;
-								break;
 							case CommandParamType.ConfigKey:
 								args[param.index] = key;
 								break;

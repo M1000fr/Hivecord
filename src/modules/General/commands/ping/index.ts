@@ -1,5 +1,5 @@
 import { Inject } from "@decorators/Inject";
-import { Client, GuildLanguage } from "@decorators/params/index.ts";
+import { Client } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { PagerService } from "@modules/Core/services/PagerService";
 import type { LeBotClient } from "@src/class/LeBotClient";
@@ -8,7 +8,6 @@ import {
 	SlashCommandController,
 } from "@src/decorators/commands/SlashCommand";
 import { CommandInteraction } from "@src/decorators/Interaction";
-import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -25,9 +24,9 @@ export default class PingCommand {
 	@SlashCommand(EPermission.Ping)
 	async default(
 		@Client() client: LeBotClient,
-		@GuildLanguage() lang: GuildLanguageContext,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
 	) {
+		const lang = await interaction.guild!.i18n();
 		// Demo data for pager
 		const demoItems = Array.from({ length: 50 }, (_, i) => ({
 			id: i + 1,

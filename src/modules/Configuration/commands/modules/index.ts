@@ -4,7 +4,7 @@ import {
 	AutocompleteInteraction,
 	CommandInteraction,
 } from "@decorators/Interaction";
-import { Client, GuildLanguage } from "@decorators/params/index.ts";
+import { Client } from "@decorators/params/index.ts";
 import { EPermission } from "@enums/EPermission";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { Autocomplete } from "@src/decorators/commands/Autocomplete.ts";
@@ -13,7 +13,7 @@ import {
 	SlashCommandController,
 } from "@src/decorators/commands/SlashCommand.ts";
 import type { CommandAutocompleteContext } from "@src/types/CommandAutocompleteContext.ts";
-import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
+
 import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
 import { ChatInputCommandInteraction } from "discord.js";
 import { modulesOptions } from "./modulesOptions.ts";
@@ -49,9 +49,9 @@ export default class ModulesCommand {
 	async run(
 		@Client() client: LeBotClient<true>,
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
-		@GuildLanguage() lang: GuildLanguageContext,
 	) {
 		await interaction.deferReply();
+		const lang = await interaction.guild!.i18n();
 		const lebot = client;
 		const moduleName = interaction.options.getString("module", true);
 

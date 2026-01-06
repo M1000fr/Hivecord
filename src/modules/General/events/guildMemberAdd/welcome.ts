@@ -4,14 +4,13 @@ import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
-import { GuildConfig } from "@decorators/params/GuildConfig";
+
 import { BotEvents } from "@enums/BotEvents";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { CustomEmbedService } from "@modules/CustomEmbed/services/CustomEmbedService";
 import { WelcomeImageService } from "@modules/General/services/WelcomeImageService";
-import { GuildLanguage } from "@src/decorators/params";
+
 import type { ContextOf } from "@src/types/ContextOf.ts";
-import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { Logger } from "@utils/Logger";
 import {
 	AttachmentBuilder,
@@ -19,7 +18,6 @@ import {
 	TextChannel,
 } from "discord.js";
 import path from "path";
-import { GeneralConfig } from "../../GeneralConfig";
 
 @EventController()
 export default class WelcomeEvent {
@@ -35,25 +33,18 @@ export default class WelcomeEvent {
 		@Client() client: LeBotClient<true>,
 		@Context()
 		[member]: ContextOf<typeof BotEvents.GuildMemberAdd>,
-
-		@GuildLanguage()
-		language: GuildLanguageContext,
-
-		@GuildConfig(GeneralConfig.WelcomeChannelId)
-		welcomeChannelId: string | undefined,
-
-		@GuildConfig(GeneralConfig.WelcomeEmbedName)
-		welcomeEmbedName: string | undefined,
-
-		@GuildConfig(GeneralConfig.WelcomeBackground)
-		configuredBackground: string | undefined,
-
-		@GuildConfig(GeneralConfig.WelcomeMessageImage)
-		welcomeMessageImageConfig: string,
-
-		@GuildConfig(GeneralConfig.WelcomeMessage)
-		welcomeMessageConfig: string,
 	) {
+		const language = await member.guild.i18n();
+		const welcomeChannelId =
+			await member.guild.config.general.WelcomeChannelId;
+		const welcomeEmbedName =
+			await member.guild.config.general.WelcomeEmbedName;
+		const configuredBackground =
+			await member.guild.config.general.WelcomeBackground;
+		const welcomeMessageImageConfig =
+			await member.guild.config.general.WelcomeMessageImage;
+		const welcomeMessageConfig =
+			await member.guild.config.general.WelcomeMessage;
 		try {
 			if (!welcomeChannelId) {
 				this.logger.warn(

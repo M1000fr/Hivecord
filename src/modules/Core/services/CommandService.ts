@@ -3,7 +3,7 @@ import {
 	CommandParamType,
 	type CommandParameter,
 } from "@decorators/params";
-import { resolveGuildConfig } from "@decorators/params/GuildConfig";
+
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import type { ICommandInstance } from "@interfaces/ICommandInstance.ts";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
@@ -281,9 +281,6 @@ export class CommandService {
 						args[param.index] = [interaction];
 					}
 					break;
-				case CommandParamType.Translate:
-					args[param.index] = langCtx;
-					break;
 				case CommandParamType.Context:
 					if (
 						interaction instanceof ChatInputCommandInteraction ||
@@ -310,15 +307,6 @@ export class CommandService {
 						args[param.index] = interaction.targetMessage;
 					}
 					break;
-				case CommandParamType.GuildConfig: {
-					args[param.index] = await resolveGuildConfig(
-						target,
-						method,
-						param.index,
-						[interaction],
-					);
-					break;
-				}
 			}
 		}
 		return args;
