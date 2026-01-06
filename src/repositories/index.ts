@@ -5,6 +5,4 @@ export * from "./ConfigurationRepository";
 
 export * from "./GuildRepository";
 
-export * from "./PermissionRepository";
 export * from "./RoleRepository";
-export * from "./UserRepository";

@@ -13,43 +13,13 @@ enum ChannelType {
     CATEGORY
 }
 
-enum SanctionType {
-    WARN
-    MUTE
-    KICK
-    BAN
-}
-
-model User {
-    id String @id
-
-    Groups            UserGroup[]
-    SanctionsReceived Sanction[]  @relation("UserSanctions")
-    SanctionsApplied  Sanction[]  @relation("ModeratorSanctions")
-    UserAsMembers     Member[]
-}
-
 model Guild {
     id   String @id
     name String
 
     Channels       Channel[]
     Roles          Role[]
-    Groups         Group[]
-    Sanctions      Sanction[]
     Configurations Configuration[]
-    CustomEmbeds   CustomEmbed[]
-    Members        Member[]
-}
-
-model Member {
-    guildId String
-    Guild   Guild  @relation(fields: [guildId], references: [id])
-
-    userId String
-    User   User   @relation(fields: [userId], references: [id])
-
-    @@id([guildId, userId])
 }
 
 model Channel {
@@ -72,65 +42,8 @@ model Role {
     guildId String
     Guild   Guild  @relation(fields: [guildId], references: [id])
 
-    Groups            Group[]
     SingleRoleConfigs RoleConfiguration[]     @relation("SingleRoleConfigs")
     ListRoleConfigs   RoleListConfiguration[] @relation("ListRoleConfigs")
-}
-
-model Permission {
-    id   Int    @id @default(autoincrement())
-    name String
-
-    GroupsPermissions GroupPermission[]
-}
-
-model UserGroup {
-    id      Int    @id @default(autoincrement())
-    userId  String
-    groupId Int
-
-    Users  User  @relation(fields: [userId], references: [id])
-    Groups Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
-}
-
-model GroupPermission {
-    id           Int @id @default(autoincrement())
-    groupId      Int
-    permissionId Int
-
-    Groups      Group      @relation(fields: [groupId], references: [id], onDelete: Cascade)
-    Permissions Permission @relation(fields: [permissionId], references: [id])
-}
-
-model Group {
-    id   Int    @id @default(autoincrement())
-    name String
-
-    guildId String
-    Guild   Guild  @relation(fields: [guildId], references: [id])
-
-    roleId String
-    Role   Role   @relation(fields: [roleId], references: [id])
-
-    UserGroups  UserGroup[]
-    Permissions GroupPermission[]
-}
-
-model Sanction {
-    id          Int          @id @default(autoincrement())
-    userId      String
-    moderatorId String
-    type        SanctionType
-    reason      String
-    createdAt   DateTime     @default(now())
-    expiresAt   DateTime?
-    active      Boolean      @default(true)
-
-    guildId String
-    Guild   Guild  @relation(fields: [guildId], references: [id])
-
-    User      User @relation("UserSanctions", fields: [userId], references: [id])
-    Moderator User @relation("ModeratorSanctions", fields: [moderatorId], references: [id])
 }
 
 model Configuration {
@@ -174,18 +87,6 @@ model RoleListConfiguration {
     Role   Role   @relation("ListRoleConfigs", fields: [roleId], references: [id])
 
     @@id([key, roleId])
-}
-
-model CustomEmbed {
-    name      String
-    data      String   @db.Text // JSON content
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    guildId String
-    Guild   Guild  @relation(fields: [guildId], references: [id])
-
-    @@id([guildId, name])
 }
 
 model BotState {

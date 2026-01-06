@@ -5,12 +5,8 @@ import {
 	CommandInteraction,
 } from "@decorators/Interaction";
 import { Client } from "@decorators/params/index.ts";
-import { UseInterceptors } from "@decorators/UseInterceptors";
-import { EPermission } from "@enums/EPermission";
-import { CommandPermissionInterceptor } from "@interceptors/CommandPermissionInterceptor";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { Autocomplete } from "@src/decorators/commands/Autocomplete.ts";
-import { CommandPermission } from "@src/decorators/commands/CommandPermission";
 import {
 	SlashCommand,
 	SlashCommandController,
@@ -48,8 +44,6 @@ export default class ModulesCommand {
 		await interaction.respond(modules);
 	}
 
-	@UseInterceptors(CommandPermissionInterceptor)
-	@CommandPermission(EPermission.ConfigureModules)
 	@SlashCommand()
 	async run(
 		@Client() client: LeBotClient<true>,

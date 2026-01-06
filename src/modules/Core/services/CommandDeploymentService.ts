@@ -1,7 +1,5 @@
 import type { LeBotClient } from "@class/LeBotClient";
 import { Injectable } from "@decorators/Injectable";
-import { EPermission } from "@enums/EPermission";
-import { PermissionService } from "@modules/Core/services/PermissionService";
 import { BotStateRepository } from "@src/repositories";
 import { Logger } from "@utils/Logger";
 import { createHash } from "crypto";
@@ -15,10 +13,7 @@ import {
 export class CommandDeploymentService {
 	private logger = new Logger("CommandDeploymentService");
 
-	constructor(
-		private readonly botStateRepository: BotStateRepository,
-		private readonly permissionService: PermissionService,
-	) {}
+	constructor(private readonly botStateRepository: BotStateRepository) {}
 
 	public async deploy(client: LeBotClient<true>) {
 		if (!client.token || !client.user) {
@@ -37,11 +32,8 @@ export class CommandDeploymentService {
 			}
 			return options;
 		});
-		const permissions = Object.values(EPermission);
 
 		try {
-			await this.permissionService.registerPermissions(permissions);
-
 			// Calculate hash of commands
 			const hash = createHash("md5")
 				.update(JSON.stringify(commandsData))

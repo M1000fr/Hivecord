@@ -12,7 +12,6 @@ import type { IExecutionContext } from "@interfaces/IExecutionContext";
 import type { IInterceptor } from "@interfaces/IInterceptor";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
-import { PermissionService } from "@modules/Core/services/PermissionService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import type { CommandArgument } from "@src/types/CommandArgument";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
@@ -32,10 +31,7 @@ import { Injectable } from "@decorators/Injectable";
 export class CommandService {
 	private logger = new Logger("CommandService");
 
-	constructor(
-		private readonly configService: ConfigService,
-		private readonly permissionService: PermissionService,
-	) {}
+	constructor(private readonly configService: ConfigService) {}
 
 	/**
 	 * Resolves i18n translation function and language code for a guild.
