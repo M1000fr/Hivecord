@@ -36,12 +36,6 @@ export function OnConfigUpdate(propertyName: string) {
 					const args: unknown[] = [];
 					for (const param of params) {
 						switch (param.type) {
-							case CommandParamType.ConfigKey:
-								args[param.index] = key;
-								break;
-							case CommandParamType.ConfigValue:
-								args[param.index] = value;
-								break;
 							case CommandParamType.Client:
 								args[param.index] = container.resolve("Client");
 								break;
