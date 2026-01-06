@@ -133,7 +133,7 @@ export class GeneralConfig {
 	static WelcomeBackground = configKey("");
 }
 
-declare module "../../interfaces/IGuildConfig" {
+declare module "@interfaces/IGuildConfig" {
 	interface IGuildConfig {
 		general: ConfigProxy<typeof GeneralConfig>;
 	}
