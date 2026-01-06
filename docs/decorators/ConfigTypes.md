@@ -48,7 +48,7 @@ export class ColorConfigHandler extends BaseModalConfigHandler {
 
 	// You can override labels and styles
 	protected override getModalTitle(t: TFunction): string {
-		return t("module.appearance.color_modal_title");
+		return "Select a Color";
 	}
 
 	// Customizing the display in the configuration list
