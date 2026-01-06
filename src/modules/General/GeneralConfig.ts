@@ -7,7 +7,6 @@ import {
 import { ModuleConfig } from "@decorators/ModuleConfig";
 import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 import type { ConfigProxy } from "@modules/Configuration/services/ConfigService";
-import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbed/CustomEmbedConfigKey";
 
 @ModuleConfig()
 export class GeneralConfig {
@@ -89,20 +88,6 @@ export class GeneralConfig {
 		emoji: "📢",
 	})
 	static WelcomeChannelId = configKey("");
-
-	@ConfigProperty({
-		displayName: "Welcome Embed",
-		displayNameLocalizations: {
-			fr: "Embed de bienvenue",
-		},
-		description: "The name of the custom embed to use for welcome messages",
-		descriptionLocalizations: {
-			fr: "Le nom de l'embed personnalisé à utiliser",
-		},
-		type: CUSTOM_EMBED_CONFIG_KEY,
-		emoji: "📜",
-	})
-	static WelcomeEmbedName = configKey("");
 
 	@ConfigProperty({
 		displayName: "Welcome Roles",

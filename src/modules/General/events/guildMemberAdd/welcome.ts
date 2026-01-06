@@ -7,7 +7,6 @@ import { Context } from "@decorators/params/Context";
 
 import { BotEvents } from "@enums/BotEvents";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { CustomEmbedService } from "@modules/CustomEmbed/services/CustomEmbedService";
 import { WelcomeImageService } from "@modules/General/services/WelcomeImageService";
 
 import type { ContextOf } from "@src/types/ContextOf.ts";
@@ -23,10 +22,7 @@ import path from "path";
 export default class WelcomeEvent {
 	private logger = new Logger("WelcomeEvent");
 
-	constructor(
-		private readonly customEmbedService: CustomEmbedService,
-		private readonly configService: ConfigService,
-	) {}
+	constructor(private readonly configService: ConfigService) {}
 
 	@On(BotEvents.GuildMemberAdd)
 	async run(
@@ -37,8 +33,6 @@ export default class WelcomeEvent {
 		const language = await member.guild.i18n();
 		const welcomeChannelId =
 			await member.guild.config.general.WelcomeChannelId;
-		const welcomeEmbedName =
-			await member.guild.config.general.WelcomeEmbedName;
 		const configuredBackground =
 			await member.guild.config.general.WelcomeBackground;
 		const welcomeMessageImageConfig =
@@ -103,18 +97,6 @@ export default class WelcomeEvent {
 			const messagePayload: MessageCreateOptions = {
 				files: [attachment],
 			};
-
-			if (welcomeEmbedName) {
-				const customEmbed = await this.customEmbedService.render(
-					member.guild,
-					welcomeEmbedName,
-					commonContext,
-				);
-
-				if (customEmbed) {
-					messagePayload.embeds = [customEmbed];
-				}
-			}
 
 			let messageTemplateStr = welcomeMessageConfig;
 
