@@ -32,6 +32,7 @@ export interface ConfigPropertyOptions {
 	required?: boolean;
 	choices?: ConfigChoice[];
 	nonNull?: boolean;
+	emoji?: string;
 }
 
 export interface IConfigClass {

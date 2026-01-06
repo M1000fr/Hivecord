@@ -68,7 +68,7 @@ export class ConfigUIBuilderService {
 
 		for (const [idx, field] of resolvedData.fields.entries()) {
 			embed.addFields({
-				name: `${idx + 1}. ${field.name}`,
+				name: `${field.emoji ? `${field.emoji} ` : ""}${idx + 1}. ${field.name}`,
 				value: `${field.description}\n${t("common.type")}: \`${ConfigFormatterService.getTypeName(field.type as EConfigType, t)}\`\n${t("common.current")}: ${field.value}`,
 				inline: true,
 			});
@@ -95,12 +95,18 @@ export class ConfigUIBuilderService {
 						opt.descriptionLocalizations?.[language as Locale] ||
 						opt.description;
 
-					return new StringSelectMenuOptionBuilder()
+					const optionBuilder = new StringSelectMenuOptionBuilder()
 						.setLabel(`${idx + 1}. ${displayName}`)
 						.setDescription(
 							ConfigFormatterService.truncate(description, 100),
 						)
 						.setValue(key);
+
+					if (opt.emoji) {
+						optionBuilder.setEmoji(opt.emoji);
+					}
+
+					return optionBuilder;
 				}),
 			);
 

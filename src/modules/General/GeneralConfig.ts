@@ -31,6 +31,7 @@ export class GeneralConfig {
 			},
 		],
 		nonNull: true,
+		emoji: "🌐",
 	})
 	static Language = configKey("fr");
 
@@ -82,6 +83,7 @@ export class GeneralConfig {
 			fr: "Le salon où envoyer les messages de bienvenue",
 		},
 		type: EConfigType.Channel,
+		emoji: "📢",
 	})
 	static WelcomeChannelId = configKey("");
 
@@ -95,6 +97,7 @@ export class GeneralConfig {
 			fr: "Le nom de l'embed personnalisé à utiliser",
 		},
 		type: CUSTOM_EMBED_CONFIG_KEY,
+		emoji: "📜",
 	})
 	static WelcomeEmbedName = configKey("");
 
@@ -108,6 +111,7 @@ export class GeneralConfig {
 			fr: "Rôles à ajouter aux nouveaux membres",
 		},
 		type: EConfigType.RoleArray,
+		emoji: "🛡️",
 	})
 	static WelcomeRoles = configKey<string[]>([]);
 

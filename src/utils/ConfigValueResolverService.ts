@@ -133,6 +133,7 @@ export class ConfigValueResolverService {
 				value: currentValue,
 				description: description,
 				type: opt.type,
+				emoji: opt.emoji,
 			});
 		}
 
