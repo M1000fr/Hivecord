@@ -1,50 +1,64 @@
 # LeBot
 
-Un bot Discord modulaire et performant écrit en TypeScript, optimisé pour l'exécution avec [Bun](https://bun.sh).
+A modular and high-performance Discord bot written in TypeScript, optimized for execution with [Bun](https://bun.sh).
 
-## Fonctionnalités
+## Features
 
-- **Architecture Modulaire** : Organisation du code par modules (General, Configuration, CustomEmbed, etc.).
-- **Injection de Dépendances** : Système robuste pour la gestion des services et des instances.
-- **Configuration Dynamique** : Accès direct à la configuration via l'objet `guild.config`.
-- **Internationalisation (i18n)** : Support multi-langue intégré avec `guild.i18n()`.
-- **Persistance** : Utilisation de Prisma (MariaDB) et cache haute performance avec Redis.
+- **Modular Architecture**: Code organization by modules (General, Configuration, CustomEmbed, etc.).
+- **Dependency Injection**: Robust system for service and instance management.
+- **Dynamic Configuration**: Direct access to configuration via the `guild.config` object.
+- **Internationalization (i18n)**: Built-in multi-language support with `guild.i18n()`.
+- **Persistence**: Using Prisma (MariaDB) and high-performance caching with Redis.
 
-## Prérequis
+## Prerequisites
 
 - [Bun](https://bun.sh) (v1.x)
-- Une base de données MariaDB ou MySQL
-- Une instance Redis
+- A MariaDB or MySQL database
+- A Redis instance
 
 ## Installation
 
-1. Installez les dépendances :
+1. Install dependencies:
 
-    ```bash
+    ```/dev/null/install.sh#L1-1
     bun install
     ```
 
-2. Configurez votre environnement (`.env`) avec votre token Discord et les URLs de connexion (DB/Redis).
+2. Configure your environment (`.env`) with your Discord token and connection URLs (DB/Redis).
 
-3. Déployez la base de données :
-    ```bash
+3. Deploy the database:
+    ```/dev/null/migrate.sh#L1-1
     bunx prisma migrate deploy
     ```
 
-## Lancement
+## Running
 
-Pour le développement avec rechargement automatique :
+For development with hot-reloading:
 
-```bash
+```/dev/null/dev.sh#L1-1
 bun dev
 ```
 
-Pour la production :
+For production:
 
-```bash
+```/dev/null/start.sh#L1-1
 bun start
 ```
 
+## Development
+
+LeBot uses a decorator system inspired by frameworks like NestJS to facilitate development.
+
+### Main Decorators
+
+- `@Module`: Defines a module and its dependencies (services, commands, events).
+- `@Injectable`: Marks a class as an injectable service.
+- `@Inject`: Injects a dependency into a constructor.
+- `@SlashCommandController`: Defines a Slash command.
+- `@SlashCommand`: Marks a method as a command entry point.
+
+👉 **[See the complete decorators documentation](./docs/decorators/README.md)**
+
 ---
 
-_Ce projet utilise Bun pour une exécution ultra-rapide._
+_This project uses Bun for ultra-fast execution._
