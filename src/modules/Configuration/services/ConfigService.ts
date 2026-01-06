@@ -180,10 +180,7 @@ export class ConfigService {
 		await this.notifyUpdate(guild.id, key, channel.id);
 	}
 
-	async deleteChannel(
-		guild: Guild,
-		key: string,
-	): Promise<void> {
+	async deleteChannel(guild: Guild, key: string): Promise<void> {
 		await this.channelConfig.delete(guild, key);
 		await this.notifyUpdate(guild.id, key, null);
 	}

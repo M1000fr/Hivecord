@@ -1,13 +1,13 @@
 import { Module } from "@decorators/Module";
+import { ConfigCacheService } from "@modules/Configuration/services/ConfigCacheService";
 import { CoreModule } from "@modules/Core/CoreModule";
 import { CustomEmbedConfigHandler } from "@src/modules/CustomEmbed/configHandler/CustomEmbedConfigHandler";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigValueService } from "@utils/ConfigValueService";
 import EmbedCommand from "./commands/embed/index";
 import { EmbedEditorInteractions } from "./interactions/EmbedEditorInteractions";
 import { CustomEmbedService } from "./services/CustomEmbedService";
-import { ConfigValueService } from "@utils/ConfigValueService";
-import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
-import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
-import { ConfigCacheService } from "@modules/Configuration/services/ConfigCacheService";
 
 @Module({
 	name: "CustomEmbed",

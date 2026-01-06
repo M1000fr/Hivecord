@@ -16,12 +16,7 @@ export class ChannelRepository extends SoftDeletableRepository<GuildBasedChannel
 		type: ChannelType,
 		deletedAt: Date | null = null,
 	) {
-		return this.softUpsert(
-			channel,
-			{ type },
-			{ type },
-			deletedAt,
-		);
+		return this.softUpsert(channel, { type }, { type }, deletedAt);
 	}
 
 	override async delete(channel: GuildBasedChannel) {
@@ -33,4 +28,3 @@ export class ChannelRepository extends SoftDeletableRepository<GuildBasedChannel
 		);
 	}
 }
-

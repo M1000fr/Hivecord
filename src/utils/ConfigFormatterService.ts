@@ -1,11 +1,11 @@
-import { Injectable } from "@decorators/Injectable";
 import {
 	EConfigType,
 	type ConfigPropertyOptions,
 } from "@decorators/ConfigProperty";
+import { Injectable } from "@decorators/Injectable";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
-import type { TFunction } from "i18next";
 import { Locale } from "discord.js";
+import type { TFunction } from "i18next";
 
 /**
  * Handles formatting of configuration values for display.

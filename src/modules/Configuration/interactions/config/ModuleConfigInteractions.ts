@@ -6,9 +6,9 @@ import { Button, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
-import { ConfigValueService } from "@utils/ConfigValueService";
 import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
 import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigValueService } from "@utils/ConfigValueService";
 import {
 	type ButtonInteraction,
 	type StringSelectMenuInteraction,

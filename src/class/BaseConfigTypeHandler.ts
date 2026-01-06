@@ -7,9 +7,9 @@ import {
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import type { ConfigTypeHandler } from "@registers/ConfigTypeRegistry";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
-import { ConfigValueService } from "@utils/ConfigValueService";
 import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
 import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigValueService } from "@utils/ConfigValueService";
 import {
 	ButtonInteraction,
 	ChatInputCommandInteraction,

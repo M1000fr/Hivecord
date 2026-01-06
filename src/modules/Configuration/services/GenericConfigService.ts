@@ -24,15 +24,10 @@ export abstract class GenericConfigService<T> {
 	 * Get a single configuration value
 	 */
 	async get(guild: Guild, key: string): Promise<string | null> {
-		return this.cache.get(
-			guild.id,
-			this.entityType,
-			key,
-			async () => {
-				const config = await this.getConfigValue(key);
-				return config ?? null;
-			},
-		);
+		return this.cache.get(guild.id, this.entityType, key, async () => {
+			const config = await this.getConfigValue(key);
+			return config ?? null;
+		});
 	}
 
 	/**
@@ -48,15 +43,10 @@ export abstract class GenericConfigService<T> {
 	 * Get a list of configuration values
 	 */
 	async getList(guild: Guild, key: string): Promise<string[]> {
-		return this.cache.get(
-			guild.id,
-			this.listType,
-			key,
-			async () => {
-				const configs = await this.getConfigListValues(guild.id, key);
-				return configs.map((c) => this.extractListItemId(c));
-			},
-		);
+		return this.cache.get(guild.id, this.listType, key, async () => {
+			const configs = await this.getConfigListValues(guild.id, key);
+			return configs.map((c) => this.extractListItemId(c));
+		});
 	}
 
 	/**
@@ -120,7 +110,10 @@ export abstract class GenericConfigService<T> {
 	protected abstract extractId(entity: T): string;
 	protected abstract extractListItemId(item: ConfigListItem): string;
 	protected abstract getConfigValue(key: string): Promise<string | null>;
-	protected abstract setConfigValue(key: string, value: string): Promise<void>;
+	protected abstract setConfigValue(
+		key: string,
+		value: string,
+	): Promise<void>;
 	protected abstract getConfigListValues(
 		guildId: string,
 		key: string,
@@ -130,8 +123,17 @@ export abstract class GenericConfigService<T> {
 		key: string,
 		values: string[],
 	): Promise<void>;
-	protected abstract addConfigListItem(key: string, value: string): Promise<void>;
-	protected abstract removeConfigListItem(key: string, value: string): Promise<void>;
+	protected abstract addConfigListItem(
+		key: string,
+		value: string,
+	): Promise<void>;
+	protected abstract removeConfigListItem(
+		key: string,
+		value: string,
+	): Promise<void>;
 	protected abstract deleteConfigValue(key: string): Promise<void>;
-	protected abstract clearConfigList(guildId: string, key: string): Promise<void>;
+	protected abstract clearConfigList(
+		guildId: string,
+		key: string,
+	): Promise<void>;
 }

@@ -1,4 +1,7 @@
 import { Module } from "@decorators/Module";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigValueService } from "@utils/ConfigValueService";
 import ModulesCommand from "./commands/modules/index";
 import { BooleanConfigHandler } from "./configHandler/BooleanConfigHandler";
 import { StringConfigHandler } from "./configHandler/StringConfigHandler";
@@ -7,11 +10,8 @@ import { ModuleConfigInteractions } from "./interactions/config/ModuleConfigInte
 import { RoleChannelConfigInteractions } from "./interactions/config/RoleChannelConfigInteractions";
 import { StringArrayConfigInteractions } from "./interactions/config/StringArrayConfigInteractions";
 import { StringConfigInteractions } from "./interactions/config/StringConfigInteractions";
-import { ConfigService } from "./services/ConfigService";
-import { ConfigValueService } from "@utils/ConfigValueService";
-import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
-import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
 import { ConfigCacheService } from "./services/ConfigCacheService";
+import { ConfigService } from "./services/ConfigService";
 
 import { CoreModule } from "@modules/Core/CoreModule";
 

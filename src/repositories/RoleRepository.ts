@@ -15,12 +15,6 @@ export class RoleRepository extends SoftDeletableRepository<Role> {
 	}
 
 	override async delete(role: Role) {
-		return this.softUpsert(
-			role,
-			{ deletedAt: new Date() },
-			{},
-			new Date(),
-		);
+		return this.softUpsert(role, { deletedAt: new Date() }, {}, new Date());
 	}
 }
-

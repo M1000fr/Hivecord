@@ -48,12 +48,10 @@ function createHandler(target: object, propertyKey: string) {
 /**
  * Factory function to create interaction decorators with minimal duplication
  */
-function createInteractionDecorator(
-	registryMethods: {
-		exact: (customId: string, handler: InteractionHandler) => void;
-		pattern: (customId: string, handler: InteractionHandler) => void;
-	},
-) {
+function createInteractionDecorator(registryMethods: {
+	exact: (customId: string, handler: InteractionHandler) => void;
+	pattern: (customId: string, handler: InteractionHandler) => void;
+}) {
 	return function (customId: string) {
 		return function (
 			target: object,
@@ -72,18 +70,24 @@ function createInteractionDecorator(
 }
 
 export const Button = createInteractionDecorator({
-	exact: (customId, handler) => InteractionRegistry.registerButton(customId, handler),
-	pattern: (customId, handler) => InteractionRegistry.registerButtonPattern(customId, handler),
+	exact: (customId, handler) =>
+		InteractionRegistry.registerButton(customId, handler),
+	pattern: (customId, handler) =>
+		InteractionRegistry.registerButtonPattern(customId, handler),
 });
 
 export const SelectMenu = createInteractionDecorator({
-	exact: (customId, handler) => InteractionRegistry.registerSelectMenu(customId, handler),
-	pattern: (customId, handler) => InteractionRegistry.registerSelectMenuPattern(customId, handler),
+	exact: (customId, handler) =>
+		InteractionRegistry.registerSelectMenu(customId, handler),
+	pattern: (customId, handler) =>
+		InteractionRegistry.registerSelectMenuPattern(customId, handler),
 });
 
 export const Modal = createInteractionDecorator({
-	exact: (customId, handler) => InteractionRegistry.registerModal(customId, handler),
-	pattern: (customId, handler) => InteractionRegistry.registerModalPattern(customId, handler),
+	exact: (customId, handler) =>
+		InteractionRegistry.registerModal(customId, handler),
+	pattern: (customId, handler) =>
+		InteractionRegistry.registerModalPattern(customId, handler),
 });
 
 export function CommandInteraction(): ParameterDecorator {

@@ -1,5 +1,5 @@
-import { Injectable } from "@decorators/Injectable";
 import { EConfigType } from "@decorators/ConfigProperty";
+import { Injectable } from "@decorators/Injectable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { Guild, type GuildBasedChannel, Role } from "discord.js";
 

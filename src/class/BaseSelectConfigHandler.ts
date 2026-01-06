@@ -1,9 +1,9 @@
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { InteractionRegistry } from "@registers/InteractionRegistry";
-import { ConfigValueService } from "@utils/ConfigValueService";
 import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
 import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigValueService } from "@utils/ConfigValueService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ActionRowBuilder,

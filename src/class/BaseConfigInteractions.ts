@@ -7,10 +7,10 @@ import {
 } from "@enums/ConfigContextVariable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
-import { ConfigValueService } from "@utils/ConfigValueService";
+import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
 import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
-import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
+import { ConfigValueService } from "@utils/ConfigValueService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ButtonBuilder,

@@ -1,9 +1,9 @@
 import { BaseModalConfigHandler } from "@class/BaseModalConfigHandler";
 import { ConfigType } from "@decorators/ConfigType";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { ConfigValueService } from "@utils/ConfigValueService";
 import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
 import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigValueService } from "@utils/ConfigValueService";
 import { TextInputStyle } from "discord.js";
 
 @ConfigType({

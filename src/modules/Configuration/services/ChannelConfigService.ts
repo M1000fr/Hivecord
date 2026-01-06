@@ -68,8 +68,7 @@ export class ChannelConfigService extends GenericConfigService<GuildBasedChannel
 	}
 
 	protected async getConfigValue(key: string): Promise<string | null> {
-		const config =
-			await this.configurationRepository.getChannelConfig(key);
+		const config = await this.configurationRepository.getChannelConfig(key);
 		return config?.channelId ?? null;
 	}
 
@@ -92,7 +91,10 @@ export class ChannelConfigService extends GenericConfigService<GuildBasedChannel
 		await this.configurationRepository.setChannelList(guildId, key, values);
 	}
 
-	protected async addConfigListItem(key: string, value: string): Promise<void> {
+	protected async addConfigListItem(
+		key: string,
+		value: string,
+	): Promise<void> {
 		await this.configurationRepository.upsertChannelListConfig(key, value);
 	}
 

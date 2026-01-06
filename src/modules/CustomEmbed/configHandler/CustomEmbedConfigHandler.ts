@@ -2,9 +2,9 @@ import { BaseSelectConfigHandler } from "@class/BaseSelectConfigHandler";
 import { ConfigType } from "@decorators/ConfigType";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { CustomEmbedRepository } from "@src/repositories";
-import { ConfigValueService } from "@utils/ConfigValueService";
 import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
 import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigValueService } from "@utils/ConfigValueService";
 import { type Guild } from "discord.js";
 import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbedConfigKey";
 

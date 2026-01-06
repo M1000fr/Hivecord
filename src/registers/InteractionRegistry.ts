@@ -70,7 +70,11 @@ export class InteractionRegistry {
 	}
 
 	static getSelectMenuHandler(customId: string): InteractionHandler | null {
-		return this.getHandler(this.selectMenus, this.selectMenuPatterns, customId);
+		return this.getHandler(
+			this.selectMenus,
+			this.selectMenuPatterns,
+			customId,
+		);
 	}
 
 	static getModalHandler(customId: string): InteractionHandler | null {

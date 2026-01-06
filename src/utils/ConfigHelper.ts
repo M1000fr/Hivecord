@@ -1,11 +1,14 @@
+import {
+	EConfigType,
+	type ConfigPropertyOptions,
+} from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
-import { EConfigType, type ConfigPropertyOptions } from "@decorators/ConfigProperty";
-import { ConfigValueService } from "./ConfigValueService";
-import { ConfigFormatterService } from "./ConfigFormatterService";
-import { ConfigValueResolverService } from "./ConfigValueResolverService";
-import { ConfigUIBuilderService } from "./ConfigUIBuilderService";
 import { Guild, User } from "discord.js";
 import type { TFunction } from "i18next";
+import { ConfigFormatterService } from "./ConfigFormatterService";
+import { ConfigUIBuilderService } from "./ConfigUIBuilderService";
+import { ConfigValueResolverService } from "./ConfigValueResolverService";
+import { ConfigValueService } from "./ConfigValueService";
 import { CustomIdHelper } from "./CustomIdHelper";
 
 /**

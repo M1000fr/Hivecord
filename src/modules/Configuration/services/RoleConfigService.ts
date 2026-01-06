@@ -42,8 +42,7 @@ export class RoleConfigService extends GenericConfigService<Role> {
 	}
 
 	protected async getConfigValue(key: string): Promise<string | null> {
-		const config =
-			await this.configurationRepository.getRoleConfig(key);
+		const config = await this.configurationRepository.getRoleConfig(key);
 		return config?.roleId ?? null;
 	}
 
@@ -66,7 +65,10 @@ export class RoleConfigService extends GenericConfigService<Role> {
 		await this.configurationRepository.setRoleList(guildId, key, values);
 	}
 
-	protected async addConfigListItem(key: string, value: string): Promise<void> {
+	protected async addConfigListItem(
+		key: string,
+		value: string,
+	): Promise<void> {
 		await this.configurationRepository.upsertRoleListConfig(key, value);
 	}
 

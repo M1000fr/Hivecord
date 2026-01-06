@@ -1,12 +1,7 @@
-import { Injectable } from "@decorators/Injectable";
-import { Inject } from "@decorators/Inject";
 import { LeBotClient } from "@class/LeBotClient";
-import {
-	EConfigType,
-	type IConfigClass,
-} from "@decorators/ConfigProperty";
-import { ConfigFormatterService } from "./ConfigFormatterService";
-import { ConfigValueResolverService } from "./ConfigValueResolverService";
+import { EConfigType, type IConfigClass } from "@decorators/ConfigProperty";
+import { Inject } from "@decorators/Inject";
+import { Injectable } from "@decorators/Injectable";
 import {
 	ActionRowBuilder,
 	EmbedBuilder,
@@ -17,6 +12,8 @@ import {
 	User,
 } from "discord.js";
 import type { TFunction } from "i18next";
+import { ConfigFormatterService } from "./ConfigFormatterService";
+import { ConfigValueResolverService } from "./ConfigValueResolverService";
 import { CustomIdHelper } from "./CustomIdHelper";
 
 /**
@@ -61,14 +58,13 @@ export class ConfigUIBuilderService {
 			.setColor("#5865F2")
 			.setTimestamp();
 
-		const resolvedData =
-			await this.resolver.buildModuleConfigEmbed(
-				guild,
-				moduleName,
-				user,
-				t,
-				locale,
-			) || { fields: [], configProperties };
+		const resolvedData = (await this.resolver.buildModuleConfigEmbed(
+			guild,
+			moduleName,
+			user,
+			t,
+			locale,
+		)) || { fields: [], configProperties };
 
 		for (const [idx, field] of resolvedData.fields.entries()) {
 			embed.addFields({
