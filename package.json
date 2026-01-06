@@ -51,7 +51,7 @@
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit",
 		"lint": "eslint .",
 		"check:errors": "bun run typecheck && bun run lint",
-		"i18n:missing": "bun scripts/findMissingKeys.ts",
+		"i18n:info": "bun scripts/findMissingKeys.ts",
 		"prepare": "husky"
 	},
 	"lint-staged": {
