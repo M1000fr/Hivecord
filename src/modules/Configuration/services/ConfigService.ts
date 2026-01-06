@@ -3,6 +3,7 @@ import {
 	type IConfigClass,
 	toConfigKey,
 	type ConfigKeyMetadata,
+	type ConfigKey,
 } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
@@ -22,7 +23,7 @@ export type ConfigProxy<T> = {
 		| "length"
 		| "configProperties"
 		? never
-		: K]: Promise<T[K]>;
+		: K]: Promise<T[K] extends ConfigKey<infer R> ? R : T[K]>;
 };
 
 @Injectable()
@@ -38,13 +39,12 @@ export class ConfigService {
 	) {}
 
 	async getLanguage(guild: Guild): Promise<string> {
-		return (await this.of(guild, GeneralConfig).Language) || "fr";
+		const config = this.of(guild, GeneralConfig);
+		const lang = await config.Language;
+		return (lang as string) || "fr";
 	}
 
-	of<T extends Record<string, unknown>>(
-		guild: Guild,
-		configClass: T,
-	): ConfigProxy<T> {
+	of<T>(guild: Guild, configClass: T): ConfigProxy<T> {
 		const metadata = (configClass as unknown as IConfigClass).configProperties;
 
 		return new Proxy({} as ConfigProxy<T>, {
