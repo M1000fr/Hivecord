@@ -51,6 +51,7 @@ export class GeneralConfig {
 			fr: "Le texte à afficher sur l'image de bienvenue",
 		},
 		type: EConfigType.String,
+		emoji: "🖼️",
 	})
 	static WelcomeMessageImage = configKey("Welcome!");
 
@@ -70,6 +71,7 @@ export class GeneralConfig {
 			fr: "Le texte du message de bienvenue",
 		},
 		type: EConfigType.String,
+		emoji: "✉️",
 	})
 	static WelcomeMessage = configKey("Welcome {user} to {guild}!");
 
@@ -125,6 +127,7 @@ export class GeneralConfig {
 			fr: "L'image de fond pour la carte de bienvenue",
 		},
 		type: EConfigType.Attachment,
+		emoji: "🎨",
 	})
 	static WelcomeBackground = configKey("");
 }
