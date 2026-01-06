@@ -70,7 +70,10 @@ const shutdown = async (signal: string) => {
 
 		process.exit(0);
 	} catch (error) {
-		logger.error("Error during shutdown:", error);
+		logger.error(
+			"Error during shutdown:",
+			error instanceof Error ? error.stack : String(error),
+		);
 		process.exit(1);
 	}
 };

@@ -89,7 +89,10 @@ export class LeBotClient<
 
 				process.exit(0);
 			} catch (error) {
-				this.logger.error("Error during shard shutdown:", error);
+				this.logger.error(
+					"Error during shard shutdown:",
+					error instanceof Error ? error.stack : String(error),
+				);
 				process.exit(1);
 			}
 		};
