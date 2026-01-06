@@ -10,17 +10,19 @@ import { ModuleConfigInteractions } from "./interactions/config/ModuleConfigInte
 import { RoleChannelConfigInteractions } from "./interactions/config/RoleChannelConfigInteractions";
 import { StringArrayConfigInteractions } from "./interactions/config/StringArrayConfigInteractions";
 import { StringConfigInteractions } from "./interactions/config/StringConfigInteractions";
+import { ChannelConfigService } from "./services/ChannelConfigService";
 import { ConfigCacheService } from "./services/ConfigCacheService";
 import { ConfigService } from "./services/ConfigService";
-
-import { CoreModule } from "@modules/Core/CoreModule";
+import { RoleConfigService } from "./services/RoleConfigService";
 
 @Module({
 	name: "Configuration",
-	imports: [CoreModule],
+	imports: [],
 	providers: [
 		// Services
 		ConfigCacheService,
+		ChannelConfigService,
+		RoleConfigService,
 		ConfigValueService,
 		ConfigUIBuilderService,
 		ConfigValueResolverService,

@@ -118,9 +118,21 @@ export class DependencyContainer {
 		}
 	}
 
-	resolve<T extends object>(token: Constructor<T>, moduleName?: string): T;
-	resolve<T = unknown>(token: ProviderToken, moduleName?: string): T;
-	resolve<T>(token: ProviderToken, moduleName?: string): T {
+	resolve<T extends object>(
+		token: Constructor<T>,
+		moduleName?: string,
+		context?: { target?: Constructor; index?: number },
+	): T;
+	resolve<T = unknown>(
+		token: ProviderToken,
+		moduleName?: string,
+		context?: { target?: Constructor; index?: number },
+	): T;
+	resolve<T>(
+		token: ProviderToken,
+		moduleName?: string,
+		context?: { target?: Constructor; index?: number },
+	): T {
 		const normalizedModule = moduleName?.toLowerCase();
 		const provider = this.findProvider(token, normalizedModule);
 
@@ -133,7 +145,7 @@ export class DependencyContainer {
 			if (existing !== undefined) return existing as T;
 		}
 
-		// 2. Handle missing provider (fallback to class injection or error)
+		// 2. Handle missing provider (strict check)
 		if (!provider) {
 			const existingFallback = this.getExistingInstance(
 				token,
@@ -141,26 +153,17 @@ export class DependencyContainer {
 			);
 			if (existingFallback !== undefined) return existingFallback as T;
 
-			if (typeof token === "function") {
-				const fallbackProvider = this.normalizeProvider(
-					token as Constructor,
-					{
-						moduleName: normalizedModule,
-					},
-				);
-				this.storeProvider(fallbackProvider);
-				const instance = this.instantiateProvider<T>(
-					fallbackProvider,
-					normalizedModule,
-				);
-				this.saveInstance(fallbackProvider, instance, normalizedModule);
-				return instance as T;
-			}
+			const tokenName =
+				typeof token === "function" ? token.name : String(token);
+			const targetName = context?.target?.name ?? "UnknownContext";
+			const indexInfo =
+				context?.index !== undefined
+					? ` at index [${context.index}]`
+					: "";
 
 			throw new Error(
-				`No provider found for token '${String(token)}' in module '${
-					normalizedModule ?? "<global>"
-				}'.`,
+				`LeBot can't resolve dependencies of the ${targetName}. ` +
+					`Please make sure that the argument "${tokenName}"${indexInfo} is available in the "${normalizedModule ?? "global"}" module context.`,
 			);
 		}
 
@@ -315,12 +318,19 @@ export class DependencyContainer {
 				return this.resolve(
 					provider.useExisting,
 					moduleName ?? provider.moduleName,
+					{ target: provider.useClass },
 				) as T;
 			}
 
 			if (provider.useFactory) {
-				const deps = (provider.inject ?? []).map((dep) =>
-					this.resolve(dep, moduleName ?? provider.moduleName),
+				const deps = (provider.inject ?? []).map((dep, index) =>
+					this.resolve(dep, moduleName ?? provider.moduleName, {
+						target:
+							typeof provider.token === "function"
+								? (provider.token as Constructor)
+								: undefined,
+						index,
+					}),
 				);
 				return provider.useFactory(...deps) as T;
 			}
@@ -348,6 +358,7 @@ export class DependencyContainer {
 				return this.resolve(
 					tokenToUse,
 					moduleName ?? provider.moduleName,
+					{ target: provider.useClass, index },
 				);
 			});
 

@@ -3,11 +3,10 @@ import { GeneralConfig } from "./GeneralConfig";
 import ReadyEvent from "./events/ready/log";
 
 import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
-import { CoreModule } from "@modules/Core/CoreModule";
 
 @Module({
 	name: "General",
-	imports: [CoreModule, ConfigurationModule],
+	imports: [ConfigurationModule],
 	config: GeneralConfig,
 	providers: [
 		// Events
