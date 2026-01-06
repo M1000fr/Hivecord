@@ -1,3 +1,4 @@
+import { Global } from "@decorators/Global";
 import { Module } from "@decorators/Module";
 import {
 	BotStateRepository,
@@ -9,6 +10,7 @@ import {
 import { PrismaService } from "./services/PrismaService";
 import { RedisService } from "./services/RedisService";
 
+@Global()
 @Module({
 	name: "Database",
 	providers: [

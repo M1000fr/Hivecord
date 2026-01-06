@@ -1,6 +1,7 @@
 import "reflect-metadata";
 
 import {
+	GLOBAL_MODULE_METADATA_KEY,
 	INJECT_METADATA_KEY,
 	INJECTABLE_METADATA_KEY,
 	MODULE_OPTIONS_METADATA_KEY,
@@ -29,7 +30,11 @@ export class DependencyContainer {
 		string,
 		Map<ProviderToken, ResolvedProvider>
 	>();
-	private exportedProviders = new Map<ProviderToken, ResolvedProvider>();
+	private exportedProviders = new Map<
+		string,
+		Map<ProviderToken, ResolvedProvider>
+	>();
+	private globalModuleNames = new Set<string>();
 
 	private globalInstances = new Map<ProviderToken, unknown>();
 	private moduleInstances = new Map<string, Map<ProviderToken, unknown>>();
@@ -43,10 +48,23 @@ export class DependencyContainer {
 	}
 
 	registerModule(options: ModuleOptions, moduleClass?: Constructor): void {
-		this.registeredModules.set(options.name.toLowerCase(), {
+		const moduleName = options.name.toLowerCase();
+		if (this.registeredModules.has(moduleName)) return;
+
+		this.registeredModules.set(moduleName, {
 			options,
 			moduleClass,
 		});
+
+		if (moduleClass) {
+			const isGlobal = Reflect.getMetadata(
+				GLOBAL_MODULE_METADATA_KEY,
+				moduleClass,
+			);
+			if (isGlobal) {
+				this.globalModuleNames.add(moduleName);
+			}
+		}
 
 		this.registerProviders(options.providers ?? [], {
 			moduleName: options.name,
@@ -205,15 +223,41 @@ export class DependencyContainer {
 		token: ProviderToken,
 		moduleName?: string,
 	): ResolvedProvider | undefined {
-		if (moduleName) {
-			const moduleProviders = this.moduleProviders.get(moduleName);
+		const normalizedModuleName = moduleName?.toLowerCase();
+
+		if (normalizedModuleName) {
+			// 1. Search in the module itself
+			const moduleProviders =
+				this.moduleProviders.get(normalizedModuleName);
 			const moduleProvider = moduleProviders?.get(token);
 			if (moduleProvider) return moduleProvider;
+
+			// 2. Search in exported providers of imported modules
+			const moduleInfo = this.registeredModules.get(normalizedModuleName);
+			if (moduleInfo?.options.imports) {
+				for (const ImportedModule of moduleInfo.options.imports) {
+					const importedOptions =
+						this.getModuleOptionsFromConstructor(ImportedModule);
+					if (!importedOptions) continue;
+
+					const importedModuleName =
+						importedOptions.name.toLowerCase();
+					const exports =
+						this.exportedProviders.get(importedModuleName);
+					const exportedProvider = exports?.get(token);
+					if (exportedProvider) return exportedProvider;
+				}
+			}
 		}
 
-		const exported = this.exportedProviders.get(token);
-		if (exported) return exported;
+		// 3. Search in global modules
+		for (const globalModuleName of this.globalModuleNames) {
+			const providers = this.moduleProviders.get(globalModuleName);
+			const provider = providers?.get(token);
+			if (provider) return provider;
+		}
 
+		// 4. Search in global scope providers
 		const globalProvider = this.globalProviders.get(token);
 		if (globalProvider) return globalProvider;
 
@@ -311,12 +355,16 @@ export class DependencyContainer {
 				new Map<ProviderToken, ResolvedProvider>();
 			moduleProviders.set(provider.token, provider);
 			this.moduleProviders.set(moduleKey, moduleProviders);
+
+			if (exports?.some((token) => token === provider.token)) {
+				const exportsMap =
+					this.exportedProviders.get(moduleKey) ??
+					new Map<ProviderToken, ResolvedProvider>();
+				exportsMap.set(provider.token, provider);
+				this.exportedProviders.set(moduleKey, exportsMap);
+			}
 		} else {
 			this.globalProviders.set(provider.token, provider);
-		}
-
-		if (exports?.some((token) => token === provider.token)) {
-			this.exportedProviders.set(provider.token, provider);
 		}
 	}
 

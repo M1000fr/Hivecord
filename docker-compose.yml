@@ -22,7 +22,6 @@ services:
         restart: always
         volumes:
             - redis_data:/data
-            timeout: 5s
 
     bot:
         build: .

@@ -3,10 +3,10 @@ import { DependencyContainer } from "@di/DependencyContainer";
 import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import type { IModuleInstance } from "@interfaces/IModuleInstance.ts";
 import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
-import { CommandDeploymentService } from "@modules/Shared/services/CommandDeploymentService";
-import { ModuleLoader } from "@modules/Shared/services/ModuleLoader";
 import { PrismaService } from "@modules/Database/services/PrismaService";
 import { RedisService } from "@modules/Database/services/RedisService";
+import { CommandDeploymentService } from "@modules/Shared/services/CommandDeploymentService";
+import { ModuleLoader } from "@modules/Shared/services/ModuleLoader";
 import { BotStateRepository } from "@src/repositories";
 import { Logger } from "@utils/Logger";
 import {

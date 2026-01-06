@@ -1,11 +1,14 @@
+import { Global } from "@decorators/Global";
 import { Module } from "@decorators/Module";
 import ModulesCommand from "./commands/modules/index";
 import { BooleanConfigHandler } from "./configHandler/BooleanConfigHandler";
 import { StringConfigHandler } from "./configHandler/StringConfigHandler";
+import { AttachmentConfigInteractions } from "./interactions/config/AttachmentConfigInteractions";
 import { BooleanConfigInteractions } from "./interactions/config/BooleanConfigInteractions";
 import { ModuleConfigInteractions } from "./interactions/config/ModuleConfigInteractions";
 import { RoleChannelConfigInteractions } from "./interactions/config/RoleChannelConfigInteractions";
 import { StringArrayConfigInteractions } from "./interactions/config/StringArrayConfigInteractions";
+import { StringChoiceConfigInteractions } from "./interactions/config/StringChoiceConfigInteractions";
 import { StringConfigInteractions } from "./interactions/config/StringConfigInteractions";
 import { ChannelConfigService } from "./services/ChannelConfigService";
 import { ConfigCacheService } from "./services/ConfigCacheService";
@@ -14,6 +17,7 @@ import { RoleConfigService } from "./services/RoleConfigService";
 
 import { DatabaseModule } from "@modules/Database/DatabaseModule";
 
+@Global()
 @Module({
 	name: "Configuration",
 	imports: [DatabaseModule],
@@ -29,7 +33,9 @@ import { DatabaseModule } from "@modules/Database/DatabaseModule";
 		ModuleConfigInteractions,
 		BooleanConfigInteractions,
 		StringConfigInteractions,
+		StringChoiceConfigInteractions,
 		RoleChannelConfigInteractions,
+		AttachmentConfigInteractions,
 		StringArrayConfigInteractions,
 		// Config Handlers
 		BooleanConfigHandler,

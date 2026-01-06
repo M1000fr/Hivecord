@@ -1,6 +1,6 @@
+import type { RedisService } from "@modules/Database/services/RedisService";
 import type { TFunction } from "@modules/Shared/services/I18nService";
 import { I18nService } from "@modules/Shared/services/I18nService";
-import type { RedisService } from "@modules/Database/services/RedisService";
 import { PagerRegistry } from "@registers/PagerRegistry";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
 import {
