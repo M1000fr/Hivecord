@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Constructor<T = object> = new (...args: any[]) => T;
 
-export type ProviderScope = "module" | "global";
+export type ProviderScope = "module" | "global" | "transient";
 
 export type ProviderToken = Constructor | string | symbol;
 
@@ -30,11 +30,16 @@ export interface FactoryProvider extends BaseProvider {
 	inject?: ProviderToken[];
 }
 
+export interface ExistingProvider extends BaseProvider {
+	useExisting: ProviderToken;
+}
+
 export type Provider =
 	| Constructor
 	| ClassProvider
 	| ValueProvider
-	| FactoryProvider;
+	| FactoryProvider
+	| ExistingProvider;
 
 export interface ResolvedProvider {
 	token: ProviderToken;
@@ -43,6 +48,7 @@ export interface ResolvedProvider {
 	useClass?: Constructor;
 	useValue?: unknown;
 	useFactory?: (...args: unknown[]) => unknown;
+	useExisting?: ProviderToken;
 	inject?: ProviderToken[];
 	moduleName?: string;
 }

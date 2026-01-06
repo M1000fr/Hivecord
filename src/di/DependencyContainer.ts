@@ -6,6 +6,7 @@ import {
 	MODULE_OPTIONS_METADATA_KEY,
 	type ClassProvider,
 	type Constructor,
+	type ExistingProvider,
 	type Provider,
 	type ProviderScope,
 	type ProviderToken,
@@ -21,7 +22,7 @@ interface ProviderRegistrationContext {
 
 export class DependencyContainer {
 	private static instance = new DependencyContainer();
-	public static isInstantiating = false;
+	private resolvingStack = new Set<ProviderToken>();
 
 	private globalProviders = new Map<ProviderToken, ResolvedProvider>();
 	private moduleProviders = new Map<
@@ -86,6 +87,27 @@ export class DependencyContainer {
 		return this.registeredModules;
 	}
 
+	public getDuplicateProviders(): Map<ProviderToken, string[]> {
+		const counts = new Map<ProviderToken, string[]>();
+
+		const add = (token: ProviderToken, loc: string) => {
+			const existing = counts.get(token) ?? [];
+			existing.push(loc);
+			counts.set(token, existing);
+		};
+
+		for (const [token] of this.globalProviders) add(token, "global");
+		for (const [mod, providers] of this.moduleProviders) {
+			for (const [token] of providers) add(token, `module:${mod}`);
+		}
+
+		const duplicates = new Map<ProviderToken, string[]>();
+		for (const [token, locs] of counts) {
+			if (locs.length > 1) duplicates.set(token, locs);
+		}
+		return duplicates;
+	}
+
 	registerProviders(
 		providers: Provider[],
 		context?: ProviderRegistrationContext,
@@ -100,12 +122,25 @@ export class DependencyContainer {
 	resolve<T = unknown>(token: ProviderToken, moduleName?: string): T;
 	resolve<T>(token: ProviderToken, moduleName?: string): T {
 		const normalizedModule = moduleName?.toLowerCase();
-		const existing = this.getExistingInstance(token, normalizedModule);
-		if (existing !== undefined) return existing as T;
-
 		const provider = this.findProvider(token, normalizedModule);
 
+		// 1. Try to get existing instance based on the found provider's scope
+		if (provider && provider.scope !== "transient") {
+			const existing = this.getInstanceByProvider(
+				provider,
+				normalizedModule,
+			);
+			if (existing !== undefined) return existing as T;
+		}
+
+		// 2. Handle missing provider (fallback to class injection or error)
 		if (!provider) {
+			const existingFallback = this.getExistingInstance(
+				token,
+				normalizedModule,
+			);
+			if (existingFallback !== undefined) return existingFallback as T;
+
 			if (typeof token === "function") {
 				const fallbackProvider = this.normalizeProvider(
 					token as Constructor,
@@ -129,6 +164,7 @@ export class DependencyContainer {
 			);
 		}
 
+		// 3. Instantiate and save the found provider
 		const instance = this.instantiateProvider<T>(
 			provider,
 			normalizedModule,
@@ -177,6 +213,16 @@ export class DependencyContainer {
 			return {
 				token: provider.provide,
 				useValue: provider.useValue,
+				scope,
+				moduleName: context?.moduleName,
+			};
+		}
+
+		if (this.isExistingProvider(provider)) {
+			const scope = this.resolveScope(provider.scope, context);
+			return {
+				token: provider.provide,
+				useExisting: provider.useExisting,
 				scope,
 				moduleName: context?.moduleName,
 			};
@@ -237,6 +283,8 @@ export class DependencyContainer {
 				new Map<ProviderToken, ResolvedProvider>();
 			moduleProviders.set(provider.token, provider);
 			this.moduleProviders.set(moduleKey, moduleProviders);
+		} else {
+			this.globalProviders.set(provider.token, provider);
 		}
 
 		if (exports?.some((token) => token === provider.token)) {
@@ -248,41 +296,64 @@ export class DependencyContainer {
 		provider: ResolvedProvider,
 		moduleName?: string,
 	): T {
-		if (provider.useValue !== undefined) {
-			return provider.useValue as T;
-		}
-
-		if (provider.useFactory) {
-			const deps = (provider.inject ?? []).map((dep) =>
-				this.resolve(dep, moduleName ?? provider.moduleName),
-			);
-			return provider.useFactory(...deps) as T;
-		}
-
-		if (!provider.useClass) {
+		if (this.resolvingStack.has(provider.token)) {
 			throw new Error(
-				`Provider '${String(provider.token)}' is missing a useClass, useValue, or useFactory definition.`,
+				`Circular dependency detected for token '${String(
+					provider.token,
+				)}'.`,
 			);
 		}
 
-		const paramTypes: unknown[] =
-			Reflect.getMetadata("design:paramtypes", provider.useClass) ?? [];
-		const injectTokens = Reflect.getMetadata(
-			INJECT_METADATA_KEY,
-			provider.useClass,
-		) as ProviderToken[] | undefined;
+		this.resolvingStack.add(provider.token);
 
-		const dependencies = paramTypes.map((paramType, index) => {
-			const overrideToken = injectTokens?.[index];
-			const tokenToUse = (overrideToken ?? paramType) as ProviderToken;
-			return this.resolve(tokenToUse, moduleName ?? provider.moduleName);
-		});
-
-		DependencyContainer.isInstantiating = true;
 		try {
+			if (provider.useValue !== undefined) {
+				return provider.useValue as T;
+			}
+
+			if (provider.useExisting !== undefined) {
+				return this.resolve(
+					provider.useExisting,
+					moduleName ?? provider.moduleName,
+				) as T;
+			}
+
+			if (provider.useFactory) {
+				const deps = (provider.inject ?? []).map((dep) =>
+					this.resolve(dep, moduleName ?? provider.moduleName),
+				);
+				return provider.useFactory(...deps) as T;
+			}
+
+			if (!provider.useClass) {
+				throw new Error(
+					`Provider '${String(
+						provider.token,
+					)}' is missing a useClass, useValue, or useFactory definition.`,
+				);
+			}
+
+			const paramTypes: unknown[] =
+				Reflect.getMetadata("design:paramtypes", provider.useClass) ??
+				[];
+			const injectTokens = Reflect.getMetadata(
+				INJECT_METADATA_KEY,
+				provider.useClass,
+			) as ProviderToken[] | undefined;
+
+			const dependencies = paramTypes.map((paramType, index) => {
+				const overrideToken = injectTokens?.[index];
+				const tokenToUse = (overrideToken ??
+					paramType) as ProviderToken;
+				return this.resolve(
+					tokenToUse,
+					moduleName ?? provider.moduleName,
+				);
+			});
+
 			return new provider.useClass(...dependencies) as T;
 		} finally {
-			DependencyContainer.isInstantiating = false;
+			this.resolvingStack.delete(provider.token);
 		}
 	}
 
@@ -291,12 +362,14 @@ export class DependencyContainer {
 		instance: T,
 		moduleName?: string,
 	) {
+		if (provider.scope === "transient") return;
+
 		if (provider.scope === "global") {
 			this.globalInstances.set(provider.token, instance);
 			return;
 		}
 
-		const moduleKey = (moduleName ?? provider.moduleName)?.toLowerCase();
+		const moduleKey = (provider.moduleName ?? moduleName)?.toLowerCase();
 		if (!moduleKey) return;
 
 		const moduleInstances =
@@ -304,6 +377,20 @@ export class DependencyContainer {
 			new Map<ProviderToken, unknown>();
 		moduleInstances.set(provider.token, instance as unknown);
 		this.moduleInstances.set(moduleKey, moduleInstances);
+	}
+
+	private getInstanceByProvider(
+		provider: ResolvedProvider,
+		moduleName?: string,
+	): unknown {
+		if (provider.scope === "global") {
+			return this.globalInstances.get(provider.token);
+		}
+
+		const moduleKey = (provider.moduleName ?? moduleName)?.toLowerCase();
+		if (!moduleKey) return undefined;
+
+		return this.moduleInstances.get(moduleKey)?.get(provider.token);
 	}
 
 	private getExistingInstance(
@@ -333,5 +420,9 @@ export class DependencyContainer {
 
 	private isValueProvider(value: Provider): value is ValueProvider {
 		return typeof value === "object" && "useValue" in value;
+	}
+
+	private isExistingProvider(value: Provider): value is ExistingProvider {
+		return typeof value === "object" && "useExisting" in value;
 	}
 }
