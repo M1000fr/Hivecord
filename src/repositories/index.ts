@@ -4,7 +4,7 @@ export * from "./ChannelRepository";
 export * from "./ConfigurationRepository";
 
 export * from "./GuildRepository";
-export * from "./MemberRepository";
+
 export * from "./PermissionRepository";
 export * from "./RoleRepository";
 export * from "./UserRepository";
