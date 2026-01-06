@@ -1,7 +1,9 @@
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { InteractionRegistry } from "@registers/InteractionRegistry";
-import type { ConfigHelper } from "@utils/ConfigHelper";
+import { ConfigValueService } from "@utils/ConfigValueService";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ActionRowBuilder,
@@ -19,8 +21,13 @@ import type { TFunction } from "i18next";
 import { BaseConfigTypeHandler } from "./BaseConfigTypeHandler";
 
 export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
-	constructor(configHelper: ConfigHelper, configService: ConfigService) {
-		super(configHelper, configService);
+	constructor(
+		valueService: ConfigValueService,
+		uiBuilder: ConfigUIBuilderService,
+		resolverService: ConfigValueResolverService,
+		configService: ConfigService,
+	) {
+		super(valueService, uiBuilder, resolverService, configService);
 	}
 
 	/**
@@ -126,7 +133,7 @@ export abstract class BaseModalConfigHandler extends BaseConfigTypeHandler {
 		const { t } = await this.getLanguageContext(interaction);
 		const defaultValue = this.getDefaultValue(module, propertyKey);
 
-		const rawValue = await this.configHelper.fetchValue(
+		const rawValue = await this.valueService.fetchValue(
 			interaction.guild!,
 			propertyKey,
 			propertyOptions.type,

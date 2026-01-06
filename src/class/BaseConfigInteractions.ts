@@ -7,8 +7,10 @@ import {
 } from "@enums/ConfigContextVariable";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
+import { ConfigValueService } from "@utils/ConfigValueService";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
-import type { ConfigHelper } from "@utils/ConfigHelper";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ButtonBuilder,
@@ -39,7 +41,9 @@ export type ConfigInteraction =
 
 export abstract class BaseConfigInteractions {
 	constructor(
-		protected readonly configHelper: ConfigHelper,
+		protected readonly valueService: ConfigValueService,
+		protected readonly uiBuilder: ConfigUIBuilderService,
+		protected readonly resolverService: ConfigValueResolverService,
 		protected readonly configService: ConfigService,
 	) {}
 
@@ -129,7 +133,7 @@ export abstract class BaseConfigInteractions {
 		if (!interaction.guildId) return;
 
 		try {
-			await this.configHelper.saveValue(
+			await this.valueService.saveValue(
 				interaction.guild!,
 				propertyKey,
 				value,
@@ -139,8 +143,7 @@ export abstract class BaseConfigInteractions {
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
 				const { lng, t } = await this.getLanguageContext(interaction);
-				const config = await this.configHelper.buildModuleConfigEmbed(
-					client,
+				const config = await this.uiBuilder.buildModuleConfigEmbed(
 					interaction.guild!,
 					moduleName,
 					interaction.user,
@@ -207,7 +210,7 @@ export abstract class BaseConfigInteractions {
 		if (!interaction.guildId) return;
 
 		try {
-			await this.configHelper.deleteValue(
+			await this.valueService.deleteValue(
 				interaction.guild!,
 				propertyKey,
 				type,
@@ -216,8 +219,7 @@ export abstract class BaseConfigInteractions {
 			const mainMessage = await this.getMainMessage(interaction);
 			if (mainMessage) {
 				const { lng, t } = await this.getLanguageContext(interaction);
-				const config = await this.configHelper.buildModuleConfigEmbed(
-					client,
+				const config = await this.uiBuilder.buildModuleConfigEmbed(
 					interaction.guild!,
 					moduleName,
 					interaction.user,
@@ -272,7 +274,7 @@ export abstract class BaseConfigInteractions {
 		);
 		const defaultValue = this.getDefaultValue(module, selectedProperty);
 
-		const currentValue = await this.configHelper.getCurrentValue(
+		const currentValue = await this.resolverService.getCurrentValue(
 			interaction.guild!,
 			selectedProperty,
 			propertyOptions.type,

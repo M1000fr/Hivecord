@@ -7,7 +7,9 @@ import {
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import type { ConfigTypeHandler } from "@registers/ConfigTypeRegistry";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
-import type { ConfigHelper } from "@utils/ConfigHelper";
+import { ConfigValueService } from "@utils/ConfigValueService";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
 import {
 	ButtonInteraction,
 	ChatInputCommandInteraction,
@@ -20,8 +22,13 @@ export abstract class BaseConfigTypeHandler
 	extends BaseConfigInteractions
 	implements ConfigTypeHandler
 {
-	constructor(configHelper: ConfigHelper, configService: ConfigService) {
-		super(configHelper, configService);
+	constructor(
+		valueService: ConfigValueService,
+		uiBuilder: ConfigUIBuilderService,
+		resolverService: ConfigValueResolverService,
+		configService: ConfigService,
+	) {
+		super(valueService, uiBuilder, resolverService, configService);
 
 		const metadata = Reflect.getMetadata(
 			CONFIG_TYPE_METADATA_KEY,
