@@ -7,7 +7,7 @@ import { Guild, type GuildBasedChannel, Role } from "discord.js";
  * Handles configuration value persistence and retrieval.
  * Responsible for get/set/delete operations across all config types.
  */
-@Injectable()
+@Injectable({ scope: "global" })
 export class ConfigValueService {
 	constructor(private readonly configService: ConfigService) {}
 

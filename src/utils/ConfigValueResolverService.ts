@@ -16,7 +16,7 @@ import { ConfigValueService } from "./ConfigValueService";
  * Handles retrieval and formatting of current configuration values.
  * Combines persistence and formatting logic for display purposes.
  */
-@Injectable()
+@Injectable({ scope: "global" })
 export class ConfigValueResolverService {
 	constructor(
 		private readonly valueService: ConfigValueService,

@@ -20,7 +20,7 @@ import { CustomIdHelper } from "./CustomIdHelper";
  * Handles building UI components (embeds, select menus) for configuration display.
  * Constructs complex Discord components from configuration metadata.
  */
-@Injectable()
+@Injectable({ scope: "global" })
 export class ConfigUIBuilderService {
 	constructor(
 		private readonly resolver: ConfigValueResolverService,

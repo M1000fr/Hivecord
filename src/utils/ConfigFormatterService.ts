@@ -11,7 +11,7 @@ import type { TFunction } from "i18next";
  * Handles formatting of configuration values for display.
  * Converts internal values to user-friendly formatted strings.
  */
-@Injectable()
+@Injectable({ scope: "global" })
 export class ConfigFormatterService {
 	/**
 	 * Truncate string to maxLength with ellipsis

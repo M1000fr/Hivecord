@@ -20,6 +20,10 @@ import {
 	GuildRepository,
 	RoleRepository,
 } from "@src/repositories";
+import { ConfigFormatterService } from "@utils/ConfigFormatterService";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigValueService } from "@utils/ConfigValueService";
 
 @Module({
 	name: "App",
@@ -41,6 +45,10 @@ import {
 		ChannelRepository,
 		BotStateRepository,
 		ConfigurationRepository,
+		ConfigValueService,
+		ConfigFormatterService,
+		ConfigUIBuilderService,
+		ConfigValueResolverService,
 	],
 	exports: [LeBotClient],
 })
