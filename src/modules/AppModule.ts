@@ -7,11 +7,19 @@ import { I18nService } from "@modules/Core/services/I18nService";
 import { PrismaService } from "@modules/Core/services/PrismaService";
 import { RedisService } from "@modules/Core/services/RedisService";
 import { GeneralModule } from "@modules/General/GeneralModule";
+import InteractionRegistryHandler from "@modules/General/events/interactionCreate/InteractionRegistryHandler";
+import CommandHandlerEvent from "@modules/General/events/interactionCreate/commandHandler";
+import PagerHandlerEvent from "@modules/General/events/interactionCreate/pagerHandler";
 
 @Module({
 	name: "App",
 	imports: [CoreModule, GeneralModule, ConfigurationModule],
-	providers: [LeBotClient],
+	providers: [
+		LeBotClient,
+		CommandHandlerEvent,
+		PagerHandlerEvent,
+		InteractionRegistryHandler,
+	],
 	exports: [LeBotClient],
 })
 export class AppModule {

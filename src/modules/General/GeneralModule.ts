@@ -9,9 +9,6 @@ import GuildMemberRegisterEvent from "./events/guildMemberAdd/sync";
 import WelcomeEvent from "./events/guildMemberAdd/welcome";
 import GuildMemberRemoveSyncEvent from "./events/guildMemberRemove/sync";
 import GuildSync from "./events/guildSync/index";
-import InteractionRegistryHandler from "./events/interactionCreate/InteractionRegistryHandler";
-import CommandHandlerEvent from "./events/interactionCreate/commandHandler";
-import PagerHandlerEvent from "./events/interactionCreate/pagerHandler";
 import ReadyEvent from "./events/ready/log";
 import ResumeWelcomeSyncEvent from "./events/ready/resumeWelcomeSync";
 import RoleSync from "./events/roleSync/sync";
@@ -37,9 +34,6 @@ import { CoreModule } from "@modules/Core/CoreModule";
 		// Events
 		ReadyEvent,
 		ResumeWelcomeSyncEvent,
-		CommandHandlerEvent,
-		PagerHandlerEvent,
-		InteractionRegistryHandler,
 		WelcomeEvent,
 		WelcomeRoleAddEvent,
 		RoleSync,
