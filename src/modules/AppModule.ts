@@ -23,16 +23,15 @@ import { GeneralModule } from "@modules/General/GeneralModule";
 })
 export class AppModule {
 	static async init(container: DependencyContainer) {
-		// Resolve and check Prisma connection
 		const prismaService = container.resolve(PrismaService);
-		await prismaService.checkDatabaseConnection();
-
-		// Check other connections
 		const redisService = container.resolve(RedisService);
-		await redisService.checkConnection();
-		await InfluxService.checkConnection();
 
-		// Initialize I18n
-		await I18nService.init();
+		// Initialize all services in parallel
+		await Promise.all([
+			prismaService.checkDatabaseConnection(),
+			redisService.checkConnection(),
+			InfluxService.checkConnection(),
+			I18nService.init(),
+		]);
 	}
 }
