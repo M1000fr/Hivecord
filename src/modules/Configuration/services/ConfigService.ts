@@ -16,8 +16,16 @@ import { ChannelConfigService } from "./ChannelConfigService";
 import { ConfigCacheService } from "./ConfigCacheService";
 import { RoleConfigService } from "./RoleConfigService";
 
+import { type Constructor } from "@di/types";
+
 export type ConfigProxy<T> = {
-	[K in keyof T]: Promise<T[K]>;
+	[K in keyof T as K extends
+		| "prototype"
+		| "name"
+		| "length"
+		| "configProperties"
+		? never
+		: K]: Promise<T[K]>;
 };
 
 @Injectable()
@@ -36,9 +44,8 @@ export class ConfigService {
 		return (await this.of(guild, GeneralConfig).Language) || "fr";
 	}
 
-	of<T>(guild: Guild, configClass: T): ConfigProxy<T> {
-		const metadata = (configClass as unknown as IConfigClass)
-			.configProperties;
+	of<T extends Record<string, any>>(guild: Guild, configClass: T): ConfigProxy<T> {
+		const metadata = (configClass as unknown as IConfigClass).configProperties;
 
 		return new Proxy({} as ConfigProxy<T>, {
 			get: (_target, prop) => {

@@ -137,15 +137,4 @@ export class GeneralConfig {
 		type: "test_string",
 	})
 	static TestString = configKey("Test");
-
-	// Instance properties for ConfigProxy compatibility
-	Language!: string;
-	WelcomeMessageImage!: string;
-	WelcomeMessage!: string;
-	WelcomeChannelId!: string;
-	WelcomeEmbedName!: string;
-	WelcomeRoles!: string[];
-	WelcomeBackground!: string;
-	TestToggle!: boolean;
-	TestString!: string;
 }
