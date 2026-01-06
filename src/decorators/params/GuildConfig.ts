@@ -24,8 +24,8 @@ export function extractGuildFromContext(context: unknown): Guild | null {
 
 	// If context is an object with a guild property (Interaction, etc)
 	if (typeof context === "object") {
-		const obj = context as any;
-		if (isGuild(obj.guild)) return obj.guild;
+		const obj = context as Record<string, unknown>;
+		if (isGuild(obj.guild)) return obj.guild as Guild;
 	}
 
 	// Handle array context (event context)
@@ -34,18 +34,19 @@ export function extractGuildFromContext(context: unknown): Guild | null {
 		if (!first) return null;
 
 		// The first argument is a Guild
-		if (isGuild(first)) return first;
+		if (isGuild(first)) return first as Guild;
 
 		// Check common patterns
 		if (typeof first === "object" && first !== null) {
-			const obj = first as any;
+			const obj = first as Record<string, unknown>;
 
 			// Direct guild property (Member, Channel, Message, Interaction)
-			if (isGuild(obj.guild)) return obj.guild;
+			if (isGuild(obj.guild)) return obj.guild as Guild;
 
 			// member.guild pattern (some specific events)
-			if (obj.member && isGuild(obj.member.guild)) {
-				return obj.member.guild;
+			const member = obj.member as Record<string, unknown> | undefined;
+			if (member && isGuild(member.guild)) {
+				return member.guild as Guild;
 			}
 		}
 	}

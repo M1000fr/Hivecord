@@ -1,10 +1,4 @@
-import {
-	type ConfigKey,
-	type ConfigKeyMetadata,
-	EConfigType,
-	type IConfigClass,
-	toConfigKey,
-} from "@decorators/ConfigProperty";
+import { type IConfigClass, toConfigKey } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ChannelType } from "@prisma/client/enums";
@@ -15,8 +9,6 @@ import { Guild, type GuildBasedChannel, Role } from "discord.js";
 import { ChannelConfigService } from "./ChannelConfigService";
 import { ConfigCacheService } from "./ConfigCacheService";
 import { RoleConfigService } from "./RoleConfigService";
-
-import { type Constructor } from "@di/types";
 
 export type ConfigProxy<T> = {
 	[K in keyof T as K extends
@@ -44,7 +36,10 @@ export class ConfigService {
 		return (await this.of(guild, GeneralConfig).Language) || "fr";
 	}
 
-	of<T extends Record<string, any>>(guild: Guild, configClass: T): ConfigProxy<T> {
+	of<T extends Record<string, unknown>>(
+		guild: Guild,
+		configClass: T,
+	): ConfigProxy<T> {
 		const metadata = (configClass as unknown as IConfigClass).configProperties;
 
 		return new Proxy({} as ConfigProxy<T>, {
