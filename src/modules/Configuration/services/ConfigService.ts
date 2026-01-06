@@ -1,4 +1,9 @@
-import { type IConfigClass, toConfigKey } from "@decorators/ConfigProperty";
+import {
+	EConfigType,
+	type IConfigClass,
+	toConfigKey,
+	type ConfigKeyMetadata,
+} from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ChannelType } from "@prisma/client/enums";
