@@ -123,18 +123,4 @@ export class GeneralConfig {
 		type: EConfigType.Attachment,
 	})
 	static WelcomeBackground = configKey("");
-
-	@ConfigProperty({
-		displayName: "Test Toggle",
-		description: "A test toggle property",
-		type: "test_toggle",
-	})
-	static TestToggle = configKey(false);
-
-	@ConfigProperty({
-		displayName: "Test String",
-		description: "A test string property",
-		type: "test_string",
-	})
-	static TestString = configKey("Test");
 }
