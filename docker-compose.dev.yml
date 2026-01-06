@@ -19,23 +19,6 @@ services:
         volumes:
             - redis_data_dev:/data
 
-    influxdb:
-        image: influxdb:2.7-alpine
-        environment:
-            DOCKER_INFLUXDB_INIT_MODE: setup
-            DOCKER_INFLUXDB_INIT_USERNAME: admin
-            DOCKER_INFLUXDB_INIT_PASSWORD: adminpassword
-            DOCKER_INFLUXDB_INIT_ORG: lebot
-            DOCKER_INFLUXDB_INIT_BUCKET: stats
-            DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: lebottoken123456789
-        ports:
-            - "8086:8086"
-        volumes:
-            - influxdb_data_dev:/var/lib/influxdb2
-            - influxdb_config_dev:/etc/influxdb2
-
 volumes:
     mariadb_data_dev:
     redis_data_dev:
-    influxdb_data_dev:
-    influxdb_config_dev:

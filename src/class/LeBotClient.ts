@@ -4,7 +4,6 @@ import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import type { IModuleInstance } from "@interfaces/IModuleInstance.ts";
 import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
 import { CommandDeploymentService } from "@modules/Core/services/CommandDeploymentService";
-import { InfluxService } from "@modules/Core/services/InfluxService";
 import { ModuleLoader } from "@modules/Core/services/ModuleLoader";
 import { PrismaService } from "@modules/Core/services/PrismaService";
 import { RedisService } from "@modules/Core/services/RedisService";
@@ -84,8 +83,6 @@ export class LeBotClient<
 				const prismaService = this.container.resolve(PrismaService);
 				await prismaService.$disconnect();
 				this.logger.log("Prisma connection closed.");
-
-				await InfluxService.close();
 
 				process.exit(0);
 			} catch (error) {

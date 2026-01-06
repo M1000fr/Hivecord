@@ -9,7 +9,6 @@ import {
 import { CommandDeploymentService } from "./services/CommandDeploymentService";
 import { CommandService } from "./services/CommandService";
 import { I18nService } from "./services/I18nService";
-import { InfluxService } from "./services/InfluxService";
 import { ModuleLoader } from "./services/ModuleLoader";
 import { PagerService } from "./services/PagerService";
 import { PermissionService } from "./services/PermissionService";
@@ -21,7 +20,6 @@ import { RedisService } from "./services/RedisService";
 	providers: [
 		PrismaService,
 		RedisService,
-		InfluxService,
 		I18nService,
 		CommandService,
 		PermissionService,
@@ -37,7 +35,6 @@ import { RedisService } from "./services/RedisService";
 	exports: [
 		PrismaService,
 		RedisService,
-		InfluxService,
 		I18nService,
 		CommandService,
 		PermissionService,
