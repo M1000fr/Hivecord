@@ -1,6 +1,7 @@
 import { Injectable } from "@decorators/Injectable";
 import type { QueryApi, WriteApi } from "@influxdata/influxdb-client";
 import { InfluxDB, Point } from "@influxdata/influxdb-client";
+import { env } from "@utils/Env";
 import { Logger } from "@utils/Logger";
 import { AsyncLocalStorage } from "async_hooks";
 
@@ -18,10 +19,10 @@ export class InfluxService {
 	private static asyncLocalStorage = new AsyncLocalStorage<TraceContext>();
 	private static instrumentedObjects = new WeakSet<object>();
 
-	private static url = process.env.INFLUX_URL || "http://localhost:8086";
-	private static token = process.env.INFLUX_TOKEN || "";
-	private static org = process.env.INFLUX_ORG || "lebot";
-	private static bucket = process.env.INFLUX_BUCKET || "stats";
+	private static url = env.INFLUX_URL;
+	private static token = env.INFLUX_TOKEN;
+	private static org = env.INFLUX_ORG;
+	private static bucket = env.INFLUX_BUCKET;
 
 	public static getInstance(): InfluxDB {
 		if (!this.instance) {

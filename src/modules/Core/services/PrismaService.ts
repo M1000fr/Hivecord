@@ -1,6 +1,7 @@
 import { Injectable } from "@decorators/Injectable";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "@prisma/client/client";
+import { env } from "@utils/Env";
 import { Logger } from "@utils/Logger";
 
 @Injectable({ scope: "global" })
@@ -27,13 +28,7 @@ export class PrismaService extends PrismaClient {
 		port: number;
 		database: string;
 	} {
-		const databaseUrl = process.env.DATABASE_URL;
-		if (!databaseUrl) {
-			throw new Error(
-				"DATABASE_URL is not defined in environment variables.",
-			);
-		}
-		const url = new URL(databaseUrl);
+		const url = new URL(env.DATABASE_URL);
 		return {
 			username: url.username,
 			password: url.password,

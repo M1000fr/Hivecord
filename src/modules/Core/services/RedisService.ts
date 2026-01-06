@@ -1,4 +1,5 @@
 import { Injectable } from "@decorators/Injectable";
+import { env } from "@utils/Env";
 import { Logger } from "@utils/Logger";
 import Redis from "ioredis";
 
@@ -8,8 +9,7 @@ export class RedisService {
 	private readonly logger = new Logger("RedisService");
 
 	constructor() {
-		const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
-		this.client = new Redis(redisUrl);
+		this.client = new Redis(env.REDIS_URL);
 
 		this.client.on("error", (err) => {
 			this.logger.error("Redis Error:", err.stack, "RedisService");
