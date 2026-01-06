@@ -1,5 +1,2 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 bun check:errors
 bunx prettier --write . --log-level warn

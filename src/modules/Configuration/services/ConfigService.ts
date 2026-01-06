@@ -67,6 +67,12 @@ export class ConfigService {
 						return this.channelConfig
 							.get(guild, key)
 							.then((v) => v ?? defaultValue);
+					case EConfigType.ChannelArray:
+						return this.channelConfig
+							.getList(guild, key)
+							.then((v) =>
+								v && v.length > 0 ? v : (defaultValue ?? []),
+							);
 					case EConfigType.Role:
 						return this.roleConfig
 							.get(guild, key)

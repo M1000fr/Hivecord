@@ -59,6 +59,8 @@ export class ConfigFormatterService {
 		if (type === EConfigType.StringArray && Array.isArray(value))
 			return value.join(", ");
 		if (type === EConfigType.Channel) return `<#${value}>`;
+		if (type === EConfigType.ChannelArray && Array.isArray(value))
+			return value.map((v) => `<#${v}>`).join(", ");
 		if (type === EConfigType.Boolean)
 			return String(value) === "true" ? "`✅`" : "`❌`";
 		if (type === EConfigType.StringChoice && options?.choices && locale) {

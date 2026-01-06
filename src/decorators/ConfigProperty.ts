@@ -14,6 +14,7 @@ export enum EConfigType {
 	RoleArray = 101,
 	StringChoice = 102,
 	StringArray = 103,
+	ChannelArray = 104,
 }
 
 export interface ConfigChoice {

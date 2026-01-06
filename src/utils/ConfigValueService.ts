@@ -108,7 +108,7 @@ export class ConfigValueService {
 		const snakeKey = ConfigValueService.toSnakeCase(key);
 		if (type === EConfigType.Role || type === EConfigType.RoleArray)
 			return this.configService.clearRoleList(guild, snakeKey);
-		if (type === EConfigType.Channel)
+		if (type === EConfigType.Channel || type === EConfigType.ChannelArray)
 			return this.configService.clearChannelList(guild, snakeKey);
 		return this.configService.delete(guild, snakeKey);
 	}

@@ -21,7 +21,7 @@ export class CustomEmbedRepository extends BaseRepository {
 			create: {
 				name,
 				data: JSON.stringify(data),
-				Guild: this.buildGuildRelation({ guild }),
+				Guild: this.buildGuildRelation({ guild })!,
 			},
 		});
 	}

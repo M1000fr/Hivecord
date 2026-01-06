@@ -17,17 +17,16 @@ export class BaseRepository {
 		guild?: GuildRelation;
 		Guild?: GuildRelation;
 	}) {
-		const guildId = entity.guild?.id || entity.Guild?.id;
-		const guildName = entity.guild?.name || entity.Guild?.name;
+		const guild = entity.guild || entity.Guild;
 
-		if (!guildId) return undefined;
+		if (!guild?.id || !guild?.name) return undefined;
 
 		return {
 			connectOrCreate: {
-				where: { id: guildId },
+				where: { id: guild.id },
 				create: {
-					id: guildId,
-					name: guildName,
+					id: guild.id,
+					name: guild.name,
 				},
 			},
 		};
