@@ -19,28 +19,32 @@ Un bot Discord modulaire et performant écrit en TypeScript, optimisé pour l'ex
 ## Installation
 
 1. Installez les dépendances :
-   ```bash
-   bun install
-   ```
+
+    ```bash
+    bun install
+    ```
 
 2. Configurez votre environnement (`.env`) avec votre token Discord et les URLs de connexion (DB/Redis).
 
 3. Déployez la base de données :
-   ```bash
-   bunx prisma migrate deploy
-   ```
+    ```bash
+    bunx prisma migrate deploy
+    ```
 
 ## Lancement
 
 Pour le développement avec rechargement automatique :
+
 ```bash
 bun dev
 ```
 
 Pour la production :
+
 ```bash
 bun start
 ```
 
 ---
-*Ce projet utilise Bun pour une exécution ultra-rapide.*
+
+_Ce projet utilise Bun pour une exécution ultra-rapide._
