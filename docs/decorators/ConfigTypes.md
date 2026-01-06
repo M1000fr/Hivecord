@@ -7,7 +7,9 @@ LeBot allows extending the configuration system by defining new custom data type
 The `@ConfigType` decorator registers a class as a handler for a specific configuration type. This class is responsible for validation, transformation, and rendering the user interface for this type.
 
 ### Metadata
+
 The decorator takes a `ConfigTypeMetadata` object:
+
 - `id`: Unique identifier for the type (often a string or a number > 100).
 - `name`: Human-readable name of the type.
 
@@ -17,12 +19,12 @@ The decorator takes a `ConfigTypeMetadata` object:
 import { ConfigType } from "@decorators/ConfigType";
 
 @ConfigType({
-    id: "color_picker",
-    name: "Color Picker"
+	id: "color_picker",
+	name: "Color Picker",
 })
 export class ColorConfigHandler {
-    // The class must implement the type management logic
-    // (Button generation, modals, data validation)
+	// The class must implement the type management logic
+	// (Button generation, modals, data validation)
 }
 ```
 
@@ -33,11 +35,11 @@ Once the type is registered via `@ConfigType`, it can be used in any `@ModuleCon
 ```typescript
 @ModuleConfig()
 export class AppearanceConfig {
-    @ConfigProperty({
-        description: "Main color for embeds",
-        type: "color_picker" // Uses the ID defined in the decorator
-    })
-    embedColor = configKey<string>("#5865F2");
+	@ConfigProperty({
+		description: "Main color for embeds",
+		type: "color_picker", // Uses the ID defined in the decorator
+	})
+	embedColor = configKey<string>("#5865F2");
 }
 ```
 
@@ -48,4 +50,5 @@ export class AppearanceConfig {
 3. **Dynamic UI**: LeBot's configuration system uses these handlers to dynamically build interaction menus (SelectMenus, Modals) allowing administrators to modify settings.
 
 ---
+
 [Back to table of contents](./README.md)

@@ -5,6 +5,7 @@ LeBot uses parameter decorators to automatically inject specific objects into yo
 ## Interaction
 
 ### @CommandInteraction()
+
 Injects the full interaction object for Slash commands or context menu commands.
 
 ```typescript/LeBot/src/modules/General/commands/Example.ts#L1-5
@@ -14,6 +15,7 @@ async execute(@CommandInteraction() interaction: ChatInputCommandInteraction) {
 ```
 
 ### @AutocompleteInteraction()
+
 Injects the `AutocompleteInteraction` object for methods handling autocompletion.
 
 ```typescript/LeBot/src/modules/General/commands/Example.ts#L7-10
@@ -27,9 +29,11 @@ async handleAutocomplete(@AutocompleteInteraction() interaction: AutocompleteInt
 Used exclusively with `@UserCommand` and `@MessageCommand`.
 
 ### @TargetUser()
+
 Retrieves the user (`User`) on whom the action was performed via the context menu.
 
 ### @TargetMessage()
+
 Retrieves the message (`Message`) on which the action was performed via the context menu.
 
 ```typescript/LeBot/src/modules/General/commands/CopyMessage.ts#L1-10
@@ -47,6 +51,7 @@ export default class CopyCommand {
 ## System
 
 ### @Client()
+
 Injects the global `LeBotClient` instance. Useful for accessing global properties, cache, or client utility methods.
 
 ```typescript/LeBot/src/modules/General/services/MyService.ts#L1-5
@@ -62,4 +67,5 @@ async doSomething(@Client() client: LeBotClient) {
 3. **Automation**: These decorators only work within classes registered as `providers` in a `@Module`.
 
 ---
+
 [Back to table of contents](./README.md)

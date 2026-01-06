@@ -52,7 +52,8 @@
 		"lint": "eslint .",
 		"check:errors": "bun run typecheck && bun run lint",
 		"i18n:info": "bun scripts/findMissingKeys.ts",
-		"prepare": "husky"
+		"prepare": "husky",
+		"format": "prettier --write ."
 	},
 	"lint-staged": {
 		"**/*.{ts,js,json,md}": [

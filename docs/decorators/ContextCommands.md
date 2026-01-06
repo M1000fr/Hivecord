@@ -7,10 +7,12 @@ Context commands are interactions that appear in the Discord context menu (right
 This decorator defines a command that executes on a **user**.
 
 ### Configuration
+
 - `name`: The name that will appear in the "Apps" menu of the user.
 - `defaultMemberPermissions`: (Optional) Permissions required to use the command.
 
 ### Example
+
 ```typescript
 import { UserCommand } from "@decorators/commands/UserCommand";
 import { CommandInteraction } from "@decorators/Interaction";
@@ -18,16 +20,19 @@ import { TargetUser } from "@decorators/params/TargetUser";
 import { UserContextMenuCommandInteraction, User } from "discord.js";
 
 @UserCommand({
-    name: "Get Avatar"
+	name: "Get Avatar",
 })
 export default class GetAvatarCommand {
-    async execute(
-        @CommandInteraction() interaction: UserContextMenuCommandInteraction,
-        @TargetUser() user: User
-    ) {
-        const avatarUrl = user.displayAvatarURL({ size: 1024 });
-        await interaction.reply({ content: `Avatar of ${user.username}: ${avatarUrl}`, ephemeral: true });
-    }
+	async execute(
+		@CommandInteraction() interaction: UserContextMenuCommandInteraction,
+		@TargetUser() user: User,
+	) {
+		const avatarUrl = user.displayAvatarURL({ size: 1024 });
+		await interaction.reply({
+			content: `Avatar of ${user.username}: ${avatarUrl}`,
+			ephemeral: true,
+		});
+	}
 }
 ```
 
@@ -36,6 +41,7 @@ export default class GetAvatarCommand {
 This decorator defines a command that executes on a **message**.
 
 ### Example
+
 ```typescript
 import { MessageCommand } from "@decorators/commands/MessageCommand";
 import { CommandInteraction } from "@decorators/Interaction";
@@ -43,15 +49,18 @@ import { TargetMessage } from "@decorators/params/TargetMessage";
 import { MessageContextMenuCommandInteraction, Message } from "discord.js";
 
 @MessageCommand({
-    name: "Copy Content"
+	name: "Copy Content",
 })
 export default class CopyMessageCommand {
-    async execute(
-        @CommandInteraction() interaction: MessageContextMenuCommandInteraction,
-        @TargetMessage() message: Message
-    ) {
-        await interaction.reply({ content: `Content copied: \`\`\`${message.content}\`\`\``, ephemeral: true });
-    }
+	async execute(
+		@CommandInteraction() interaction: MessageContextMenuCommandInteraction,
+		@TargetMessage() message: Message,
+	) {
+		await interaction.reply({
+			content: `Content copied: \`\`\`${message.content}\`\`\``,
+			ephemeral: true,
+		});
+	}
 }
 ```
 
@@ -62,4 +71,5 @@ export default class CopyMessageCommand {
 3. **Registration**: As with Slash commands, these classes must be declared in the `providers` of a `@Module`.
 
 ---
+
 [Back to table of contents](./README.md)

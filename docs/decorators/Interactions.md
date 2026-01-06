@@ -6,11 +6,11 @@ LeBot provides an automatic routing system for Discord component interactions (b
 
 Each decorator takes a `customId` as an argument. This `customId` can be an exact string or a pattern using wildcards (`*`).
 
-| Decorator | Component Type |
-| :--- | :--- |
-| `@Button(customId)` | Button (`ButtonBuilder`) |
+| Decorator               | Component Type                                |
+| :---------------------- | :-------------------------------------------- |
+| `@Button(customId)`     | Button (`ButtonBuilder`)                      |
 | `@SelectMenu(customId)` | Select Menu (`StringSelectMenuBuilder`, etc.) |
-| `@Modal(customId)` | Modal window (`ModalBuilder`) |
+| `@Modal(customId)`      | Modal window (`ModalBuilder`)                 |
 
 ## Basic Usage
 
@@ -68,4 +68,5 @@ export class ExampleModal {
 ```
 
 ---
+
 [Back to table of contents](./README.md)

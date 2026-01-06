@@ -7,6 +7,7 @@ Interceptors are a powerful concept inspired by Aspect-Oriented Programming (AOP
 The `@UseInterceptors` decorator allows binding one or more interceptors to a class or a specific method.
 
 ### Scope
+
 - **On a class**: The interceptor will apply to all entry points (decorated methods) of the class.
 - **On a method**: The interceptor will only apply to that specific method.
 
@@ -31,6 +32,7 @@ An interceptor is a class decorated with `@Injectable` (or simply managed by the
 ### The IInterceptor Interface
 
 It requires the implementation of the `intercept(context, next)` method:
+
 - `context`: Contains information about the current execution (interaction, client, arguments).
 - `next`: An asynchronous function that allows continuing the execution flow to the next interceptor or the final method.
 
@@ -56,6 +58,7 @@ export class LoggingInterceptor implements IInterceptor {
 ## The IExecutionContext Object
 
 The context object passed to the interceptor provides methods to inspect the current call:
+
 - `getHandler()`: Returns a reference to the method that is about to be executed.
 - `getClass()`: Returns the constructor of the target class.
 - `getArguments()`: Returns the list of arguments that will be passed to the method.
@@ -64,6 +67,7 @@ The context object passed to the interceptor provides methods to inspect the cur
 ## Execution Flow
 
 Interceptors work like an onion (similar to Koa or Express middleware):
+
 1. Interceptor A (pre-processing)
 2. Interceptor B (pre-processing)
 3. Target Method (execution)
@@ -73,4 +77,5 @@ Interceptors work like an onion (similar to Koa or Express middleware):
 If an interceptor does not call `await next()`, command execution is interrupted. This is how permission checks are implemented.
 
 ---
+
 [Back to table of contents](./README.md)

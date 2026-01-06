@@ -11,20 +11,25 @@ This decorator can be applied either to a **class** (to protect all methods insi
 This is the most common use to protect the entry point of a Slash command.
 
 ```typescript
-import { SlashCommandController, SlashCommand } from "@decorators/commands/SlashCommand";
+import {
+	SlashCommandController,
+	SlashCommand,
+} from "@decorators/commands/SlashCommand";
 import { CommandPermission } from "@decorators/commands/CommandPermission";
 import { EPermission } from "@enums/EPermission";
 
 @SlashCommandController({
-    name: "admin",
-    description: "Administration commands"
+	name: "admin",
+	description: "Administration commands",
 })
 export default class AdminCommand {
-    @CommandPermission(EPermission.Admin) // Requires 'Admin' permission
-    @SlashCommand()
-    async execute(@CommandInteraction() interaction: ChatInputCommandInteraction) {
-        await interaction.reply("Access granted to administration.");
-    }
+	@CommandPermission(EPermission.Admin) // Requires 'Admin' permission
+	@SlashCommand()
+	async execute(
+		@CommandInteraction() interaction: ChatInputCommandInteraction,
+	) {
+		await interaction.reply("Access granted to administration.");
+	}
 }
 ```
 
@@ -36,7 +41,7 @@ If you apply the decorator to the class, all commands and subcommands within tha
 @CommandPermission(EPermission.Moderator)
 @SlashCommandController({ name: "mod", description: "Moderation tools" })
 export default class ModCommand {
-    // All methods here require Moderator permission
+	// All methods here require Moderator permission
 }
 ```
 
@@ -52,4 +57,5 @@ export default class ModCommand {
 - **Hierarchy**: The permission system is independent of Discord's native permissions (ManageMessages, etc.), allowing for much more flexible management through the bot's Configuration module.
 
 ---
+
 [Back to table of contents](./README.md)

@@ -24,12 +24,13 @@ export class ReadyEvent {
 The `@On` decorator is placed on a method to specify which Discord event it should listen for.
 
 ### Configuration
+
 It can take either the event name as a `string` or an `EventOptions` configuration object.
 
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `name` | `string` | The name of the Discord event (e.g., `messageCreate`, `guildMemberAdd`). |
-| `once` | `boolean` | If `true`, the listener will only execute once. |
+| Property | Type      | Description                                                              |
+| :------- | :-------- | :----------------------------------------------------------------------- |
+| `name`   | `string`  | The name of the Discord event (e.g., `messageCreate`, `guildMemberAdd`). |
+| `once`   | `boolean` | If `true`, the listener will only execute once.                          |
 
 ### Example with options
 
@@ -54,4 +55,5 @@ export class MemberJoinEvent {
 3. **Registration**: Don't forget to add the controller class to the `providers` array of your `@Module`.
 
 ---
+
 [Back to table of contents](./README.md)

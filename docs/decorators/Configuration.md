@@ -10,21 +10,25 @@ The `@ModuleConfig` decorator marks a class as a configuration schema for a modu
 
 ```typescript
 import { ModuleConfig } from "@decorators/ModuleConfig";
-import { ConfigProperty, EConfigType, configKey } from "@decorators/ConfigProperty";
+import {
+	ConfigProperty,
+	EConfigType,
+	configKey,
+} from "@decorators/ConfigProperty";
 
 @ModuleConfig()
 export class GeneralConfig {
-    @ConfigProperty({
-        description: "The channel where welcome messages are sent",
-        type: EConfigType.Channel
-    })
-    welcomeChannelId = configKey<string | null>(null);
+	@ConfigProperty({
+		description: "The channel where welcome messages are sent",
+		type: EConfigType.Channel,
+	})
+	welcomeChannelId = configKey<string | null>(null);
 
-    @ConfigProperty({
-        description: "The welcome message",
-        type: EConfigType.String
-    })
-    welcomeMessage = configKey<string>("Welcome to the server {user}!");
+	@ConfigProperty({
+		description: "The welcome message",
+		type: EConfigType.String,
+	})
+	welcomeMessage = configKey<string>("Welcome to the server {user}!");
 }
 ```
 
@@ -34,17 +38,18 @@ This decorator defines an individual property within a configuration class.
 
 ### Decorator Options
 
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `description` | `string` | Description of the option (used in config commands). |
-| `type` | `EConfigType` | The data type (String, Integer, Boolean, Role, Channel, etc.). |
-| `displayName` | `string` | (Optional) Human-readable name of the option. |
-| `choices` | `Array` | (Optional) List of fixed choices for `StringChoice` types. |
-| `required` | `boolean` | (Optional) Whether the option is mandatory. |
+| Property      | Type          | Description                                                    |
+| :------------ | :------------ | :------------------------------------------------------------- |
+| `description` | `string`      | Description of the option (used in config commands).           |
+| `type`        | `EConfigType` | The data type (String, Integer, Boolean, Role, Channel, etc.). |
+| `displayName` | `string`      | (Optional) Human-readable name of the option.                  |
+| `choices`     | `Array`       | (Optional) List of fixed choices for `StringChoice` types.     |
+| `required`    | `boolean`     | (Optional) Whether the option is mandatory.                    |
 
 ### EConfigType
 
 The system supports standard Discord types as well as custom types:
+
 - `String`, `Integer`, `Boolean`, `User`, `Channel`, `Role`, `Number`.
 - `RoleArray`, `ChannelArray`, `StringArray`: For storing lists of items.
 - `StringChoice`: To limit values to a predefined list.
@@ -59,12 +64,15 @@ import { ConfigContextVariable } from "@enums/ConfigContextVariable";
 
 @ModuleConfig()
 export class WelcomeConfig {
-    @ConfigProperty({
-        description: "Welcome message",
-        type: EConfigType.String
-    })
-    @ConfigContext([ConfigContextVariable.User, ConfigContextVariable.GuildName])
-    welcomeMessage = configKey<string>("Welcome {user} to {guild}!");
+	@ConfigProperty({
+		description: "Welcome message",
+		type: EConfigType.String,
+	})
+	@ConfigContext([
+		ConfigContextVariable.User,
+		ConfigContextVariable.GuildName,
+	])
+	welcomeMessage = configKey<string>("Welcome {user} to {guild}!");
 }
 ```
 
@@ -97,6 +105,7 @@ This decorator allows reacting in real-time to configuration changes. When an op
 ### Usage and Injection
 
 The method can inject several parameters via dedicated parameter decorators:
+
 - `@Client()`: The bot instance.
 
 ```typescript
@@ -104,15 +113,14 @@ import { OnConfigUpdate } from "@decorators/OnConfigUpdate";
 import { Client } from "@decorators/params";
 
 export class WelcomeService {
-    @OnConfigUpdate("general.welcomeChannelId")
-    async onWelcomeChannelChange(
-        @Client() client: LeBotClient
-    ) {
-        console.log(`The welcome channel configuration has changed.`);
-        // Refresh logic, logs, etc.
-    }
+	@OnConfigUpdate("general.welcomeChannelId")
+	async onWelcomeChannelChange(@Client() client: LeBotClient) {
+		console.log(`The welcome channel configuration has changed.`);
+		// Refresh logic, logs, etc.
+	}
 }
 ```
 
 ---
+
 [Back to table of contents](./README.md)

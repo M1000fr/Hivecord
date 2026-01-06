@@ -48,4 +48,5 @@ export class MyCommand {
 3. **Recursion**: The system automatically handles dependency chains (if Service A requires Service B, both will be instantiated in the correct order).
 
 ---
+
 [Back to table of contents](./README.md)

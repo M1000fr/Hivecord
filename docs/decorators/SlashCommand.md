@@ -7,7 +7,9 @@ LeBot simplifies the creation of Discord slash commands using class and method d
 This decorator is placed on a class to define it as a command container.
 
 ### Configuration
+
 It accepts an object of type `CommandOptions`:
+
 - `name`: Command name (lowercase, no spaces).
 - `description`: Description displayed in the Discord interface.
 - `contexts`: (Optional) Defines whether the command is available in DMs, Guilds, etc.
@@ -64,8 +66,10 @@ export default class ConfigCommand {
 ## Parameter Injection
 
 Command methods support automatic parameter injection to facilitate access to Discord objects:
+
 - `@CommandInteraction()`: The `ChatInputCommandInteraction` interaction.
 - `@Client()`: The `LeBotClient` instance.
 
 ---
+
 [Back to table of contents](./README.md)
