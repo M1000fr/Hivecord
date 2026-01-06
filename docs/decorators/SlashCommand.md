@@ -63,11 +63,36 @@ export default class ConfigCommand {
 }
 ```
 
+## @OptionRoute
+
+The `@OptionRoute` decorator allows you to route an interaction to different methods based on the value of a specific option. This is particularly useful for commands that use a "type" or "action" option to determine their behavior without using full subcommands.
+
+```typescript
+@SlashCommandController({
+    name: "manage",
+    description: "Manage items"
+})
+export default class ManageCommand {
+    @SlashCommand()
+    @OptionRoute({ option: "action", value: "add" })
+    async add(@CommandInteraction() interaction: ChatInputCommandInteraction) {
+        // Executed if the "action" option is "add"
+    }
+
+    @SlashCommand()
+    @OptionRoute({ option: "action", value: "remove" })
+    async remove(@CommandInteraction() interaction: ChatInputCommandInteraction) {
+        // Executed if the "action" option is "remove"
+    }
+}
+```
+
 ## Parameter Injection
 
 Command methods support automatic parameter injection to facilitate access to Discord objects:
 
 - `@CommandInteraction()`: The `ChatInputCommandInteraction` interaction.
+- `@Context()`: The `IExecutionContext` (i18n, guild config).
 - `@Client()`: The `LeBotClient` instance.
 
 ---

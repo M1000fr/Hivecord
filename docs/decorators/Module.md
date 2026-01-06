@@ -34,6 +34,26 @@ import { DatabaseModule } from "@modules/Database/DatabaseModule";
 export class ExampleModule {}
 ```
 
+## @Global
+
+The `@Global` decorator marks a module as global. When a module is global, its exported providers are available in all other modules without the need to import the global module in their `imports` array.
+
+### Usage Example
+
+```typescript/LeBot/src/modules/Shared/SharedModule.ts#L1-10
+import { Module } from "@decorators/Module";
+import { Global } from "@decorators/Global";
+import { SharedService } from "./services/SharedService";
+
+@Global()
+@Module({
+    name: "Shared",
+    providers: [SharedService],
+    exports: [SharedService]
+})
+export class SharedModule {}
+```
+
 ## How it Works
 
 When the bot starts via the `Bootstrap`, each module is analyzed:

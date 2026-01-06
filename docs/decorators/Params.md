@@ -24,6 +24,16 @@ async handleAutocomplete(@AutocompleteInteraction() interaction: AutocompleteInt
 }
 ```
 
+### @Context()
+
+Injects the execution context (`IExecutionContext`), which contains utility methods for internationalization (`i18n`) and access to the guild's configuration.
+
+```typescript/LeBot/src/modules/General/commands/Example.ts#L12-15
+async execute(@Context() context: IExecutionContext) {
+    const text = context.i18n("WELCOME");
+}
+```
+
 ## Target
 
 Used exclusively with `@UserCommand` and `@MessageCommand`.

@@ -7,6 +7,7 @@ LeBot uses a decorator-based architecture to simplify component declaration, dep
 ### Structure and Injection
 
 - [**@Module**](./Module.md): Defines a module, its providers, imports, and configuration.
+- [**@Global**](./Module.md#global): Marks a module as global for application-wide availability.
 - [**@Injectable**](./Injectable.md): Marks a class as injectable by the DI (Dependency Injection) system.
 - [**@Inject**](./Injectable.md#inject): Allows manual injection of a dependency into a constructor.
 
@@ -14,6 +15,7 @@ LeBot uses a decorator-based architecture to simplify component declaration, dep
 
 - [**@SlashCommandController**](./SlashCommand.md): Defines a class as a Slash command controller.
 - [**@SlashCommand / @Subcommand**](./SlashCommand.md): Marks a method as an entry point for a command or sub-command.
+- [**@OptionRoute**](./SlashCommand.md#optionroute): Routes an interaction based on an option's value.
 - [**@UserCommand / @MessageCommand**](./ContextCommands.md): Creates context menu commands (right-click on user or message).
 - [**@CommandPermission**](./Permissions.md): Restricts access to a command via the bot's permission system.
 
@@ -26,6 +28,7 @@ LeBot uses a decorator-based architecture to simplify component declaration, dep
 ### Method Parameters (Injection)
 
 - [**@CommandInteraction / @AutocompleteInteraction**](./Params.md#interaction): Injects the corresponding Discord interaction.
+- [**@Context**](./Params.md#context): Injects the execution context (i18n, guild config).
 - [**@Client**](./Params.md#client): Injects the `LeBotClient` instance.
 - [**@TargetUser / @TargetMessage**](./Params.md#cible): Retrieves the target of a context command.
 
