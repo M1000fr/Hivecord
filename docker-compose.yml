@@ -1,4 +1,4 @@
-name: LeBot Production
+name: lebot
 services:
     mariadb:
         image: mariadb:latest

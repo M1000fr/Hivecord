@@ -1,4 +1,4 @@
-name: LeBot Development Environment
+name: lebot-dev
 services:
     mariadb:
         image: mariadb:latest
