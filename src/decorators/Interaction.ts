@@ -8,6 +8,8 @@ import { DependencyContainer } from "@di/DependencyContainer";
 import type { Constructor } from "@di/types";
 import { InteractionRegistry } from "@registers/InteractionRegistry";
 
+type InteractionHandler = (interaction: unknown) => Promise<void>;
+
 function createHandler(target: object, propertyKey: string) {
 	return async (interaction: unknown) => {
 		const container = DependencyContainer.getInstance();
@@ -43,68 +45,46 @@ function createHandler(target: object, propertyKey: string) {
 	};
 }
 
-export function Button(customId: string) {
-	return function (
-		target: object,
-		propertyKey: string,
-		_descriptor: PropertyDescriptor,
-	) {
-		const isPattern = customId.includes("*");
-		if (isPattern) {
-			InteractionRegistry.registerButtonPattern(
-				customId,
-				createHandler(target, propertyKey),
-			);
-		} else {
-			InteractionRegistry.registerButton(
-				customId,
-				createHandler(target, propertyKey),
-			);
-		}
+/**
+ * Factory function to create interaction decorators with minimal duplication
+ */
+function createInteractionDecorator(
+	registryMethods: {
+		exact: (customId: string, handler: InteractionHandler) => void;
+		pattern: (customId: string, handler: InteractionHandler) => void;
+	},
+) {
+	return function (customId: string) {
+		return function (
+			target: object,
+			propertyKey: string,
+			_descriptor: PropertyDescriptor,
+		) {
+			const isPattern = customId.includes("*");
+			const handler = createHandler(target, propertyKey);
+			if (isPattern) {
+				registryMethods.pattern(customId, handler);
+			} else {
+				registryMethods.exact(customId, handler);
+			}
+		};
 	};
 }
 
-export function SelectMenu(customId: string) {
-	return function (
-		target: object,
-		propertyKey: string,
-		_descriptor: PropertyDescriptor,
-	) {
-		const isPattern = customId.includes("*");
-		if (isPattern) {
-			InteractionRegistry.registerSelectMenuPattern(
-				customId,
-				createHandler(target, propertyKey),
-			);
-		} else {
-			InteractionRegistry.registerSelectMenu(
-				customId,
-				createHandler(target, propertyKey),
-			);
-		}
-	};
-}
+export const Button = createInteractionDecorator({
+	exact: (customId, handler) => InteractionRegistry.registerButton(customId, handler),
+	pattern: (customId, handler) => InteractionRegistry.registerButtonPattern(customId, handler),
+});
 
-export function Modal(customId: string) {
-	return function (
-		target: object,
-		propertyKey: string,
-		_descriptor: PropertyDescriptor,
-	) {
-		const isPattern = customId.includes("*");
-		if (isPattern) {
-			InteractionRegistry.registerModalPattern(
-				customId,
-				createHandler(target, propertyKey),
-			);
-		} else {
-			InteractionRegistry.registerModal(
-				customId,
-				createHandler(target, propertyKey),
-			);
-		}
-	};
-}
+export const SelectMenu = createInteractionDecorator({
+	exact: (customId, handler) => InteractionRegistry.registerSelectMenu(customId, handler),
+	pattern: (customId, handler) => InteractionRegistry.registerSelectMenuPattern(customId, handler),
+});
+
+export const Modal = createInteractionDecorator({
+	exact: (customId, handler) => InteractionRegistry.registerModal(customId, handler),
+	pattern: (customId, handler) => InteractionRegistry.registerModalPattern(customId, handler),
+});
 
 export function CommandInteraction(): ParameterDecorator {
 	return (

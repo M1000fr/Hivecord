@@ -14,7 +14,7 @@ import {
 	IntentsBitField,
 } from "discord.js";
 
-@Injectable()
+@Injectable({ scope: "global" })
 export class LeBotClient<
 	Ready extends boolean = boolean,
 > extends Client<Ready> {

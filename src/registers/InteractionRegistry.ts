@@ -2,6 +2,10 @@ import { Collection, type Interaction } from "discord.js";
 
 type InteractionHandler = (interaction: Interaction) => Promise<void>;
 
+/**
+ * Centralized registry for interaction handlers (buttons, select menus, modals).
+ * Supports both exact match and pattern matching with wildcard support.
+ */
 export class InteractionRegistry {
 	static buttons = new Collection<string, InteractionHandler>();
 	static selectMenus = new Collection<string, InteractionHandler>();
@@ -37,46 +41,40 @@ export class InteractionRegistry {
 		this.modalPatterns.set(pattern, handler);
 	}
 
-	static getButtonHandler(customId: string): InteractionHandler | null {
+	/**
+	 * Generic handler lookup with exact and pattern matching
+	 * @param exact Collection with exact match handlers
+	 * @param pattern Collection with pattern-based handlers
+	 * @param customId The custom ID to match
+	 */
+	private static getHandler(
+		exact: Collection<string, InteractionHandler>,
+		pattern: Collection<string, InteractionHandler>,
+		customId: string,
+	): InteractionHandler | null {
 		// Try exact match first
-		const exactHandler = this.buttons.get(customId);
+		const exactHandler = exact.get(customId);
 		if (exactHandler) return exactHandler;
 
 		// Try pattern matching
-		for (const [pattern, handler] of this.buttonPatterns) {
-			if (this.matchesPattern(customId, pattern)) {
+		for (const [patternStr, handler] of pattern) {
+			if (this.matchesPattern(customId, patternStr)) {
 				return handler;
 			}
 		}
 		return null;
+	}
+
+	static getButtonHandler(customId: string): InteractionHandler | null {
+		return this.getHandler(this.buttons, this.buttonPatterns, customId);
 	}
 
 	static getSelectMenuHandler(customId: string): InteractionHandler | null {
-		// Try exact match first
-		const exactHandler = this.selectMenus.get(customId);
-		if (exactHandler) return exactHandler;
-
-		// Try pattern matching
-		for (const [pattern, handler] of this.selectMenuPatterns) {
-			if (this.matchesPattern(customId, pattern)) {
-				return handler;
-			}
-		}
-		return null;
+		return this.getHandler(this.selectMenus, this.selectMenuPatterns, customId);
 	}
 
 	static getModalHandler(customId: string): InteractionHandler | null {
-		// Try exact match first
-		const exactHandler = this.modals.get(customId);
-		if (exactHandler) return exactHandler;
-
-		// Try pattern matching
-		for (const [pattern, handler] of this.modalPatterns) {
-			if (this.matchesPattern(customId, pattern)) {
-				return handler;
-			}
-		}
-		return null;
+		return this.getHandler(this.modals, this.modalPatterns, customId);
 	}
 
 	private static matchesPattern(customId: string, pattern: string): boolean {

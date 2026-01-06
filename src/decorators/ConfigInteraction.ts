@@ -1,13 +1,14 @@
 import { Injectable } from "@decorators/Injectable";
 import type { Constructor } from "@di/types";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import { ConfigValueService } from "@utils/ConfigValueService";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
 import "reflect-metadata";
 
 /**
  * Decorator for configuration interaction classes that extend BaseConfigInteractions.
- * Automatically injects ConfigHelper and ConfigService, eliminating the need for
- * explicit constructors.
+ * Automatically injects required services for configuration management.
  */
 export function ConfigInteraction(): ClassDecorator {
 	return ((target: Constructor) => {
@@ -17,7 +18,12 @@ export function ConfigInteraction(): ClassDecorator {
 		// Define explicit parameter types for dependency injection
 		Reflect.defineMetadata(
 			"design:paramtypes",
-			[ConfigHelper, ConfigService],
+			[
+				ConfigValueService,
+				ConfigUIBuilderService,
+				ConfigValueResolverService,
+				ConfigService,
+			],
 			target,
 		);
 
