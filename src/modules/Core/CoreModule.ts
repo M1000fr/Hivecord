@@ -1,7 +1,6 @@
 import { Module } from "@decorators/Module";
 import {
 	ChannelRepository,
-	CustomEmbedRepository,
 	GuildRepository,
 	RoleRepository,
 	UserRepository,
@@ -28,7 +27,6 @@ import { RedisService } from "./services/RedisService";
 		UserRepository,
 		RoleRepository,
 		ChannelRepository,
-		CustomEmbedRepository,
 		CommandDeploymentService,
 		ModuleLoader,
 	],
@@ -43,7 +41,6 @@ import { RedisService } from "./services/RedisService";
 		UserRepository,
 		RoleRepository,
 		ChannelRepository,
-		CustomEmbedRepository,
 		CommandDeploymentService,
 		ModuleLoader,
 	],

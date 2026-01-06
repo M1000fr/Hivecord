@@ -2,7 +2,7 @@ export * from "./BaseRepository";
 export * from "./BotStateRepository";
 export * from "./ChannelRepository";
 export * from "./ConfigurationRepository";
-export * from "./CustomEmbedRepository";
+
 export * from "./GuildRepository";
 export * from "./MemberRepository";
 export * from "./PermissionRepository";
