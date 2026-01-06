@@ -23,7 +23,7 @@ export class ChannelRepository extends SoftDeletableRepository<GuildBasedChannel
 		return this.softUpsert(
 			channel,
 			{ deletedAt: new Date() },
-			{ type: ChannelType.TEXT, guildId: channel.guild.id },
+			{ type: ChannelType.TEXT },
 			new Date(),
 		);
 	}

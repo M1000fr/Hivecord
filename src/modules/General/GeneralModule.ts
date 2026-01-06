@@ -55,12 +55,6 @@ import { CoreModule } from "@modules/Core/CoreModule";
 		WelcomeRoleSyncService,
 		PingCommandInteractions,
 	],
-	exports: [
-		SpacerService,
-		SyncService,
-		WelcomeImageService,
-		WelcomeRoleService,
-		WelcomeRoleSyncService,
-	],
+	exports: [],
 })
 export class GeneralModule {}
