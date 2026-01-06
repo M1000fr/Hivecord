@@ -16,7 +16,7 @@ The decorator accepts a configuration object with the following properties:
 
 ## Usage Example
 
-```typescript/LeBot/src/modules/Example/ExampleModule.ts#L1-16
+```typescript
 import { Module } from "@decorators/Module";
 import { ExampleService } from "./services/ExampleService";
 import { ExampleCommand } from "./commands/ExampleCommand";
@@ -40,7 +40,7 @@ The `@Global` decorator marks a module as global. When a module is global, its e
 
 ### Usage Example
 
-```typescript/LeBot/src/modules/Shared/SharedModule.ts#L1-10
+```typescript
 import { Module } from "@decorators/Module";
 import { Global } from "@decorators/Global";
 import { SharedService } from "./services/SharedService";

@@ -8,7 +8,7 @@ LeBot uses parameter decorators to automatically inject specific objects into yo
 
 Injects the full interaction object for Slash commands or context menu commands.
 
-```typescript/LeBot/src/modules/General/commands/Example.ts#L1-5
+```typescript
 async execute(@CommandInteraction() interaction: ChatInputCommandInteraction) {
     await interaction.reply("Hello!");
 }
@@ -18,7 +18,7 @@ async execute(@CommandInteraction() interaction: ChatInputCommandInteraction) {
 
 Injects the `AutocompleteInteraction` object for methods handling autocompletion.
 
-```typescript/LeBot/src/modules/General/commands/Example.ts#L7-10
+```typescript
 async handleAutocomplete(@AutocompleteInteraction() interaction: AutocompleteInteraction) {
     // ...
 }
@@ -28,7 +28,7 @@ async handleAutocomplete(@AutocompleteInteraction() interaction: AutocompleteInt
 
 Injects the execution context (`IExecutionContext`), which contains utility methods for internationalization (`i18n`) and access to the guild's configuration.
 
-```typescript/LeBot/src/modules/General/commands/Example.ts#L12-15
+```typescript
 async execute(@Context() context: IExecutionContext) {
     const text = context.i18n("WELCOME");
 }
@@ -46,7 +46,7 @@ Retrieves the user (`User`) on whom the action was performed via the context men
 
 Retrieves the message (`Message`) on which the action was performed via the context menu.
 
-```typescript/LeBot/src/modules/General/commands/CopyMessage.ts#L1-10
+```typescript
 @MessageCommand({ name: "Copy" })
 export default class CopyCommand {
     async execute(
@@ -64,7 +64,7 @@ export default class CopyCommand {
 
 Injects the global `LeBotClient` instance. Useful for accessing global properties, cache, or client utility methods.
 
-```typescript/LeBot/src/modules/General/services/MyService.ts#L1-5
+```typescript
 async doSomething(@Client() client: LeBotClient) {
     console.log(`The bot is logged in as ${client.user?.tag}`);
 }

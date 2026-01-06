@@ -6,7 +6,7 @@ LeBot uses a decoration system to listen for Discord API events. This allows gro
 
 This decorator marks a class as an event controller. Classes decorated with `@EventController` are automatically registered as singletons, and their methods decorated with `@On` are attached to the Discord client.
 
-```typescript/LeBot/src/modules/General/events/ReadyEvent.ts#L1-10
+```typescript
 import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
 
@@ -34,7 +34,7 @@ It can take either the event name as a `string` or an `EventOptions` configurati
 
 ### Example with options
 
-```typescript/LeBot/src/modules/General/events/MemberJoinEvent.ts#L1-12
+```typescript
 import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
 import { GuildMember } from "discord.js";

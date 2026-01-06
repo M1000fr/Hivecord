@@ -16,7 +16,7 @@ Each decorator takes a `customId` as an argument. This `customId` can be an exac
 
 Decorated methods automatically receive the corresponding interaction. For these methods to be registered, the class must be included in a module's `providers`.
 
-```typescript/LeBot/src/modules/General/interactions/PingInteractions.ts#L1-15
+```typescript
 import { Button } from "@decorators/Interaction";
 import { ButtonInteraction } from "discord.js";
 
@@ -32,7 +32,7 @@ export class PingInteractions {
 
 It is common to use dynamic `customId`s (for example: `user_kick:123456789`). You can use the asterisk `*` to capture these interactions.
 
-```typescript/LeBot/src/modules/General/interactions/UserInteractions.ts#L1-12
+```typescript
 import { Button } from "@decorators/Interaction";
 import { ButtonInteraction } from "discord.js";
 
@@ -50,7 +50,7 @@ export class UserInteractions {
 
 As with Slash commands, you can use parameter decorators to inject the client instance or other utilities:
 
-```typescript/LeBot/src/modules/General/interactions/ExampleModal.ts#L1-15
+```typescript
 import { Modal } from "@decorators/Interaction";
 import { Client } from "@decorators/params/index.ts";
 import { ModalSubmitInteraction } from "discord.js";

@@ -8,7 +8,7 @@ The `@Injectable` decorator marks a class as manageable by the service container
 
 ### Example
 
-```typescript/LeBot/src/modules/General/services/DataService.ts#L1-10
+```typescript
 import { Injectable } from "@src/decorators/Injectable";
 
 @Injectable()
@@ -25,7 +25,7 @@ The `@Inject` decorator is used in a class constructor to request the injection 
 
 ### Example
 
-```typescript/LeBot/src/modules/General/commands/MyCommand.ts#L1-15
+```typescript
 import { Inject } from "@decorators/Inject";
 import { DataService } from "../services/DataService";
 

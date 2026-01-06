@@ -11,7 +11,7 @@ The `@UseInterceptors` decorator allows binding one or more interceptors to a cl
 - **On a class**: The interceptor will apply to all entry points (decorated methods) of the class.
 - **On a method**: The interceptor will only apply to that specific method.
 
-```typescript/LeBot/src/modules/General/commands/SecureCommand.ts#L1-15
+```typescript
 import { UseInterceptors } from "@decorators/UseInterceptors";
 import { CommandPermissionInterceptor } from "@interceptors/CommandPermissionInterceptor";
 
@@ -38,7 +38,7 @@ It requires the implementation of the `intercept(context, next)` method:
 
 ### Example: LoggingInterceptor
 
-```typescript/LeBot/src/interceptors/LoggingInterceptor.ts#L1-15
+```typescript
 import { IInterceptor } from "@interfaces/IInterceptor";
 import { IExecutionContext } from "@interfaces/IExecutionContext";
 

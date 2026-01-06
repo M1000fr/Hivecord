@@ -90,6 +90,7 @@ Each module in `src/modules` follows a structured pattern:
 - **Config**: Dynamic configuration schemas using `@ModuleConfig`.
 
 Example module structure:
+
 ```text
 modules/MyModule/
 ├── commands/      # Slash commands
