@@ -15,38 +15,37 @@ const GUILD_CONFIG_METADATA_KEY = "lebot:param:guild-config";
 export function extractGuildFromContext(context: unknown): Guild | null {
 	if (!context) return null;
 
+	// Helper to check if an object is a Guild
+	const isGuild = (obj: unknown): obj is Guild =>
+		obj !== null && typeof obj === "object" && "id" in obj && !("guild" in obj);
+
+	// Direct Guild object
+	if (isGuild(context)) return context;
+
+	// If context is an object with a guild property (Interaction, etc)
+	if (typeof context === "object") {
+		const obj = context as any;
+		if (isGuild(obj.guild)) return obj.guild;
+	}
+
 	// Handle array context (event context)
 	if (Array.isArray(context)) {
 		const first = context[0];
 		if (!first) return null;
 
+		// The first argument is a Guild
+		if (isGuild(first)) return first;
+
 		// Check common patterns
 		if (typeof first === "object" && first !== null) {
-			const obj = first as Record<string, unknown>;
+			const obj = first as any;
 
-			// Direct guild property (interactions)
-			if (
-				obj.guild &&
-				typeof obj.guild === "object" &&
-				"id" in obj.guild
-			) {
-				return obj.guild as Guild;
-			}
+			// Direct guild property (Member, Channel, Message, Interaction)
+			if (isGuild(obj.guild)) return obj.guild;
 
-			// member.guild.id pattern
-			if (
-				obj.member &&
-				typeof obj.member === "object" &&
-				"guild" in obj.member
-			) {
-				const member = obj.member as Record<string, unknown>;
-				if (
-					member.guild &&
-					typeof member.guild === "object" &&
-					"id" in member.guild
-				) {
-					return member.guild as Guild;
-				}
+			// member.guild pattern (some specific events)
+			if (obj.member && isGuild(obj.member.guild)) {
+				return obj.member.guild;
 			}
 		}
 	}
