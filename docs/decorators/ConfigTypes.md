@@ -32,6 +32,15 @@ import { BaseModalConfigHandler } from "@src/class/BaseModalConfigHandler";
 	name: "Color Picker",
 })
 export class ColorConfigHandler extends BaseModalConfigHandler {
+	constructor(
+		valueService: ConfigValueService,
+		uiBuilder: ConfigUIBuilderService,
+		resolverService: ConfigValueResolverService,
+		configService: ConfigService,
+	) {
+		super(valueService, uiBuilder, resolverService, configService);
+	}
+
 	// CustomId prefix used for interaction routing
 	get customIdPrefix(): string {
 		return "config_color";
