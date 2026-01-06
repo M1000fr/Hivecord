@@ -31,6 +31,13 @@ export class Logger {
 		context?: string,
 		trace?: string,
 	) {
+		if (level === "debug" || level === "verbose") {
+			const isDebugEnabled =
+				process.env.DEBUG === "true" ||
+				process.env.NODE_ENV === "development";
+			if (!isDebugEnabled) return;
+		}
+
 		const timestamp = new Date().toLocaleString();
 		const ctx = context || this.context || "Application";
 		const pid = process.pid;
@@ -52,9 +59,6 @@ export class Logger {
 		const output = `${green}[LeBot] ${pid}  -${reset} ${timestamp}   ${color}${level.toUpperCase()}${reset} ${yellow}[${ctx}]${reset} ${color}${formattedMessage}${reset}`;
 
 		console.log(output);
-		if (trace) {
-			console.log(trace);
-		}
 		if (trace) {
 			console.error(trace);
 		}
