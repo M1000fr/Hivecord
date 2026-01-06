@@ -48,18 +48,19 @@ function extractKeysFromCode(): Set<string> {
 }
 
 function flattenKeys(
-	obj: Record<string, any>,
+	obj: Record<string, unknown>,
 	prefix = "",
 	result: Set<string> = new Set(),
 ): Set<string> {
 	for (const key in obj) {
+		const value = obj[key];
 		if (
-			typeof obj[key] === "object" &&
-			obj[key] !== null &&
-			!Array.isArray(obj[key])
+			typeof value === "object" &&
+			value !== null &&
+			!Array.isArray(value)
 		) {
 			flattenKeys(
-				obj[key] as Record<string, any>,
+				value as Record<string, unknown>,
 				prefix + key + ".",
 				result,
 			);
@@ -77,9 +78,9 @@ function getLocaleKeys(localeFile: string): Set<string> {
 	}
 	const content = fs.readFileSync(filePath, "utf-8");
 	try {
-		const json = JSON.parse(content);
+		const json = JSON.parse(content) as Record<string, unknown>;
 		return flattenKeys(json);
-	} catch (e) {
+	} catch {
 		console.error(`\x1b[31mError parsing JSON in ${localeFile}\x1b[0m`);
 		return new Set();
 	}

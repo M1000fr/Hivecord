@@ -18,7 +18,7 @@ export function OnConfigUpdate(propertyName: string) {
 
 		ConfigUpdateRegistry.register(
 			configKey,
-			async (guildId, key, value) => {
+			async (_guildId, _key, _value) => {
 				const container = DependencyContainer.getInstance();
 				const instance = container.resolve(
 					target.constructor as Constructor,
