@@ -20,15 +20,7 @@ export class MemberRepository extends BaseRepository {
 						create: { id: member.user.id },
 					},
 				},
-				Guild: {
-					connectOrCreate: {
-						where: { id: member.guild.id },
-						create: {
-							id: member.guild.id,
-							name: member.guild.name,
-						},
-					},
-				},
+				Guild: this.buildGuildRelation({ guild: member.guild })!,
 			},
 		});
 	}

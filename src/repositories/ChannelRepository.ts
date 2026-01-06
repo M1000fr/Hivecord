@@ -1,58 +1,36 @@
 import { Repository } from "@decorators/Repository";
 import { ChannelType } from "@prisma/client/enums";
 import type { GuildBasedChannel } from "discord.js";
-import { BaseRepository } from "./BaseRepository";
+import { SoftDeletableRepository } from "./SoftDeletableRepository";
 
+/**
+ * Repository for Channel entities with soft-delete support.
+ */
 @Repository()
-export class ChannelRepository extends BaseRepository {
+export class ChannelRepository extends SoftDeletableRepository<GuildBasedChannel> {
+	protected entityType = "channel";
+	protected prismaModel = this.prisma.channel;
+
 	async upsert(
 		channel: GuildBasedChannel,
 		type: ChannelType,
 		deletedAt: Date | null = null,
 	) {
-		return this.prisma.channel.upsert({
-			where: {
-				id: channel.id,
-			},
-			update: {
-				type,
-				deletedAt,
-				Guild: {
-					connectOrCreate: {
-						where: { id: channel.guild.id },
-						create: {
-							id: channel.guild.id,
-							name: channel.guild.name,
-						},
-					},
-				},
-			},
-			create: {
-				id: channel.id,
-				type,
-				Guild: {
-					connectOrCreate: {
-						where: { id: channel.guild.id },
-						create: {
-							id: channel.guild.id,
-							name: channel.guild.name,
-						},
-					},
-				},
-			},
-		});
+		return this.softUpsert(
+			channel,
+			{ type },
+			{ type },
+			deletedAt,
+		);
 	}
 
-	async delete(channel: GuildBasedChannel) {
-		return this.prisma.channel.upsert({
-			where: { id: channel.id },
-			update: { deletedAt: new Date() },
-			create: {
-				id: channel.id,
-				guildId: channel.guild.id,
-				type: ChannelType.TEXT, // Default type if not exists
-				deletedAt: new Date(),
-			},
-		});
+	override async delete(channel: GuildBasedChannel) {
+		return this.softUpsert(
+			channel,
+			{ deletedAt: new Date() },
+			{ type: ChannelType.TEXT, guildId: channel.guild.id },
+			new Date(),
+		);
 	}
 }
+

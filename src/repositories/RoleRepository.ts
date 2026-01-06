@@ -1,57 +1,26 @@
 import { Repository } from "@decorators/Repository";
 import { Role } from "discord.js";
-import { BaseRepository } from "./BaseRepository";
+import { SoftDeletableRepository } from "./SoftDeletableRepository";
 
+/**
+ * Repository for Role entities with soft-delete support.
+ */
 @Repository()
-export class RoleRepository extends BaseRepository {
+export class RoleRepository extends SoftDeletableRepository<Role> {
+	protected entityType = "role";
+	protected prismaModel = this.prisma.role;
+
 	async upsert(role: Role, deletedAt: Date | null = null) {
-		return this.prisma.role.upsert({
-			where: { id: role.id },
-			update: {
-				Guild: {
-					connectOrCreate: {
-						where: { id: role.guild.id },
-						create: {
-							id: role.guild.id,
-							name: role.guild.name,
-						},
-					},
-				},
-				deletedAt,
-			},
-			create: {
-				id: role.id,
-				Guild: {
-					connectOrCreate: {
-						where: { id: role.guild.id },
-						create: {
-							id: role.guild.id,
-							name: role.guild.name,
-						},
-					},
-				},
-				deletedAt,
-			},
-		});
+		return this.softUpsert(role, {}, {}, deletedAt);
 	}
 
-	async delete(role: Role) {
-		return this.prisma.role.upsert({
-			where: { id: role.id },
-			update: { deletedAt: new Date() },
-			create: {
-				id: role.id,
-				Guild: {
-					connectOrCreate: {
-						where: { id: role.guild.id },
-						create: {
-							id: role.guild.id,
-							name: role.guild.name,
-						},
-					},
-				},
-				deletedAt: new Date(),
-			},
-		});
+	override async delete(role: Role) {
+		return this.softUpsert(
+			role,
+			{ deletedAt: new Date() },
+			{},
+			new Date(),
+		);
 	}
 }
+
