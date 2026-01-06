@@ -8,7 +8,8 @@ import {
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { I18nService } from "@modules/Core/services/I18nService";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import { ConfigFormatterService } from "@utils/ConfigFormatterService";
+import { CustomIdHelper } from "@utils/CustomIdHelper";
 
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import {
@@ -55,7 +56,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		propertyKey: string,
 		moduleName: string,
 	) {
-		const currentValues = (await this.configHelper.fetchValue(
+		const currentValues = (await this.valueService.fetchValue(
 			guild,
 			propertyKey,
 			EConfigType.StringArray,
@@ -91,7 +92,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder()
 				.setCustomId(
-					ConfigHelper.buildCustomId([
+					CustomIdHelper.build([
 						"module_config_array_add",
 						moduleName,
 						propertyKey,
@@ -106,7 +107,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			row.addComponents(
 				new ButtonBuilder()
 					.setCustomId(
-						ConfigHelper.buildCustomId([
+						CustomIdHelper.build([
 							"module_config_array_remove",
 							moduleName,
 							propertyKey,
@@ -117,7 +118,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 					.setStyle(ButtonStyle.Danger),
 				new ButtonBuilder()
 					.setCustomId(
-						ConfigHelper.buildCustomId([
+						CustomIdHelper.build([
 							"module_config_array_edit",
 							moduleName,
 							propertyKey,
@@ -191,7 +192,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		});
 
 		const modal = new ModalBuilder({
-			customId: ConfigHelper.buildCustomId([
+			customId: CustomIdHelper.build([
 				"module_config_array_add_sub",
 				moduleName,
 				propertyKey,
@@ -215,7 +216,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const propertyKey = parts[2]!;
 		const newValue = interaction.fields.getTextInputValue("value");
 
-		const currentValues = (await this.configHelper.fetchValue(
+		const currentValues = (await this.valueService.fetchValue(
 			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -235,7 +236,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 
 		const newValues = [...valuesToUse, newValue];
 
-		await this.configHelper.saveValue(
+		await this.valueService.saveValue(
 			interaction.guild!,
 			propertyKey,
 			newValues,
@@ -253,7 +254,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const moduleName = parts[1]!;
 		const propertyKey = parts[2]!;
 
-		const currentValues = (await this.configHelper.fetchValue(
+		const currentValues = (await this.valueService.fetchValue(
 			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -281,7 +282,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 
 		const select = new StringSelectMenuBuilder()
 			.setCustomId(
-				ConfigHelper.buildCustomId([
+				CustomIdHelper.build([
 					"module_config_array_remove_sub",
 					moduleName,
 					propertyKey,
@@ -295,7 +296,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		valuesToUse.slice(0, 25).forEach((value, index) => {
 			select.addOptions(
 				new StringSelectMenuOptionBuilder()
-					.setLabel(ConfigHelper.truncate(value, 100))
+					.setLabel(ConfigFormatterService.truncate(value, 100))
 					.setValue(index.toString()),
 			);
 		});
@@ -310,7 +311,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 				new ActionRowBuilder<ButtonBuilder>().addComponents(
 					new ButtonBuilder()
 						.setCustomId(
-							ConfigHelper.buildCustomId([
+							CustomIdHelper.build([
 								"module_config_array_cancel",
 								moduleName,
 								propertyKey,
@@ -346,7 +347,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const propertyKey = parts[2]!;
 		const selectedIndices = interaction.values.map(Number);
 
-		const currentValues = (await this.configHelper.fetchValue(
+		const currentValues = (await this.valueService.fetchValue(
 			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -368,7 +369,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 			(_, index) => !selectedIndices.includes(index),
 		);
 
-		await this.configHelper.saveValue(
+		await this.valueService.saveValue(
 			interaction.guild!,
 			propertyKey,
 			newValues,
@@ -386,7 +387,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const moduleName = parts[1]!;
 		const propertyKey = parts[2]!;
 
-		const currentValues = (await this.configHelper.fetchValue(
+		const currentValues = (await this.valueService.fetchValue(
 			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -399,7 +400,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 
 		const select = new StringSelectMenuBuilder()
 			.setCustomId(
-				ConfigHelper.buildCustomId([
+				CustomIdHelper.build([
 					"module_config_array_edit_sel",
 					moduleName,
 					propertyKey,
@@ -413,7 +414,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		currentValues.slice(0, 25).forEach((value, index) => {
 			select.addOptions(
 				new StringSelectMenuOptionBuilder()
-					.setLabel(ConfigHelper.truncate(value, 100))
+					.setLabel(ConfigFormatterService.truncate(value, 100))
 					.setValue(index.toString()),
 			);
 		});
@@ -428,7 +429,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 				new ActionRowBuilder<ButtonBuilder>().addComponents(
 					new ButtonBuilder()
 						.setCustomId(
-							ConfigHelper.buildCustomId([
+							CustomIdHelper.build([
 								"module_config_array_cancel",
 								moduleName,
 								propertyKey,
@@ -454,7 +455,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const index = interaction.values[0];
 		if (!index) return;
 
-		const currentValues = (await this.configHelper.fetchValue(
+		const currentValues = (await this.valueService.fetchValue(
 			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -471,7 +472,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		});
 
 		const modal = new ModalBuilder({
-			customId: ConfigHelper.buildCustomId([
+			customId: CustomIdHelper.build([
 				"module_config_array_edit_sub",
 				moduleName,
 				propertyKey,
@@ -497,7 +498,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 		const index = Number(parts[4]);
 		const newValue = interaction.fields.getTextInputValue("value");
 
-		const currentValues = (await this.configHelper.fetchValue(
+		const currentValues = (await this.valueService.fetchValue(
 			interaction.guild!,
 			propertyKey,
 			EConfigType.StringArray,
@@ -505,7 +506,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
 
 		if (index >= 0 && index < currentValues.length) {
 			currentValues[index] = newValue;
-			await this.configHelper.saveValue(
+			await this.valueService.saveValue(
 				interaction.guild!,
 				propertyKey,
 				currentValues,

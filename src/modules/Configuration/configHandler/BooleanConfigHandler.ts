@@ -1,15 +1,22 @@
 import { BaseToggleConfigHandler } from "@class/BaseToggleConfigHandler";
 import { ConfigType } from "@decorators/ConfigType";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import { ConfigValueService } from "@utils/ConfigValueService";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
 
 @ConfigType({
 	id: "test_toggle",
 	name: "Test Toggle",
 })
 export class BooleanConfigHandler extends BaseToggleConfigHandler {
-	constructor(configHelper: ConfigHelper, configService: ConfigService) {
-		super(configHelper, configService);
+	constructor(
+		valueService: ConfigValueService,
+		uiBuilder: ConfigUIBuilderService,
+		resolverService: ConfigValueResolverService,
+		configService: ConfigService,
+	) {
+		super(valueService, uiBuilder, resolverService, configService);
 	}
 
 	get customIdPrefix(): string {

@@ -30,7 +30,7 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 		);
 		const defaultValue = this.getDefaultValue(module, selectedProperty);
 
-		const currentValue = await this.configHelper.getCurrentValue(
+		const currentValue = await this.resolverService.getCurrentValue(
 			interaction.guild,
 			selectedProperty,
 			propertyOptions.type,

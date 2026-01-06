@@ -14,7 +14,7 @@ import {
 } from "@src/decorators/commands/SlashCommand.ts";
 import type { CommandAutocompleteContext } from "@src/types/CommandAutocompleteContext.ts";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
 import { ChatInputCommandInteraction } from "discord.js";
 import { modulesOptions } from "./modulesOptions.ts";
 
@@ -23,7 +23,7 @@ import { modulesOptions } from "./modulesOptions.ts";
 export default class ModulesCommand {
 	constructor(
 		private readonly configService: ConfigService,
-		private readonly configHelper: ConfigHelper,
+		private readonly uiBuilder: ConfigUIBuilderService,
 	) {}
 
 	@Autocomplete({ optionName: "module" })
@@ -81,8 +81,7 @@ export default class ModulesCommand {
 			return;
 		}
 
-		const config = await this.configHelper.buildModuleConfigEmbed(
-			lebot,
+		const config = await this.uiBuilder.buildModuleConfigEmbed(
 			interaction.guild!,
 			moduleName,
 			interaction.user,

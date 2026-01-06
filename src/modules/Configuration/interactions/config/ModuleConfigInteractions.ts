@@ -6,7 +6,9 @@ import { Button, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import { ConfigValueService } from "@utils/ConfigValueService";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
 import {
 	type ButtonInteraction,
 	type StringSelectMenuInteraction,
@@ -21,7 +23,9 @@ import { StringConfigInteractions } from "./StringConfigInteractions";
 @Injectable()
 export class ModuleConfigInteractions extends BaseConfigInteractions {
 	constructor(
-		configHelper: ConfigHelper,
+		valueService: ConfigValueService,
+		uiBuilder: ConfigUIBuilderService,
+		resolverService: ConfigValueResolverService,
 		configService: ConfigService,
 		@Inject(BooleanConfigInteractions)
 		private readonly booleanHandler: BooleanConfigInteractions,
@@ -36,7 +40,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 		@Inject(StringArrayConfigInteractions)
 		private readonly stringArrayHandler: StringArrayConfigInteractions,
 	) {
-		super(configHelper, configService);
+		super(valueService, uiBuilder, resolverService, configService);
 	}
 
 	@SelectMenu("module_config:*")
@@ -83,8 +87,7 @@ export class ModuleConfigInteractions extends BaseConfigInteractions {
 
 		try {
 			const { lng, t } = await this.getLanguageContext(interaction);
-			const config = await this.configHelper.buildModuleConfigEmbed(
-				client,
+			const config = await this.uiBuilder.buildModuleConfigEmbed(
 				interaction.guild!,
 				moduleName,
 				interaction.user,

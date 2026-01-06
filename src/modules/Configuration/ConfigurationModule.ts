@@ -8,6 +8,10 @@ import { RoleChannelConfigInteractions } from "./interactions/config/RoleChannel
 import { StringArrayConfigInteractions } from "./interactions/config/StringArrayConfigInteractions";
 import { StringConfigInteractions } from "./interactions/config/StringConfigInteractions";
 import { ConfigService } from "./services/ConfigService";
+import { ConfigValueService } from "@utils/ConfigValueService";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigCacheService } from "./services/ConfigCacheService";
 
 import { CoreModule } from "@modules/Core/CoreModule";
 
@@ -15,10 +19,15 @@ import { CoreModule } from "@modules/Core/CoreModule";
 	name: "Configuration",
 	imports: [CoreModule],
 	providers: [
+		// Services
+		ConfigCacheService,
+		ConfigValueService,
+		ConfigUIBuilderService,
+		ConfigValueResolverService,
+		ConfigService,
 		// Commands
 		ModulesCommand,
-		// Services
-		ConfigService,
+		// Interactions
 		ModuleConfigInteractions,
 		BooleanConfigInteractions,
 		StringConfigInteractions,

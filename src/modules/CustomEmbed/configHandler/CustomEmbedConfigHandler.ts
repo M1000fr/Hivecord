@@ -2,7 +2,9 @@ import { BaseSelectConfigHandler } from "@class/BaseSelectConfigHandler";
 import { ConfigType } from "@decorators/ConfigType";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { CustomEmbedRepository } from "@src/repositories";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import { ConfigValueService } from "@utils/ConfigValueService";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
 import { type Guild } from "discord.js";
 import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbedConfigKey";
 
@@ -12,11 +14,13 @@ import { CUSTOM_EMBED_CONFIG_KEY } from "../CustomEmbedConfigKey";
 })
 export class CustomEmbedConfigHandler extends BaseSelectConfigHandler {
 	constructor(
-		configHelper: ConfigHelper,
+		valueService: ConfigValueService,
+		uiBuilder: ConfigUIBuilderService,
+		resolverService: ConfigValueResolverService,
 		configService: ConfigService,
 		private readonly customEmbedRepository: CustomEmbedRepository,
 	) {
-		super(configHelper, configService);
+		super(valueService, uiBuilder, resolverService, configService);
 	}
 
 	get customIdPrefix() {

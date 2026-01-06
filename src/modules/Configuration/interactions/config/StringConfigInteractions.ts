@@ -2,7 +2,7 @@ import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { Button, Modal } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import { ConfigFormatterService } from "@utils/ConfigFormatterService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
@@ -48,7 +48,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 		await this.getLanguageContext(interaction);
 		const defaultValue = this.getDefaultValue(module, propertyKey);
 
-		const rawValue = await this.configHelper.fetchValue(
+		const rawValue = await this.valueService.fetchValue(
 			interaction.guild!,
 			propertyKey,
 			propertyOptions.type,
@@ -56,7 +56,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 
 		const valueToUse = (rawValue || defaultValue || "") as string;
 
-		const labelText = ConfigHelper.truncate(
+		const labelText = ConfigFormatterService.truncate(
 			propertyOptions.description,
 			45,
 		);
@@ -80,7 +80,7 @@ export class StringConfigInteractions extends BaseConfigInteractions {
 				messageId,
 				interaction.user.id,
 			]),
-			title: ConfigHelper.truncate(
+			title: ConfigFormatterService.truncate(
 				`Configure: ${propertyOptions.displayName || propertyKey}`,
 				45,
 			),

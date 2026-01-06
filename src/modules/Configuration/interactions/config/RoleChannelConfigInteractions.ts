@@ -8,7 +8,7 @@ import {
 import { SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { I18nService } from "@modules/Core/services/I18nService";
-import { ConfigHelper } from "@utils/ConfigHelper";
+import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ActionRowBuilder,
 	ButtonStyle,
@@ -89,7 +89,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 	) {
 		const isRole =
 			type === EConfigType.Role || type === EConfigType.RoleArray;
-		const customId = ConfigHelper.buildCustomId([
+		const customId = CustomIdHelper.build([
 			isRole ? "module_config_role" : "module_config_channel",
 			moduleName,
 			selectedProperty,
@@ -146,7 +146,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 		);
 		const defaultValue = this.getDefaultValue(module, selectedProperty);
 
-		const currentValue = await this.configHelper.getCurrentValue(
+		const currentValue = await this.resolverService.getCurrentValue(
 			interaction.guild!,
 			selectedProperty,
 			propertyOptions.type,
@@ -156,7 +156,7 @@ export class RoleChannelConfigInteractions extends BaseConfigInteractions {
 			defaultValue,
 		);
 
-		const rawValue = await this.configHelper.fetchValue(
+		const rawValue = await this.valueService.fetchValue(
 			interaction.guild!,
 			selectedProperty,
 			propertyOptions.type,
