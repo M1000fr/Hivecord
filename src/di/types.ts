@@ -57,3 +57,5 @@ export const INJECTABLE_METADATA_KEY = "lebot:injectable:options";
 export const INJECT_METADATA_KEY = "lebot:inject:tokens";
 export const MODULE_OPTIONS_METADATA_KEY = "lebot:module:options";
 export const PROVIDER_TYPE_METADATA_KEY = "lebot:provider:type";
+export const INTERCEPTORS_METADATA_KEY = "lebot:interceptors";
+export const COMMAND_PERMISSION_METADATA_KEY = "lebot:command:permission";

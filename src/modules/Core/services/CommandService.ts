@@ -4,8 +4,12 @@ import {
 	type CommandParameter,
 } from "@decorators/params";
 
+import { DependencyContainer } from "@di/DependencyContainer";
+import { INTERCEPTORS_METADATA_KEY, type Constructor } from "@di/types";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import type { ICommandInstance } from "@interfaces/ICommandInstance.ts";
+import type { IExecutionContext } from "@interfaces/IExecutionContext";
+import type { IInterceptor } from "@interfaces/IInterceptor";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Core/services/I18nService";
 import { PermissionService } from "@modules/Core/services/PermissionService";
@@ -19,7 +23,6 @@ import {
 	Client,
 	Guild,
 	MessageContextMenuCommandInteraction,
-	MessageFlags,
 	UserContextMenuCommandInteraction,
 } from "discord.js";
 
@@ -144,19 +147,9 @@ export class CommandService {
 			const subcommandInfo = commandClass.subcommands?.get(key);
 
 			if (subcommandInfo) {
-				const { method, permission } = subcommandInfo;
-				if (
-					permission &&
-					!(await this.checkPermission(
-						interaction,
-						permission,
-						commandInstance,
-					))
-				) {
-					return;
-				}
+				const { method } = subcommandInfo;
 
-				await this.invoke(
+				await this.runWithInterceptors(
 					client,
 					interaction,
 					commandInstance,
@@ -181,19 +174,9 @@ export class CommandService {
 						: null;
 
 				if (route) {
-					const { method, permission } = route;
-					if (
-						permission &&
-						!(await this.checkPermission(
-							interaction,
-							permission,
-							commandInstance,
-						))
-					) {
-						return;
-					}
+					const { method } = route;
 
-					await this.invoke(
+					await this.runWithInterceptors(
 						client,
 						interaction,
 						commandInstance,
@@ -209,19 +192,7 @@ export class CommandService {
 		// 3. Fallback to Default Command
 		const defaultCommand = commandClass.defaultCommand;
 		if (defaultCommand) {
-			const permission = commandClass.defaultCommandPermission;
-			if (
-				permission &&
-				!(await this.checkPermission(
-					interaction,
-					permission,
-					commandInstance,
-				))
-			) {
-				return;
-			}
-
-			await this.invoke(
+			await this.runWithInterceptors(
 				client,
 				interaction,
 				commandInstance,
@@ -312,46 +283,81 @@ export class CommandService {
 		return args;
 	}
 
-	/**
-	 * Checks if a user has the required permission to execute a command.
-	 * If permission is denied, it sends an ephemeral reply to the user.
-	 * @param interaction The chat input command interaction.
-	 * @param permission The permission string to check.
-	 * @param commandInstance The instance of the command class.
-	 * @returns A promise that resolves to true if the user has permission, false otherwise.
-	 * @protected
-	 */
-	protected async checkPermission(
-		interaction: ChatInputCommandInteraction,
-		permission: string,
+	private async runWithInterceptors(
+		client: Client,
+		interaction:
+			| ChatInputCommandInteraction
+			| AutocompleteInteraction
+			| UserContextMenuCommandInteraction
+			| MessageContextMenuCommandInteraction,
 		commandInstance: object,
-	): Promise<boolean> {
-		const roleIds =
-			interaction.member && "roles" in interaction.member
-				? Array.isArray(interaction.member.roles)
-					? interaction.member.roles
-					: interaction.member.roles.cache.map((r) => r.id)
-				: [];
+		method: string,
+		langCtx: GuildLanguageContext,
+		logSuffix?: string,
+	): Promise<void> {
+		const classInterceptors = (Reflect.getMetadata(
+			INTERCEPTORS_METADATA_KEY,
+			commandInstance.constructor,
+		) || []) as Constructor<IInterceptor>[];
 
-		const hasPermission = await this.permissionService.hasPermission(
-			interaction.user.id,
-			interaction.guild?.ownerId,
-			roleIds,
-			permission,
+		const methodInterceptors = (Reflect.getMetadata(
+			INTERCEPTORS_METADATA_KEY,
+			commandInstance,
+			method,
+		) || []) as Constructor<IInterceptor>[];
+
+		const interceptorConstructors = [
+			...classInterceptors,
+			...methodInterceptors,
+		];
+
+		const uniqueInterceptors = [...new Set(interceptorConstructors)];
+
+		const container = DependencyContainer.getInstance();
+		const interceptors = uniqueInterceptors.map((Ctor) =>
+			container.resolve(Ctor),
 		);
 
-		if (!hasPermission) {
-			this.logger.log(
-				`Permission denied for command ${commandInstance.constructor.name}: User ${interaction.user.tag} missing ${permission}`,
-			);
-			await interaction.reply({
-				content: `You need the permission \`${permission}\` to perform this action.`,
-				flags: [MessageFlags.Ephemeral],
-			});
-			return false;
-		}
+		const executionContext: IExecutionContext = {
+			getClient: () => client,
+			getInteraction: () => interaction,
+			getClass: () => commandInstance,
+			getMethodName: () => method,
+			getHandler: async () => {
+				const args = await this.resolveArguments(
+					commandInstance,
+					method,
+					client,
+					interaction,
+					langCtx,
+				);
+				return (
+					(commandInstance as unknown as ICommandInstance)[
+						method
+					] as (...args: CommandArgument[]) => Promise<void>
+				)(...args);
+			},
+		};
 
-		return true;
+		let index = -1;
+		const next = async (): Promise<void> => {
+			index++;
+			const interceptor = interceptors[index];
+			if (interceptor) {
+				await interceptor.intercept(executionContext, next);
+			} else {
+				await this.invoke(
+					client,
+					interaction,
+					commandInstance,
+					method,
+					langCtx,
+					logSuffix,
+				);
+			}
+		};
+
+		await next();
 	}
 
 	/**
@@ -373,7 +379,7 @@ export class CommandService {
 		// For context menus, we'll use a convention: look for an 'execute' method
 		const method = "execute";
 
-		await this.invoke(
+		await this.runWithInterceptors(
 			client,
 			interaction,
 			commandInstance,

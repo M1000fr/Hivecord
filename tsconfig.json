@@ -18,13 +18,14 @@
 			"@class/*": ["./src/class/*"],
 			"@decorators/*": ["./src/decorators/*"],
 			"@enums/*": ["./src/enums/*"],
+			"@interceptors/*": ["./src/interceptors/*"],
 			"@interfaces/*": ["./src/interfaces/*"],
 			"@modules/*": ["./src/modules/*"],
 			"@types/*": ["./src/types/*"],
 			"@utils/*": ["./src/utils/*"],
 			"@registers/*": ["./src/registers/*"],
 			"@prisma/*": ["./src/prisma/*"],
-			"@di/*": ["./src/di/*"]
+			"@di/*": ["./src/di/*"],
 		},
 		// Best practices
 		"strict": true,
@@ -37,6 +38,6 @@
 		"noUnusedParameters": false,
 		"noPropertyAccessFromIndexSignature": false,
 		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true
-	}
+		"emitDecoratorMetadata": true,
+	},
 }
