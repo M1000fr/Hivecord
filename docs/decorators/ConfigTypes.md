@@ -13,18 +13,53 @@ The decorator takes a `ConfigTypeMetadata` object:
 - `id`: Unique identifier for the type (often a string or a number > 100).
 - `name`: Human-readable name of the type.
 
-### Example of creating a custom type
+### Implementation Base Classes
+
+To function correctly within the configuration UI, a config handler must extend one of the following base classes depending on the interaction type desired:
+
+- **`BaseSelectConfigHandler`**: For types using a dropdown selection (`StringSelectMenu`).
+- **`BaseToggleConfigHandler`**: For boolean-like types using a simple toggle button.
+- **`BaseModalConfigHandler`**: For types requiring text input via a Discord Modal.
+
+### Example: Creating a Custom Modal Handler
 
 ```typescript
 import { ConfigType } from "@decorators/ConfigType";
+import { BaseModalConfigHandler } from "@src/class/BaseModalConfigHandler";
 
 @ConfigType({
 	id: "color_picker",
 	name: "Color Picker",
 })
-export class ColorConfigHandler {
-	// The class must implement the type management logic
-	// (Button generation, modals, data validation)
+export class ColorConfigHandler extends BaseModalConfigHandler {
+	// CustomId prefix used for interaction routing
+	get customIdPrefix(): string {
+		return "config_color";
+	}
+
+	// You can override labels and styles
+	protected override getModalTitle(t: TFunction): string {
+		return t("module.appearance.color_modal_title");
+	}
+
+	// Customizing the display in the configuration list
+	override async formatValue(
+		guildId: string,
+		value: string,
+	): Promise<string> {
+		return `\`${value}\``;
+	}
+}
+```
+
+### Customizing Value Formatting
+
+You can override the `formatValue` method to control how the configuration value is displayed in the main configuration embed. This is useful for adding emojis, formatting IDs into names, or adding previews.
+
+```typescript
+override async formatValue(guildId: string, value: string): Promise<string> {
+	if (value === "special") return "✨ **Special Value**";
+	return `\`${value}\``;
 }
 ```
 
@@ -46,8 +81,9 @@ export class AppearanceConfig {
 ## Key Points
 
 1. **Global Injection**: Classes decorated with `@ConfigType` are automatically injected with a global scope (`scope: "global"`), meaning they are available throughout the application.
-2. **Standardization**: Using custom types allows centralizing validation logic (e.g., checking that a string is a valid hex code) instead of repeating it in every service.
-3. **Dynamic UI**: LeBot's configuration system uses these handlers to dynamically build interaction menus (SelectMenus, Modals) allowing administrators to modify settings.
+2. **Base Classes**: Always extend `BaseSelectConfigHandler`, `BaseToggleConfigHandler`, or `BaseModalConfigHandler`. These classes handle the complex logic of building Discord components, managing ephemeral messages, and routing interactions.
+3. **Standardization**: Using custom types allows centralizing validation logic (e.g., checking that a string is a valid hex code) instead of repeating it in every service.
+4. **Dynamic UI**: LeBot's configuration system uses these handlers to dynamically build interaction menus allowing administrators to modify settings without leaving Discord.
 
 ---
 
