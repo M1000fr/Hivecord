@@ -98,25 +98,17 @@ export default class WelcomeEvent {
 				files: [attachment],
 			};
 
-			let messageTemplateStr = welcomeMessageConfig;
+			const welcomeMessageTemplate = new MessageTemplate(
+				welcomeMessageConfig,
+				language.locale,
+			);
 
-			// If no embed and no config, use default
-			if (!messagePayload.embeds && !messageTemplateStr) {
-				messageTemplateStr = "Welcome {user} to {guild}!";
-			}
-
-			if (messageTemplateStr) {
-				const welcomeMessageTemplate = new MessageTemplate(
-					messageTemplateStr,
-					language.locale,
-				);
-				Object.entries(commonContext).forEach(([key, value]) => {
-					if (value !== null && value !== undefined) {
-						welcomeMessageTemplate.addContext(key, value);
-					}
-				});
-				messagePayload.content = welcomeMessageTemplate.resolve();
-			}
+			Object.entries(commonContext).forEach(([key, value]) => {
+				if (value !== null && value !== undefined) {
+					welcomeMessageTemplate.addContext(key, value);
+				}
+			});
+			messagePayload.content = welcomeMessageTemplate.resolve();
 
 			await channel.send(messagePayload);
 		} catch (error) {
