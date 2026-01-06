@@ -27,7 +27,7 @@ import {
 
 import { Injectable } from "@decorators/Injectable";
 
-@Injectable()
+@Injectable({ scope: "global" })
 export class CommandService {
 	private logger = new Logger("CommandService");
 

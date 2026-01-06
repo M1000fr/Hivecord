@@ -9,7 +9,7 @@ import {
 	PermissionsBitField,
 } from "discord.js";
 
-@Injectable()
+@Injectable({ scope: "global" })
 export class CommandDeploymentService {
 	private logger = new Logger("CommandDeploymentService");
 

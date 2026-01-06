@@ -19,7 +19,7 @@ import { getProvidersByType } from "@utils/getProvidersByType";
 import { Logger } from "@utils/Logger";
 import { ApplicationCommandType } from "discord.js";
 
-@Injectable()
+@Injectable({ scope: "global" })
 export class ModuleLoader {
 	private logger = new Logger("ModuleLoader");
 	private container = DependencyContainer.getInstance();

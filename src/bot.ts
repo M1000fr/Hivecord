@@ -6,7 +6,16 @@ import { Bootstrap } from "./Bootstrap";
 
 const logger = new Logger("Bootstrap");
 
-const leBotInstance = await Bootstrap.create();
+let leBotInstance;
+try {
+	leBotInstance = await Bootstrap.create();
+} catch (error) {
+	logger.error(
+		"Failed to initialize LeBot:",
+		error instanceof Error ? error.stack : String(error),
+	);
+	process.exit(1);
+}
 
 try {
 	await leBotInstance.start(env.DISCORD_TOKEN);

@@ -5,7 +5,7 @@ import { RedisService } from "@modules/Core/services/RedisService";
 import { PagerRegistry, type PagerState } from "@registers/PagerRegistry";
 import { ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
 
-@Injectable()
+@Injectable({ scope: "global" })
 export class PagerService {
 	constructor(private readonly redisService: RedisService) {}
 

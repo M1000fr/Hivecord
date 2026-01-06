@@ -155,14 +155,39 @@ export class DependencyContainer {
 
 			const tokenName =
 				typeof token === "function" ? token.name : String(token);
-			const targetName = context?.target?.name ?? "UnknownContext";
+			const target = context?.target;
+			const targetName = target?.name ?? "UnknownContext";
+
+			let dependencySummary = "";
+			if (target) {
+				const paramTypes: unknown[] =
+					Reflect.getMetadata("design:paramtypes", target) ?? [];
+				const injectTokens = Reflect.getMetadata(
+					INJECT_METADATA_KEY,
+					target,
+				) as ProviderToken[] | undefined;
+
+				const deps = paramTypes.map((paramType, index) => {
+					const overrideToken = injectTokens?.[index];
+					const tokenToUse = (overrideToken ??
+						paramType) as ProviderToken;
+					const name =
+						typeof tokenToUse === "function"
+							? tokenToUse.name
+							: String(tokenToUse);
+					return index === context?.index ? "?" : name;
+				});
+				dependencySummary =
+					deps.length > 0 ? ` (${deps.join(", ")})` : "";
+			}
+
 			const indexInfo =
 				context?.index !== undefined
 					? ` at index [${context.index}]`
 					: "";
 
 			throw new Error(
-				`LeBot can't resolve dependencies of the ${targetName}. ` +
+				`LeBot can't resolve dependencies of the ${targetName}${dependencySummary}. ` +
 					`Please make sure that the argument "${tokenName}"${indexInfo} is available in the "${normalizedModule ?? "global"}" module context.`,
 			);
 		}
@@ -317,14 +342,14 @@ export class DependencyContainer {
 			if (provider.useExisting !== undefined) {
 				return this.resolve(
 					provider.useExisting,
-					moduleName ?? provider.moduleName,
+					provider.moduleName ?? moduleName,
 					{ target: provider.useClass },
 				) as T;
 			}
 
 			if (provider.useFactory) {
 				const deps = (provider.inject ?? []).map((dep, index) =>
-					this.resolve(dep, moduleName ?? provider.moduleName, {
+					this.resolve(dep, provider.moduleName ?? moduleName, {
 						target:
 							typeof provider.token === "function"
 								? (provider.token as Constructor)
@@ -357,7 +382,7 @@ export class DependencyContainer {
 					paramType) as ProviderToken;
 				return this.resolve(
 					tokenToUse,
-					moduleName ?? provider.moduleName,
+					provider.moduleName ?? moduleName,
 					{ target: provider.useClass, index },
 				);
 			});

@@ -5,7 +5,7 @@ import i18next from "i18next";
 
 export type { TFunction } from "i18next";
 
-@Injectable()
+@Injectable({ scope: "global" })
 export class I18nService {
 	static async init() {
 		await i18next.init({

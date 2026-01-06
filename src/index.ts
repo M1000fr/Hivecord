@@ -24,6 +24,7 @@ manager.spawn().catch((error) => {
 	} else {
 		logger.error("Failed to spawn shards:", error);
 	}
+	process.exit(1);
 });
 
 // Health check server

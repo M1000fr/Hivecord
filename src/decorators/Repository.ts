@@ -10,7 +10,7 @@ import "reflect-metadata";
 export function Repository(): ClassDecorator {
 	return ((target: Constructor) => {
 		// Apply Injectable decorator
-		Injectable()(target);
+		Injectable({ scope: "global" })(target);
 
 		// Store original constructor
 		const original = target;
@@ -19,6 +19,8 @@ export function Repository(): ClassDecorator {
 		const newConstructor = function (prisma: PrismaService) {
 			return Reflect.construct(original, [prisma]);
 		} as unknown as Constructor;
+
+		Object.defineProperty(newConstructor, "name", { value: original.name });
 
 		// Copy prototype and static properties
 		newConstructor.prototype = original.prototype;
