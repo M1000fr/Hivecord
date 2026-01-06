@@ -1,4 +1,5 @@
 import { Repository } from "@decorators/Repository";
+import { PrismaService } from "@modules/Core/services/PrismaService";
 import { ChannelType } from "@prisma/client/enums";
 import type { GuildBasedChannel } from "discord.js";
 import { SoftDeletableRepository } from "./SoftDeletableRepository";
@@ -9,7 +10,12 @@ import { SoftDeletableRepository } from "./SoftDeletableRepository";
 @Repository()
 export class ChannelRepository extends SoftDeletableRepository<GuildBasedChannel> {
 	protected entityType = "channel";
-	protected prismaModel = this.prisma.channel;
+	protected prismaModel;
+
+	constructor(prisma: PrismaService) {
+		super(prisma);
+		this.prismaModel = this.prisma.channel;
+	}
 
 	async upsert(
 		channel: GuildBasedChannel,

@@ -1,9 +1,13 @@
 import { Repository } from "@decorators/Repository";
+import { PrismaService } from "@modules/Core/services/PrismaService";
 import { Guild } from "discord.js";
 import { BaseRepository } from "./BaseRepository";
 
 @Repository()
 export class ConfigurationRepository extends BaseRepository {
+	constructor(prisma: PrismaService) {
+		super(prisma);
+	}
 	async get(guild: Guild, key: string) {
 		return this.prisma.configuration.findFirst({
 			where: { guildId: guild.id, key },
