@@ -49,12 +49,12 @@ Retrieves the message (`Message`) on which the action was performed via the cont
 ```typescript
 @MessageCommand({ name: "Copy" })
 export default class CopyCommand {
-    async execute(
-        @CommandInteraction() interaction: MessageContextMenuCommandInteraction,
-        @TargetMessage() message: Message
-    ) {
-        await interaction.reply({ content: message.content, ephemeral: true });
-    }
+	async execute(
+		@CommandInteraction() interaction: MessageContextMenuCommandInteraction,
+		@TargetMessage() message: Message,
+	) {
+		await interaction.reply({ content: message.content, ephemeral: true });
+	}
 }
 ```
 

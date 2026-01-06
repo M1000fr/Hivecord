@@ -23,13 +23,10 @@ import { ExampleCommand } from "./commands/ExampleCommand";
 import { DatabaseModule } from "@modules/Database/DatabaseModule";
 
 @Module({
-    name: "Example",
-    imports: [DatabaseModule],
-    providers: [
-        ExampleService,
-        ExampleCommand
-    ],
-    exports: [ExampleService]
+	name: "Example",
+	imports: [DatabaseModule],
+	providers: [ExampleService, ExampleCommand],
+	exports: [ExampleService],
 })
 export class ExampleModule {}
 ```
@@ -47,9 +44,9 @@ import { SharedService } from "./services/SharedService";
 
 @Global()
 @Module({
-    name: "Shared",
-    providers: [SharedService],
-    exports: [SharedService]
+	name: "Shared",
+	providers: [SharedService],
+	exports: [SharedService],
 })
 export class SharedModule {}
 ```

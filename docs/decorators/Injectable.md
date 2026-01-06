@@ -13,9 +13,9 @@ import { Injectable } from "@src/decorators/Injectable";
 
 @Injectable()
 export class DataService {
-    getData() {
-        return "Important data";
-    }
+	getData() {
+		return "Important data";
+	}
 }
 ```
 
@@ -30,14 +30,12 @@ import { Inject } from "@decorators/Inject";
 import { DataService } from "../services/DataService";
 
 export class MyCommand {
-    constructor(
-        @Inject(DataService) private dataService: DataService
-    ) {}
+	constructor(@Inject(DataService) private dataService: DataService) {}
 
-    async execute() {
-        const data = this.dataService.getData();
-        console.log(data);
-    }
+	async execute() {
+		const data = this.dataService.getData();
+		console.log(data);
+	}
 }
 ```
 

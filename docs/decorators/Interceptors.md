@@ -17,11 +17,13 @@ import { CommandPermissionInterceptor } from "@interceptors/CommandPermissionInt
 
 @SlashCommandController({ name: "admin", description: "Secure zone" })
 export default class SecureCommand {
-    @UseInterceptors(CommandPermissionInterceptor)
-    @SlashCommand()
-    async execute(@CommandInteraction() interaction: ChatInputCommandInteraction) {
-        await interaction.reply("Access granted!");
-    }
+	@UseInterceptors(CommandPermissionInterceptor)
+	@SlashCommand()
+	async execute(
+		@CommandInteraction() interaction: ChatInputCommandInteraction,
+	) {
+		await interaction.reply("Access granted!");
+	}
 }
 ```
 
@@ -43,15 +45,15 @@ import { IInterceptor } from "@interfaces/IInterceptor";
 import { IExecutionContext } from "@interfaces/IExecutionContext";
 
 export class LoggingInterceptor implements IInterceptor {
-    async intercept(context: IExecutionContext, next: () => Promise<void>) {
-        const start = Date.now();
-        console.log(`Before executing ${context.getHandler().name}...`);
+	async intercept(context: IExecutionContext, next: () => Promise<void>) {
+		const start = Date.now();
+		console.log(`Before executing ${context.getHandler().name}...`);
 
-        await next(); // Calls the next interceptor or the target method
+		await next(); // Calls the next interceptor or the target method
 
-        const duration = Date.now() - start;
-        console.log(`Execution finished in ${duration}ms`);
-    }
+		const duration = Date.now() - start;
+		console.log(`Execution finished in ${duration}ms`);
+	}
 }
 ```
 

@@ -21,10 +21,13 @@ import { Button } from "@decorators/Interaction";
 import { ButtonInteraction } from "discord.js";
 
 export class PingInteractions {
-    @Button("ping_button")
-    async handlePingButton(interaction: ButtonInteraction) {
-        await interaction.reply({ content: "You clicked the button!", ephemeral: true });
-    }
+	@Button("ping_button")
+	async handlePingButton(interaction: ButtonInteraction) {
+		await interaction.reply({
+			content: "You clicked the button!",
+			ephemeral: true,
+		});
+	}
 }
 ```
 
@@ -37,12 +40,12 @@ import { Button } from "@decorators/Interaction";
 import { ButtonInteraction } from "discord.js";
 
 export class UserInteractions {
-    @Button("user_kick:*")
-    async handleKick(interaction: ButtonInteraction) {
-        // The full customId is available via interaction.customId
-        const userId = interaction.customId.split(":")[1];
-        await interaction.reply(`Kick action on user ${userId}`);
-    }
+	@Button("user_kick:*")
+	async handleKick(interaction: ButtonInteraction) {
+		// The full customId is available via interaction.customId
+		const userId = interaction.customId.split(":")[1];
+		await interaction.reply(`Kick action on user ${userId}`);
+	}
 }
 ```
 
@@ -57,13 +60,13 @@ import { ModalSubmitInteraction } from "discord.js";
 import { LeBotClient } from "@src/class/LeBotClient";
 
 export class ExampleModal {
-    @Modal("my_modal_id")
-    async onSubmit(
-        interaction: ModalSubmitInteraction,
-        @Client() client: LeBotClient
-    ) {
-        console.log(`Modal submitted by ${interaction.user.tag}`);
-    }
+	@Modal("my_modal_id")
+	async onSubmit(
+		interaction: ModalSubmitInteraction,
+		@Client() client: LeBotClient,
+	) {
+		console.log(`Modal submitted by ${interaction.user.tag}`);
+	}
 }
 ```
 

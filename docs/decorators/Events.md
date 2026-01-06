@@ -12,10 +12,10 @@ import { On } from "@decorators/On";
 
 @EventController()
 export class ReadyEvent {
-    @On("ready")
-    async onReady() {
-        console.log("The bot is ready!");
-    }
+	@On("ready")
+	async onReady() {
+		console.log("The bot is ready!");
+	}
 }
 ```
 
@@ -41,10 +41,10 @@ import { GuildMember } from "discord.js";
 
 @EventController()
 export class MemberJoinEvent {
-    @On({ name: "guildMemberAdd", once: false })
-    async handleJoin(member: GuildMember) {
-        console.log(`${member.user.tag} joined the server.`);
-    }
+	@On({ name: "guildMemberAdd", once: false })
+	async handleJoin(member: GuildMember) {
+		console.log(`${member.user.tag} joined the server.`);
+	}
 }
 ```
 
