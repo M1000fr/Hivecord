@@ -14,13 +14,13 @@ It accepts an object of type `CommandOptions`:
 - `description`: Description displayed in the Discord interface.
 - `contexts`: (Optional) Defines whether the command is available in DMs, Guilds, etc.
 
-```Hivecord
+```ts
 @SlashCommandController({
-    name: "ping",
-    description: "Responds with Pong!"
+  name: "ping",
+  description: "Responds with Pong!",
 })
 export default class PingCommand {
-    // ...
+  // ...
 }
 ```
 
@@ -28,7 +28,7 @@ export default class PingCommand {
 
 This decorator is placed on a method of the class to define the command entry point. By default, the `execute` method (or any method decorated without a specific name) is called when the base command is executed.
 
-```Hivecord
+```ts
     @SlashCommand()
     async execute(@CommandInteraction() interaction: ChatInputCommandInteraction) {
         await interaction.reply("Pong! 🏓");
@@ -39,27 +39,27 @@ This decorator is placed on a method of the class to define the command entry po
 
 To create subcommands (e.g., `/config set` and `/config view`), use the `@Subcommand` decorator.
 
-```Hivecord
+```ts
 @SlashCommandController({
-    name: "config",
-    description: "Manages the configuration"
+  name: "config",
+  description: "Manages the configuration",
 })
 export default class ConfigCommand {
-    @Subcommand({
-        name: "view",
-        description: "View current configuration"
-    })
-    async view(@CommandInteraction() interaction: ChatInputCommandInteraction) {
-        // Logic to view
-    }
+  @Subcommand({
+    name: "view",
+    description: "View current configuration",
+  })
+  async view(@CommandInteraction() interaction: ChatInputCommandInteraction) {
+    // Logic to view
+  }
 
-    @Subcommand({
-        name: "set",
-        description: "Modify an option"
-    })
-    async set(@CommandInteraction() interaction: ChatInputCommandInteraction) {
-        // Logic to modify
-    }
+  @Subcommand({
+    name: "set",
+    description: "Modify an option",
+  })
+  async set(@CommandInteraction() interaction: ChatInputCommandInteraction) {
+    // Logic to modify
+  }
 }
 ```
 
@@ -67,25 +67,60 @@ export default class ConfigCommand {
 
 The `@OptionRoute` decorator allows you to route an interaction to different methods based on the value of a specific option. This is particularly useful for commands that use a "type" or "action" option to determine their behavior without using full subcommands.
 
-```typescript
+```ts
 @SlashCommandController({
-	name: "manage",
-	description: "Manage items",
+  name: "manage",
+  description: "Manage items",
 })
 export default class ManageCommand {
-	@SlashCommand()
-	@OptionRoute({ option: "action", value: "add" })
-	async add(@CommandInteraction() interaction: ChatInputCommandInteraction) {
-		// Executed if the "action" option is "add"
-	}
+  @SlashCommand()
+  @OptionRoute({ option: "action", value: "add" })
+  async add(@CommandInteraction() interaction: ChatInputCommandInteraction) {
+    // Executed if the "action" option is "add"
+  }
 
-	@SlashCommand()
-	@OptionRoute({ option: "action", value: "remove" })
-	async remove(
-		@CommandInteraction() interaction: ChatInputCommandInteraction,
-	) {
-		// Executed if the "action" option is "remove"
-	}
+  @SlashCommand()
+  @OptionRoute({ option: "action", value: "remove" })
+  async remove(@CommandInteraction() interaction: ChatInputCommandInteraction) {
+    // Executed if the "action" option is "remove"
+  }
+}
+```
+
+## @Autocomplete
+
+The `@Autocomplete` decorator allows you to provide real-time suggestions for a specific option in your Slash command. It is a method decorator that links a handler to an option name.
+
+To receive the autocomplete interaction, use the `@AutocompleteInteraction()` parameter decorator.
+
+```ts
+@SlashCommandController({
+  name: "search",
+  description: "Search for an item",
+})
+export default class SearchCommand {
+  @Autocomplete({ optionName: "item" })
+  async handleSearch(
+    @AutocompleteInteraction() interaction: AutocompleteInteraction,
+  ) {
+    const focusedValue = interaction.options.getFocused();
+    const choices = ["apple", "banana", "orange"];
+    const filtered = choices.filter((choice) =>
+      choice.startsWith(focusedValue),
+    );
+
+    await interaction.respond(
+      filtered.map((choice) => ({ name: choice, value: choice })),
+    );
+  }
+
+  @SlashCommand()
+  async execute(
+    @CommandInteraction() interaction: ChatInputCommandInteraction,
+  ) {
+    const item = interaction.options.getString("item");
+    await interaction.reply(`You selected: ${item}`);
+  }
 }
 ```
 

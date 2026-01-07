@@ -12,7 +12,7 @@ Interceptors allow executing logic before or after command execution. Since this
 
 ## Autocomplete (@Autocomplete)
 
-The `@Autocomplete` decorator allows linking a specific method to a Slash command option to provide real-time suggestions to the user as they type.
+The `@Autocomplete` decorator is a **method decorator** that links a specific method to a Slash command option to provide real-time suggestions. To receive the interaction object, use the `@AutocompleteInteraction()` **parameter decorator** on one of the method's arguments.
 
 ### Configuration
 

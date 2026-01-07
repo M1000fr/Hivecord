@@ -17,12 +17,14 @@ Each decorator takes a `customId` as an argument. This `customId` can be an exac
 Decorated methods automatically receive the corresponding interaction. For these methods to be registered, the class must be included in a module's `providers`.
 
 ```typescript
-import { Button } from "@decorators/Interaction";
+import { Button, CommandInteraction } from "@decorators/Interaction";
 import { ButtonInteraction } from "discord.js";
 
 export class PingInteractions {
 	@Button("ping_button")
-	async handlePingButton(interaction: ButtonInteraction) {
+	async handlePingButton(
+		@CommandInteraction() interaction: ButtonInteraction,
+	) {
 		await interaction.reply({
 			content: "You clicked the button!",
 			ephemeral: true,
@@ -36,12 +38,12 @@ export class PingInteractions {
 It is common to use dynamic `customId`s (for example: `user_kick:123456789`). You can use the asterisk `*` to capture these interactions.
 
 ```typescript
-import { Button } from "@decorators/Interaction";
+import { Button, CommandInteraction } from "@decorators/Interaction";
 import { ButtonInteraction } from "discord.js";
 
 export class UserInteractions {
 	@Button("user_kick:*")
-	async handleKick(interaction: ButtonInteraction) {
+	async handleKick(@CommandInteraction() interaction: ButtonInteraction) {
 		// The full customId is available via interaction.customId
 		const userId = interaction.customId.split(":")[1];
 		await interaction.reply(`Kick action on user ${userId}`);
@@ -54,7 +56,7 @@ export class UserInteractions {
 As with Slash commands, you can use parameter decorators to inject the client instance or other utilities:
 
 ```typescript
-import { Modal } from "@decorators/Interaction";
+import { Modal, CommandInteraction } from "@decorators/Interaction";
 import { Client } from "@decorators/params/index.ts";
 import { ModalSubmitInteraction } from "discord.js";
 import { HivecordClient } from "@src/class/HivecordClient";
@@ -62,7 +64,7 @@ import { HivecordClient } from "@src/class/HivecordClient";
 export class ExampleModal {
 	@Modal("my_modal_id")
 	async onSubmit(
-		interaction: ModalSubmitInteraction,
+		@CommandInteraction() interaction: ModalSubmitInteraction,
 		@Client() client: HivecordClient,
 	) {
 		console.log(`Modal submitted by ${interaction.user.tag}`);

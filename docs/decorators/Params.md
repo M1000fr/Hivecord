@@ -16,9 +16,10 @@ async execute(@CommandInteraction() interaction: ChatInputCommandInteraction) {
 
 ### @AutocompleteInteraction()
 
-Injects the `AutocompleteInteraction` object for methods handling autocompletion.
+Injects the `AutocompleteInteraction` object for methods handling autocompletion. This is used in conjunction with the `@Autocomplete` method decorator.
 
 ```typescript
+@Autocomplete({ optionName: "item" })
 async handleAutocomplete(@AutocompleteInteraction() interaction: AutocompleteInteraction) {
     // ...
 }

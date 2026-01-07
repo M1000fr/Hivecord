@@ -17,7 +17,7 @@ Hivecord uses a decorator-based architecture to simplify component declaration, 
 - [**@SlashCommand / @Subcommand**](./SlashCommand.md): Marks a method as an entry point for a command or sub-command.
 - [**@OptionRoute**](./SlashCommand.md#optionroute): Routes an interaction based on an option's value.
 - [**@UserCommand / @MessageCommand**](./ContextCommands.md): Creates context menu commands (right-click on user or message).
-- [**@CommandPermission**](./Permissions.md): Restricts access to a command via the bot's permission system.
+
 
 ### Events and Interactions
 
@@ -30,7 +30,7 @@ Hivecord uses a decorator-based architecture to simplify component declaration, 
 - [**@CommandInteraction / @AutocompleteInteraction**](./Params.md#interaction): Injects the corresponding Discord interaction.
 - [**@Context**](./Params.md#context): Injects the execution context (i18n, guild config).
 - [**@Client**](./Params.md#client): Injects the `HivecordClient` instance.
-- [**@TargetUser / @TargetMessage**](./Params.md#cible): Retrieves the target of a context command.
+- [**@TargetUser / @TargetMessage**](./Params.md#target): Retrieves the target of a context command.
 
 ### Configuration and Advanced
 
@@ -39,9 +39,9 @@ Hivecord uses a decorator-based architecture to simplify component declaration, 
 - [**@OnConfigUpdate**](./Configuration.md#onconfigupdate): Reacts in real-time to configuration changes.
 - [**@ConfigType**](./ConfigTypes.md): Registers a custom configuration type.
 - [**@UseInterceptors**](./Interceptors.md): Applies interceptors (validation, logs, etc.) to a class or method.
-- [**@Autocomplete**](./Advanced.md#autocomplétion-autocomplete): Links a method to a command's autocomplete logic.
-- [**@Repository**](./Advanced.md#dépôts-de-données-repository): Specialization of `@Injectable` for data access with Prisma.
-- [**@ConfigInteraction**](./Advanced.md#interface-de-configuration-configinteraction): Automates injection for configuration UI handlers.
+- [**@Autocomplete**](./Advanced.md#autocomplete-autocomplete): Links a method to a command's autocomplete logic.
+- [**@Repository**](./Advanced.md#data-repositories-repository): Specialization of `@Injectable` for data access with Prisma.
+- [**@ConfigInteraction**](./Advanced.md#configuration-interface-configinteraction): Automates injection for configuration UI handlers.
 
 ---
 
