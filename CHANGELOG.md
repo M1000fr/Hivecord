@@ -1,3 +1,126 @@
+# [2.0.0](https://github.com/M1000fr/Hivecord/compare/v1.0.0...v2.0.0) (2026-01-07)
+
+
+### Bug Fixes
+
+* add @Injectable() decorator to EmbedEditorInteractions ([73a4bf3](https://github.com/M1000fr/Hivecord/commit/73a4bf3b1946cf0b308421f38a32e111dcb4c454))
+* add @Interaction() decorator to all config interaction handlers ([2720688](https://github.com/M1000fr/Hivecord/commit/272068805c7dc10fa6bf024ea007b9a8bca36478))
+* add Array.isArray check for params metadata ([28ce83b](https://github.com/M1000fr/Hivecord/commit/28ce83bde5d1617ce4125674c5954064b6bada88))
+* add explicit constructors to repository classes for proper DI ([a94ace2](https://github.com/M1000fr/Hivecord/commit/a94ace26ed978ea775af691772caa17e0e1ac598))
+* add instanceof Map check for optionRoutes iteration ([3759588](https://github.com/M1000fr/Hivecord/commit/3759588fd32b5a4594c6bbb9b6e36a5a7897d659))
+* **ci:** ignore main branch for pull requests ([9cc7d6e](https://github.com/M1000fr/Hivecord/commit/9cc7d6e25c7275cb2b51eb8cc79bb68c187bff48))
+* **config:** correct proxy typing and restore runtime stability ([f2ab8a8](https://github.com/M1000fr/Hivecord/commit/f2ab8a8f79e0b93348a5eb0e6cfca2b13bd6e132))
+* **config:** ensure language consistency and improve default value handling ([e27ef1b](https://github.com/M1000fr/Hivecord/commit/e27ef1ba1a99d87a2f0bd4dbc1216333de213589))
+* **config:** fix missing CustomIdHelper imports and language property error ([17bdcdb](https://github.com/M1000fr/Hivecord/commit/17bdcdbd3148f6446f70a12698f02e2934fda3b8))
+* **config:** fix snake_case conversion and enhance config helper ([c316483](https://github.com/M1000fr/Hivecord/commit/c316483dd476e9f7aeb7c6f38a230572a3d2b70f))
+* **config:** implement default value handling and display ([7651ad6](https://github.com/M1000fr/Hivecord/commit/7651ad61ffbf6b03606f680c33709ef8864a7283))
+* **config:** improve UI flow, interaction detection and message cleanup ([4bffabd](https://github.com/M1000fr/Hivecord/commit/4bffabd806b0e016ac69fb038c68ea0e12f927c3))
+* **config:** restore missing EConfigType runtime import in ConfigService ([20b4f49](https://github.com/M1000fr/Hivecord/commit/20b4f498d27244504be3d9560b34213df6d9276a))
+* **core:** conditionally clear global commands ([9f76f0c](https://github.com/M1000fr/Hivecord/commit/9f76f0c2b1152eb71988af71307a29f483429c1a))
+* **core:** ensure global commands are cleared in debug mode ([7637e14](https://github.com/M1000fr/Hivecord/commit/7637e1478c90746a824306d9f38acc4ee95dcadd))
+* correct method names in ConfigService and apply formatting ([8ca70e1](https://github.com/M1000fr/Hivecord/commit/8ca70e10a621f34cf1503a111510de490a4834b0))
+* correct TypeScript errors after defaultValue removal ([6f054ec](https://github.com/M1000fr/Hivecord/commit/6f054ec8e056b18e163a20bce2ddcc70547dc0af))
+* **decorators:** ensure paramtypes metadata in @Injectable ([1ca4820](https://github.com/M1000fr/Hivecord/commit/1ca4820806bb39c0bb9a4348718aeca3caeb2b4e))
+* **di:** set LeBotClient scope to global and refactor interaction decorators ([e06d131](https://github.com/M1000fr/Hivecord/commit/e06d13123b4f520d6004cbae9be160603ac7a729))
+* drop guildId default ([b505113](https://github.com/M1000fr/Hivecord/commit/b505113011ba814b59c35a148058c4a65d998183))
+* enforce parameter decorator usage in OnConfigUpdate ([9fbf76d](https://github.com/M1000fr/Hivecord/commit/9fbf76d3e0402217567c9cd042658dd50ba5f0a3))
+* **lint:** remove any types and unused imports ([7eb9ed3](https://github.com/M1000fr/Hivecord/commit/7eb9ed3372b8e9020bc9d357707cd9c36cf8798d))
+* **logger:** fix double stack trace and filter debug/verbose logs ([5cd6c3b](https://github.com/M1000fr/Hivecord/commit/5cd6c3bdcc5b4cf98c367eea8aca4257f35edc8e))
+* move missing repository and provider registrations to CoreModule ([f5f94ae](https://github.com/M1000fr/Hivecord/commit/f5f94aef12db82a687fd8f4581d41e68c9449e7a))
+* register missing repositories in CoreModule ([5ae0c19](https://github.com/M1000fr/Hivecord/commit/5ae0c1983d2e2d5a4849c42b694f7dc39ea4444f))
+* remove Proxy wrapper from @Injectable decorator ([cf60a83](https://github.com/M1000fr/Hivecord/commit/cf60a83c36127e469d168d7353aad5806161d061))
+* resolve dependency injection and type-only import issues ([9e11cfa](https://github.com/M1000fr/Hivecord/commit/9e11cfab4ce866b8d7d3d660712865049ea1304d))
+* resolve lint errors and warnings in audit script and OnConfigUpdate decorator ([dc35e82](https://github.com/M1000fr/Hivecord/commit/dc35e82ec61f1138cb5a15cadaccfe2247cdd95e))
+* **services:** cleanup logs and connection handling ([bfcf5b9](https://github.com/M1000fr/Hivecord/commit/bfcf5b9e2451d32aeea63a7c7625ec15415e8fec))
+* **tsc:** resolve prisma mapping errors and missing EConfigType.ChannelArray ([d63d272](https://github.com/M1000fr/Hivecord/commit/d63d2720b4f7b687c081b38e3fbd0f96bbd157b4))
+* **type:** fix typescript types import ([f5b02c5](https://github.com/M1000fr/Hivecord/commit/f5b02c5b01d0a1a0e8c82c50feedd8d649a06221))
+* **types:** handle unknown error types in shutdown handlers ([3c6454f](https://github.com/M1000fr/Hivecord/commit/3c6454f3094412bc4219624b80de9527adf4f980))
+* **types:** resolve typecheck errors and improve IGuildConfig for module augmentation ([5760207](https://github.com/M1000fr/Hivecord/commit/5760207aa9f8c689a5b60237352b0064f2e51de2))
+* use explicit imports for repositories in EntityService to avoid circular dependency issues ([d115511](https://github.com/M1000fr/Hivecord/commit/d11551156843c6518c2c01f01c7dab4a3b6a5800))
+* wrap AutocompleteInteraction in array for proper destructuring ([6a854f7](https://github.com/M1000fr/Hivecord/commit/6a854f7715aab235175ceb0ff8b0ce7c96e86320))
+
+
+### Code Refactoring
+
+* unify module architecture with single providers array ([3ae1425](https://github.com/M1000fr/Hivecord/commit/3ae142556718dabd5fdc3c8f425a09f4bea6724f))
+
+
+### Features
+
+* add @ConfigInteraction decorator for config interactions ([45f0d70](https://github.com/M1000fr/Hivecord/commit/45f0d7001febd4e1045cc3a988676cfe30f00c3a))
+* add @Repository decorator for automatic DI setup ([fa096fe](https://github.com/M1000fr/Hivecord/commit/fa096fe44ae51a3a6fd676e6d53473eee5dcdfe7))
+* add CommandAutocompleteContext type ([431ef97](https://github.com/M1000fr/Hivecord/commit/431ef979695d9fd958f712f65b6f4b60139ef97a))
+* add GuildLanguageContext interface to unify locale and translation function ([03375db](https://github.com/M1000fr/Hivecord/commit/03375dbe7417aaf25c461202db2b59f617467920))
+* add support for context menu commands (user and message) ([3d0c517](https://github.com/M1000fr/Hivecord/commit/3d0c51788c0b560cfd418f17d681470bd8995428))
+* add validation for @Injectable() decorator on module classes ([2eeb3d9](https://github.com/M1000fr/Hivecord/commit/2eeb3d91e58c003c34f968e182e85e12eaece0fc))
+* **app:** import CustomEmbedModule in AppModule ([b28ce41](https://github.com/M1000fr/Hivecord/commit/b28ce41a178ef688cb41dea4bce05d0493429d49))
+* auto-apply @Injectable() in command and event decorators ([fc6c3d6](https://github.com/M1000fr/Hivecord/commit/fc6c3d6e5d1a4bb1aaf96e635679fbd27ac85e18))
+* **commands:** add @CommandPermission decorator and CommandPermissionInterceptor ([54b8f6e](https://github.com/M1000fr/Hivecord/commit/54b8f6ef90d707ab1ab86302987b11688e17e216))
+* **commands:** add Pager demo to ping command ([aa37ac6](https://github.com/M1000fr/Hivecord/commit/aa37ac664e628efa78eb68da4b6e16df03316028))
+* **config:** add dynamic config type registry ([a7bcef5](https://github.com/M1000fr/Hivecord/commit/a7bcef5ac17e3536447f28ce917670e756f88496))
+* **config:** add dynamic guild configuration and i18n to Guild object ([9dffc1a](https://github.com/M1000fr/Hivecord/commit/9dffc1a97be02eb3f2067413b66c511f62584bd9))
+* **config:** add emojis to all General module config properties ([6555a92](https://github.com/M1000fr/Hivecord/commit/6555a9239ddd52de1d175055797355d94e11a9d0))
+* **config:** add optional emoji to ConfigProperty and display it in UI ([e30b9b6](https://github.com/M1000fr/Hivecord/commit/e30b9b68f7551d12624ffea77eb16424aee8c59b))
+* **config:** add type-safe configuration keys for GeneralConfig ([8b21304](https://github.com/M1000fr/Hivecord/commit/8b2130469bf2af531e5466ed389cbf6c6dd1c003))
+* **config:** implement dynamic config type framework and specialized handlers ([7940318](https://github.com/M1000fr/Hivecord/commit/7940318616addf57d21e1f9296cb6f741319744f))
+* **config:** implement native dynamic configuration type framework ([3b640e3](https://github.com/M1000fr/Hivecord/commit/3b640e3dfb526fb201d663149f9407da482420be))
+* **core:** add interceptors infrastructure and @UseInterceptors decorator ([920dad3](https://github.com/M1000fr/Hivecord/commit/920dad31e7556d017297b4ebfcb30da64983e476))
+* **core:** add module type distinction ([d79b80c](https://github.com/M1000fr/Hivecord/commit/d79b80c848df8263a8c6fd3f64afe5cba2e1259e))
+* **core:** clear global commands in debug mode ([d376e16](https://github.com/M1000fr/Hivecord/commit/d376e168796e434115c41d2b796111d8800c7902))
+* **core:** create PagerService as injectable service ([c47499f](https://github.com/M1000fr/Hivecord/commit/c47499f3856becba2ebd34c09651e74b939f8914))
+* **core:** extract command deployment logic to CommandDeploymentService ([a8d734c](https://github.com/M1000fr/Hivecord/commit/a8d734cf9d6798ff30a24de16b8f53529eb1d293))
+* **core:** extract module loading logic to ModuleLoader ([e981df4](https://github.com/M1000fr/Hivecord/commit/e981df4ebc688a6192e2f0f6fcaf59494d477569))
+* **core:** implement Bootstrap and AppModule ([bd9307d](https://github.com/M1000fr/Hivecord/commit/bd9307db0e89a6aebac40473fdd9c88e0e1392c2))
+* **core:** implement module imports ([6a2bb08](https://github.com/M1000fr/Hivecord/commit/6a2bb0889d9c343012789db3d73066573e713d9d))
+* **core:** implement new decorators and update CommandService for DI ([2f123cc](https://github.com/M1000fr/Hivecord/commit/2f123cc3f0a3984ae9f84fe37fc4680be7261e76))
+* **core:** initialize reflect-metadata at app bootstrap ([4d8f99e](https://github.com/M1000fr/Hivecord/commit/4d8f99e21dd96562008529dffb2837d687237bfd))
+* **core:** integrate GuildConfig parameter resolution in commands and events ([b5e1589](https://github.com/M1000fr/Hivecord/commit/b5e1589c69fcb86af454e656d30b16e13ff8740c))
+* **core:** register PagerService in CoreModule ([b32dd69](https://github.com/M1000fr/Hivecord/commit/b32dd6915c2be4c6093e3b4cf1091dcda0464a02))
+* **core:** update core architecture for dependency injection ([ecbd98a](https://github.com/M1000fr/Hivecord/commit/ecbd98a5fdc20763a40cf56f9bdee8227855d219))
+* **decorators:** add GuildConfig parameter decorator with type-safe keys ([18aa467](https://github.com/M1000fr/Hivecord/commit/18aa4672a5c03e77c47264c999e317a576d4b789))
+* **decorators:** introduce @Injectable, @Inject, and @Service for DI providers ([f08960d](https://github.com/M1000fr/Hivecord/commit/f08960df6271ebb71e740f1337b1bec11653a89c))
+* **di:** add DependencyContainer and provider typing with global and module scopes ([e4dd2ac](https://github.com/M1000fr/Hivecord/commit/e4dd2acca6e8c3ba7405ca1705ee7194f4e0d2a5))
+* **di:** enforce dependency injection usage ([785103f](https://github.com/M1000fr/Hivecord/commit/785103f92fbbe606612db4996316fc63e64f5064))
+* **di:** enhance container with circular detection, transient scope and aliasing ([6cb7ffe](https://github.com/M1000fr/Hivecord/commit/6cb7ffed1a7c9f648416c6d58a86cf5a044bc7ba))
+* enhance i18n audit script and add i18n:info command ([e1da36d](https://github.com/M1000fr/Hivecord/commit/e1da36d3f48d8f75ac405f9f99bcdadf919df84c))
+* **env:** validate environment variables and centralize config ([f38a5dc](https://github.com/M1000fr/Hivecord/commit/f38a5dc6c75bf94d8cdb35992b91407eab7cede1))
+* **healthcheck:** add docker healthcheck script ([6ac5fed](https://github.com/M1000fr/Hivecord/commit/6ac5fed681c0c90a4190f08b578656be33a6d9c5))
+* **i18n:** add pager translations for navigation buttons ([a82d88c](https://github.com/M1000fr/Hivecord/commit/a82d88c90dad237084492c09512df38468dff155))
+* **i18n:** export TFunction type from I18nService ([aed6b5c](https://github.com/M1000fr/Hivecord/commit/aed6b5c3e9a901f79be2b368823d2dd59bfd1bb6))
+* infer subcommand name from method name ([c62550c](https://github.com/M1000fr/Hivecord/commit/c62550cd2a8b956ed965f46bb6246dd2d09fc2ec))
+* **lifecycle:** implement graceful shutdown ([5226f4e](https://github.com/M1000fr/Hivecord/commit/5226f4e7e32da2b51f6cf21362fc523ee9228541))
+* **modules:** create CustomEmbed module ([e68fe07](https://github.com/M1000fr/Hivecord/commit/e68fe076c6c830ca026be6d59691858107d63432))
+* **modules:** register module services as providers/exports and mark services @Service for DI ([432191a](https://github.com/M1000fr/Hivecord/commit/432191a7a566438808cab881078c9803695371de))
+* **module:** support providers, exports, and global scope; store module options via metadata ([5117aef](https://github.com/M1000fr/Hivecord/commit/5117aef4b3afd85d967517825db49d61c8f5b269))
+* **params:** add @Interaction() parameter decorator ([9a6634c](https://github.com/M1000fr/Hivecord/commit/9a6634ccb3e843a7e641a42b71ddac0a0ea6e19f))
+
+
+### Performance Improvements
+
+* **init:** parallelize service startup and add timing logs ([0a91d2d](https://github.com/M1000fr/Hivecord/commit/0a91d2d7005fc96dead06da9e5b54f27704dcf2c))
+
+
+### BREAKING CHANGES
+
+* Remove commands and events arrays from ModuleOptions
+
+- Add ProviderType ('service' | 'command' | 'event') to DI system
+- Add PROVIDER_TYPE_METADATA_KEY for type discrimination
+- Update all decorators to add provider type metadata:
+  - @EventController sets type='event'
+  - @CommandController/@UserCommand/@MessageCommand set type='command'
+  - Regular @Injectable defaults to type='service'
+- Create getProvidersByType utility to filter providers by type
+- Update ModuleOptions to only use 'providers' array
+- Remove deprecated 'commands' and 'events' arrays
+- Refactor all modules to use unified providers array
+- Simplify LeBotClient validation and loading logic
+- Remove backward compatibility code
+
+All providers (services, commands, events) are now registered in a single
+'providers' array, with their type determined by decorator metadata. This
+creates a more consistent and maintainable architecture.
+
 ## [1.0.1-dev.1](https://github.com/M1000fr/Hivecord/compare/v1.0.0...v1.0.1-dev.1) (2025-12-20)
 
 ### Bug Fixes
