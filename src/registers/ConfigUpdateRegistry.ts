@@ -14,7 +14,7 @@ export class ConfigUpdateRegistry {
 		if (!ConfigUpdateRegistry.listeners.has(key)) {
 			ConfigUpdateRegistry.listeners.set(key, []);
 		}
-		ConfigUpdateRegistry.listeners.get(key)!.push(callback);
+		ConfigUpdateRegistry.listeners.get(key)?.push(callback);
 	}
 
 	static async execute(guildId: string, key: string, value: unknown) {

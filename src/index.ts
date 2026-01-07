@@ -1,7 +1,7 @@
+import path from "node:path";
 import { env } from "@utils/Env";
 import { Logger } from "@utils/Logger";
 import { ShardingManager } from "discord.js";
-import path from "path";
 
 const logger = new Logger("ShardingManager");
 

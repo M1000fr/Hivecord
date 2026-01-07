@@ -51,7 +51,7 @@ export class MessageTemplate {
 	}
 
 	private replace(text: string): string {
-		return text.replace(/\{([a-zA-Z0-9_.]+)\}/g, (match, path) => {
+		return text.replace(/\{([a-zA-Z0-9_.]+)\}/g, (_match, path) => {
 			const value = this.getValue(this.context, path);
 			if (value === undefined || value === null)
 				return I18nService.t("common.unknown", { lng: this.locale });

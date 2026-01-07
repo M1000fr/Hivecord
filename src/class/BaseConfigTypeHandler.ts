@@ -79,7 +79,7 @@ export abstract class BaseConfigTypeHandler
 		}
 	}
 
-	async formatValue?(guildId: string, value: unknown): Promise<string> {
+	async formatValue?(_guildId: string, value: unknown): Promise<string> {
 		return String(value);
 	}
 

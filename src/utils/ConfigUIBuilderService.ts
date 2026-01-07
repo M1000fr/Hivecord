@@ -24,7 +24,7 @@ import { CustomIdHelper } from "./CustomIdHelper";
 export class ConfigUIBuilderService {
 	constructor(
 		private readonly resolver: ConfigValueResolverService,
-		@Inject(LeBotClient) private readonly client: LeBotClient<true>,
+		@Inject(LeBotClient) private readonly _client: LeBotClient<true>,
 	) {}
 
 	/**

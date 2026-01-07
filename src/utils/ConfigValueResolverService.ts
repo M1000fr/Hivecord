@@ -21,7 +21,7 @@ export class ConfigValueResolverService {
 	constructor(
 		private readonly valueService: ConfigValueService,
 		private readonly formatterService: ConfigFormatterService,
-		@Inject(LeBotClient) private readonly client: LeBotClient<true>,
+		@Inject(LeBotClient) private readonly _client: LeBotClient<true>,
 	) {}
 
 	/**
@@ -77,7 +77,7 @@ export class ConfigValueResolverService {
 	async buildModuleConfigEmbed(
 		guild: Guild,
 		moduleName: string,
-		user: User,
+		_user: User,
 		t: TFunction,
 		locale: string,
 	) {

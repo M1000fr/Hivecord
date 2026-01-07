@@ -122,7 +122,7 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 				const filePath = `data/${fileName}`;
 
 				// Ensure data directory exists
-				const fs = await import("fs/promises");
+				const fs = await import("node:fs/promises");
 				try {
 					await fs.access("data");
 				} catch {

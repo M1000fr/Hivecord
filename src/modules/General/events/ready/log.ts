@@ -9,8 +9,6 @@ import { Logger } from "@utils/Logger";
 export default class ReadyEvent {
 	private logger = new Logger("ReadyEvent");
 
-	constructor() {}
-
 	@On({ name: BotEvents.ClientReady, once: true })
 	async run(@Client() client: LeBotClient<true>) {
 		if (client.user) {

@@ -123,7 +123,7 @@ export abstract class BaseConfigInteractions {
 	}
 
 	protected async updateConfig(
-		client: LeBotClient<true>,
+		_client: LeBotClient<true>,
 		interaction: RepliableInteraction,
 		moduleName: string,
 		propertyKey: string,
@@ -203,7 +203,7 @@ export abstract class BaseConfigInteractions {
 	}
 
 	protected async deleteConfig(
-		client: LeBotClient<true>,
+		_client: LeBotClient<true>,
 		interaction: RepliableInteraction,
 		moduleName: string,
 		propertyKey: string,
@@ -484,7 +484,7 @@ export abstract class BaseConfigInteractions {
 			.setColor("#5865F2")
 			.setTimestamp();
 
-		if (configContexts && configContexts[selectedProperty]) {
+		if (configContexts?.[selectedProperty]) {
 			const variables = configContexts[selectedProperty];
 			const variablesDescription = variables
 				.map((v) => {

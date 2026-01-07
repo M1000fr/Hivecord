@@ -158,7 +158,7 @@ export class ModuleLoader {
 	}
 
 	private loadConfigHandlers(
-		client: LeBotClient,
+		_client: LeBotClient,
 		options: ModuleOptions,
 	): void {
 		if (!options.providers) return;

@@ -1,9 +1,5 @@
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
-import type { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { InteractionRegistry } from "@registers/InteractionRegistry";
-import type { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
-import type { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
-import type { ConfigValueService } from "@utils/ConfigValueService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ActionRowBuilder,
@@ -23,15 +19,6 @@ export interface SelectOption {
 }
 
 export abstract class BaseSelectConfigHandler extends BaseConfigTypeHandler {
-	constructor(
-		valueService: ConfigValueService,
-		uiBuilder: ConfigUIBuilderService,
-		resolverService: ConfigValueResolverService,
-		configService: ConfigService,
-	) {
-		super(valueService, uiBuilder, resolverService, configService);
-	}
-
 	/**
 	 * The prefix used for custom IDs of this handler
 	 */

@@ -50,7 +50,7 @@ export default class ModulesCommand {
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
 	) {
 		await interaction.deferReply();
-		const lang = await interaction.guild!.i18n();
+		const lang = await interaction.guild?.i18n();
 		const lebot = client;
 		const moduleName = interaction.options.getString("module", true);
 

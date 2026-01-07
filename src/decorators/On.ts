@@ -10,8 +10,7 @@ export function On<K extends keyof ClientEvents | string>(
 	return (
 		target: object,
 		propertyKey: string | symbol,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		descriptor: PropertyDescriptor,
+		_descriptor: PropertyDescriptor,
 	) => {
 		const eventOptions =
 			typeof options === "string" ? { name: options } : options;

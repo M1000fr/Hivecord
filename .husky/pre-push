@@ -1,4 +1,4 @@
-```#!/usr/bin/env sh
+#!/usr/bin/env sh
 
 # 1. Error checking (lint + typecheck)
 echo "🔍 Checking for errors..."

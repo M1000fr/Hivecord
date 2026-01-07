@@ -11,7 +11,7 @@ import { DiscordAPIError } from "discord.js";
 
 @EventController()
 export default class PagerHandlerEvent {
-	constructor(@Inject(PagerService) private pagerService: PagerService) {}
+	constructor(@Inject(PagerService) private _pagerService: PagerService) {}
 
 	@On(BotEvents.InteractionCreate)
 	async run(
