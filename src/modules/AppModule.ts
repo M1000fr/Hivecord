@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { Module } from "@decorators/Module";
 import { DependencyContainer } from "@di/DependencyContainer";
 import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
@@ -23,7 +23,7 @@ import { ConfigValueService } from "@utils/ConfigValueService";
   name: "App",
   imports: [DatabaseModule, GeneralModule, ConfigurationModule],
   providers: [
-    LeBotClient,
+    HivecordClient,
     CommandHandlerEvent,
     PagerHandlerEvent,
     InteractionRegistryHandler,
@@ -37,7 +37,7 @@ import { ConfigValueService } from "@utils/ConfigValueService";
     ConfigUIBuilderService,
     ConfigValueResolverService,
   ],
-  exports: [LeBotClient],
+  exports: [HivecordClient],
 })
 export class AppModule {
   static async init(container: DependencyContainer) {

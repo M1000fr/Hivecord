@@ -1,5 +1,5 @@
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
@@ -25,7 +25,7 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
     const lng = await this.configService.getLanguage(interaction.guild);
     const t = I18nService.getFixedT(lng);
 
-    const module = (interaction.client as LeBotClient).modules.get(
+    const module = (interaction.client as HivecordClient).modules.get(
       moduleName.toLowerCase(),
     );
     const defaultValue = this.getDefaultValue(module, selectedProperty);
@@ -132,7 +132,7 @@ export class AttachmentConfigInteractions extends BaseConfigInteractions {
 
         // Update config with file path
         await this.updateConfig(
-          interaction.client as LeBotClient<true>,
+          interaction.client as HivecordClient<true>,
           interaction,
           moduleName,
           selectedProperty,

@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { EventController } from "@decorators/EventController";
 import { Inject } from "@decorators/Inject";
 import { On } from "@decorators/On";
@@ -15,7 +15,7 @@ export default class PagerHandlerEvent {
 
   @On(BotEvents.InteractionCreate)
   async run(
-    @Client() client: LeBotClient<true>,
+    @Client() client: HivecordClient<true>,
     @Context() [interaction]: ContextOf<typeof BotEvents.InteractionCreate>,
   ) {
     if (!interaction.isButton() && !interaction.isStringSelectMenu()) return;

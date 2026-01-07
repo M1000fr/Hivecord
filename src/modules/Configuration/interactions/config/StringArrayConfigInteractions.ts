@@ -1,5 +1,5 @@
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import {
   type ConfigPropertyOptions,
@@ -61,7 +61,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
       EConfigType.StringArray,
     )) as string[];
 
-    const module = (guild.client as LeBotClient).modules.get(
+    const module = (guild.client as HivecordClient).modules.get(
       moduleName.toLowerCase(),
     );
     const defaultValue = this.getDefaultValue(module, propertyKey) as
@@ -151,7 +151,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
     moduleName: string,
     propertyKey: string,
   ) {
-    const client = interaction.client as LeBotClient<true>;
+    const client = interaction.client as HivecordClient<true>;
     const module = client.modules.get(moduleName);
     if (!module || !module.options.config) return;
 
@@ -220,7 +220,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
       EConfigType.StringArray,
     )) as string[];
 
-    const module = (interaction.client as LeBotClient).modules.get(
+    const module = (interaction.client as HivecordClient).modules.get(
       moduleName.toLowerCase(),
     );
     const defaultValue = this.getDefaultValue(module, propertyKey) as
@@ -258,7 +258,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
       EConfigType.StringArray,
     )) as string[];
 
-    const module = (interaction.client as LeBotClient).modules.get(
+    const module = (interaction.client as HivecordClient).modules.get(
       moduleName.toLowerCase(),
     );
     const defaultValue = this.getDefaultValue(module, propertyKey) as
@@ -346,7 +346,7 @@ export class StringArrayConfigInteractions extends BaseConfigInteractions {
       EConfigType.StringArray,
     )) as string[];
 
-    const module = (interaction.client as LeBotClient).modules.get(
+    const module = (interaction.client as HivecordClient).modules.get(
       moduleName.toLowerCase(),
     );
     const defaultValue = this.getDefaultValue(module, propertyKey) as

@@ -1,6 +1,6 @@
 # Custom Configuration Types (@ConfigType)
 
-LeBot allows extending the configuration system by defining new custom data types. This is useful for managing complex structures or specific selections that are not covered by standard Discord types.
+Hivecord allows extending the configuration system by defining new custom data types. This is useful for managing complex structures or specific selections that are not covered by standard Discord types.
 
 ## @ConfigType
 
@@ -92,7 +92,7 @@ export class AppearanceConfig {
 1. **Global Injection**: Classes decorated with `@ConfigType` are automatically injected with a global scope (`scope: "global"`), meaning they are available throughout the application.
 2. **Base Classes**: Always extend `BaseSelectConfigHandler`, `BaseToggleConfigHandler`, or `BaseModalConfigHandler`. These classes handle the complex logic of building Discord components, managing ephemeral messages, and routing interactions.
 3. **Standardization**: Using custom types allows centralizing validation logic (e.g., checking that a string is a valid hex code) instead of repeating it in every service.
-4. **Dynamic UI**: LeBot's configuration system uses these handlers to dynamically build interaction menus allowing administrators to modify settings without leaving Discord.
+4. **Dynamic UI**: Hivecord's configuration system uses these handlers to dynamically build interaction menus allowing administrators to modify settings without leaving Discord.
 
 ---
 

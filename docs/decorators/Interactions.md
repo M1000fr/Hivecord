@@ -1,6 +1,6 @@
 # Interactions (@Button, @SelectMenu, @Modal)
 
-LeBot provides an automatic routing system for Discord component interactions (buttons, select menus, and modals). Instead of manually managing large `switch` or `if` structures within a global event, you can decorate methods to respond specifically to certain `customId`s.
+Hivecord provides an automatic routing system for Discord component interactions (buttons, select menus, and modals). Instead of manually managing large `switch` or `if` structures within a global event, you can decorate methods to respond specifically to certain `customId`s.
 
 ## Interaction Decorators
 
@@ -57,13 +57,13 @@ As with Slash commands, you can use parameter decorators to inject the client in
 import { Modal } from "@decorators/Interaction";
 import { Client } from "@decorators/params/index.ts";
 import { ModalSubmitInteraction } from "discord.js";
-import { LeBotClient } from "@src/class/LeBotClient";
+import { HivecordClient } from "@src/class/HivecordClient";
 
 export class ExampleModal {
 	@Modal("my_modal_id")
 	async onSubmit(
 		interaction: ModalSubmitInteraction,
-		@Client() client: LeBotClient,
+		@Client() client: HivecordClient,
 	) {
 		console.log(`Modal submitted by ${interaction.user.tag}`);
 	}

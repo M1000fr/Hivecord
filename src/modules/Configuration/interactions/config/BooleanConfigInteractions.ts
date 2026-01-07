@@ -1,5 +1,5 @@
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { Button } from "@decorators/Interaction";
@@ -45,7 +45,7 @@ export class BooleanConfigInteractions extends BaseConfigInteractions {
     const newValue = !isTrue;
 
     await this.updateConfig(
-      interaction.client as LeBotClient<true>,
+      interaction.client as HivecordClient<true>,
       interaction,
       moduleName,
       selectedProperty,

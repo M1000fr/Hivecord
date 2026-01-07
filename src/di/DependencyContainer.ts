@@ -198,7 +198,7 @@ export class DependencyContainer {
         context?.index !== undefined ? ` at index [${context.index}]` : "";
 
       throw new Error(
-        `LeBot can't resolve dependencies of the ${targetName}${dependencySummary}. ` +
+        `Hivecord can't resolve dependencies of the ${targetName}${dependencySummary}. ` +
           `Please make sure that the argument "${tokenName}"${indexInfo} is available in the "${normalizedModule ?? "global"}" module context.`,
       );
     }

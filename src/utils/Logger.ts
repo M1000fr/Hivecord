@@ -56,7 +56,7 @@ export class Logger {
 			formattedMessage = String(message);
 		}
 
-		const output = `${green}[LeBot] ${pid}  -${reset} ${timestamp}   ${color}${level.toUpperCase()}${reset} ${yellow}[${ctx}]${reset} ${color}${formattedMessage}${reset}`;
+		const output = `${green}[Hivecord] ${pid}  -${reset} ${timestamp}   ${color}${level.toUpperCase()}${reset} ${yellow}[${ctx}]${reset} ${color}${formattedMessage}${reset}`;
 
 		console.log(output);
 		if (trace) {

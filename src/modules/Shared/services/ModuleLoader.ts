@@ -1,5 +1,5 @@
 import { BaseConfigTypeHandler } from "@class/BaseConfigTypeHandler";
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { Injectable } from "@decorators/Injectable";
 import { EVENT_METADATA_KEY } from "@decorators/On";
 import {
@@ -24,7 +24,7 @@ export class ModuleLoader {
   private logger = new Logger("ModuleLoader");
   private container = DependencyContainer.getInstance();
 
-  public async loadModules(client: LeBotClient) {
+  public async loadModules(client: HivecordClient) {
     const registeredModules = this.container.getRegisteredModules();
     const allErrors: string[] = [];
 
@@ -101,7 +101,7 @@ export class ModuleLoader {
     }
   }
 
-  private loadCommands(client: LeBotClient, options: ModuleOptions): void {
+  private loadCommands(client: HivecordClient, options: ModuleOptions): void {
     const moduleName = options.name;
 
     if (!options.providers) return;
@@ -156,7 +156,7 @@ export class ModuleLoader {
   }
 
   private loadConfigHandlers(
-    _client: LeBotClient,
+    _client: HivecordClient,
     options: ModuleOptions,
   ): void {
     if (!options.providers) return;
@@ -182,7 +182,7 @@ export class ModuleLoader {
     }
   }
 
-  private loadEvents(client: LeBotClient, options: ModuleOptions): void {
+  private loadEvents(client: HivecordClient, options: ModuleOptions): void {
     const moduleName = options.name;
 
     if (!options.providers) return;

@@ -1,8 +1,9 @@
 {
-  "name": "lebot",
+  "name": "hivecord",
   "module": "src/index.ts",
   "type": "module",
-  "private": true,
+  "private": false,
+  "license": "CC-BY-NC-SA-4.0",
   "version": "1.0.1-dev.1",
   "devDependencies": {
     "@biomejs/biome": "2.3.11",

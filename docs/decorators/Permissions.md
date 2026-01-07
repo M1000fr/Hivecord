@@ -1,6 +1,6 @@
 # Permissions (@CommandPermission)
 
-LeBot uses a granular permission system to restrict access to commands. Unlike native Discord permissions which are often limited, the `@CommandPermission` decorator allows linking a command to a specific permission defined in the `EPermission` enum.
+Hivecord uses a granular permission system to restrict access to commands. Unlike native Discord permissions which are often limited, the `@CommandPermission` decorator allows linking a command to a specific permission defined in the `EPermission` enum.
 
 ## @CommandPermission
 

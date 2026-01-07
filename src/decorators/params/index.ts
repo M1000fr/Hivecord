@@ -8,7 +8,7 @@ export * from "./Interaction";
 export * from "./TargetMessage";
 export * from "./TargetUser";
 
-export const COMMAND_PARAMS_METADATA_KEY = "lebot:command:params";
+export const COMMAND_PARAMS_METADATA_KEY = "hivecord:command:params";
 
 export enum CommandParamType {
 	Client = "CLIENT",

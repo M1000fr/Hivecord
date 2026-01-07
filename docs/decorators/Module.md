@@ -1,6 +1,6 @@
 # @Module
 
-The `@Module` decorator is the cornerstone of LeBot's architecture. It allows grouping domain-related components (commands, services, events) and managing dependencies between different parts of the bot.
+The `@Module` decorator is the cornerstone of Hivecord's architecture. It allows grouping domain-related components (commands, services, events) and managing dependencies between different parts of the bot.
 
 ## Properties
 

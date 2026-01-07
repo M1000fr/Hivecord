@@ -1,4 +1,4 @@
-# LeBot
+# Hivecord
 
 A modular and high-performance Discord bot written in TypeScript, optimized for execution with [Bun](https://bun.sh).
 
@@ -18,7 +18,7 @@ A modular and high-performance Discord bot written in TypeScript, optimized for 
 ├── prisma/         # Database schema and migrations
 ├── scripts/        # Utility and maintenance scripts
 └── src/            # Source code
-    ├── class/      # Base classes (LeBotClient, Pager, etc.)
+    ├── class/      # Base classes (HivecordClient, Pager, etc.)
     ├── decorators/ # Custom decorators for the modular system
     ├── di/         # Dependency Injection container
     ├── enums/      # Shared enums
@@ -101,7 +101,7 @@ modules/MyModule/
 
 ## Development
 
-LeBot uses a decorator system inspired by frameworks like NestJS to facilitate development.
+Hivecord uses a decorator system inspired by frameworks like NestJS to facilitate development.
 
 ### Main Decorators
 

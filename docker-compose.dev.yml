@@ -1,24 +1,24 @@
-name: lebot-dev
+name: hivecord-dev
 services:
-    mariadb:
-        image: mariadb:latest
-        environment:
-            MYSQL_ROOT_PASSWORD: root_password
-            MYSQL_DATABASE: lebot_db
-            MYSQL_USER: lebot_user
-            MYSQL_PASSWORD: lebot_password
-        ports:
-            - "3306:3306"
-        volumes:
-            - mariadb_data_dev:/var/lib/mysql
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: hivecord_db
+      MYSQL_USER: hivecord_user
+      MYSQL_PASSWORD: hivecord_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data_dev:/var/lib/mysql
 
-    redis:
-        image: redis:alpine
-        ports:
-            - "6379:6379"
-        volumes:
-            - redis_data_dev:/data
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_dev:/data
 
 volumes:
-    mariadb_data_dev:
-    redis_data_dev:
+  mariadb_data_dev:
+  redis_data_dev:

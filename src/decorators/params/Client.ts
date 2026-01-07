@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { CommandParamType, registerCommandParameter } from "./index";
 
 export function Client(): ParameterDecorator;
@@ -16,7 +16,7 @@ export function Client(
 	if (target && propertyKey && parameterIndex === undefined) {
 		Object.defineProperty(target, propertyKey, {
 			get: () => {
-				return LeBotClient.getInstance();
+				return HivecordClient.getInstance();
 			},
 			enumerable: true,
 			configurable: true,

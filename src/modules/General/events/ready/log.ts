@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
@@ -10,7 +10,7 @@ export default class ReadyEvent {
   private logger = new Logger("ReadyEvent");
 
   @On({ name: BotEvents.ClientReady, once: true })
-  async run(@Client() client: LeBotClient<true>) {
+  async run(@Client() client: HivecordClient<true>) {
     if (client.user) {
       this.logger.log(`Logged in as ${client.user.tag}!`);
     }

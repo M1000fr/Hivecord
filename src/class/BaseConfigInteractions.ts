@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import type {
   ConfigPropertyOptions,
   EConfigType,
@@ -114,7 +114,7 @@ export abstract class BaseConfigInteractions {
   }
 
   protected async updateConfig(
-    _client: LeBotClient<true>,
+    _client: HivecordClient<true>,
     interaction: RepliableInteraction,
     moduleName: string,
     propertyKey: string,
@@ -187,7 +187,7 @@ export abstract class BaseConfigInteractions {
   }
 
   protected async deleteConfig(
-    _client: LeBotClient<true>,
+    _client: HivecordClient<true>,
     interaction: RepliableInteraction,
     moduleName: string,
     propertyKey: string,
@@ -249,7 +249,7 @@ export abstract class BaseConfigInteractions {
     const lng = await this.configService.getLanguage(interaction.guild!);
     const t = I18nService.getFixedT(lng);
 
-    const module = (interaction.client as LeBotClient).modules.get(
+    const module = (interaction.client as HivecordClient).modules.get(
       moduleName.toLowerCase(),
     );
     const defaultValue = this.getDefaultValue(module, selectedProperty);
@@ -343,7 +343,7 @@ export abstract class BaseConfigInteractions {
   }
 
   protected async getInteractionContext(interaction: ConfigInteraction) {
-    const client = interaction.client as LeBotClient<true>;
+    const client = interaction.client as HivecordClient<true>;
     const parts = CustomIdHelper.parse(interaction.customId);
     const userId = parts[parts.length - 1];
 
@@ -390,7 +390,7 @@ export abstract class BaseConfigInteractions {
   }
 
   protected getPropertyContext(
-    client: LeBotClient<true>,
+    client: HivecordClient<true>,
     moduleName: string,
     propertyKey: string,
   ) {

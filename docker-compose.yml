@@ -1,51 +1,50 @@
-name: lebot
+name: hivecord
 services:
-    mariadb:
-        image: mariadb:latest
-        restart: always
-        environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
-            MYSQL_DATABASE: ${MYSQL_DATABASE:-lebot_db}
-            MYSQL_USER: ${MYSQL_USER:-lebot_user}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD:-lebot_password}
-        healthcheck:
-            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-            start_period: 10s
-            interval: 10s
-            timeout: 5s
-            retries: 3
-        volumes:
-            - mariadb_data:/var/lib/mysql
+  mariadb:
+    image: mariadb:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-hivecord_db}
+      MYSQL_USER: ${MYSQL_USER:-hivecord_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-hivecord_password}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - mariadb_data:/var/lib/mysql
 
-    redis:
-        image: redis:alpine
-        restart: always
-        volumes:
-            - redis_data:/data
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis_data:/data
 
-    bot:
-        build: .
-        restart: always
-        image: reg.m1000.fr/leserveur/lebot:latest
-        depends_on:
-            mariadb:
-                condition: service_healthy
-            redis:
-                condition: service_started
-        healthcheck:
-            test: ["CMD", "bun", "src/healthcheck.ts"]
-            interval: 30s
-            timeout: 10s
-            retries: 3
-        environment:
-            DATABASE_URL: mysql://${MYSQL_USER:-lebot_user}:${MYSQL_PASSWORD:-lebot_password}@mariadb:3306/${MYSQL_DATABASE:-lebot_db}
-            REDIS_URL: redis://redis:6379
-            DISCORD_TOKEN: ${DISCORD_TOKEN}
-            DEBUG_DISCORD_GUILD_ID: ${DEBUG_DISCORD_GUILD_ID}
-            BACKUP_SECRET: ${BACKUP_SECRET}
-        volumes:
-            - ./data:/app/data
+  bot:
+    build: .
+    restart: always
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "bun", "src/healthcheck.ts"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER:-hivecord_user}:${MYSQL_PASSWORD:-hivecord_password}@mariadb:3306/${MYSQL_DATABASE:-hivecord_db}
+      REDIS_URL: redis://redis:6379
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DEBUG_DISCORD_GUILD_ID: ${DEBUG_DISCORD_GUILD_ID}
+      BACKUP_SECRET: ${BACKUP_SECRET}
+    volumes:
+      - ./data:/app/data
 
 volumes:
-    mariadb_data:
-    redis_data:
+  mariadb_data:
+  redis_data:

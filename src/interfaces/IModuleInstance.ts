@@ -1,7 +1,7 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { type ModuleOptions } from "./ModuleOptions";
 
 export interface IModuleInstance {
   moduleOptions: ModuleOptions;
-  setup?: (client: LeBotClient<boolean>) => Promise<void>;
+  setup?: (client: HivecordClient<boolean>) => Promise<void>;
 }

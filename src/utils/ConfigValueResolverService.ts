@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import {
   type ConfigKeyMetadata,
   type ConfigPropertyOptions,
@@ -21,7 +21,7 @@ export class ConfigValueResolverService {
   constructor(
     private readonly valueService: ConfigValueService,
     private readonly formatterService: ConfigFormatterService,
-    @Inject(LeBotClient) private readonly _client: LeBotClient<true>,
+    @Inject(HivecordClient) private readonly _client: HivecordClient<true>,
   ) {}
 
   /**

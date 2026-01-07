@@ -1,6 +1,6 @@
 # Decorators Documentation
 
-LeBot uses a decorator-based architecture to simplify component declaration, dependency injection, and Discord interaction management. This approach keeps the code clean, modular, and highly typed.
+Hivecord uses a decorator-based architecture to simplify component declaration, dependency injection, and Discord interaction management. This approach keeps the code clean, modular, and highly typed.
 
 ## Table of Contents
 
@@ -29,7 +29,7 @@ LeBot uses a decorator-based architecture to simplify component declaration, dep
 
 - [**@CommandInteraction / @AutocompleteInteraction**](./Params.md#interaction): Injects the corresponding Discord interaction.
 - [**@Context**](./Params.md#context): Injects the execution context (i18n, guild config).
-- [**@Client**](./Params.md#client): Injects the `LeBotClient` instance.
+- [**@Client**](./Params.md#client): Injects the `HivecordClient` instance.
 - [**@TargetUser / @TargetMessage**](./Params.md#cible): Retrieves the target of a context command.
 
 ### Configuration and Advanced

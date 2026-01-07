@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
@@ -36,7 +36,7 @@ export default class InteractionCreateEvent {
 
   @On(BotEvents.InteractionCreate)
   async run(
-    @Client() client: LeBotClient<true>,
+    @Client() client: HivecordClient<true>,
     @Context() [interaction]: ContextOf<typeof BotEvents.InteractionCreate>,
   ) {
     if (interaction.isAutocomplete()) {

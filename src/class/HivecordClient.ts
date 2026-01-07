@@ -17,7 +17,7 @@ import {
 } from "discord.js";
 
 @Injectable({ scope: "global" })
-export class LeBotClient<
+export class HivecordClient<
   Ready extends boolean = boolean,
 > extends Client<Ready> {
   public commands = new Collection<
@@ -29,8 +29,8 @@ export class LeBotClient<
     { instance: IModuleInstance; options: ModuleOptions }
   >();
   private container = DependencyContainer.getInstance();
-  private static instance: LeBotClient;
-  private logger = new Logger("LeBotClient");
+  private static instance: HivecordClient;
+  private logger = new Logger("HivecordClient");
 
   constructor(
     public readonly botStateRepository: BotStateRepository,
@@ -49,12 +49,12 @@ export class LeBotClient<
         IntentsBitField.Flags.GuildInvites,
       ],
     });
-    LeBotClient.instance = this;
+    HivecordClient.instance = this;
     this.handleProcessEvents();
   }
 
-  static getInstance(): LeBotClient {
-    return LeBotClient.instance;
+  static getInstance(): HivecordClient {
+    return HivecordClient.instance;
   }
 
   private handleProcessEvents() {
@@ -116,6 +116,6 @@ export class LeBotClient<
   }
 
   public async deployCommands() {
-    await this.commandDeploymentService.deploy(this as LeBotClient<true>);
+    await this.commandDeploymentService.deploy(this as HivecordClient<true>);
   }
 }

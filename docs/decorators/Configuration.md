@@ -1,6 +1,6 @@
 # Configuration (@ModuleConfig & @ConfigProperty)
 
-LeBot features a dynamic per-server (Guild) configuration system. This system allows defining typed parameters that are automatically persisted in the database and modifiable via an interface (usually a configuration command).
+Hivecord features a dynamic per-server (Guild) configuration system. This system allows defining typed parameters that are automatically persisted in the database and modifiable via an interface (usually a configuration command).
 
 ## @ModuleConfig
 
@@ -114,7 +114,7 @@ import { Client } from "@decorators/params";
 
 export class WelcomeService {
 	@OnConfigUpdate("general.welcomeChannelId")
-	async onWelcomeChannelChange(@Client() client: LeBotClient) {
+	async onWelcomeChannelChange(@Client() client: HivecordClient) {
 		console.log(`The welcome channel configuration has changed.`);
 		// Refresh logic, logs, etc.
 	}

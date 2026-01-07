@@ -1,6 +1,6 @@
 # Dependency Injection (@Injectable & @Inject)
 
-LeBot integrates a powerful Dependency Injection (DI) system that helps manage object lifecycles and facilitates testing and modularity.
+Hivecord integrates a powerful Dependency Injection (DI) system that helps manage object lifecycles and facilitates testing and modularity.
 
 ## @Injectable
 

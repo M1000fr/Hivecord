@@ -1,6 +1,6 @@
 # Slash Commands (@SlashCommandController & @SlashCommand)
 
-LeBot simplifies the creation of Discord slash commands using class and method decorators. This system automatically handles command registration with the Discord API and interaction routing.
+Hivecord simplifies the creation of Discord slash commands using class and method decorators. This system automatically handles command registration with the Discord API and interaction routing.
 
 ## @SlashCommandController
 
@@ -14,7 +14,7 @@ It accepts an object of type `CommandOptions`:
 - `description`: Description displayed in the Discord interface.
 - `contexts`: (Optional) Defines whether the command is available in DMs, Guilds, etc.
 
-```LeBot
+```Hivecord
 @SlashCommandController({
     name: "ping",
     description: "Responds with Pong!"
@@ -28,7 +28,7 @@ export default class PingCommand {
 
 This decorator is placed on a method of the class to define the command entry point. By default, the `execute` method (or any method decorated without a specific name) is called when the base command is executed.
 
-```LeBot
+```Hivecord
     @SlashCommand()
     async execute(@CommandInteraction() interaction: ChatInputCommandInteraction) {
         await interaction.reply("Pong! 🏓");
@@ -39,7 +39,7 @@ This decorator is placed on a method of the class to define the command entry po
 
 To create subcommands (e.g., `/config set` and `/config view`), use the `@Subcommand` decorator.
 
-```LeBot
+```Hivecord
 @SlashCommandController({
     name: "config",
     description: "Manages the configuration"
@@ -95,7 +95,7 @@ Command methods support automatic parameter injection to facilitate access to Di
 
 - `@CommandInteraction()`: The `ChatInputCommandInteraction` interaction.
 - `@Context()`: The `IExecutionContext` (i18n, guild config).
-- `@Client()`: The `LeBotClient` instance.
+- `@Client()`: The `HivecordClient` instance.
 
 ---
 

@@ -1,5 +1,5 @@
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
-import { LeBotClient } from "@src/class/LeBotClient";
+import { HivecordClient } from "@src/class/HivecordClient";
 import {
   ButtonInteraction,
   ChatInputCommandInteraction,
@@ -38,7 +38,7 @@ export interface ConfigTypeHandler {
       | StringSelectMenuInteraction
       | ButtonInteraction
       | ChatInputCommandInteraction,
-    client: LeBotClient,
+    client: HivecordClient,
     moduleName: string,
     propertyKey: string,
     value: unknown,

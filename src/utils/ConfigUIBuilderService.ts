@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { EConfigType, type IConfigClass } from "@decorators/ConfigProperty";
 import { Inject } from "@decorators/Inject";
 import { Injectable } from "@decorators/Injectable";
@@ -24,7 +24,7 @@ import { CustomIdHelper } from "./CustomIdHelper";
 export class ConfigUIBuilderService {
   constructor(
     private readonly resolver: ConfigValueResolverService,
-    @Inject(LeBotClient) private readonly _client: LeBotClient<true>,
+    @Inject(HivecordClient) private readonly _client: HivecordClient<true>,
   ) {}
 
   /**

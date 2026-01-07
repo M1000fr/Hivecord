@@ -1,6 +1,6 @@
 # Parameter Decorators
 
-LeBot uses parameter decorators to automatically inject specific objects into your command or interaction methods. This avoids having to manually extract data from the base interaction object.
+Hivecord uses parameter decorators to automatically inject specific objects into your command or interaction methods. This avoids having to manually extract data from the base interaction object.
 
 ## Interaction
 
@@ -62,10 +62,10 @@ export default class CopyCommand {
 
 ### @Client()
 
-Injects the global `LeBotClient` instance. Useful for accessing global properties, cache, or client utility methods.
+Injects the global `HivecordClient` instance. Useful for accessing global properties, cache, or client utility methods.
 
 ```typescript
-async doSomething(@Client() client: LeBotClient) {
+async doSomething(@Client() client: HivecordClient) {
     console.log(`The bot is logged in as ${client.user?.tag}`);
 }
 ```

@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { Injectable } from "@decorators/Injectable";
 import {
   AutocompleteInteraction,
@@ -27,7 +27,7 @@ export default class ModulesCommand {
 
   @Autocomplete({ optionName: "module" })
   async autocompleteModule(
-    @Client() client: LeBotClient<true>,
+    @Client() client: HivecordClient<true>,
     @AutocompleteInteraction() [interaction]: CommandAutocompleteContext,
   ) {
     const focusedValue = interaction.options.getFocused().toLowerCase();
@@ -46,7 +46,7 @@ export default class ModulesCommand {
 
   @SlashCommand()
   async run(
-    @Client() client: LeBotClient<true>,
+    @Client() client: HivecordClient<true>,
     @CommandInteraction() interaction: ChatInputCommandInteraction,
   ) {
     await interaction.deferReply();
@@ -59,10 +59,10 @@ export default class ModulesCommand {
       return;
     }
 
-    const lebot = client;
+    const hivecord = client;
     const moduleName = interaction.options.getString("module", true);
 
-    const module = lebot.modules.get(moduleName.toLowerCase());
+    const module = hivecord.modules.get(moduleName.toLowerCase());
 
     if (!module) {
       await interaction.editReply({

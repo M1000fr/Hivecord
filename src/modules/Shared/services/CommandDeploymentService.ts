@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import { Injectable } from "@decorators/Injectable";
 import { BotStateRepository } from "@src/repositories";
 import { Logger } from "@utils/Logger";
@@ -15,7 +15,7 @@ export class CommandDeploymentService {
 
   constructor(private readonly botStateRepository: BotStateRepository) {}
 
-  public async deploy(client: LeBotClient<true>) {
+  public async deploy(client: HivecordClient<true>) {
     if (!client.token || !client.user) {
       this.logger.error("Client not logged in or token missing.");
       return;

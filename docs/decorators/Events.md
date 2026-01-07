@@ -1,6 +1,6 @@
 # Events (@EventController & @On)
 
-LeBot uses a decoration system to listen for Discord API events. This allows grouping event-related logic into dedicated classes and benefiting from dependency injection.
+Hivecord uses a decoration system to listen for Discord API events. This allows grouping event-related logic into dedicated classes and benefiting from dependency injection.
 
 ## @EventController
 

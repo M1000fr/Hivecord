@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { HivecordClient } from "@class/HivecordClient";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import {
   CONFIG_TYPE_METADATA_KEY,
@@ -56,20 +56,20 @@ export abstract class BaseConfigTypeHandler
       | StringSelectMenuInteraction
       | ButtonInteraction
       | ChatInputCommandInteraction,
-    client: LeBotClient,
+    client: HivecordClient,
     moduleName: string,
     propertyKey: string,
     value: unknown,
   ): Promise<void> {
     // Default implementation (can be overridden)
     const { propertyOptions } = this.getPropertyContext(
-      client as LeBotClient<true>,
+      client as HivecordClient<true>,
       moduleName,
       propertyKey,
     );
     if (propertyOptions) {
       await this.updateConfig(
-        client as LeBotClient<true>,
+        client as HivecordClient<true>,
         interaction,
         moduleName,
         propertyKey,
@@ -85,7 +85,7 @@ export abstract class BaseConfigTypeHandler
 
   /**
    * Register interactions for this handler.
-   * Called automatically by LeBotClient after instantiation.
+   * Called automatically by HivecordClient after instantiation.
    */
   registerInteractions?(): void;
 }
