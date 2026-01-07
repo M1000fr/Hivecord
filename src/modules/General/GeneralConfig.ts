@@ -31,7 +31,7 @@ export class GeneralConfig {
 		nonNull: true,
 		emoji: "🌐",
 	})
-	static Language = configKey("fr");
+	static Language = configKey("en");
 }
 
 declare module "@interfaces/IGuildConfig" {
