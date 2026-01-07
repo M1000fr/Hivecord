@@ -1,5 +1,5 @@
 import { LeBotClient } from "@class/LeBotClient";
-import type {
+import {
   ConfigKeyMetadata,
   ConfigPropertyOptions,
   EConfigType,
@@ -7,10 +7,10 @@ import type {
 } from "@decorators/ConfigProperty";
 import { Inject } from "@decorators/Inject";
 import { Injectable } from "@decorators/Injectable";
-import type { Guild, Locale, User } from "discord.js";
+import { Guild, Locale, User } from "discord.js";
 import type { TFunction } from "i18next";
 import { ConfigFormatterService } from "./ConfigFormatterService";
-import type { ConfigValueService } from "./ConfigValueService";
+import { ConfigValueService } from "./ConfigValueService";
 
 /**
  * Handles retrieval and formatting of current configuration values.

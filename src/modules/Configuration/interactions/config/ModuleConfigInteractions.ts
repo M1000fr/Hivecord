@@ -4,15 +4,12 @@ import { Inject } from "@decorators/Inject";
 import { Injectable } from "@decorators/Injectable";
 import { Button, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
-import type { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
-import type { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
-import type { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
-import type { ConfigValueService } from "@utils/ConfigValueService";
-import type {
-  ButtonInteraction,
-  StringSelectMenuInteraction,
-} from "discord.js";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigValueService } from "@utils/ConfigValueService";
+import { ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
 import { AttachmentConfigInteractions } from "./AttachmentConfigInteractions";
 import { BooleanConfigInteractions } from "./BooleanConfigInteractions";
 import { RoleChannelConfigInteractions } from "./RoleChannelConfigInteractions";

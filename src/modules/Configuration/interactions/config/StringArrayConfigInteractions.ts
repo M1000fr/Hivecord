@@ -1,10 +1,10 @@
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
-import type { LeBotClient } from "@class/LeBotClient";
+import { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import {
-	type ConfigPropertyOptions,
-	EConfigType,
-	type IConfigClass,
+  type ConfigPropertyOptions,
+  EConfigType,
+  type IConfigClass,
 } from "@decorators/ConfigProperty";
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
@@ -12,508 +12,500 @@ import { I18nService } from "@modules/Shared/services/I18nService";
 import { ConfigFormatterService } from "@utils/ConfigFormatterService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
-	ActionRowBuilder,
-	ButtonBuilder,
-	type ButtonInteraction,
-	ButtonStyle,
-	type Guild,
-	ModalBuilder,
-	type ModalSubmitInteraction,
-	type RepliableInteraction,
-	StringSelectMenuBuilder,
-	type StringSelectMenuInteraction,
-	StringSelectMenuOptionBuilder,
-	TextInputBuilder,
-	TextInputStyle,
+  ActionRowBuilder,
+  ButtonBuilder,
+  type ButtonInteraction,
+  ButtonStyle,
+  type Guild,
+  ModalBuilder,
+  type ModalSubmitInteraction,
+  type RepliableInteraction,
+  StringSelectMenuBuilder,
+  type StringSelectMenuInteraction,
+  StringSelectMenuOptionBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 
 @ConfigInteraction()
 export class StringArrayConfigInteractions extends BaseConfigInteractions {
-	async show(
-		interaction: RepliableInteraction,
-		propertyOptions: ConfigPropertyOptions,
-		propertyKey: string,
-		moduleName: string,
-	) {
-		const view = await this.buildView(
-			interaction.guild!,
-			interaction.user.id,
-			propertyOptions,
-			propertyKey,
-			moduleName,
-		);
+  async show(
+    interaction: RepliableInteraction,
+    propertyOptions: ConfigPropertyOptions,
+    propertyKey: string,
+    moduleName: string,
+  ) {
+    const view = await this.buildView(
+      interaction.guild!,
+      interaction.user.id,
+      propertyOptions,
+      propertyKey,
+      moduleName,
+    );
 
-		await interaction.reply({
-			...view,
-		});
-	}
+    await interaction.reply({
+      ...view,
+    });
+  }
 
-	private async buildView(
-		guild: Guild,
-		userId: string,
-		propertyOptions: ConfigPropertyOptions,
-		propertyKey: string,
-		moduleName: string,
-	) {
-		const currentValues = (await this.valueService.fetchValue(
-			guild,
-			propertyKey,
-			EConfigType.StringArray,
-		)) as string[];
+  private async buildView(
+    guild: Guild,
+    userId: string,
+    propertyOptions: ConfigPropertyOptions,
+    propertyKey: string,
+    moduleName: string,
+  ) {
+    const currentValues = (await this.valueService.fetchValue(
+      guild,
+      propertyKey,
+      EConfigType.StringArray,
+    )) as string[];
 
-		const module = (guild.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
-		const defaultValue = this.getDefaultValue(module, propertyKey) as
-			| string[]
-			| undefined;
+    const module = (guild.client as LeBotClient).modules.get(
+      moduleName.toLowerCase(),
+    );
+    const defaultValue = this.getDefaultValue(module, propertyKey) as
+      | string[]
+      | undefined;
 
-		const valuesToUse =
-			currentValues && currentValues.length > 0
-				? currentValues
-				: defaultValue || [];
+    const valuesToUse =
+      currentValues && currentValues.length > 0
+        ? currentValues
+        : defaultValue || [];
 
-		const lng = await this.configService.getLanguage(guild);
-		const t = I18nService.getFixedT(lng);
+    const lng = await this.configService.getLanguage(guild);
+    const t = I18nService.getFixedT(lng);
 
-		const displayValue =
-			valuesToUse.length > 0
-				? valuesToUse.map((v) => `\n- ${v}`).join()
-				: t("common.none", "None");
+    const displayValue =
+      valuesToUse.length > 0
+        ? valuesToUse.map((v) => `\n- ${v}`).join()
+        : t("common.none", "None");
 
-		const embed = this.buildPropertyEmbed(
-			propertyOptions,
-			propertyKey,
-			displayValue,
-			{ locale: lng, t },
-		);
+    const embed = this.buildPropertyEmbed(
+      propertyOptions,
+      propertyKey,
+      displayValue,
+      { locale: lng, t },
+    );
 
-		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			new ButtonBuilder()
-				.setCustomId(
-					CustomIdHelper.build([
-						"module_config_array_add",
-						moduleName,
-						propertyKey,
-						userId,
-					]),
-				)
-				.setLabel("Add")
-				.setStyle(ButtonStyle.Success),
-		);
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(
+          CustomIdHelper.build([
+            "module_config_array_add",
+            moduleName,
+            propertyKey,
+            userId,
+          ]),
+        )
+        .setLabel("Add")
+        .setStyle(ButtonStyle.Success),
+    );
 
-		if (valuesToUse.length > 0) {
-			row.addComponents(
-				new ButtonBuilder()
-					.setCustomId(
-						CustomIdHelper.build([
-							"module_config_array_remove",
-							moduleName,
-							propertyKey,
-							userId,
-						]),
-					)
-					.setLabel("Remove")
-					.setStyle(ButtonStyle.Danger),
-				new ButtonBuilder()
-					.setCustomId(
-						CustomIdHelper.build([
-							"module_config_array_edit",
-							moduleName,
-							propertyKey,
-							userId,
-						]),
-					)
-					.setLabel("Edit")
-					.setStyle(ButtonStyle.Primary),
-			);
-		}
+    if (valuesToUse.length > 0) {
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId(
+            CustomIdHelper.build([
+              "module_config_array_remove",
+              moduleName,
+              propertyKey,
+              userId,
+            ]),
+          )
+          .setLabel("Remove")
+          .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId(
+            CustomIdHelper.build([
+              "module_config_array_edit",
+              moduleName,
+              propertyKey,
+              userId,
+            ]),
+          )
+          .setLabel("Edit")
+          .setStyle(ButtonStyle.Primary),
+      );
+    }
 
-		row.addComponents(
-			this.createConfigButton(
-				"module_config_cancel",
-				moduleName,
-				propertyKey,
-				userId,
-				"Cancel",
-				ButtonStyle.Secondary,
-			),
-		);
+    row.addComponents(
+      this.createConfigButton(
+        "module_config_cancel",
+        moduleName,
+        propertyKey,
+        userId,
+        "Cancel",
+        ButtonStyle.Secondary,
+      ),
+    );
 
-		return { embeds: [embed], components: [row] };
-	}
+    return { embeds: [embed], components: [row] };
+  }
 
-	private async refreshView(
-		interaction:
-			| ModalSubmitInteraction
-			| StringSelectMenuInteraction
-			| ButtonInteraction,
-		moduleName: string,
-		propertyKey: string,
-	) {
-		const client = interaction.client as LeBotClient<true>;
-		const module = client.modules.get(moduleName);
-		if (!module || !module.options.config) return;
+  private async refreshView(
+    interaction:
+      | ModalSubmitInteraction
+      | StringSelectMenuInteraction
+      | ButtonInteraction,
+    moduleName: string,
+    propertyKey: string,
+  ) {
+    const client = interaction.client as LeBotClient<true>;
+    const module = client.modules.get(moduleName);
+    if (!module || !module.options.config) return;
 
-		const configProperties = (
-			module.options.config as unknown as IConfigClass
-		).configProperties;
-		const propertyOptions = configProperties?.[propertyKey];
+    const configProperties = (module.options.config as unknown as IConfigClass)
+      .configProperties;
+    const propertyOptions = configProperties?.[propertyKey];
 
-		if (!propertyOptions) return;
+    if (!propertyOptions) return;
 
-		const view = await this.buildView(
-			interaction.guild!,
-			interaction.user.id,
-			propertyOptions,
-			propertyKey,
-			moduleName,
-		);
+    const view = await this.buildView(
+      interaction.guild!,
+      interaction.user.id,
+      propertyOptions,
+      propertyKey,
+      moduleName,
+    );
 
-		if (interaction.isMessageComponent()) {
-			await interaction.update(view);
-		}
-	}
+    if (interaction.isMessageComponent()) {
+      await interaction.update(view);
+    }
+  }
 
-	@Button("module_config_array_add:*:*:*")
-	async handleAddButton(@Interaction() interaction: ButtonInteraction) {
-		const ctx = await this.getInteractionContext(interaction);
-		if (!ctx) return;
-		const { parts, userId } = ctx;
-		const moduleName = parts[1]!;
-		const propertyKey = parts[2]!;
+  @Button("module_config_array_add:*:*:*")
+  async handleAddButton(@Interaction() interaction: ButtonInteraction) {
+    const ctx = await this.getInteractionContext(interaction);
+    if (!ctx) return;
+    const { parts, userId } = ctx;
+    const moduleName = parts[1]!;
+    const propertyKey = parts[2]!;
 
-		const input = new TextInputBuilder({
-			customId: "value",
-			label: "Value",
-			style: TextInputStyle.Short,
-			required: true,
-		});
+    const input = new TextInputBuilder({
+      customId: "value",
+      label: "Value",
+      style: TextInputStyle.Short,
+      required: true,
+    });
 
-		const modal = new ModalBuilder({
-			customId: CustomIdHelper.build([
-				"module_config_array_add_sub",
-				moduleName,
-				propertyKey,
-				userId,
-			]),
-			title: "Add Value",
-			components: [
-				new ActionRowBuilder<TextInputBuilder>().addComponents(input),
-			],
-		});
+    const modal = new ModalBuilder({
+      customId: CustomIdHelper.build([
+        "module_config_array_add_sub",
+        moduleName,
+        propertyKey,
+        userId,
+      ]),
+      title: "Add Value",
+      components: [
+        new ActionRowBuilder<TextInputBuilder>().addComponents(input),
+      ],
+    });
 
-		await interaction.showModal(modal);
-	}
+    await interaction.showModal(modal);
+  }
 
-	@Modal("module_config_array_add_sub:*:*:*")
-	async handleAddModal(@Interaction() interaction: ModalSubmitInteraction) {
-		const ctx = await this.getInteractionContext(interaction);
-		if (!ctx) return;
-		const { parts } = ctx;
-		const moduleName = parts[1]!;
-		const propertyKey = parts[2]!;
-		const newValue = interaction.fields.getTextInputValue("value");
+  @Modal("module_config_array_add_sub:*:*:*")
+  async handleAddModal(@Interaction() interaction: ModalSubmitInteraction) {
+    const ctx = await this.getInteractionContext(interaction);
+    if (!ctx) return;
+    const { parts } = ctx;
+    const moduleName = parts[1]!;
+    const propertyKey = parts[2]!;
+    const newValue = interaction.fields.getTextInputValue("value");
 
-		const currentValues = (await this.valueService.fetchValue(
-			interaction.guild!,
-			propertyKey,
-			EConfigType.StringArray,
-		)) as string[];
+    const currentValues = (await this.valueService.fetchValue(
+      interaction.guild!,
+      propertyKey,
+      EConfigType.StringArray,
+    )) as string[];
 
-		const module = (interaction.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
-		const defaultValue = this.getDefaultValue(module, propertyKey) as
-			| string[]
-			| undefined;
+    const module = (interaction.client as LeBotClient).modules.get(
+      moduleName.toLowerCase(),
+    );
+    const defaultValue = this.getDefaultValue(module, propertyKey) as
+      | string[]
+      | undefined;
 
-		const valuesToUse =
-			currentValues && currentValues.length > 0
-				? currentValues
-				: defaultValue || [];
+    const valuesToUse =
+      currentValues && currentValues.length > 0
+        ? currentValues
+        : defaultValue || [];
 
-		const newValues = [...valuesToUse, newValue];
+    const newValues = [...valuesToUse, newValue];
 
-		await this.valueService.saveValue(
-			interaction.guild!,
-			propertyKey,
-			newValues,
-			EConfigType.StringArray,
-		);
+    await this.valueService.saveValue(
+      interaction.guild!,
+      propertyKey,
+      newValues,
+      EConfigType.StringArray,
+    );
 
-		await this.refreshView(interaction, moduleName, propertyKey);
-	}
+    await this.refreshView(interaction, moduleName, propertyKey);
+  }
 
-	@Button("module_config_array_remove:*:*:*")
-	async handleRemoveButton(@Interaction() interaction: ButtonInteraction) {
-		const ctx = await this.getInteractionContext(interaction);
-		if (!ctx) return;
-		const { parts, userId } = ctx;
-		const moduleName = parts[1]!;
-		const propertyKey = parts[2]!;
+  @Button("module_config_array_remove:*:*:*")
+  async handleRemoveButton(@Interaction() interaction: ButtonInteraction) {
+    const ctx = await this.getInteractionContext(interaction);
+    if (!ctx) return;
+    const { parts, userId } = ctx;
+    const moduleName = parts[1]!;
+    const propertyKey = parts[2]!;
 
-		const currentValues = (await this.valueService.fetchValue(
-			interaction.guild!,
-			propertyKey,
-			EConfigType.StringArray,
-		)) as string[];
+    const currentValues = (await this.valueService.fetchValue(
+      interaction.guild!,
+      propertyKey,
+      EConfigType.StringArray,
+    )) as string[];
 
-		const module = (interaction.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
-		const defaultValue = this.getDefaultValue(module, propertyKey) as
-			| string[]
-			| undefined;
+    const module = (interaction.client as LeBotClient).modules.get(
+      moduleName.toLowerCase(),
+    );
+    const defaultValue = this.getDefaultValue(module, propertyKey) as
+      | string[]
+      | undefined;
 
-		const valuesToUse =
-			currentValues && currentValues.length > 0
-				? currentValues
-				: defaultValue || [];
+    const valuesToUse =
+      currentValues && currentValues.length > 0
+        ? currentValues
+        : defaultValue || [];
 
-		if (valuesToUse.length === 0) {
-			await this.respondToInteraction(
-				interaction,
-				"No values to remove.",
-			);
-			return;
-		}
+    if (valuesToUse.length === 0) {
+      await this.respondToInteraction(interaction, "No values to remove.");
+      return;
+    }
 
-		const select = new StringSelectMenuBuilder()
-			.setCustomId(
-				CustomIdHelper.build([
-					"module_config_array_remove_sub",
-					moduleName,
-					propertyKey,
-					userId,
-				]),
-			)
-			.setPlaceholder("Select values to remove")
-			.setMinValues(1)
-			.setMaxValues(Math.min(valuesToUse.length, 25));
+    const select = new StringSelectMenuBuilder()
+      .setCustomId(
+        CustomIdHelper.build([
+          "module_config_array_remove_sub",
+          moduleName,
+          propertyKey,
+          userId,
+        ]),
+      )
+      .setPlaceholder("Select values to remove")
+      .setMinValues(1)
+      .setMaxValues(Math.min(valuesToUse.length, 25));
 
-		valuesToUse.slice(0, 25).forEach((value, index) => {
-			select.addOptions(
-				new StringSelectMenuOptionBuilder()
-					.setLabel(ConfigFormatterService.truncate(value, 100))
-					.setValue(index.toString()),
-			);
-		});
+    valuesToUse.slice(0, 25).forEach((value, index) => {
+      select.addOptions(
+        new StringSelectMenuOptionBuilder()
+          .setLabel(ConfigFormatterService.truncate(value, 100))
+          .setValue(index.toString()),
+      );
+    });
 
-		await interaction.update({
-			content: "Select values to remove:",
-			embeds: [],
-			components: [
-				new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-					select,
-				),
-				new ActionRowBuilder<ButtonBuilder>().addComponents(
-					new ButtonBuilder()
-						.setCustomId(
-							CustomIdHelper.build([
-								"module_config_array_cancel",
-								moduleName,
-								propertyKey,
-								userId,
-							]),
-						)
-						.setLabel("Cancel")
-						.setStyle(ButtonStyle.Secondary),
-				),
-			],
-		});
-	}
+    await interaction.update({
+      content: "Select values to remove:",
+      embeds: [],
+      components: [
+        new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select),
+        new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId(
+              CustomIdHelper.build([
+                "module_config_array_cancel",
+                moduleName,
+                propertyKey,
+                userId,
+              ]),
+            )
+            .setLabel("Cancel")
+            .setStyle(ButtonStyle.Secondary),
+        ),
+      ],
+    });
+  }
 
-	@Button("module_config_array_cancel:*:*:*")
-	async handleCancelButton(@Interaction() interaction: ButtonInteraction) {
-		const ctx = await this.getInteractionContext(interaction);
-		if (!ctx) return;
-		const { parts } = ctx;
-		const moduleName = parts[1]!;
-		const propertyKey = parts[2]!;
+  @Button("module_config_array_cancel:*:*:*")
+  async handleCancelButton(@Interaction() interaction: ButtonInteraction) {
+    const ctx = await this.getInteractionContext(interaction);
+    if (!ctx) return;
+    const { parts } = ctx;
+    const moduleName = parts[1]!;
+    const propertyKey = parts[2]!;
 
-		await this.refreshView(interaction, moduleName, propertyKey);
-	}
+    await this.refreshView(interaction, moduleName, propertyKey);
+  }
 
-	@SelectMenu("module_config_array_remove_sub:*:*:*")
-	async handleRemoveSelect(
-		@Interaction() interaction: StringSelectMenuInteraction,
-	) {
-		const ctx = await this.getInteractionContext(interaction);
-		if (!ctx) return;
-		const { parts } = ctx;
-		const moduleName = parts[1]!;
-		const propertyKey = parts[2]!;
-		const selectedIndices = interaction.values.map(Number);
+  @SelectMenu("module_config_array_remove_sub:*:*:*")
+  async handleRemoveSelect(
+    @Interaction() interaction: StringSelectMenuInteraction,
+  ) {
+    const ctx = await this.getInteractionContext(interaction);
+    if (!ctx) return;
+    const { parts } = ctx;
+    const moduleName = parts[1]!;
+    const propertyKey = parts[2]!;
+    const selectedIndices = interaction.values.map(Number);
 
-		const currentValues = (await this.valueService.fetchValue(
-			interaction.guild!,
-			propertyKey,
-			EConfigType.StringArray,
-		)) as string[];
+    const currentValues = (await this.valueService.fetchValue(
+      interaction.guild!,
+      propertyKey,
+      EConfigType.StringArray,
+    )) as string[];
 
-		const module = (interaction.client as LeBotClient).modules.get(
-			moduleName.toLowerCase(),
-		);
-		const defaultValue = this.getDefaultValue(module, propertyKey) as
-			| string[]
-			| undefined;
+    const module = (interaction.client as LeBotClient).modules.get(
+      moduleName.toLowerCase(),
+    );
+    const defaultValue = this.getDefaultValue(module, propertyKey) as
+      | string[]
+      | undefined;
 
-		const valuesToUse =
-			currentValues && currentValues.length > 0
-				? currentValues
-				: defaultValue || [];
+    const valuesToUse =
+      currentValues && currentValues.length > 0
+        ? currentValues
+        : defaultValue || [];
 
-		const newValues = valuesToUse.filter(
-			(_, index) => !selectedIndices.includes(index),
-		);
+    const newValues = valuesToUse.filter(
+      (_, index) => !selectedIndices.includes(index),
+    );
 
-		await this.valueService.saveValue(
-			interaction.guild!,
-			propertyKey,
-			newValues,
-			EConfigType.StringArray,
-		);
+    await this.valueService.saveValue(
+      interaction.guild!,
+      propertyKey,
+      newValues,
+      EConfigType.StringArray,
+    );
 
-		await this.refreshView(interaction, moduleName, propertyKey);
-	}
+    await this.refreshView(interaction, moduleName, propertyKey);
+  }
 
-	@Button("module_config_array_edit:*:*:*")
-	async handleEditButton(@Interaction() interaction: ButtonInteraction) {
-		const ctx = await this.getInteractionContext(interaction);
-		if (!ctx) return;
-		const { parts, userId } = ctx;
-		const moduleName = parts[1]!;
-		const propertyKey = parts[2]!;
+  @Button("module_config_array_edit:*:*:*")
+  async handleEditButton(@Interaction() interaction: ButtonInteraction) {
+    const ctx = await this.getInteractionContext(interaction);
+    if (!ctx) return;
+    const { parts, userId } = ctx;
+    const moduleName = parts[1]!;
+    const propertyKey = parts[2]!;
 
-		const currentValues = (await this.valueService.fetchValue(
-			interaction.guild!,
-			propertyKey,
-			EConfigType.StringArray,
-		)) as string[];
+    const currentValues = (await this.valueService.fetchValue(
+      interaction.guild!,
+      propertyKey,
+      EConfigType.StringArray,
+    )) as string[];
 
-		if (currentValues.length === 0) {
-			await this.respondToInteraction(interaction, "No values to edit.");
-			return;
-		}
+    if (currentValues.length === 0) {
+      await this.respondToInteraction(interaction, "No values to edit.");
+      return;
+    }
 
-		const select = new StringSelectMenuBuilder()
-			.setCustomId(
-				CustomIdHelper.build([
-					"module_config_array_edit_sel",
-					moduleName,
-					propertyKey,
-					userId,
-				]),
-			)
-			.setPlaceholder("Select value to edit")
-			.setMinValues(1)
-			.setMaxValues(1);
+    const select = new StringSelectMenuBuilder()
+      .setCustomId(
+        CustomIdHelper.build([
+          "module_config_array_edit_sel",
+          moduleName,
+          propertyKey,
+          userId,
+        ]),
+      )
+      .setPlaceholder("Select value to edit")
+      .setMinValues(1)
+      .setMaxValues(1);
 
-		currentValues.slice(0, 25).forEach((value, index) => {
-			select.addOptions(
-				new StringSelectMenuOptionBuilder()
-					.setLabel(ConfigFormatterService.truncate(value, 100))
-					.setValue(index.toString()),
-			);
-		});
+    currentValues.slice(0, 25).forEach((value, index) => {
+      select.addOptions(
+        new StringSelectMenuOptionBuilder()
+          .setLabel(ConfigFormatterService.truncate(value, 100))
+          .setValue(index.toString()),
+      );
+    });
 
-		await interaction.update({
-			content: "Select value to edit:",
-			embeds: [],
-			components: [
-				new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-					select,
-				),
-				new ActionRowBuilder<ButtonBuilder>().addComponents(
-					new ButtonBuilder()
-						.setCustomId(
-							CustomIdHelper.build([
-								"module_config_array_cancel",
-								moduleName,
-								propertyKey,
-								userId,
-							]),
-						)
-						.setLabel("Cancel")
-						.setStyle(ButtonStyle.Secondary),
-				),
-			],
-		});
-	}
+    await interaction.update({
+      content: "Select value to edit:",
+      embeds: [],
+      components: [
+        new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select),
+        new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId(
+              CustomIdHelper.build([
+                "module_config_array_cancel",
+                moduleName,
+                propertyKey,
+                userId,
+              ]),
+            )
+            .setLabel("Cancel")
+            .setStyle(ButtonStyle.Secondary),
+        ),
+      ],
+    });
+  }
 
-	@SelectMenu("module_config_array_edit_sel:*:*:*")
-	async handleEditSelect(
-		@Interaction() interaction: StringSelectMenuInteraction,
-	) {
-		const ctx = await this.getInteractionContext(interaction);
-		if (!ctx) return;
-		const { parts, userId } = ctx;
-		const moduleName = parts[1]!;
-		const propertyKey = parts[2]!;
-		const index = interaction.values[0];
-		if (!index) return;
+  @SelectMenu("module_config_array_edit_sel:*:*:*")
+  async handleEditSelect(
+    @Interaction() interaction: StringSelectMenuInteraction,
+  ) {
+    const ctx = await this.getInteractionContext(interaction);
+    if (!ctx) return;
+    const { parts, userId } = ctx;
+    const moduleName = parts[1]!;
+    const propertyKey = parts[2]!;
+    const index = interaction.values[0];
+    if (!index) return;
 
-		const currentValues = (await this.valueService.fetchValue(
-			interaction.guild!,
-			propertyKey,
-			EConfigType.StringArray,
-		)) as string[];
+    const currentValues = (await this.valueService.fetchValue(
+      interaction.guild!,
+      propertyKey,
+      EConfigType.StringArray,
+    )) as string[];
 
-		const valueToEdit = currentValues[Number(index)] || "";
+    const valueToEdit = currentValues[Number(index)] || "";
 
-		const input = new TextInputBuilder({
-			customId: "value",
-			label: "Value",
-			style: TextInputStyle.Short,
-			value: valueToEdit,
-			required: true,
-		});
+    const input = new TextInputBuilder({
+      customId: "value",
+      label: "Value",
+      style: TextInputStyle.Short,
+      value: valueToEdit,
+      required: true,
+    });
 
-		const modal = new ModalBuilder({
-			customId: CustomIdHelper.build([
-				"module_config_array_edit_sub",
-				moduleName,
-				propertyKey,
-				userId,
-				index,
-			]),
-			title: "Edit Value",
-			components: [
-				new ActionRowBuilder<TextInputBuilder>().addComponents(input),
-			],
-		});
+    const modal = new ModalBuilder({
+      customId: CustomIdHelper.build([
+        "module_config_array_edit_sub",
+        moduleName,
+        propertyKey,
+        userId,
+        index,
+      ]),
+      title: "Edit Value",
+      components: [
+        new ActionRowBuilder<TextInputBuilder>().addComponents(input),
+      ],
+    });
 
-		await interaction.showModal(modal);
-	}
+    await interaction.showModal(modal);
+  }
 
-	@Modal("module_config_array_edit_sub:*:*:*:*")
-	async handleEditModal(@Interaction() interaction: ModalSubmitInteraction) {
-		const ctx = await this.getInteractionContext(interaction);
-		if (!ctx) return;
-		const { parts } = ctx;
-		const moduleName = parts[1]!;
-		const propertyKey = parts[2]!;
-		const index = Number(parts[4]);
-		const newValue = interaction.fields.getTextInputValue("value");
+  @Modal("module_config_array_edit_sub:*:*:*:*")
+  async handleEditModal(@Interaction() interaction: ModalSubmitInteraction) {
+    const ctx = await this.getInteractionContext(interaction);
+    if (!ctx) return;
+    const { parts } = ctx;
+    const moduleName = parts[1]!;
+    const propertyKey = parts[2]!;
+    const index = Number(parts[4]);
+    const newValue = interaction.fields.getTextInputValue("value");
 
-		const currentValues = (await this.valueService.fetchValue(
-			interaction.guild!,
-			propertyKey,
-			EConfigType.StringArray,
-		)) as string[];
+    const currentValues = (await this.valueService.fetchValue(
+      interaction.guild!,
+      propertyKey,
+      EConfigType.StringArray,
+    )) as string[];
 
-		if (index >= 0 && index < currentValues.length) {
-			currentValues[index] = newValue;
-			await this.valueService.saveValue(
-				interaction.guild!,
-				propertyKey,
-				currentValues,
-				EConfigType.StringArray,
-			);
-			await this.refreshView(interaction, moduleName, propertyKey);
-		} else {
-			await this.respondToInteraction(interaction, "Invalid index.");
-		}
-	}
+    if (index >= 0 && index < currentValues.length) {
+      currentValues[index] = newValue;
+      await this.valueService.saveValue(
+        interaction.guild!,
+        propertyKey,
+        currentValues,
+        EConfigType.StringArray,
+      );
+      await this.refreshView(interaction, moduleName, propertyKey);
+    } else {
+      await this.respondToInteraction(interaction, "Invalid index.");
+    }
+  }
 }

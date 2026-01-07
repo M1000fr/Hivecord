@@ -1,5 +1,5 @@
-import type { CommandArgument } from "../types/CommandArgument";
+import { CommandArgument } from "../types/CommandArgument";
 
 export interface ICommandInstance {
-	[key: string]: ((...args: CommandArgument[]) => Promise<void>) | unknown;
+  [key: string]: ((...args: CommandArgument[]) => Promise<void>) | unknown;
 }

@@ -31,7 +31,7 @@
         "noUnusedPrivateClassMembers": "off"
       },
       "style": {
-        "useImportType": "error",
+        "useImportType": "off",
         "useNodejsImportProtocol": "off",
         "useTemplate": "off",
         "noNonNullAssertion": "off",

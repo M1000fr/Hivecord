@@ -1,11 +1,11 @@
-import type { LeBotClient } from "@class/LeBotClient";
+import { LeBotClient } from "@class/LeBotClient";
 import { Injectable } from "@decorators/Injectable";
 import {
   AutocompleteInteraction,
   CommandInteraction,
 } from "@decorators/Interaction";
 import { Client } from "@decorators/params/index.ts";
-import type { ConfigService } from "@modules/Configuration/services/ConfigService";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { Autocomplete } from "@src/decorators/commands/Autocomplete.ts";
 import {
   SlashCommand,
@@ -13,8 +13,8 @@ import {
 } from "@src/decorators/commands/SlashCommand.ts";
 import type { CommandAutocompleteContext } from "@src/types/CommandAutocompleteContext.ts";
 
-import type { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
-import type { ChatInputCommandInteraction } from "discord.js";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ChatInputCommandInteraction } from "discord.js";
 import { modulesOptions } from "./modulesOptions.ts";
 
 @Injectable()

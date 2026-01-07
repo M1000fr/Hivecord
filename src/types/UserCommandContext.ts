@@ -1,5 +1,5 @@
-import type { UserContextMenuCommandInteraction } from "discord.js";
+import { UserContextMenuCommandInteraction } from "discord.js";
 
 export type UserCommandContext = [
-	interaction: UserContextMenuCommandInteraction,
+  interaction: UserContextMenuCommandInteraction,
 ];

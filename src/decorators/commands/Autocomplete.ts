@@ -1,19 +1,19 @@
-import type { ICommandClass } from "@interfaces/ICommandClass.ts";
+import { ICommandClass } from "@interfaces/ICommandClass.ts";
 
 export interface AutocompleteOptions {
-	optionName: string;
+  optionName: string;
 }
 
 export function Autocomplete(options: AutocompleteOptions) {
-	return (
-		target: object,
-		propertyKey: string,
-		_descriptor: PropertyDescriptor,
-	) => {
-		const constructor = target.constructor as ICommandClass;
-		if (!constructor.autocompletes) {
-			constructor.autocompletes = new Map();
-		}
-		constructor.autocompletes.set(options.optionName, propertyKey);
-	};
+  return (
+    target: object,
+    propertyKey: string,
+    _descriptor: PropertyDescriptor,
+  ) => {
+    const constructor = target.constructor as ICommandClass;
+    if (!constructor.autocompletes) {
+      constructor.autocompletes = new Map();
+    }
+    constructor.autocompletes.set(options.optionName, propertyKey);
+  };
 }

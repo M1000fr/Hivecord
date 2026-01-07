@@ -1,5 +1,5 @@
 import { LeBotClient } from "@class/LeBotClient";
-import type { EConfigType, IConfigClass } from "@decorators/ConfigProperty";
+import { EConfigType, IConfigClass } from "@decorators/ConfigProperty";
 import { Inject } from "@decorators/Inject";
 import { Injectable } from "@decorators/Injectable";
 import {
@@ -13,7 +13,7 @@ import {
 } from "discord.js";
 import type { TFunction } from "i18next";
 import { ConfigFormatterService } from "./ConfigFormatterService";
-import type { ConfigValueResolverService } from "./ConfigValueResolverService";
+import { ConfigValueResolverService } from "./ConfigValueResolverService";
 import { CustomIdHelper } from "./CustomIdHelper";
 
 /**

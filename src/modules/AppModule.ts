@@ -1,6 +1,6 @@
 import { LeBotClient } from "@class/LeBotClient";
 import { Module } from "@decorators/Module";
-import type { DependencyContainer } from "@di/DependencyContainer";
+import { DependencyContainer } from "@di/DependencyContainer";
 import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
 import { DatabaseModule } from "@modules/Database/DatabaseModule";
 import { PrismaService } from "@modules/Database/services/PrismaService";
@@ -20,35 +20,35 @@ import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
 import { ConfigValueService } from "@utils/ConfigValueService";
 
 @Module({
-	name: "App",
-	imports: [DatabaseModule, GeneralModule, ConfigurationModule],
-	providers: [
-		LeBotClient,
-		CommandHandlerEvent,
-		PagerHandlerEvent,
-		InteractionRegistryHandler,
-		CommandDeploymentService,
-		ModuleLoader,
-		I18nService,
-		CommandService,
-		PagerService,
-		ConfigValueService,
-		ConfigFormatterService,
-		ConfigUIBuilderService,
-		ConfigValueResolverService,
-	],
-	exports: [LeBotClient],
+  name: "App",
+  imports: [DatabaseModule, GeneralModule, ConfigurationModule],
+  providers: [
+    LeBotClient,
+    CommandHandlerEvent,
+    PagerHandlerEvent,
+    InteractionRegistryHandler,
+    CommandDeploymentService,
+    ModuleLoader,
+    I18nService,
+    CommandService,
+    PagerService,
+    ConfigValueService,
+    ConfigFormatterService,
+    ConfigUIBuilderService,
+    ConfigValueResolverService,
+  ],
+  exports: [LeBotClient],
 })
 export class AppModule {
-	static async init(container: DependencyContainer) {
-		const prismaService = container.resolve(PrismaService);
-		const redisService = container.resolve(RedisService);
+  static async init(container: DependencyContainer) {
+    const prismaService = container.resolve(PrismaService);
+    const redisService = container.resolve(RedisService);
 
-		// Initialize all services in parallel
-		await Promise.all([
-			prismaService.checkDatabaseConnection(),
-			redisService.checkConnection(),
-			I18nService.init(),
-		]);
-	}
+    // Initialize all services in parallel
+    await Promise.all([
+      prismaService.checkDatabaseConnection(),
+      redisService.checkConnection(),
+      I18nService.init(),
+    ]);
+  }
 }

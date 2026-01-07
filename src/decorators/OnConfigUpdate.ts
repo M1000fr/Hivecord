@@ -1,52 +1,49 @@
 import { toConfigKey } from "@decorators/ConfigProperty";
 import {
-	COMMAND_PARAMS_METADATA_KEY,
-	type CommandParameter,
-	CommandParamType,
+  COMMAND_PARAMS_METADATA_KEY,
+  type CommandParameter,
+  CommandParamType,
 } from "@decorators/params";
 import { DependencyContainer } from "@di/DependencyContainer";
-import type { Constructor } from "@di/types";
+import { Constructor } from "@di/types";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 
 export function OnConfigUpdate(propertyName: string) {
-	return (
-		target: object,
-		propertyKey: string,
-		_descriptor: PropertyDescriptor,
-	) => {
-		const configKey = toConfigKey(propertyName);
+  return (
+    target: object,
+    propertyKey: string,
+    _descriptor: PropertyDescriptor,
+  ) => {
+    const configKey = toConfigKey(propertyName);
 
-		ConfigUpdateRegistry.register(
-			configKey,
-			async (_guildId, _key, _value) => {
-				const container = DependencyContainer.getInstance();
-				const instance = container.resolve(
-					target.constructor as Constructor,
-				) as Record<string, (...args: unknown[]) => Promise<void>>;
-				const method = instance[propertyKey];
+    ConfigUpdateRegistry.register(configKey, async (_guildId, _key, _value) => {
+      const container = DependencyContainer.getInstance();
+      const instance = container.resolve(
+        target.constructor as Constructor,
+      ) as Record<string, (...args: unknown[]) => Promise<void>>;
+      const method = instance[propertyKey];
 
-				if (method) {
-					const params: CommandParameter[] =
-						Reflect.getMetadata(
-							COMMAND_PARAMS_METADATA_KEY,
-							target,
-							propertyKey,
-						) || [];
+      if (method) {
+        const params: CommandParameter[] =
+          Reflect.getMetadata(
+            COMMAND_PARAMS_METADATA_KEY,
+            target,
+            propertyKey,
+          ) || [];
 
-					const args: unknown[] = [];
-					for (const param of params) {
-						switch (param.type) {
-							case CommandParamType.Client:
-								args[param.index] = container.resolve("Client");
-								break;
-							default:
-								break;
-						}
-					}
+        const args: unknown[] = [];
+        for (const param of params) {
+          switch (param.type) {
+            case CommandParamType.Client:
+              args[param.index] = container.resolve("Client");
+              break;
+            default:
+              break;
+          }
+        }
 
-					await method.call(instance, ...args);
-				}
-			},
-		);
-	};
+        await method.call(instance, ...args);
+      }
+    });
+  };
 }
