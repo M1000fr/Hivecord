@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/M1000fr/Hivecord/compare/v2.0.0...v2.1.0) (2026-01-07)
+
+
+### Features
+
+* add ping command for example ([db8bc25](https://github.com/M1000fr/Hivecord/commit/db8bc259bf0eb833931c347ca9928d540a0110f0))
+
 # [2.0.0](https://github.com/M1000fr/Hivecord/compare/v1.0.0...v2.0.0) (2026-01-07)
 
 
