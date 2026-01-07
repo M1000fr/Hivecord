@@ -1,8 +1,8 @@
 import "reflect-metadata";
 
-import { IModuleConfigClass } from "@decorators/ModuleConfig";
+import { type IModuleConfigClass } from "@decorators/ModuleConfig";
 import { MODULE_OPTIONS_METADATA_KEY, type ProviderToken } from "@di/types";
-import { ModuleOptions } from "@interfaces/ModuleOptions.ts";
+import { type ModuleOptions } from "@interfaces/ModuleOptions.ts";
 
 function ensureExportsAreDeclared(options: ModuleOptions) {
   if (options.exports && !options.providers) {

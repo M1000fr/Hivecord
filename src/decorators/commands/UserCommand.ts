@@ -1,6 +1,6 @@
 import { Injectable } from "@decorators/Injectable";
 import { PROVIDER_TYPE_METADATA_KEY } from "@di/types";
-import { IContextMenuCommandClass } from "@interfaces/IContextMenuCommandClass";
+import { type IContextMenuCommandClass } from "@interfaces/IContextMenuCommandClass";
 import "reflect-metadata";
 
 export interface UserCommandOptions {

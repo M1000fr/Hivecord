@@ -1,4 +1,4 @@
-import { Constructor, Provider, ProviderToken } from "@di/types";
+import type { Constructor, Provider, ProviderToken } from "@di/types";
 
 export interface ModuleOptions {
   name: string;

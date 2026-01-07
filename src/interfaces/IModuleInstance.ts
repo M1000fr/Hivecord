@@ -1,5 +1,5 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { ModuleOptions } from "./ModuleOptions";
+import { type ModuleOptions } from "./ModuleOptions";
 
 export interface IModuleInstance {
   moduleOptions: ModuleOptions;

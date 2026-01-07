@@ -7,7 +7,7 @@ import {
   User,
   UserContextMenuCommandInteraction,
 } from "discord.js";
-import { GuildLanguageContext } from "./GuildLanguageContext";
+import { type GuildLanguageContext } from "./GuildLanguageContext";
 
 export type CommandArgument =
   | Client

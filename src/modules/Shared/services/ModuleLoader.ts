@@ -9,11 +9,11 @@ import {
 } from "@decorators/params";
 import { DependencyContainer } from "@di/DependencyContainer";
 import { type Constructor, INJECTABLE_METADATA_KEY } from "@di/types";
-import { CommandOptions } from "@interfaces/CommandOptions.ts";
-import { ICommandClass } from "@interfaces/ICommandClass.ts";
-import { IContextMenuCommandClass } from "@interfaces/IContextMenuCommandClass.ts";
-import { IModuleInstance } from "@interfaces/IModuleInstance.ts";
-import { ModuleOptions } from "@interfaces/ModuleOptions.ts";
+import { type CommandOptions } from "@interfaces/CommandOptions.ts";
+import { type ICommandClass } from "@interfaces/ICommandClass.ts";
+import { type IContextMenuCommandClass } from "@interfaces/IContextMenuCommandClass.ts";
+import { type IModuleInstance } from "@interfaces/IModuleInstance.ts";
+import { type ModuleOptions } from "@interfaces/ModuleOptions.ts";
 
 import { getProvidersByType } from "@utils/getProvidersByType";
 import { Logger } from "@utils/Logger";

@@ -11,7 +11,7 @@ import { ChannelType } from "@prisma/client/enums";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 import { ConfigurationRepository, GuildRepository } from "@src/repositories";
 import { Logger } from "@utils/Logger";
-import { Guild, GuildBasedChannel, Role } from "discord.js";
+import { Guild, type GuildBasedChannel, Role } from "discord.js";
 import { ChannelConfigService } from "./ChannelConfigService";
 import { ConfigCacheService } from "./ConfigCacheService";
 import { RoleConfigService } from "./RoleConfigService";

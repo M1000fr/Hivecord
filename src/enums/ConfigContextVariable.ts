@@ -1,4 +1,4 @@
-import { LocalizationMap } from "discord.js";
+import { type LocalizationMap } from "discord.js";
 
 export enum ConfigContextVariable {
   User = "user",

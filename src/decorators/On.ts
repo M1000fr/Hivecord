@@ -1,5 +1,5 @@
-import { EventOptions } from "@interfaces/EventOptions.ts";
-import { ClientEvents } from "discord.js";
+import { type EventOptions } from "@interfaces/EventOptions.ts";
+import { type ClientEvents } from "discord.js";
 import "reflect-metadata";
 
 export const EVENT_METADATA_KEY = "lebot:event";

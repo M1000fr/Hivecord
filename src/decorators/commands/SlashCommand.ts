@@ -1,7 +1,7 @@
 import { Injectable } from "@decorators/Injectable";
 import { PROVIDER_TYPE_METADATA_KEY } from "@di/types";
-import { CommandOptions } from "@interfaces/CommandOptions.ts";
-import { ICommandClass } from "@interfaces/ICommandClass.ts";
+import { type CommandOptions } from "@interfaces/CommandOptions.ts";
+import { type ICommandClass } from "@interfaces/ICommandClass.ts";
 import "reflect-metadata";
 
 export function SlashCommandController(options: CommandOptions) {

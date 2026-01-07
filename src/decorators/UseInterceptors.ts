@@ -1,5 +1,5 @@
-import { Constructor, INTERCEPTORS_METADATA_KEY } from "@di/types";
-import { IInterceptor } from "@interfaces/IInterceptor";
+import { type Constructor, INTERCEPTORS_METADATA_KEY } from "@di/types";
+import { type IInterceptor } from "@interfaces/IInterceptor";
 import "reflect-metadata";
 
 export function UseInterceptors(...interceptors: Constructor<IInterceptor>[]) {

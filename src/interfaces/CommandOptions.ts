@@ -1,8 +1,8 @@
 import {
-  ApplicationCommandOptionData,
+  type ApplicationCommandOptionData,
   InteractionContextType,
-  LocalizationMap,
-  PermissionResolvable,
+  type LocalizationMap,
+  type PermissionResolvable,
 } from "discord.js";
 
 export interface CommandOptions {

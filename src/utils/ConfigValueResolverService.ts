@@ -1,9 +1,9 @@
 import { LeBotClient } from "@class/LeBotClient";
 import {
-  ConfigKeyMetadata,
-  ConfigPropertyOptions,
+  type ConfigKeyMetadata,
+  type ConfigPropertyOptions,
   EConfigType,
-  IConfigClass,
+  type IConfigClass,
 } from "@decorators/ConfigProperty";
 import { Inject } from "@decorators/Inject";
 import { Injectable } from "@decorators/Injectable";

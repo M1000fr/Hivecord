@@ -3,7 +3,7 @@ import { LeBotClient } from "@src/class/LeBotClient";
 import {
   ButtonInteraction,
   ChatInputCommandInteraction,
-  RepliableInteraction,
+  type RepliableInteraction,
   StringSelectMenuInteraction,
 } from "discord.js";
 

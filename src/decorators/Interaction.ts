@@ -5,7 +5,7 @@ import {
   registerCommandParameter,
 } from "@decorators/params/index.ts";
 import { DependencyContainer } from "@di/DependencyContainer";
-import { Constructor } from "@di/types";
+import { type Constructor } from "@di/types";
 import { InteractionRegistry } from "@registers/InteractionRegistry";
 
 type InteractionHandler = (interaction: unknown) => Promise<void>;

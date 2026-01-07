@@ -1,4 +1,4 @@
-import { CommandOptions } from "./CommandOptions";
+import { type CommandOptions } from "./CommandOptions";
 
 export interface ICommandClass {
   commandOptions?: CommandOptions;

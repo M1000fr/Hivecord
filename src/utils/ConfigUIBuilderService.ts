@@ -1,5 +1,5 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { EConfigType, IConfigClass } from "@decorators/ConfigProperty";
+import { EConfigType, type IConfigClass } from "@decorators/ConfigProperty";
 import { Inject } from "@decorators/Inject";
 import { Injectable } from "@decorators/Injectable";
 import {

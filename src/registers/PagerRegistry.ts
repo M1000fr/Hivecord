@@ -1,9 +1,9 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
+  type BaseMessageOptions,
   EmbedBuilder,
-  Interaction,
-  MessageActionRowComponentBuilder,
+  type Interaction,
+  type MessageActionRowComponentBuilder,
 } from "discord.js";
 
 export type PagerRenderer<T = unknown> = (

@@ -1,4 +1,4 @@
-import { IExecutionContext } from "./IExecutionContext";
+import { type IExecutionContext } from "./IExecutionContext";
 
 export interface IInterceptor {
   intercept(

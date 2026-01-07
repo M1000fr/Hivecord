@@ -1,4 +1,4 @@
-import { CommandOptions } from "@interfaces/CommandOptions.ts";
+import { type CommandOptions } from "@interfaces/CommandOptions.ts";
 import {
   ApplicationCommandOptionType,
   InteractionContextType,

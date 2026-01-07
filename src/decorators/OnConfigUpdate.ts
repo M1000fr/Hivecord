@@ -5,7 +5,7 @@ import {
   CommandParamType,
 } from "@decorators/params";
 import { DependencyContainer } from "@di/DependencyContainer";
-import { Constructor } from "@di/types";
+import { type Constructor } from "@di/types";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 
 export function OnConfigUpdate(propertyName: string) {

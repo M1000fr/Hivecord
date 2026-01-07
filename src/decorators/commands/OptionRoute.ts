@@ -1,4 +1,4 @@
-import { ICommandClass } from "@interfaces/ICommandClass.ts";
+import { type ICommandClass } from "@interfaces/ICommandClass.ts";
 
 export interface OptionRouteOptions {
   option: string;

@@ -4,7 +4,7 @@ import {
   EConfigType,
 } from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
-import { ConfigProxy } from "@modules/Configuration/services/ConfigService";
+import { type ConfigProxy } from "@modules/Configuration/services/ConfigService";
 
 @ModuleConfig()
 export class GeneralConfig {

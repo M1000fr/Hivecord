@@ -1,7 +1,7 @@
 import { Repository } from "@decorators/Repository";
 import { PrismaService } from "@modules/Database/services/PrismaService";
 import { ChannelType } from "@prisma/client/enums";
-import { GuildBasedChannel } from "discord.js";
+import { type GuildBasedChannel } from "discord.js";
 import { SoftDeletableRepository } from "./SoftDeletableRepository";
 
 /**

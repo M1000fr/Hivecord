@@ -6,10 +6,10 @@ import {
 } from "@decorators/params";
 import { DependencyContainer } from "@di/DependencyContainer";
 import { type Constructor, INTERCEPTORS_METADATA_KEY } from "@di/types";
-import { ICommandClass } from "@interfaces/ICommandClass.ts";
-import { ICommandInstance } from "@interfaces/ICommandInstance.ts";
-import { IExecutionContext } from "@interfaces/IExecutionContext";
-import { IInterceptor } from "@interfaces/IInterceptor";
+import { type ICommandClass } from "@interfaces/ICommandClass.ts";
+import { type ICommandInstance } from "@interfaces/ICommandInstance.ts";
+import { type IExecutionContext } from "@interfaces/IExecutionContext";
+import { type IInterceptor } from "@interfaces/IInterceptor";
 import { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { I18nService } from "@modules/Shared/services/I18nService";
