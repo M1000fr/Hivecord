@@ -5,7 +5,7 @@ import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import "reflect-metadata";
 
 export function SlashCommandController(options: CommandOptions) {
-	return function (target: abstract new (...args: never[]) => object) {
+	return (target: abstract new (...args: never[]) => object) => {
 		// Apply @Injectable() automatically
 		Injectable()(target);
 		// Mark as command provider
@@ -21,11 +21,11 @@ export interface SubcommandOptions {
 }
 
 export function SlashCommand(options?: SubcommandOptions) {
-	return function (
+	return (
 		target: object,
 		propertyKey: string,
 		_descriptor: PropertyDescriptor,
-	) {
+	) => {
 		const constructor = target.constructor as ICommandClass;
 
 		if (options && "index" in options) {

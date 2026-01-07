@@ -56,7 +56,7 @@ export function configKey<T>(defaultValue?: T): T {
 }
 
 export function ConfigProperty(options: ConfigPropertyOptions) {
-	return function (target: object, propertyKey: string) {
+	return (target: object, propertyKey: string) => {
 		const isStatic = typeof target === "function";
 		const constructor = (isStatic
 			? target

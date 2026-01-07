@@ -9,7 +9,7 @@ export interface UserCommandOptions {
 }
 
 export function UserCommand(options: UserCommandOptions) {
-	return function (target: abstract new (...args: never[]) => object) {
+	return (target: abstract new (...args: never[]) => object) => {
 		// Apply @Injectable() automatically
 		Injectable()(target);
 		// Mark as command provider

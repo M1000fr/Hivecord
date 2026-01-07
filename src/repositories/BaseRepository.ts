@@ -1,5 +1,5 @@
 import { Injectable } from "@decorators/Injectable";
-import { PrismaService } from "@modules/Database/services/PrismaService";
+import type { PrismaService } from "@modules/Database/services/PrismaService";
 
 export interface GuildRelation {
 	id: string;

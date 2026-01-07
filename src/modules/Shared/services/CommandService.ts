@@ -1,16 +1,16 @@
+import { Injectable } from "@decorators/Injectable";
 import {
 	COMMAND_PARAMS_METADATA_KEY,
-	CommandParamType,
 	type CommandParameter,
+	CommandParamType,
 } from "@decorators/params";
-
 import { DependencyContainer } from "@di/DependencyContainer";
-import { INTERCEPTORS_METADATA_KEY, type Constructor } from "@di/types";
+import { type Constructor, INTERCEPTORS_METADATA_KEY } from "@di/types";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import type { ICommandInstance } from "@interfaces/ICommandInstance.ts";
 import type { IExecutionContext } from "@interfaces/IExecutionContext";
 import type { IInterceptor } from "@interfaces/IInterceptor";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import type { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { I18nService } from "@modules/Shared/services/I18nService";
 import type { CommandArgument } from "@src/types/CommandArgument";
@@ -19,13 +19,11 @@ import { Logger } from "@utils/Logger";
 import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
-	Client,
-	Guild,
+	type Client,
+	type Guild,
 	MessageContextMenuCommandInteraction,
 	UserContextMenuCommandInteraction,
 } from "discord.js";
-
-import { Injectable } from "@decorators/Injectable";
 
 @Injectable({ scope: "global" })
 export class CommandService {

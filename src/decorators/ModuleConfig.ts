@@ -3,7 +3,7 @@ export interface IModuleConfigClass {
 }
 
 export function ModuleConfig() {
-	return function (constructor: object) {
+	return (constructor: object) => {
 		(constructor as IModuleConfigClass).isModuleConfig = true;
 	};
 }

@@ -1,5 +1,5 @@
-import { Guild } from "discord.js";
-import { ConfigCacheService } from "./ConfigCacheService";
+import type { Guild } from "discord.js";
+import type { ConfigCacheService } from "./ConfigCacheService";
 
 /**
  * Generic interface for configuration list items

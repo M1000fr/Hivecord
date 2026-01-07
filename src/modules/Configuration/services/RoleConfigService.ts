@@ -1,7 +1,10 @@
 import { Injectable } from "@decorators/Injectable";
-import { ConfigurationRepository, RoleRepository } from "@src/repositories";
-import { Role } from "discord.js";
-import { ConfigCacheService } from "./ConfigCacheService";
+import type {
+	ConfigurationRepository,
+	RoleRepository,
+} from "@src/repositories";
+import type { Role } from "discord.js";
+import type { ConfigCacheService } from "./ConfigCacheService";
 import { GenericConfigService } from "./GenericConfigService";
 
 /**

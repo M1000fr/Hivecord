@@ -15,30 +15,30 @@ export class InteractionRegistry {
 	static modalPatterns = new Collection<string, InteractionHandler>();
 
 	static registerButton(customId: string, handler: InteractionHandler) {
-		this.buttons.set(customId, handler);
+		InteractionRegistry.buttons.set(customId, handler);
 	}
 
 	static registerSelectMenu(customId: string, handler: InteractionHandler) {
-		this.selectMenus.set(customId, handler);
+		InteractionRegistry.selectMenus.set(customId, handler);
 	}
 
 	static registerModal(customId: string, handler: InteractionHandler) {
-		this.modals.set(customId, handler);
+		InteractionRegistry.modals.set(customId, handler);
 	}
 
 	static registerButtonPattern(pattern: string, handler: InteractionHandler) {
-		this.buttonPatterns.set(pattern, handler);
+		InteractionRegistry.buttonPatterns.set(pattern, handler);
 	}
 
 	static registerSelectMenuPattern(
 		pattern: string,
 		handler: InteractionHandler,
 	) {
-		this.selectMenuPatterns.set(pattern, handler);
+		InteractionRegistry.selectMenuPatterns.set(pattern, handler);
 	}
 
 	static registerModalPattern(pattern: string, handler: InteractionHandler) {
-		this.modalPatterns.set(pattern, handler);
+		InteractionRegistry.modalPatterns.set(pattern, handler);
 	}
 
 	/**
@@ -58,7 +58,7 @@ export class InteractionRegistry {
 
 		// Try pattern matching
 		for (const [patternStr, handler] of pattern) {
-			if (this.matchesPattern(customId, patternStr)) {
+			if (InteractionRegistry.matchesPattern(customId, patternStr)) {
 				return handler;
 			}
 		}
@@ -66,19 +66,27 @@ export class InteractionRegistry {
 	}
 
 	static getButtonHandler(customId: string): InteractionHandler | null {
-		return this.getHandler(this.buttons, this.buttonPatterns, customId);
+		return InteractionRegistry.getHandler(
+			InteractionRegistry.buttons,
+			InteractionRegistry.buttonPatterns,
+			customId,
+		);
 	}
 
 	static getSelectMenuHandler(customId: string): InteractionHandler | null {
-		return this.getHandler(
-			this.selectMenus,
-			this.selectMenuPatterns,
+		return InteractionRegistry.getHandler(
+			InteractionRegistry.selectMenus,
+			InteractionRegistry.selectMenuPatterns,
 			customId,
 		);
 	}
 
 	static getModalHandler(customId: string): InteractionHandler | null {
-		return this.getHandler(this.modals, this.modalPatterns, customId);
+		return InteractionRegistry.getHandler(
+			InteractionRegistry.modals,
+			InteractionRegistry.modalPatterns,
+			customId,
+		);
 	}
 
 	private static matchesPattern(customId: string, pattern: string): boolean {

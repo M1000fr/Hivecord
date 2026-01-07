@@ -52,12 +52,12 @@ function createInteractionDecorator(registryMethods: {
 	exact: (customId: string, handler: InteractionHandler) => void;
 	pattern: (customId: string, handler: InteractionHandler) => void;
 }) {
-	return function (customId: string) {
-		return function (
+	return (customId: string) =>
+		(
 			target: object,
 			propertyKey: string,
 			_descriptor: PropertyDescriptor,
-		) {
+		) => {
 			const isPattern = customId.includes("*");
 			const handler = createHandler(target, propertyKey);
 			if (isPattern) {
@@ -66,7 +66,6 @@ function createInteractionDecorator(registryMethods: {
 				registryMethods.exact(customId, handler);
 			}
 		};
-	};
 }
 
 export const Button = createInteractionDecorator({

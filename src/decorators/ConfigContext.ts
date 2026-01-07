@@ -1,11 +1,11 @@
-import { ConfigContextVariable } from "@enums/ConfigContextVariable";
+import type { ConfigContextVariable } from "@enums/ConfigContextVariable";
 
 export interface IConfigClass {
 	configContexts?: Record<string, ConfigContextVariable[]>;
 }
 
 export function ConfigContext(variables: ConfigContextVariable[]) {
-	return function (target: object, propertyKey: string) {
+	return (target: object, propertyKey: string) => {
 		const constructor = target.constructor as IConfigClass;
 		if (!constructor.configContexts) {
 			constructor.configContexts = {};

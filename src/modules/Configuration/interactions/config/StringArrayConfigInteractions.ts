@@ -1,8 +1,9 @@
-import { LeBotClient } from "@class/LeBotClient";
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
+import type { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import {
-	EConfigType,
 	type ConfigPropertyOptions,
+	EConfigType,
 	type IConfigClass,
 } from "@decorators/ConfigProperty";
 import { Button, Modal, SelectMenu } from "@decorators/Interaction";
@@ -10,22 +11,20 @@ import { Interaction } from "@decorators/params";
 import { I18nService } from "@modules/Shared/services/I18nService";
 import { ConfigFormatterService } from "@utils/ConfigFormatterService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
-
-import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
-	ButtonInteraction,
+	type ButtonInteraction,
 	ButtonStyle,
-	Guild,
+	type Guild,
 	ModalBuilder,
-	ModalSubmitInteraction,
+	type ModalSubmitInteraction,
+	type RepliableInteraction,
 	StringSelectMenuBuilder,
-	StringSelectMenuInteraction,
+	type StringSelectMenuInteraction,
 	StringSelectMenuOptionBuilder,
 	TextInputBuilder,
 	TextInputStyle,
-	type RepliableInteraction,
 } from "discord.js";
 
 @ConfigInteraction()

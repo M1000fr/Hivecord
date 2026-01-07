@@ -6,12 +6,12 @@ import { Interaction } from "@decorators/params";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ActionRowBuilder,
-	ButtonBuilder,
-	StringSelectMenuBuilder,
-	StringSelectMenuOptionBuilder,
+	type ButtonBuilder,
 	type Locale,
 	type RepliableInteraction,
+	StringSelectMenuBuilder,
 	type StringSelectMenuInteraction,
+	StringSelectMenuOptionBuilder,
 } from "discord.js";
 
 @ConfigInteraction()

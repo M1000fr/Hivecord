@@ -76,10 +76,10 @@ export class ConfigTypeRegistry {
 	 * @param definition The type definition
 	 */
 	static register(definition: ConfigTypeDefinition): void {
-		if (this.types.has(definition.id)) {
+		if (ConfigTypeRegistry.types.has(definition.id)) {
 			return;
 		}
-		this.types.set(definition.id, definition);
+		ConfigTypeRegistry.types.set(definition.id, definition);
 	}
 
 	/**
@@ -88,7 +88,7 @@ export class ConfigTypeRegistry {
 	 * @returns The type definition or undefined
 	 */
 	static get(id: string): ConfigTypeDefinition | undefined {
-		return this.types.get(id);
+		return ConfigTypeRegistry.types.get(id);
 	}
 
 	/**
@@ -97,7 +97,7 @@ export class ConfigTypeRegistry {
 	 * @returns True if registered
 	 */
 	static has(id: string): boolean {
-		return this.types.has(id);
+		return ConfigTypeRegistry.types.has(id);
 	}
 
 	/**
@@ -105,7 +105,7 @@ export class ConfigTypeRegistry {
 	 * @returns Array of all type definitions
 	 */
 	static getAll(): ConfigTypeDefinition[] {
-		return Array.from(this.types.values());
+		return Array.from(ConfigTypeRegistry.types.values());
 	}
 
 	/**
@@ -113,13 +113,13 @@ export class ConfigTypeRegistry {
 	 * @param id The type identifier
 	 */
 	static unregister(id: string): void {
-		this.types.delete(id);
+		ConfigTypeRegistry.types.delete(id);
 	}
 
 	/**
 	 * Clear all registered types
 	 */
 	static clear(): void {
-		this.types.clear();
+		ConfigTypeRegistry.types.clear();
 	}
 }

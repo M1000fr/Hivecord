@@ -1,4 +1,4 @@
-import { LeBotClient } from "@class/LeBotClient";
+import type { LeBotClient } from "@class/LeBotClient";
 import { EventController } from "@decorators/EventController";
 import { Inject } from "@decorators/Inject";
 import { On } from "@decorators/On";

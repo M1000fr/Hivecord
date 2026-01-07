@@ -4,11 +4,11 @@ import { Injectable } from "@decorators/Injectable";
 import { EVENT_METADATA_KEY } from "@decorators/On";
 import {
 	COMMAND_PARAMS_METADATA_KEY,
-	CommandParamType,
 	type CommandParameter,
+	CommandParamType,
 } from "@decorators/params";
 import { DependencyContainer } from "@di/DependencyContainer";
-import { INJECTABLE_METADATA_KEY, type Constructor } from "@di/types";
+import { type Constructor, INJECTABLE_METADATA_KEY } from "@di/types";
 import type { CommandOptions } from "@interfaces/CommandOptions.ts";
 import type { ICommandClass } from "@interfaces/ICommandClass.ts";
 import type { IContextMenuCommandClass } from "@interfaces/IContextMenuCommandClass.ts";

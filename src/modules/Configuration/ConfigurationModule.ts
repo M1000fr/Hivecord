@@ -1,5 +1,6 @@
 import { Global } from "@decorators/Global";
 import { Module } from "@decorators/Module";
+import { DatabaseModule } from "@modules/Database/DatabaseModule";
 import ModulesCommand from "./commands/modules/index";
 import { BooleanConfigHandler } from "./configHandler/BooleanConfigHandler";
 import { StringConfigHandler } from "./configHandler/StringConfigHandler";
@@ -14,8 +15,6 @@ import { ChannelConfigService } from "./services/ChannelConfigService";
 import { ConfigCacheService } from "./services/ConfigCacheService";
 import { ConfigService } from "./services/ConfigService";
 import { RoleConfigService } from "./services/RoleConfigService";
-
-import { DatabaseModule } from "@modules/Database/DatabaseModule";
 
 @Global()
 @Module({

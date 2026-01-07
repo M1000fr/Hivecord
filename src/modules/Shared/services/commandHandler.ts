@@ -1,15 +1,15 @@
-import { LeBotClient } from "@class/LeBotClient";
+import type { LeBotClient } from "@class/LeBotClient";
 import { EventController } from "@decorators/EventController";
 import { On } from "@decorators/On";
 import { Client } from "@decorators/params/Client";
 import { Context } from "@decorators/params/Context";
 import { BotEvents } from "@enums/BotEvents";
-import { CommandService } from "@modules/Shared/services/CommandService";
+import type { CommandService } from "@modules/Shared/services/CommandService";
 import type { ContextOf } from "@src/types/ContextOf.ts";
 import { Logger } from "@utils/Logger";
 import {
-	MessageFlags,
 	type InteractionReplyOptions,
+	MessageFlags,
 	type RepliableInteraction,
 } from "discord.js";
 

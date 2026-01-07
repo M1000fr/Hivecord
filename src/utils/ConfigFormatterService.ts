@@ -1,10 +1,10 @@
 import {
-	EConfigType,
 	type ConfigPropertyOptions,
+	EConfigType,
 } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
-import { Locale } from "discord.js";
+import type { Locale } from "discord.js";
 import type { TFunction } from "i18next";
 
 /**

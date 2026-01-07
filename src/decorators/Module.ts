@@ -46,7 +46,7 @@ export function Module(options: ModuleOptions) {
 		}
 	}
 
-	return function <T extends { new (): object }>(constructor: T) {
+	return <T extends { new (): object }>(constructor: T) => {
 		if (typeof constructor !== "function") {
 			throw new Error(`@Module decorator can only be used on classes.`);
 		}

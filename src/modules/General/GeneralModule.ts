@@ -1,8 +1,7 @@
 import { Module } from "@decorators/Module";
-import { GeneralConfig } from "./GeneralConfig";
-import ReadyEvent from "./events/ready/log";
-
 import { ConfigurationModule } from "@modules/Configuration/ConfigurationModule";
+import ReadyEvent from "./events/ready/log";
+import { GeneralConfig } from "./GeneralConfig";
 
 @Module({
 	name: "General",

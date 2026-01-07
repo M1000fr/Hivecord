@@ -9,12 +9,15 @@ import { Injectable } from "@decorators/Injectable";
 import { GeneralConfig } from "@modules/General/GeneralConfig";
 import { ChannelType } from "@prisma/client/enums";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
-import { ConfigurationRepository, GuildRepository } from "@src/repositories";
+import type {
+	ConfigurationRepository,
+	GuildRepository,
+} from "@src/repositories";
 import { Logger } from "@utils/Logger";
-import { Guild, type GuildBasedChannel, Role } from "discord.js";
-import { ChannelConfigService } from "./ChannelConfigService";
-import { ConfigCacheService } from "./ConfigCacheService";
-import { RoleConfigService } from "./RoleConfigService";
+import type { Guild, GuildBasedChannel, Role } from "discord.js";
+import type { ChannelConfigService } from "./ChannelConfigService";
+import type { ConfigCacheService } from "./ConfigCacheService";
+import type { RoleConfigService } from "./RoleConfigService";
 
 export type ConfigProxy<T> = {
 	[K in keyof T as K extends

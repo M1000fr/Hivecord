@@ -1,14 +1,13 @@
+import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { Button, Modal } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
 import { ConfigFormatterService } from "@utils/ConfigFormatterService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
-
-import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
 import {
 	ActionRowBuilder,
-	ButtonBuilder,
+	type ButtonBuilder,
 	type ButtonInteraction,
 	ButtonStyle,
 	ModalBuilder,

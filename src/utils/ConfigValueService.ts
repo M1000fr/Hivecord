@@ -1,7 +1,7 @@
 import { EConfigType } from "@decorators/ConfigProperty";
 import { Injectable } from "@decorators/Injectable";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { Guild, type GuildBasedChannel, Role } from "discord.js";
+import type { ConfigService } from "@modules/Configuration/services/ConfigService";
+import type { Guild, GuildBasedChannel, Role } from "discord.js";
 
 /**
  * Handles configuration value persistence and retrieval.

@@ -5,9 +5,9 @@ import type { IModuleInstance } from "@interfaces/IModuleInstance.ts";
 import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
 import { PrismaService } from "@modules/Database/services/PrismaService";
 import { RedisService } from "@modules/Database/services/RedisService";
-import { CommandDeploymentService } from "@modules/Shared/services/CommandDeploymentService";
-import { ModuleLoader } from "@modules/Shared/services/ModuleLoader";
-import { BotStateRepository } from "@src/repositories";
+import type { CommandDeploymentService } from "@modules/Shared/services/CommandDeploymentService";
+import type { ModuleLoader } from "@modules/Shared/services/ModuleLoader";
+import type { BotStateRepository } from "@src/repositories";
 import { Logger } from "@utils/Logger";
 import {
 	Client,
@@ -54,7 +54,7 @@ export class LeBotClient<
 	}
 
 	static getInstance(): LeBotClient {
-		return this.instance;
+		return LeBotClient.instance;
 	}
 
 	private handleProcessEvents() {

@@ -1,9 +1,9 @@
 import { BaseToggleConfigHandler } from "@class/BaseToggleConfigHandler";
 import { ConfigType } from "@decorators/ConfigType";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
-import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
-import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
-import { ConfigValueService } from "@utils/ConfigValueService";
+import type { ConfigService } from "@modules/Configuration/services/ConfigService";
+import type { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import type { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import type { ConfigValueService } from "@utils/ConfigValueService";
 
 @ConfigType({
 	id: "test_toggle",

@@ -1,17 +1,17 @@
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import type { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { InteractionRegistry } from "@registers/InteractionRegistry";
-import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
-import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
-import { ConfigValueService } from "@utils/ConfigValueService";
+import type { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import type { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import type { ConfigValueService } from "@utils/ConfigValueService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ActionRowBuilder,
-	ButtonBuilder,
-	Guild,
+	type ButtonBuilder,
+	type Guild,
 	type RepliableInteraction,
 	StringSelectMenuBuilder,
-	StringSelectMenuInteraction,
+	type StringSelectMenuInteraction,
 	StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { BaseConfigTypeHandler } from "./BaseConfigTypeHandler";

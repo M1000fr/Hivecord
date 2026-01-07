@@ -6,11 +6,11 @@ export interface SubcommandOptions {
 }
 
 export function Subcommand(options?: SubcommandOptions) {
-	return function (
+	return (
 		target: object,
 		propertyKey: string,
 		_descriptor: PropertyDescriptor,
-	) {
+	) => {
 		const constructor = target.constructor as ICommandClass;
 		if (!constructor.subcommands) {
 			constructor.subcommands = new Map();

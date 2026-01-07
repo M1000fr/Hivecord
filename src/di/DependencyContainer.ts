@@ -1,13 +1,13 @@
 import "reflect-metadata";
 
 import {
+	type ClassProvider,
+	type Constructor,
+	type ExistingProvider,
 	GLOBAL_MODULE_METADATA_KEY,
 	INJECT_METADATA_KEY,
 	INJECTABLE_METADATA_KEY,
 	MODULE_OPTIONS_METADATA_KEY,
-	type ClassProvider,
-	type Constructor,
-	type ExistingProvider,
 	type Provider,
 	type ProviderScope,
 	type ProviderToken,
@@ -44,7 +44,7 @@ export class DependencyContainer {
 	>();
 
 	static getInstance(): DependencyContainer {
-		return this.instance;
+		return DependencyContainer.instance;
 	}
 
 	registerModule(options: ModuleOptions, moduleClass?: Constructor): void {

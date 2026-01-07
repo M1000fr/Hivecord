@@ -1,7 +1,7 @@
 import {
 	ConfigProperty,
-	EConfigType,
 	configKey,
+	EConfigType,
 } from "@decorators/ConfigProperty";
 import { ModuleConfig } from "@decorators/ModuleConfig";
 import type { ConfigProxy } from "@modules/Configuration/services/ConfigService";

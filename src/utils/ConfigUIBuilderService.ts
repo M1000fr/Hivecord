@@ -1,19 +1,19 @@
 import { LeBotClient } from "@class/LeBotClient";
-import { EConfigType, type IConfigClass } from "@decorators/ConfigProperty";
+import type { EConfigType, IConfigClass } from "@decorators/ConfigProperty";
 import { Inject } from "@decorators/Inject";
 import { Injectable } from "@decorators/Injectable";
 import {
 	ActionRowBuilder,
 	EmbedBuilder,
-	Guild,
-	Locale,
+	type Guild,
+	type Locale,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
-	User,
+	type User,
 } from "discord.js";
 import type { TFunction } from "i18next";
 import { ConfigFormatterService } from "./ConfigFormatterService";
-import { ConfigValueResolverService } from "./ConfigValueResolverService";
+import type { ConfigValueResolverService } from "./ConfigValueResolverService";
 import { CustomIdHelper } from "./CustomIdHelper";
 
 /**

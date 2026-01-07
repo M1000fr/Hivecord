@@ -1,27 +1,29 @@
 import type { LeBotClient } from "@class/LeBotClient";
-import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
-import { EConfigType } from "@decorators/ConfigProperty";
+import type {
+	ConfigPropertyOptions,
+	EConfigType,
+} from "@decorators/ConfigProperty";
 import {
 	ConfigContextData,
-	ConfigContextVariable,
+	type ConfigContextVariable,
 } from "@enums/ConfigContextVariable";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import type { ConfigService } from "@modules/Configuration/services/ConfigService";
 import { I18nService } from "@modules/Shared/services/I18nService";
 import type { GuildLanguageContext } from "@src/types/GuildLanguageContext";
-import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
-import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
-import { ConfigValueService } from "@utils/ConfigValueService";
+import type { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import type { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import type { ConfigValueService } from "@utils/ConfigValueService";
 import { CustomIdHelper } from "@utils/CustomIdHelper";
 import {
 	ButtonBuilder,
+	type ButtonInteraction,
 	ButtonStyle,
+	type ChannelSelectMenuInteraction,
 	EmbedBuilder,
-	Locale,
+	type Locale,
+	type MentionableSelectMenuInteraction,
 	Message,
 	MessageFlags,
-	type ButtonInteraction,
-	type ChannelSelectMenuInteraction,
-	type MentionableSelectMenuInteraction,
 	type ModalSubmitInteraction,
 	type RepliableInteraction,
 	type RoleSelectMenuInteraction,

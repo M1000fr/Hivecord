@@ -1,14 +1,14 @@
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
-import { LeBotClient } from "@class/LeBotClient";
+import type { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { EConfigType } from "@decorators/ConfigProperty";
 import { I18nService } from "@modules/Shared/services/I18nService";
 import {
 	ActionRowBuilder,
-	ButtonBuilder,
+	type ButtonBuilder,
 	ButtonStyle,
-	Message,
+	type Message,
 	type MessageActionRowComponentBuilder,
 	type RepliableInteraction,
 } from "discord.js";

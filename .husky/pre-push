@@ -1,30 +1,32 @@
-#!/usr/bin/env sh
+```#!/usr/bin/env sh
 
 # 1. Error checking (lint + typecheck)
 echo "🔍 Checking for errors..."
 bun run check:errors || exit 1
 
-# 2. Identifying files that need formatting
-echo "🧪 Checking formatting..."
-# We use || true because prettier --list-different returns a non-zero exit code if there are differences
-FILES_TO_FORMAT=$(bunx prettier --list-different .) || true
+# 2. Identifying files that need formatting/lint fixing
+echo "🧪 Checking formatting and linting..."
+# Biome check --write will report files that it would change
+# We use --no-errors-on-unmatched to avoid failing if no files match
+FILES_TO_FIX=$(bunx biome check .) || true
 
-if [ -n "$FILES_TO_FORMAT" ]; then
-    echo "✨ Files were found with incorrect formatting. Fixing..."
+# Check if there are changes to be committed
+if ! git diff --exit-code --quiet; then
+    echo "✨ Files were found with incorrect formatting or fixable lint errors. Fixing..."
 
-    # Format only the affected files
-    echo "$FILES_TO_FORMAT" | xargs bunx prettier --write
+    # Apply fixes
+    bunx biome check --write .
 
-    # Add only these specific files to the Git index
-    echo "$FILES_TO_FORMAT" | xargs git add
+    # Add changes to Git index
+    git add .
 
-    # Create the commit with the requested message
+    # Create the commit
     # --no-verify is crucial to avoid triggering hooks in a loop
-    git commit -m "refactor: format with prettier" --no-verify
+    git commit -m "refactor: format and lint with biome" --no-verify
 
     echo ""
     echo "------------------------------------------------------------"
-    echo "✅ Formatting completed and committed automatically."
+    echo "✅ Formatting and linting fixed and committed automatically."
     echo "🚀 Push cancelled to include this new commit."
     echo "👉 Please run 'git push' again to send all commits."
     echo "------------------------------------------------------------"
@@ -33,5 +35,5 @@ if [ -n "$FILES_TO_FORMAT" ]; then
     # Cancel the current push to force a re-push with the new commit
     exit 1
 else
-    echo "✅ Formatting is perfect. Proceeding with push..."
+    echo "✅ Code style and linting are perfect. Proceeding with push..."
 fi

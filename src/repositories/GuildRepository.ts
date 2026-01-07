@@ -1,6 +1,6 @@
 import { Repository } from "@decorators/Repository";
-import { PrismaService } from "@modules/Database/services/PrismaService";
-import { Guild } from "discord.js";
+import type { PrismaService } from "@modules/Database/services/PrismaService";
+import type { Guild } from "discord.js";
 import { BaseRepository } from "./BaseRepository";
 
 @Repository()

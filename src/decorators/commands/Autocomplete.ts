@@ -5,11 +5,11 @@ export interface AutocompleteOptions {
 }
 
 export function Autocomplete(options: AutocompleteOptions) {
-	return function (
+	return (
 		target: object,
 		propertyKey: string,
 		_descriptor: PropertyDescriptor,
-	) {
+	) => {
 		const constructor = target.constructor as ICommandClass;
 		if (!constructor.autocompletes) {
 			constructor.autocompletes = new Map();

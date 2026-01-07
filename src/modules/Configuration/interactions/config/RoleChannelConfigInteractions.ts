@@ -1,9 +1,9 @@
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
-import { LeBotClient } from "@class/LeBotClient";
+import type { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import {
-	EConfigType,
 	type ConfigPropertyOptions,
+	EConfigType,
 } from "@decorators/ConfigProperty";
 import { SelectMenu } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
@@ -13,10 +13,10 @@ import {
 	ActionRowBuilder,
 	ButtonStyle,
 	ChannelSelectMenuBuilder,
-	RoleSelectMenuBuilder,
 	type ChannelSelectMenuInteraction,
 	type MessageActionRowComponentBuilder,
 	type RepliableInteraction,
+	RoleSelectMenuBuilder,
 	type RoleSelectMenuInteraction,
 } from "discord.js";
 

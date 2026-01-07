@@ -4,16 +4,16 @@ import {
 	CONFIG_TYPE_METADATA_KEY,
 	type ConfigTypeMetadata,
 } from "@decorators/ConfigType";
-import { ConfigService } from "@modules/Configuration/services/ConfigService";
+import type { ConfigService } from "@modules/Configuration/services/ConfigService";
 import type { ConfigTypeHandler } from "@registers/ConfigTypeRegistry";
 import { ConfigTypeRegistry } from "@registers/ConfigTypeRegistry";
-import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
-import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
-import { ConfigValueService } from "@utils/ConfigValueService";
-import {
+import type { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import type { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import type { ConfigValueService } from "@utils/ConfigValueService";
+import type {
 	ButtonInteraction,
 	ChatInputCommandInteraction,
-	type RepliableInteraction,
+	RepliableInteraction,
 	StringSelectMenuInteraction,
 } from "discord.js";
 import { BaseConfigInteractions } from "./BaseConfigInteractions";

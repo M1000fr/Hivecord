@@ -1,9 +1,12 @@
 import { Pager, type PagerOptions } from "@class/Pager";
 import { Injectable } from "@decorators/Injectable";
-import { RedisService } from "@modules/Database/services/RedisService";
+import type { RedisService } from "@modules/Database/services/RedisService";
 import { I18nService } from "@modules/Shared/services/I18nService";
 import { PagerRegistry, type PagerState } from "@registers/PagerRegistry";
-import { ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
+import type {
+	ButtonInteraction,
+	StringSelectMenuInteraction,
+} from "discord.js";
 
 @Injectable({ scope: "global" })
 export class PagerService {

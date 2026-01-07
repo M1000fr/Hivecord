@@ -1,10 +1,10 @@
 import { BaseConfigInteractions } from "@class/BaseConfigInteractions";
-import { LeBotClient } from "@class/LeBotClient";
+import type { LeBotClient } from "@class/LeBotClient";
 import { ConfigInteraction } from "@decorators/ConfigInteraction";
 import type { ConfigPropertyOptions } from "@decorators/ConfigProperty";
 import { Button } from "@decorators/Interaction";
 import { Interaction } from "@decorators/params";
-import { type ButtonInteraction, type RepliableInteraction } from "discord.js";
+import type { ButtonInteraction, RepliableInteraction } from "discord.js";
 
 @ConfigInteraction()
 export class BooleanConfigInteractions extends BaseConfigInteractions {

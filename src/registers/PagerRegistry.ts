@@ -1,9 +1,9 @@
-import {
+import type {
 	ActionRowBuilder,
+	BaseMessageOptions,
 	EmbedBuilder,
-	type BaseMessageOptions,
-	type Interaction,
-	type MessageActionRowComponentBuilder,
+	Interaction,
+	MessageActionRowComponentBuilder,
 } from "discord.js";
 
 export type PagerRenderer<T = unknown> = (
@@ -40,10 +40,10 @@ export class PagerRegistry {
 	private static definitions: Map<string, PagerDefinition> = new Map();
 
 	static register(name: string, definition: PagerDefinition) {
-		this.definitions.set(name, definition);
+		PagerRegistry.definitions.set(name, definition);
 	}
 
 	static get(name: string): PagerDefinition | undefined {
-		return this.definitions.get(name);
+		return PagerRegistry.definitions.get(name);
 	}
 }

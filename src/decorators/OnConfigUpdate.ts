@@ -1,19 +1,19 @@
 import { toConfigKey } from "@decorators/ConfigProperty";
 import {
 	COMMAND_PARAMS_METADATA_KEY,
-	CommandParamType,
 	type CommandParameter,
+	CommandParamType,
 } from "@decorators/params";
 import { DependencyContainer } from "@di/DependencyContainer";
 import type { Constructor } from "@di/types";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 
 export function OnConfigUpdate(propertyName: string) {
-	return function (
+	return (
 		target: object,
 		propertyKey: string,
 		_descriptor: PropertyDescriptor,
-	) {
+	) => {
 		const configKey = toConfigKey(propertyName);
 
 		ConfigUpdateRegistry.register(
