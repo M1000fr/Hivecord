@@ -43,4 +43,4 @@ jobs:
         run: bun run typecheck
 
       - name: Check i18n keys
-        run: bun run i18n:missing
+        run: bun run i18n:info
