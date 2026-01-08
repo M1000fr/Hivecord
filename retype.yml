@@ -1,5 +1,8 @@
 input: .
 output: public
+url: hivecord.m1000.fr
+
+# Exclude technical and build folders to keep the sidebar clean
 exclude:
   - .github
   - .husky
@@ -21,12 +24,60 @@ exclude:
   - prisma.config.ts
   - tsconfig.json
   - public
+
 branding:
   title: Hivecord
-  label: Docs
+  label: Framework
   color: "#f6ad55"
+  logo: /static/logo.png # Placeholder if you add one later
+  repository: https://github.com/M1000fr/Hivecord
+
 footer:
-  copyright: "&copy; {{ year }} Hivecord. Built with Retype."
-links:
-  - text: GitHub
-    link: https://github.com/M1000fr/Hivecord
+  copyright: "&copy; {{ year }} Hivecord Project. Built with Retype."
+
+# Sidebar organization
+sidebar:
+  links:
+    - text: GitHub
+      link: https://github.com/M1000fr/Hivecord
+      icon: mark-github
+  sections:
+    - text: Getting Started
+      items:
+        - text: Introduction
+          link: /
+    - text: Core Architecture
+      items:
+        - text: Modules
+          link: docs/decorators/Module.md
+        - text: Dependency Injection
+          link: docs/decorators/Injectable.md
+        - text: Interceptors
+          link: docs/decorators/Interceptors.md
+    - text: Discord Interactions
+      items:
+        - text: Slash Commands
+          link: docs/decorators/SlashCommand.md
+        - text: Context Commands
+          link: docs/decorators/ContextCommands.md
+        - text: UI Components (Buttons/Modals)
+          link: docs/decorators/Interactions.md
+        - text: Events
+          link: docs/decorators/Events.md
+    - text: Configuration & Data
+      items:
+        - text: Module Configuration
+          link: docs/decorators/Configuration.md
+        - text: Custom Types
+          link: docs/decorators/ConfigTypes.md
+        - text: Advanced Usage
+          link: docs/decorators/Advanced.md
+
+# Search settings
+search:
+  placeholder: Search documentation...
+  keep_directory_path: false
+
+# Markdown features
+templating:
+  enabled: true
