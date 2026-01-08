@@ -71,6 +71,18 @@ The `@OptionRoute` decorator allows you to route an interaction to different met
 @SlashCommandController({
   name: "manage",
   description: "Manage items",
+  options: [
+    {
+      name: "action",
+      type: "STRING",
+      description: "Action to perform",
+      required: true,
+      choices: [
+        { name: "Add", value: "add" },
+        { name: "Remove", value: "remove" },
+      ],
+    },
+  ],
 })
 export default class ManageCommand {
   @SlashCommand()
