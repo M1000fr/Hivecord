@@ -28,17 +28,12 @@
     "@prisma/client": "^7.2.0",
     "axios": "^1.13.2",
     "discord.js": "^14.25.1",
-    "gif-frames": "^1.0.1",
-    "gifencoder": "^2.0.1",
     "i18next": "^25.7.3",
     "ioredis": "^5.8.2",
     "mysql2": "^3.16.0",
     "prisma": "^7.2.0",
     "reflect-metadata": "^0.2.2",
     "ts-node": "^10.9.2"
-  },
-  "resolutions": {
-    "canvas": "npm:@napi-rs/canvas@^0.1.83"
   },
   "scripts": {
     "dev": "bun .",
@@ -54,8 +49,5 @@
     "**/*.{ts,js,json,md}": [
       "biome check --write --no-errors-on-unmatched"
     ]
-  },
-  "trustedDependencies": [
-    "@napi-rs/canvas"
-  ]
+  }
 }
