@@ -1,101 +1,118 @@
 # Hivecord
 
-A modular and high-performance Discord bot framework written in TypeScript, optimized for [Bun](https://bun.sh).
+A modular and high-performance Discord bot written in TypeScript, optimized for execution with [Bun](https://bun.sh).
 
-:::v-stack
-!![Modular Architecture](https://img.shields.io/badge/Architecture-Modular-orange?style=for-the-badge)
-!![Dependency Injection](https://img.shields.io/badge/DI-Inversify--style-blue?style=for-the-badge)
-!![High Performance](https://img.shields.io/badge/Runtime-Bun-black?style=for-the-badge)
-:::
+## Features
 
----
+- **Modular Architecture**: Code organization by modules (General, Configuration, CustomEmbed, etc.).
+- **Dependency Injection**: Robust system for service and instance management.
+- **Dynamic Configuration**: Direct access to configuration via the `guild.config` object.
+- **Internationalization (i18n)**: Built-in multi-language support with `guild.i18n()`.
+- **Persistence**: Using Prisma (MariaDB) and high-performance caching with Redis.
 
-## ![:icon-rocket: Quick Start]
-
-Dive into the documentation to learn how to build your own modules.
-
-[!ref icon="book" text="Read the Documentation" target="blank"](./docs/decorators/README.md)
-[!ref icon="zap" text="Get Started" variant="primary"](./docs/decorators/Module.md)
-
----
-
-## ![:icon-star: Key Features]
-
-### ![:icon-cpu: Modular Architecture]
-Organize your code by features. Each module is self-contained with its own commands, events, and services.
-
-### ![:icon-link: Dependency Injection]
-Robust system for service and instance management. No more manual singleton handling.
-
-### ![:icon-gear: Dynamic Configuration]
-Direct access to guild-specific configuration via the `guild.config` object with real-time updates.
-
-### ![:icon-globe: Internationalization]
-Built-in multi-language support. Translate your bot easily with `guild.i18n()` and automated key checking.
-
----
-
-## ![:icon-package: Core Components]
-
-:::grid
-{ "columns": 2 }
-
-> ### ![:icon-terminal: Slash Commands]
-> Define commands using decorators. Supports subcommands, autocomplete, and parameter injection.
-> [Learn more](./docs/decorators/SlashCommand.md)
-
-> ### ![:icon-zap: Interactions]
-> Handle buttons, select menus, and modals with simple method decorators and wildcard routing.
-> [Learn more](./docs/decorators/Interactions.md)
-
-> ### ![:icon-database: Persistence]
-> Powered by **Prisma** (MariaDB/MySQL) and high-performance caching with **Redis**.
-> [Learn more](./docs/decorators/Advanced.md#data-repositories-repository)
-
-> ### ![:icon-shield: Interceptors]
-> Apply middleware-like logic for permissions, logging, or validation at the class or method level.
-> [Learn more](./docs/decorators/Interceptors.md)
-:::
-
----
-
-## ![:icon-tools: Project Structure]
+## Project Structure
 
 ```text
 .
-├── docs/           # Detailed documentation (Retype)
+├── docs/           # Detailed documentation
 ├── prisma/         # Database schema and migrations
-├── src/            # Source code
-│   ├── class/      # Base framework classes
-│   ├── decorators/ # Interaction & DI decorators
-│   ├── modules/    # Feature modules (The core of your bot)
-│   └── index.ts    # Application entry point
+├── scripts/        # Utility and maintenance scripts
+└── src/            # Source code
+    ├── class/      # Base classes (HivecordClient, Pager, etc.)
+    ├── decorators/ # Custom decorators for the modular system
+    ├── di/         # Dependency Injection container
+    ├── enums/      # Shared enums
+    ├── interceptors/ # Interaction interceptors
+    ├── interfaces/ # TypeScript interfaces
+    ├── locales/    # Translation files (i18n)
+    ├── modules/    # Feature modules (Configuration, General, etc.)
+    ├── prisma/     # Prisma client and database adapter
+    ├── registers/  # Component registries
+    ├── repositories/ # Data access layer (Prisma)
+    ├── types/      # Custom type definitions
+    ├── utils/      # Helper functions and services
+    ├── Bootstrap.ts # Bot initialization logic
+    ├── bot.ts       # Discord client setup
+    └── index.ts     # Application entry point
 ```
+
+## Prerequisites
+
+- [Bun](https://bun.sh) (v1.x)
+- A MariaDB or MySQL database
+- A Redis instance
+
+## Installation
+
+1. Install dependencies:
+
+    ```
+    bun install
+    ```
+
+2. Configure your environment (`.env`) with your Discord token and connection URLs (DB/Redis).
+
+3. Deploy the database:
+    ```
+    bunx prisma migrate deploy
+    ```
+
+## Running
+
+For development with hot-reloading:
+
+```
+bun dev
+```
+
+For production:
+
+```
+bun start
+```
+
+## Scripts
+
+- `bun dev`: Starts the bot in development mode.
+- `bun start`: Deploys migrations and starts the bot in production mode.
+- `bun run typecheck`: Runs TypeScript type checking.
+- `bun run lint`: Checks for code style issues.
+- `bun run format`: Formats the code using Prettier.
+- `bun run i18n:info`: Shows translation coverage and missing keys.
+
+## Modules Architecture
+
+Each module in `src/modules` follows a structured pattern:
+
+- **Module Class**: Entry point defined with `@Module`.
+- **Controllers**: Handle commands (`@SlashCommandController`) and events (`@EventController`).
+- **Services**: Business logic marked with `@Injectable`.
+- **Config**: Dynamic configuration schemas using `@ModuleConfig`.
+
+Example module structure:
+
+```text
+modules/MyModule/
+├── commands/      # Slash commands
+├── events/        # Event listeners
+├── services/      # Business logic
+└── MyModule.ts    # Module definition
+```
+
+## Development
+
+Hivecord uses a decorator system inspired by frameworks like NestJS to facilitate development.
+
+### Main Decorators
+
+- `@Module`: Defines a module and its dependencies (services, commands, events).
+- `@Injectable`: Marks a class as an injectable service.
+- `@Inject`: Injects a dependency into a constructor.
+- `@SlashCommandController`: Defines a Slash command.
+- `@SlashCommand`: Marks a method as a command entry point.
+
+👉 **[See the complete decorators documentation](https://hivecord.m1000.fr)**
 
 ---
 
-## ![:icon-terminal: Installation]
-
-=== :icon-package: Install
-```bash
-bun install
-```
-=== :icon-database: Database
-```bash
-# Configure .env first
-bunx prisma migrate deploy
-```
-=== :icon-play: Run
-```bash
-bun dev # Hot-reload
-bun start # Production
-```
-===
-
----
-
-[!ref text="View Decorators API" icon="arrow-right"](./docs/decorators/README.md)
-
-:::footer
-&copy; {{ year }} Hivecord. Built with :icon-heart: using Bun and Retype.
-:::
+_This project uses Bun for ultra-fast execution._
