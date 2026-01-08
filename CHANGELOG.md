@@ -1,3 +1,16 @@
+# [2.4.0](https://github.com/M1000fr/Hivecord/compare/v2.3.0...v2.4.0) (2026-01-08)
+
+
+### Bug Fixes
+
+* **core:** ensure interaction handlers resolve from the correct module context ([9b46466](https://github.com/M1000fr/Hivecord/commit/9b464668f2cd8ee56e44caecbca11a3fdf9e7cfa))
+
+
+### Features
+
+* **examples:** add Modal example with LabelBuilder syntax ([bf70500](https://github.com/M1000fr/Hivecord/commit/bf70500fdd66f0fa048b2b80ea60c1c8b06dcfe6))
+* **types:** add interaction context types and update button example ([0f24121](https://github.com/M1000fr/Hivecord/commit/0f24121aa9546f8169f66c39d5113eca63863a95))
+
 # [2.3.0](https://github.com/M1000fr/Hivecord/compare/v2.2.0...v2.3.0) (2026-01-08)
 
 
