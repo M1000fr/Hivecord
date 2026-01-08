@@ -1,29 +1,5 @@
 input: docs
-output: .retype
 url: hivecord.m1000.fr
-
-# Exclude technical and build folders
-exclude:
-  - .github
-  - .husky
-  - .vscode
-  - .zed
-  - data
-  - node_modules
-  - prisma
-  - scripts
-  - src
-  - .dockerignore
-  - .gitignore
-  - .releaserc
-  - biome.json
-  - bun.lock
-  - docker-compose.dev.yml
-  - docker-compose.yml
-  - package.json
-  - prisma.config.ts
-  - tsconfig.json
-  - .retype
 
 branding:
   title: Hivecord
