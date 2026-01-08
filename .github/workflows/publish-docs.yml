@@ -20,7 +20,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          publish_dir: ./.retype
           publish_branch: gh-pages
           cname: hivecord.m1000.fr
           force_orphan: true
