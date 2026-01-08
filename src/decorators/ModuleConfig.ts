@@ -1,9 +1,9 @@
 export interface IModuleConfigClass {
-	isModuleConfig?: boolean;
+  isModuleConfig?: boolean;
 }
 
-export function ModuleConfig() {
-	return (constructor: object) => {
-		(constructor as IModuleConfigClass).isModuleConfig = true;
-	};
+export function ModuleConfig(): ClassDecorator {
+  return (constructor: Function) => {
+    (constructor as unknown as IModuleConfigClass).isModuleConfig = true;
+  };
 }

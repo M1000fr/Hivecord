@@ -4,26 +4,28 @@ import { type CommandOptions } from "@interfaces/CommandOptions.ts";
 import { type ICommandClass } from "@interfaces/ICommandClass.ts";
 import "reflect-metadata";
 
-export function SlashCommandController(options: CommandOptions) {
-  return (target: abstract new (...args: never[]) => object) => {
+export function SlashCommandController(
+  options: CommandOptions,
+): ClassDecorator {
+  return ((target: Function) => {
     // Apply @Injectable() automatically
-    Injectable()(target);
+    Injectable()(target as any);
     // Mark as command provider
     Reflect.defineMetadata(PROVIDER_TYPE_METADATA_KEY, "command", target);
 
     const commandClass = target as unknown as ICommandClass;
     commandClass.commandOptions = options;
-  };
+  }) as ClassDecorator;
 }
 
 export interface SubcommandOptions {
   index: string;
 }
 
-export function SlashCommand(options?: SubcommandOptions) {
+export function SlashCommand(options?: SubcommandOptions): MethodDecorator {
   return (
     target: object,
-    propertyKey: string,
+    propertyKey: string | symbol,
     _descriptor: PropertyDescriptor,
   ) => {
     const constructor = target.constructor as ICommandClass;
@@ -36,10 +38,10 @@ export function SlashCommand(options?: SubcommandOptions) {
       const key =
         parts.length > 1 ? `${parts[0]}:${parts[1]}` : (parts[0] as string);
       constructor.subcommands.set(key, {
-        method: propertyKey,
+        method: propertyKey as string,
       });
     } else {
-      constructor.defaultCommand = propertyKey;
+      constructor.defaultCommand = propertyKey as string;
     }
   };
 }

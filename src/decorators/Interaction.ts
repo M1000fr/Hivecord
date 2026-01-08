@@ -49,10 +49,14 @@ function createInteractionDecorator(registryMethods: {
   exact: (customId: string, handler: InteractionHandler) => void;
   pattern: (customId: string, handler: InteractionHandler) => void;
 }) {
-  return (customId: string) =>
-    (target: object, propertyKey: string, _descriptor: PropertyDescriptor) => {
+  return (customId: string): MethodDecorator =>
+    (
+      target: object,
+      propertyKey: string | symbol,
+      _descriptor: PropertyDescriptor,
+    ) => {
       const isPattern = customId.includes("*");
-      const handler = createHandler(target, propertyKey);
+      const handler = createHandler(target, propertyKey as string);
       if (isPattern) {
         registryMethods.pattern(customId, handler);
       } else {

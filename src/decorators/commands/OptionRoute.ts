@@ -5,10 +5,10 @@ export interface OptionRouteOptions {
   value: string | number | boolean;
 }
 
-export function OptionRoute(options: OptionRouteOptions) {
+export function OptionRoute(options: OptionRouteOptions): MethodDecorator {
   return (
     target: object,
-    propertyKey: string,
+    propertyKey: string | symbol,
     _descriptor: PropertyDescriptor,
   ) => {
     const constructor = target.constructor as ICommandClass;
@@ -25,7 +25,7 @@ export function OptionRoute(options: OptionRouteOptions) {
 
     // Register the value -> method mapping
     optionMap.set(options.value, {
-      method: propertyKey,
+      method: propertyKey as string,
     });
   };
 }

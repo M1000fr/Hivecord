@@ -8,10 +8,10 @@ export interface MessageCommandOptions {
   defaultMemberPermissions?: string;
 }
 
-export function MessageCommand(options: MessageCommandOptions) {
-  return (target: abstract new (...args: never[]) => object) => {
+export function MessageCommand(options: MessageCommandOptions): ClassDecorator {
+  return ((target: Function) => {
     // Apply @Injectable() automatically
-    Injectable()(target);
+    Injectable()(target as any);
     // Mark as command provider
     Reflect.defineMetadata(PROVIDER_TYPE_METADATA_KEY, "command", target);
 
@@ -20,5 +20,5 @@ export function MessageCommand(options: MessageCommandOptions) {
       ...options,
       type: "message",
     };
-  };
+  }) as ClassDecorator;
 }

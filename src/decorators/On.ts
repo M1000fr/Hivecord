@@ -6,7 +6,7 @@ export const EVENT_METADATA_KEY = "hivecord:event";
 
 export function On<K extends keyof ClientEvents | string>(
   options: EventOptions<K> | K,
-) {
+): MethodDecorator {
   return (
     target: object,
     propertyKey: string | symbol,

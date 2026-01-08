@@ -34,7 +34,7 @@ function ensureExportsAreDeclared(options: ModuleOptions) {
   }
 }
 
-export function Module(options: ModuleOptions) {
+export function Module(options: ModuleOptions): ClassDecorator {
   ensureExportsAreDeclared(options);
 
   if (options.config) {
@@ -46,15 +46,11 @@ export function Module(options: ModuleOptions) {
     }
   }
 
-  return <T extends { new (): object }>(constructor: T) => {
-    if (typeof constructor !== "function") {
-      throw new Error(`@Module decorator can only be used on classes.`);
-    }
-
+  return ((constructor: Function) => {
     Reflect.defineMetadata(MODULE_OPTIONS_METADATA_KEY, options, constructor);
     // @ts-expect-error: Mixin requires any[] constructor
     return class extends constructor {
       public moduleOptions = options;
     };
-  };
+  }) as ClassDecorator;
 }

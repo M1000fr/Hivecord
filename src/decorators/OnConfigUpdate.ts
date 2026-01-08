@@ -8,10 +8,10 @@ import { DependencyContainer } from "@di/DependencyContainer";
 import { type Constructor } from "@di/types";
 import { ConfigUpdateRegistry } from "@registers/ConfigUpdateRegistry";
 
-export function OnConfigUpdate(propertyName: string) {
+export function OnConfigUpdate(propertyName: string): MethodDecorator {
   return (
     target: object,
-    propertyKey: string,
+    propertyKey: string | symbol,
     _descriptor: PropertyDescriptor,
   ) => {
     const configKey = toConfigKey(propertyName);
@@ -20,7 +20,7 @@ export function OnConfigUpdate(propertyName: string) {
       const container = DependencyContainer.getInstance();
       const instance = container.resolve(
         target.constructor as Constructor,
-      ) as Record<string, (...args: unknown[]) => Promise<void>>;
+      ) as Record<string | symbol, (...args: unknown[]) => Promise<void>>;
       const method = instance[propertyKey];
 
       if (method) {

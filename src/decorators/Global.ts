@@ -7,7 +7,7 @@ import "reflect-metadata";
  * in all other modules without the need to import the global module.
  */
 export function Global(): ClassDecorator {
-	return (target: object) => {
-		Reflect.defineMetadata(GLOBAL_MODULE_METADATA_KEY, true, target);
-	};
+  return (target: object) => {
+    Reflect.defineMetadata(GLOBAL_MODULE_METADATA_KEY, true, target);
+  };
 }

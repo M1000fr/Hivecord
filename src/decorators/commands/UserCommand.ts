@@ -8,10 +8,10 @@ export interface UserCommandOptions {
   defaultMemberPermissions?: string;
 }
 
-export function UserCommand(options: UserCommandOptions) {
-  return (target: abstract new (...args: never[]) => object) => {
+export function UserCommand(options: UserCommandOptions): ClassDecorator {
+  return ((target: Function) => {
     // Apply @Injectable() automatically
-    Injectable()(target);
+    Injectable()(target as any);
     // Mark as command provider
     Reflect.defineMetadata(PROVIDER_TYPE_METADATA_KEY, "command", target);
 
@@ -20,5 +20,5 @@ export function UserCommand(options: UserCommandOptions) {
       ...options,
       type: "user",
     };
-  };
+  }) as ClassDecorator;
 }

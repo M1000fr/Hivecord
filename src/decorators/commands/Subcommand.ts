@@ -5,10 +5,10 @@ export interface SubcommandOptions {
   group?: string;
 }
 
-export function Subcommand(options?: SubcommandOptions) {
+export function Subcommand(options?: SubcommandOptions): MethodDecorator {
   return (
     target: object,
-    propertyKey: string,
+    propertyKey: string | symbol,
     _descriptor: PropertyDescriptor,
   ) => {
     const constructor = target.constructor as ICommandClass;
@@ -17,11 +17,11 @@ export function Subcommand(options?: SubcommandOptions) {
     }
 
     // Infer name from method name if not provided
-    const name = options?.name ?? propertyKey;
+    const name = options?.name ?? (propertyKey as string);
     const group = options?.group;
 
     constructor.subcommands.set(group ? `${group}:${name}` : name, {
-      method: propertyKey,
+      method: propertyKey as string,
     });
   };
 }

@@ -2,10 +2,12 @@ import { type Constructor, INTERCEPTORS_METADATA_KEY } from "@di/types";
 import { type IInterceptor } from "@interfaces/IInterceptor";
 import "reflect-metadata";
 
-export function UseInterceptors(...interceptors: Constructor<IInterceptor>[]) {
+export function UseInterceptors(
+  ...interceptors: Constructor<IInterceptor>[]
+): ClassDecorator & MethodDecorator {
   return (
-    target: object | (abstract new (...args: never[]) => object),
-    propertyKey?: string,
+    target: any,
+    propertyKey?: string | symbol,
     _descriptor?: PropertyDescriptor,
   ) => {
     if (propertyKey) {
