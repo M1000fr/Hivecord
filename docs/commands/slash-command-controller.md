@@ -45,23 +45,6 @@ export class PingController {
 
 ---
 
-## :icon-shield: Permissions
-
-You can restrict access to all commands within a controller by using the `@Permissions` decorator on the class itself.
-
-```typescript
-@SlashCommandController({
-    name: "admin",
-    description: "Administrative tools"
-})
-@Permissions(["Administrator"]) // Entire controller requires Admin perms
-export class AdminController {
-    // ...
-}
-```
-
----
-
 ## :icon-workflow: How it works
 
 1. **Detection**: During bootstrap, Hivecord scans modules for `controllers`.
