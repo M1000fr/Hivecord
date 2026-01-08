@@ -105,6 +105,31 @@ export class DependencyContainer {
 		return this.registeredModules;
 	}
 
+	public clearInstance(token: ProviderToken, moduleName?: string): void {
+		this.globalInstances.delete(token);
+		if (moduleName) {
+			this.moduleInstances.get(moduleName.toLowerCase())?.delete(token);
+		}
+	}
+
+	public clearModule(moduleName: string): void {
+		const normalizedName = moduleName.toLowerCase();
+
+		// Clear global providers and instances belonging to this module
+		for (const [token, provider] of this.globalProviders.entries()) {
+			if (provider.moduleName?.toLowerCase() === normalizedName) {
+				this.globalProviders.delete(token);
+				this.globalInstances.delete(token);
+			}
+		}
+
+		this.registeredModules.delete(normalizedName);
+		this.moduleProviders.delete(normalizedName);
+		this.exportedProviders.delete(normalizedName);
+		this.moduleInstances.delete(normalizedName);
+		this.globalModuleNames.delete(normalizedName);
+	}
+
 	public getDuplicateProviders(): Map<ProviderToken, string[]> {
 		const counts = new Map<ProviderToken, string[]>();
 
@@ -346,6 +371,10 @@ export class DependencyContainer {
 		provider: ResolvedProvider,
 		exports?: ProviderToken[],
 	) {
+		// When re-registering a provider (hot-reload), we must clear existing instances
+		// to force the container to re-instantiate with the new class definition.
+		this.clearInstance(provider.token, provider.moduleName);
+
 		if (provider.scope === "global") {
 			this.globalProviders.set(provider.token, provider);
 		} else if (provider.moduleName) {

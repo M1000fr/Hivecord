@@ -76,9 +76,6 @@ export class ConfigTypeRegistry {
 	 * @param definition The type definition
 	 */
 	static register(definition: ConfigTypeDefinition): void {
-		if (ConfigTypeRegistry.types.has(definition.id)) {
-			return;
-		}
 		ConfigTypeRegistry.types.set(definition.id, definition);
 	}
 

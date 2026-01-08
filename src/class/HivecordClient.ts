@@ -6,6 +6,7 @@ import type { ModuleOptions } from "@interfaces/ModuleOptions.ts";
 import { PrismaService } from "@modules/Database/services/PrismaService";
 import { RedisService } from "@modules/Database/services/RedisService";
 import { CommandDeploymentService } from "@modules/Shared/services/CommandDeploymentService";
+import { HotReloadService } from "@modules/Shared/services/HotReloadService";
 import { ModuleLoader } from "@modules/Shared/services/ModuleLoader";
 import { BotStateRepository } from "@src/repositories";
 import { Logger } from "@utils/Logger";
@@ -36,6 +37,7 @@ export class HivecordClient<
 		public readonly botStateRepository: BotStateRepository,
 		private readonly moduleLoader: ModuleLoader,
 		private readonly commandDeploymentService: CommandDeploymentService,
+		private readonly hotReloadService: HotReloadService,
 	) {
 		super({
 			intents: [
@@ -100,6 +102,7 @@ export class HivecordClient<
 
 	public async start(token: string): Promise<string> {
 		await this.moduleLoader.loadModules(this);
+		this.hotReloadService.init(this);
 		try {
 			return await this.login(token);
 		} catch (error: unknown) {

@@ -9,6 +9,7 @@ import { GeneralModule } from "@modules/General/GeneralModule";
 import { CommandDeploymentService } from "@modules/Shared/services/CommandDeploymentService";
 import { CommandService } from "@modules/Shared/services/CommandService";
 import CommandHandlerEvent from "@modules/Shared/services/commandHandler";
+import { HotReloadService } from "@modules/Shared/services/HotReloadService";
 import { I18nService } from "@modules/Shared/services/I18nService";
 import InteractionRegistryHandler from "@modules/Shared/services/InteractionRegistryHandler";
 import { ModuleLoader } from "@modules/Shared/services/ModuleLoader";
@@ -29,6 +30,7 @@ import { ConfigValueService } from "@utils/ConfigValueService";
 		InteractionRegistryHandler,
 		CommandDeploymentService,
 		ModuleLoader,
+		HotReloadService,
 		I18nService,
 		CommandService,
 		PagerService,

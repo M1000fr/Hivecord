@@ -35,4 +35,8 @@ export class ConfigUpdateRegistry {
 			}
 		}
 	}
+
+	static clear() {
+		ConfigUpdateRegistry.listeners.clear();
+	}
 }
