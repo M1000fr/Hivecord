@@ -62,12 +62,13 @@ export default class SearchCommand {
 
 ## :icon-database: Data Repositories (`@Repository`)
 
-The `@Repository` decorator is a specialized utility for data access classes. It simplifies Prisma usage by automatically handling database service injection.
+The `@Repository` decorator is a specialized utility for data access classes. It marks a class as a repository provider that should be registered in a module.
 
 ### :icon-star: Benefits
 
 - Automatically applies `@Injectable()`.
-- Automatically injects `PrismaService` into the constructor.
+- Tags the provider as a repository for identification.
+- Uses standard constructor injection for dependencies.
 - Prepares the class to be used as a singleton in your services.
 
 === :icon-code: Example
@@ -77,6 +78,7 @@ import { PrismaService } from "@modules/Shared/services/PrismaService";
 
 @Repository()
 export class UserRepository {
+	// Dependencies are injected via standard constructor injection
 	constructor(private prisma: PrismaService) {}
 
 	async findUser(id: string) {
@@ -85,6 +87,10 @@ export class UserRepository {
 }
 ```
 ===
+
+!!! info "Explicit Registration Required"
+Repositories must be explicitly registered in a module's `providers` array to be available for injection.
+!!!
 
 ---
 

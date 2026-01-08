@@ -16,7 +16,7 @@ Hivecord automatically routes the incoming interaction to the correct method. No
 
 ## :icon-pencil: Usage
 
-In its simplest form, apply `@SlashCommand()` to a method. By default, this method will be called when the base command defined in the controller is executed.
+In its simplest form, apply `@SlashCommand()` to a method without parameters. This marks the method as the default handler for the base command. If you need to handle subcommands, use the `@Subcommand` decorator instead.
 
 === :icon-code: Example
 ```typescript
@@ -35,6 +35,10 @@ export class PingController {
 }
 ```
 ===
+
+!!! info "Note"
+For commands with subcommands or subcommand groups, use the `@Subcommand` decorator. The `@SlashCommand()` decorator is typically used for simple commands without subcommands.
+!!!
 
 ---
 

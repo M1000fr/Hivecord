@@ -56,7 +56,7 @@ In a command or a component interaction (`@Button`, `@SelectMenu`, `@Modal`), `@
 
 ```typescript
 // Slash Command
-async execute(@Context() [interaction]: [ChatInputCommandInteraction]) {
+async execute(@Context() [interaction]: ChatInputCommandInteraction) {
     await interaction.reply("Hello!");
 }
 

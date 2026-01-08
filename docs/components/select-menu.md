@@ -21,12 +21,12 @@ To handle a select menu interaction, apply the `@SelectMenu` decorator to a meth
 === :icon-code: String Select
 ```typescript
 import { SelectMenu, Context } from "@decorators/Interaction";
-import { StringSelectContext } from "@src/types/InteractionContexts";
+import { SelectMenuContext } from "@src/types/InteractionContexts";
 
 @Injectable()
 export class SettingsHandler {
     @SelectMenu("theme_selector")
-    async onThemeSelect(@Context() [interaction]: StringSelectContext) {
+    async onThemeSelect(@Context() [interaction]: SelectMenuContext) {
         const selectedTheme = interaction.values[0];
         await interaction.reply({
             content: `Theme updated to: ${selectedTheme}`,
@@ -46,7 +46,7 @@ Wildcards allow you to handle multiple menus with a single method, which is part
 ```typescript
 // Matches "role_assign:1", "role_assign:2", etc.
 @SelectMenu("role_assign:*")
-async onRoleSelect(@Context() [interaction]: StringSelectContext) {
+async onRoleSelect(@Context() [interaction]: SelectMenuContext) {
     const categoryId = interaction.customId.split(":")[1];
     const roles = interaction.values;
     
@@ -62,11 +62,7 @@ Hivecord's `@SelectMenu` decorator works with all Discord.js select menu types. 
 
 | Menu Type | Context Type |
 | :--- | :--- |
-| **StringSelectMenu** | `StringSelectContext` |
-| **UserSelectMenu** | `UserSelectContext` |
-| **RoleSelectMenu** | `RoleSelectContext` |
-| **MentionableSelectMenu** | `MentionableSelectContext` |
-| **ChannelSelectMenu** | `ChannelSelectContext` |
+| **All Select Menus** | `SelectMenuContext` |
 
 ---
 

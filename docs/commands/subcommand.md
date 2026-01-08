@@ -22,8 +22,8 @@ Subcommands are defined as methods within a class decorated with `@SlashCommandC
 
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `name` | `string` | **Required.** The subcommand name (lowercase, no spaces). |
-| `description` | `string` | **Required.** Description shown in the Discord UI for this specific action. |
+| `name` | `string` | (Optional) The subcommand name. If not provided, uses the method name. |
+| `group` | `string` | (Optional) The subcommand group name for nested commands. |
 
 === :icon-code: Example
 ```typescript
@@ -47,18 +47,12 @@ import { ChatInputCommandInteraction, ApplicationCommandOptionType } from "disco
     ]
 })
 export class UserController {
-    @Subcommand({
-        name: "info",
-        description: "Show information about a user"
-    })
+    @Subcommand({ name: "info" })
     async info(@CommandInteraction() interaction: ChatInputCommandInteraction) {
         // Logic for /user info
     }
 
-    @Subcommand({
-        name: "avatar",
-        description: "Show a user's avatar"
-    })
+    @Subcommand({ name: "avatar" })
     async avatar(@CommandInteraction() interaction: ChatInputCommandInteraction) {
         // Logic for /user avatar
     }
@@ -76,16 +70,23 @@ If you need deeper organization, you can use **Subcommand Groups**. These are de
 @SlashCommandController({
     name: "config",
     description: "Bot configuration",
-    groups: [
-        { name: "admin", description: "Admin-only settings" }
+    options: [
+        {
+            name: "admin",
+            description: "Admin-only settings",
+            type: ApplicationCommandOptionType.SubcommandGroup,
+            options: [
+                {
+                    name: "setup",
+                    description: "Initial bot setup",
+                    type: ApplicationCommandOptionType.Subcommand
+                }
+            ]
+        }
     ]
 })
 export class ConfigController {
-    @Subcommand({
-        name: "setup",
-        group: "admin", // References the group above
-        description: "Initial bot setup"
-    })
+    @Subcommand({ name: "setup", group: "admin" })
     async setup(@CommandInteraction() interaction: ChatInputCommandInteraction) {
         // Executed for: /config admin setup
     }

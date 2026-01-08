@@ -1,12 +1,12 @@
 ---
 order: 90
-title: "On / @Once"
+title: "On"
 icon: clock
 ---
 
-# :icon-clock: @On / @Once
+# :icon-clock: @On
 
-Methods within an `@EventController` can be decorated with `@On` or `@Once` to listen for Discord events.
+Methods within an `@EventController` can be decorated with `@On` to listen for Discord events.
 
 === :icon-code: @On
 ```typescript
@@ -26,9 +26,9 @@ export class MyEventController {
 
 ---
 
-## :icon-clock: @Once
+## :icon-clock: Once Option
 
-If you want a listener to trigger only the **first time** an event occurs and then remove itself, use the `@Once` decorator instead.
+If you want a listener to trigger only the **first time** an event occurs and then remove itself, use the `once` option in the `@On` decorator.
 
 ```typescript
 @On(Events.ClientReady)
@@ -36,7 +36,7 @@ async onReady() {
     console.log("Bot is online! (Triggers every time the client connects)");
 }
 
-@Once(Events.ClientReady)
+@On({ name: Events.ClientReady, once: true })
 async onFirstReady() {
     console.log("This only logs once during the initial startup.");
 }

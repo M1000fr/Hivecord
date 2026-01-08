@@ -141,3 +141,57 @@ export class WelcomeService {
 ```
 
 ---
+
+## :icon-package: @ConfigInteraction
+
+The `@ConfigInteraction` decorator is used to mark classes that handle configuration-related interactions (buttons, select menus, modals). It automatically applies `@Injectable()` and injects the required services for configuration management.
+
+!!! info "Automatic Injection"
+Classes decorated with `@ConfigInteraction` automatically receive four essential services without needing to manually specify them in the constructor.
+!!!
+
+### :icon-pencil: Usage
+
+Apply `@ConfigInteraction()` to classes that extend configuration handler base classes like `BaseModalConfigHandler`, `BaseSelectConfigHandler`, or `BaseToggleConfigHandler`.
+
+```typescript
+import { ConfigInteraction } from "@decorators/ConfigInteraction";
+import { BaseModalConfigHandler } from "@class/BaseModalConfigHandler";
+import { ConfigValueService } from "@utils/ConfigValueService";
+import { ConfigUIBuilderService } from "@utils/ConfigUIBuilderService";
+import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
+import { ConfigService } from "@modules/Configuration/services/ConfigService";
+
+@ConfigInteraction()
+export class MyConfigHandler extends BaseModalConfigHandler {
+    constructor(
+        valueService: ConfigValueService,
+        uiBuilder: ConfigUIBuilderService,
+        resolverService: ConfigValueResolverService,
+        configService: ConfigService,
+    ) {
+        super(valueService, uiBuilder, resolverService, configService);
+    }
+
+    // Your implementation...
+}
+```
+
+### :icon-zap: Injected Services
+
+The decorator automatically provides the following services in the constructor:
+
+| Service | Description |
+| :--- | :--- |
+| `ConfigValueService` | Manages reading and writing configuration values to the database. |
+| `ConfigUIBuilderService` | Builds Discord UI components for configuration interfaces. |
+| `ConfigValueResolverService` | Resolves and formats configuration values for display. |
+| `ConfigService` | Core service for configuration system operations. |
+
+### :icon-info: Key Points
+
+1. **Extends Base Classes**: Typically used with `BaseModalConfigHandler`, `BaseSelectConfigHandler`, or `BaseToggleConfigHandler`.
+2. **Automatic Registration**: Classes are automatically injectable and can be used in custom configuration types.
+3. **Standard Order**: The four injected services must appear in the constructor in the exact order shown above.
+
+---
