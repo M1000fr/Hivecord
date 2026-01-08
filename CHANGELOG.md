@@ -1,3 +1,10 @@
+## [2.4.6](https://github.com/M1000fr/Hivecord/compare/v2.4.5...v2.4.6) (2026-01-08)
+
+
+### Bug Fixes
+
+* explicit output directory for Retype build and cleanup config ([c691d85](https://github.com/M1000fr/Hivecord/commit/c691d857736751004efbbff4c7a5a8fa32325a06))
+
 ## [2.4.5](https://github.com/M1000fr/Hivecord/compare/v2.4.4...v2.4.5) (2026-01-08)
 
 
