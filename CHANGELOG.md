@@ -1,3 +1,10 @@
+## [2.4.7](https://github.com/M1000fr/Hivecord/compare/v2.4.6...v2.4.7) (2026-01-08)
+
+
+### Bug Fixes
+
+* use npx retypeapp and debug build output ([cd1df6d](https://github.com/M1000fr/Hivecord/commit/cd1df6da8aa919d26e4aa87a3420b9c889727d80))
+
 ## [2.4.6](https://github.com/M1000fr/Hivecord/compare/v2.4.5...v2.4.6) (2026-01-08)
 
 
