@@ -1,126 +1,23 @@
 {
 	"common": {
 		"unknown": "Unknown",
-		"user": "User",
 		"none": "None",
 		"cancel": "Cancel",
 		"clear": "Clear",
-		"save": "Save",
-		"add": "Add",
-		"back": "Back",
 		"edit": "Edit",
-		"remove": "Remove",
-		"author": "Author",
-		"color": "Color",
-		"description": "Description",
-		"fields": "Fields",
-		"footer": "Footer",
-		"images": "Images",
-		"title": "Title",
-		"name": "Name",
-		"value": "Value",
-		"text": "Text",
-		"image": "Image",
-		"thumbnail": "Thumbnail",
-		"url": "URL",
 		"type": "Type",
 		"current": "Current",
 		"previous": "Previous",
 		"next": "Next",
-		"preview": "Preview",
-		"title_url": "Title & URL",
-		"icon_url": "Icon URL",
-		"image_url": "Image URL",
-		"thumbnail_url": "Thumbnail URL",
-		"inline": "Inline (true/false)",
 		"toggle": "Toggle"
 	},
 	"modules": {
 		"configuration": {
 			"commands": {
-				"embed": {
-					"deleted": "Embed deleted.",
-					"list": "Embed List :\n{{embeds}}",
-					"new_embed_desc": "Description for new embed",
-					"new_embed_title": "New Embed",
-					"editor_intro": "Embed Editor for `{{name}}`",
-					"not_found": "❌ Embed `{{name}}` not found."
-				},
 				"modules": {
 					"build_failed": "Failed to build module configuration.",
 					"not_found": "Module **{{module}}** not found.",
 					"no_config": "Module **{{module}}** has no configuration options."
-				},
-				"backup": {},
-				"restore": {}
-			},
-			"utils": {
-				"embed_editor": {
-					"buttons": {},
-					"fields": {
-						"add": {
-							"description": "Add a new field"
-						},
-						"back": {
-							"description": "Go back"
-						},
-						"edit": {
-							"description": "Edit this field"
-						},
-						"placeholder": "Select a field action...",
-						"remove": {
-							"description": "Remove this field"
-						}
-					},
-					"menu": {
-						"author": {
-							"description": "Edit author"
-						},
-						"color": {
-							"description": "Edit color"
-						},
-						"description": {
-							"description": "Edit description"
-						},
-						"fields": {
-							"description": "Edit fields"
-						},
-						"footer": {
-							"description": "Edit footer"
-						},
-						"images": {
-							"description": "Edit images"
-						},
-						"placeholder": "Select an element to edit...",
-						"title_url": {
-							"description": "Edit title and URL"
-						}
-					},
-					"modals": {
-						"author": {
-							"title": "Edit Author"
-						},
-						"color": {
-							"placeholder": "#FFFFFF",
-							"title": "Edit Color"
-						},
-						"description": {
-							"title": "Edit Description"
-						},
-						"field": {
-							"title": "Edit Field"
-						},
-						"footer": {
-							"title": "Edit Footer"
-						},
-						"images": {
-							"image_placeholder": "https://...",
-							"title": "Edit Images"
-						},
-						"title": {
-							"title": "Edit Title"
-						}
-					}
 				}
 			}
 		}
@@ -133,7 +30,6 @@
 			"select_placeholder": "Select a property...",
 			"select_value_placeholder": "Select a value...",
 			"no_options_found": "No options found",
-			"types": {},
 			"configure_property": "⚙️ Configure: {{property}}",
 			"available_variables": "Available Variables",
 			"modal_title": "Edit Value"

@@ -1,124 +1,23 @@
 {
 	"common": {
 		"unknown": "Inconnu",
-		"user": "Utilisateur",
 		"none": "Aucun",
 		"cancel": "Annuler",
 		"clear": "Effacer",
-		"save": "Sauvegarder",
-		"add": "Ajouter",
-		"back": "Retour",
 		"edit": "Modifier",
-		"remove": "Supprimer",
-		"author": "Auteur",
-		"color": "Couleur",
-		"description": "Description",
-		"fields": "Champs",
-		"footer": "Pied de page",
-		"images": "Images",
-		"title": "Titre",
-		"name": "Nom",
-		"value": "Valeur",
-		"text": "Texte",
-		"image": "Image",
-		"thumbnail": "Miniature",
-		"url": "URL",
 		"type": "Type",
 		"current": "Actuel",
 		"previous": "Précédent",
 		"next": "Suivant",
-		"preview": "Aperçu",
-		"title_url": "Titre & URL",
-		"icon_url": "URL de l'icône",
-		"image_url": "URL de l'image",
-		"thumbnail_url": "URL de la miniature",
-		"inline": "En ligne (true/false)",
 		"toggle": "Basculer"
 	},
 	"modules": {
 		"configuration": {
 			"commands": {
-				"embed": {
-					"deleted": "Embed supprimé.",
-					"list": "Liste des embeds :\n{{embeds}}",
-					"new_embed_desc": "Description du nouvel embed",
-					"new_embed_title": "Nouvel Embed",
-					"editor_intro": "Éditeur d'embed pour `{{name}}`",
-					"not_found": "❌ Embed `{{name}}` introuvable."
-				},
 				"modules": {
 					"build_failed": "Échec de la construction de la configuration du module.",
 					"not_found": "Module **{{module}}** introuvable.",
 					"no_config": "Le module **{{module}}** n'a pas d'options de configuration."
-				}
-			},
-			"utils": {
-				"embed_editor": {
-					"buttons": {},
-					"fields": {
-						"add": {
-							"description": "Ajouter un nouveau champ"
-						},
-						"back": {
-							"description": "Retour"
-						},
-						"edit": {
-							"description": "Modifier ce champ"
-						},
-						"placeholder": "Sélectionnez une action de champ...",
-						"remove": {
-							"description": "Supprimer ce champ"
-						}
-					},
-					"menu": {
-						"author": {
-							"description": "Modifier l'auteur"
-						},
-						"color": {
-							"description": "Modifier la couleur"
-						},
-						"description": {
-							"description": "Modifier la description"
-						},
-						"fields": {
-							"description": "Modifier les champs"
-						},
-						"footer": {
-							"description": "Modifier le pied de page"
-						},
-						"images": {
-							"description": "Modifier les images"
-						},
-						"placeholder": "Sélectionnez un élément à modifier...",
-						"title_url": {
-							"description": "Modifier le titre et l'URL"
-						}
-					},
-					"modals": {
-						"author": {
-							"title": "Modifier l'auteur"
-						},
-						"color": {
-							"placeholder": "#FFFFFF",
-							"title": "Modifier la couleur"
-						},
-						"description": {
-							"title": "Modifier la description"
-						},
-						"field": {
-							"title": "Modifier le champ"
-						},
-						"footer": {
-							"title": "Modifier le pied de page"
-						},
-						"images": {
-							"image_placeholder": "https://...",
-							"title": "Modifier les images"
-						},
-						"title": {
-							"title": "Modifier le titre"
-						}
-					}
 				}
 			}
 		}
@@ -131,7 +30,6 @@
 			"select_placeholder": "Sélectionnez une propriété...",
 			"select_value_placeholder": "Sélectionnez une valeur...",
 			"no_options_found": "Aucune option trouvée",
-			"types": {},
 			"configure_property": "⚙️ Configurer : {{property}}",
 			"available_variables": "Variables disponibles",
 			"modal_title": "Modifier la valeur"
