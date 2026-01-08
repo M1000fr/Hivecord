@@ -12,19 +12,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Build Retype
         uses: retypeapp/action-build@v3
 
-      - name: Add CNAME
-        run: |
-          mkdir -p public
-          echo "hivecord.m1000.fr" > public/CNAME
-
-      - name: Push to gh-pages
-        uses: retypeapp/action-github-pages@v3
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          branch: gh-pages
-          token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          cname: hivecord.m1000.fr
+          force_orphan: true
