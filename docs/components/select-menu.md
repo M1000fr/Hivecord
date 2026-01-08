@@ -1,3 +1,9 @@
+---
+order: 80
+title: "SelectMenu"
+icon: list-unordered
+---
+
 # :icon-list-unordered: SelectMenu
 
 The `@SelectMenu` decorator is used to handle interactions from Discord select menus (string, user, role, mentionable, and channel select menus). It automatically routes the interaction to the decorated method based on the component's `customId`.
@@ -84,5 +90,5 @@ Select menu handlers support the full injection system to access the interaction
 
 ---
 
-[!ref text="Back to Button" icon="arrow-left"](Button.md)
-[!ref text="Modal" icon="arrow-right"](Modal.md)
+[!ref text="Back to Button" icon="arrow-left"](button.md)
+[!ref text="Modal" icon="arrow-right"](modal.md)

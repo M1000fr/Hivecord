@@ -1,3 +1,9 @@
+---
+order: 100
+title: "Module"
+icon: package
+---
+
 # :icon-package: Module
 
 The `@Module` decorator is the heart of Hivecord's architecture. It defines a logical unit of your bot, grouping together commands, events, services, and configuration.
@@ -35,25 +41,6 @@ export class GeneralModule {}
 
 ---
 
-## :icon-globe: Global Modules
-
-By default, modules are scoped. If you want a module's providers to be available everywhere without importing the module in every other module, use the `@Global()` decorator.
-
-```typescript
-@Global()
-@Module({
-    providers: [SharedService],
-    exports: [SharedService],
-})
-export class CoreModule {}
-```
-
-!!! warning "Use Sparingly"
-Overusing global modules can make dependency tracking difficult. Reserve this for truly universal services like Database or Logging.
-!!!
-
----
-
 ## :icon-workflow: Lifecycle
 
 Modules can hook into the bot's lifecycle. If your module class implements `OnModuleInit`, the `onModuleInit` method will be called when the bot starts and the module is loaded.
@@ -69,5 +56,5 @@ export class MyModule implements OnModuleInit {
 
 ---
 
-[!ref text="Back to Home" icon="arrow-left"](/)
-[!ref text="Slash Commands" icon="arrow-right"](SlashCommand.md)
+[!ref text="Back to Home" icon="arrow-left"](../README.md)
+[!ref text="Module Configuration" icon="arrow-right"](configuration.md)

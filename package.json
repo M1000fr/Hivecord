@@ -15,6 +15,7 @@
 		"husky": "^9.1.7",
 		"lint-staged": "^16.2.7",
 		"node-gyp": "^12.1.0",
+		"retypeapp": "^3.11.0",
 		"sed-lite": "^1.1.0",
 		"semantic-release": "^25.0.2"
 	},
@@ -44,7 +45,8 @@
 		"i18n:info": "bun scripts/i18n.ts --info",
 		"i18n:clean": "bun scripts/i18n.ts --clean:unused",
 		"prepare": "husky",
-		"format": "biome check --write ."
+		"format": "biome check --write .",
+		"docs:dev": "retype start docs"
 	},
 	"lint-staged": {
 		"**/*.{ts,js,json,md}": [

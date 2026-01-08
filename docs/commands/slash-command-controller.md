@@ -1,3 +1,9 @@
+---
+order: 100
+title: "SlashCommandController"
+icon: gear
+---
+
 # :icon-gear: SlashCommandController
 
 The `@SlashCommandController` decorator is the cornerstone of Hivecord's command system. It defines a class as a container for Discord Slash commands, subcommands, and context menus.
@@ -65,5 +71,5 @@ export class AdminController {
 
 ---
 
-[!ref text="Back to Home" icon="arrow-left"](/)
-[!ref text="SlashCommand" icon="arrow-right"](SlashCommand.md)
+[!ref text="Back to Repository" icon="arrow-left"](../di/repository.md)
+[!ref text="SlashCommand" icon="arrow-right"](slash-command.md)

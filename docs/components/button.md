@@ -1,3 +1,9 @@
+---
+order: 90
+title: "Button"
+icon: zap
+---
+
 # :icon-zap: Button
 
 The `@Button` decorator allows you to handle interactions from Discord buttons. Instead of managing a global `interactionCreate` event, you can route specific button clicks directly to your methods.
@@ -68,5 +74,5 @@ Button handlers support automatic parameter injection.
 
 ---
 
-[!ref text="Back to Interactions" icon="arrow-left"](Interactions.md)
-[!ref text="SelectMenu" icon="arrow-right"](SelectMenu.md)
+[!ref text="Back to Overview" icon="arrow-left"](overview.md)
+[!ref text="SelectMenu" icon="arrow-right"](select-menu.md)

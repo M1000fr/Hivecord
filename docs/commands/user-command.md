@@ -1,3 +1,9 @@
+---
+order: 85
+title: "UserCommand"
+icon: person
+---
+
 # :icon-person: UserCommand
 
 The `@UserCommand` decorator defines a context menu command that appears when a user right-clicks on a **User** in the Discord interface (under the "Apps" sub-menu).
@@ -57,10 +63,10 @@ When handling a `@UserCommand`, you can use the `@TargetUser()` decorator to ins
 ## :icon-light-bulb: Key Features
 
 *   **Automatic Registration**: Like Slash commands, User commands are automatically synced with Discord by Hivecord.
-*   **Permissions**: You can apply `@Permissions` to the method to restrict who can use this context menu action.
+*   **Permissions**: You can apply [`@Permissions`](permissions.md) to the method to restrict who can use this context menu action.
 *   **Global/Guild**: Supports both global registration and guild-specific registration.
 
 ---
 
-[!ref text="Back to ContextMenu" icon="arrow-left"](ContextCommands.md)
-[!ref text="MessageCommand" icon="arrow-right"](MessageCommand.md)
+[!ref text="Back to Context Menu Overview" icon="arrow-left"](overview.md)
+[!ref text="MessageCommand" icon="arrow-right"](message-command.md)

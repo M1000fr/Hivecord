@@ -1,19 +1,29 @@
-# Custom Configuration Types (@ConfigType)
+---
+order: 80
+title: Custom Config Types
+icon: paintbrush
+---
+
+# :icon-paintbrush: Custom Configuration Types
 
 Hivecord allows extending the configuration system by defining new custom data types. This is useful for managing complex structures or specific selections that are not covered by standard Discord types.
 
-## @ConfigType
+---
+
+## :icon-gear: @ConfigType
 
 The `@ConfigType` decorator registers a class as a handler for a specific configuration type. This class is responsible for validation, transformation, and rendering the user interface for this type.
 
-### Metadata
+### :icon-info: Metadata
 
 The decorator takes a `ConfigTypeMetadata` object:
 
 - `id`: Unique identifier for the type (often a string or a number > 100).
 - `name`: Human-readable name of the type.
 
-### Implementation Base Classes
+---
+
+### :icon-stack: Implementation Base Classes
 
 To function correctly within the configuration UI, a config handler must extend one of the following base classes depending on the interaction type desired:
 
@@ -21,7 +31,9 @@ To function correctly within the configuration UI, a config handler must extend 
 - **`BaseToggleConfigHandler`**: For boolean-like types using a simple toggle button.
 - **`BaseModalConfigHandler`**: For types requiring text input via a Discord Modal.
 
-### Example: Creating a Custom Modal Handler
+---
+
+### :icon-code: Example: Creating a Custom Modal Handler
 
 ```typescript
 import { ConfigType } from "@decorators/ConfigType";
@@ -61,7 +73,9 @@ export class ColorConfigHandler extends BaseModalConfigHandler {
 }
 ```
 
-### Customizing Value Formatting
+---
+
+### :icon-pencil: Customizing Value Formatting
 
 You can override the `formatValue` method to control how the configuration value is displayed in the main configuration embed. This is useful for adding emojis, formatting IDs into names, or adding previews.
 
@@ -72,7 +86,9 @@ override async formatValue(guildId: string, value: string): Promise<string> {
 }
 ```
 
-## Using the custom type
+---
+
+## :icon-rocket: Using the custom type
 
 Once the type is registered via `@ConfigType`, it can be used in any `@ModuleConfig` class by using its `id`.
 
@@ -87,7 +103,9 @@ export class AppearanceConfig {
 }
 ```
 
-## Key Points
+---
+
+## :icon-light-bulb: Key Points
 
 1. **Global Injection**: Classes decorated with `@ConfigType` are automatically injected with a global scope (`scope: "global"`), meaning they are available throughout the application.
 2. **Base Classes**: Always extend `BaseSelectConfigHandler`, `BaseToggleConfigHandler`, or `BaseModalConfigHandler`. These classes handle the complex logic of building Discord components, managing ephemeral messages, and routing interactions.
@@ -96,4 +114,4 @@ export class AppearanceConfig {
 
 ---
 
-[Back to table of contents]/)
+[!ref text="Back to Configuration" icon="arrow-left"](configuration.md)

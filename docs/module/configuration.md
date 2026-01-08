@@ -1,12 +1,20 @@
-# Configuration (@ModuleConfig & @ConfigProperty)
+---
+order: 90
+title: Configuration
+icon: diff
+---
+
+# :icon-diff: Configuration
 
 Hivecord features a dynamic per-server (Guild) configuration system. This system allows defining typed parameters that are automatically persisted in the database and modifiable via an interface (usually a configuration command).
 
-## @ModuleConfig
+---
+
+## :icon-gear: @ModuleConfig
 
 The `@ModuleConfig` decorator marks a class as a configuration schema for a module. This class defines the data structure that will be managed for each server.
 
-### Configuration Class Example
+### :icon-code: Configuration Class Example
 
 ```typescript
 import { ModuleConfig } from "@decorators/ModuleConfig";
@@ -32,11 +40,13 @@ export class GeneralConfig {
 }
 ```
 
-## @ConfigProperty
+---
+
+## :icon-list-unordered: @ConfigProperty
 
 This decorator defines an individual property within a configuration class.
 
-### Decorator Options
+### :icon-info: Decorator Options
 
 | Property      | Type          | Description                                                    |
 | :------------ | :------------ | :------------------------------------------------------------- |
@@ -46,7 +56,7 @@ This decorator defines an individual property within a configuration class.
 | `choices`     | `Array`       | (Optional) List of fixed choices for `StringChoice` types.     |
 | `required`    | `boolean`     | (Optional) Whether the option is mandatory.                    |
 
-### EConfigType
+### :icon-stack: EConfigType
 
 The system supports standard Discord types as well as custom types:
 
@@ -54,7 +64,9 @@ The system supports standard Discord types as well as custom types:
 - `RoleArray`, `ChannelArray`, `StringArray`: For storing lists of items.
 - `StringChoice`: To limit values to a predefined list.
 
-## @ConfigContext
+---
+
+## :icon-mention: @ConfigContext
 
 The `@ConfigContext` decorator allows defining which context variables (placeholders) are available for a given configuration property. This is particularly useful for customizable messages.
 
@@ -76,7 +88,9 @@ export class WelcomeConfig {
 }
 ```
 
-## Usage in a Module
+---
+
+## :icon-package: Usage in a Module
 
 To enable configuration, bind the class to the module via the `config` property of the `@Module` decorator.
 
@@ -89,7 +103,9 @@ To enable configuration, bind the class to the module via the `config` property 
 export class GeneralModule {}
 ```
 
-## Accessing Values
+---
+
+## :icon-terminal: Accessing Values
 
 Once configured, you can access values via the `guild.config` object (if injected or extended) or via the `ConfigService`.
 
@@ -98,11 +114,13 @@ Once configured, you can access values via the `guild.config` object (if injecte
 const channelId = await interaction.guild.config.general.welcomeChannelId;
 ```
 
-## @OnConfigUpdate
+---
+
+## :icon-zap: @OnConfigUpdate
 
 This decorator allows reacting in real-time to configuration changes. When an option is modified by an administrator, the decorated method is automatically called.
 
-### Usage and Injection
+### :icon-pencil: Usage and Injection
 
 The method can inject several parameters via dedicated parameter decorators:
 
@@ -112,6 +130,7 @@ The method can inject several parameters via dedicated parameter decorators:
 import { OnConfigUpdate } from "@decorators/OnConfigUpdate";
 import { Client } from "@decorators/params";
 
+@Injectable()
 export class WelcomeService {
 	@OnConfigUpdate("general.welcomeChannelId")
 	async onWelcomeChannelChange(@Client() client: HivecordClient) {
@@ -123,4 +142,5 @@ export class WelcomeService {
 
 ---
 
-[Back to table of contents]/)
+[!ref text="Back to Module" icon="arrow-left"](module.md)
+[!ref text="Custom Config Types" icon="arrow-right"](config-types.md)

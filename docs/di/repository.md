@@ -1,3 +1,9 @@
+---
+order: 80
+title: "Repository"
+icon: database
+---
+
 # :icon-database: Repository
 
 The `@Repository` decorator is a specialized version of `@Injectable` designed specifically for the data access layer. It marks a class as a managed provider that handles database operations, typically using Prisma.
@@ -62,5 +68,5 @@ export class UserModule {}
 
 ---
 
-[!ref text="Back to Inject" icon="arrow-left"](Inject.md)
-[!ref text="Interceptors" icon="arrow-right"](Interceptors.md)
+[!ref text="Back to Inject" icon="arrow-left"](inject.md)
+[!ref text="Slash Command Controller" icon="arrow-right"](../commands/slash-command-controller.md)
