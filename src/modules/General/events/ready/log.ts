@@ -7,13 +7,13 @@ import { Logger } from "@utils/Logger";
 
 @EventController()
 export default class ReadyEvent {
-  private logger = new Logger("ReadyEvent");
+	private logger = new Logger("ReadyEvent");
 
-  @On({ name: BotEvents.ClientReady, once: true })
-  async run(@Client() client: HivecordClient<true>) {
-    if (client.user) {
-      this.logger.log(`Logged in as ${client.user.tag}!`);
-    }
-    await client.deployCommands();
-  }
+	@On({ name: BotEvents.ClientReady, once: true })
+	async run(@Client() client: HivecordClient<true>) {
+		if (client.user) {
+			this.logger.log(`Logged in as ${client.user.tag}!`);
+		}
+		await client.deployCommands();
+	}
 }

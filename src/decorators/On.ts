@@ -5,20 +5,20 @@ import "reflect-metadata";
 export const EVENT_METADATA_KEY = "hivecord:event";
 
 export function On<K extends keyof ClientEvents | string>(
-  options: EventOptions<K> | K,
+	options: EventOptions<K> | K,
 ): MethodDecorator {
-  return (
-    target: object,
-    propertyKey: string | symbol,
-    _descriptor: PropertyDescriptor,
-  ) => {
-    const eventOptions =
-      typeof options === "string" ? { name: options } : options;
-    Reflect.defineMetadata(
-      EVENT_METADATA_KEY,
-      eventOptions,
-      target,
-      propertyKey,
-    );
-  };
+	return (
+		target: object,
+		propertyKey: string | symbol,
+		_descriptor: PropertyDescriptor,
+	) => {
+		const eventOptions =
+			typeof options === "string" ? { name: options } : options;
+		Reflect.defineMetadata(
+			EVENT_METADATA_KEY,
+			eventOptions,
+			target,
+			propertyKey,
+		);
+	};
 }

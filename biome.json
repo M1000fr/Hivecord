@@ -1,74 +1,74 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
-  },
-  "files": {
-    "ignoreUnknown": false
-  },
-  "formatter": {
-    "enabled": false,
-    "formatWithErrors": false,
-    "indentStyle": "tab",
-    "indentWidth": 4,
-    "lineEnding": "lf",
-    "lineWidth": 80,
-    "attributePosition": "auto"
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true,
-      "complexity": {
-        "noStaticOnlyClass": "off",
-        "noBannedTypes": "off"
-      },
-      "correctness": {
-        "noUnusedVariables": "off",
-        "noUnusedFunctionParameters": "off",
-        "noUnusedPrivateClassMembers": "off"
-      },
-      "style": {
-        "useImportType": "off",
-        "useNodejsImportProtocol": "off",
-        "useTemplate": "off",
-        "noNonNullAssertion": "off",
-        "useLiteralEnumMembers": "off"
-      },
-      "suspicious": {
-        "noExplicitAny": "off",
-        "noImplicitAnyLet": "off",
-        "noAssignInExpressions": "off",
-        "useIterableCallbackReturn": "off",
-        "noShadowRestrictedNames": "off"
-      }
-    }
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "double"
-    },
-    "parser": {
-      "unsafeParameterDecoratorsEnabled": true
-    }
-  },
-  "overrides": [
-    {
-      "includes": [
-        "dist/**",
-        "node_modules/**",
-        "data/**",
-        ".husky/**",
-        "src/prisma/client/**"
-      ],
-      "linter": {
-        "enabled": false
-      },
-      "formatter": {
-        "enabled": false
-      }
-    }
-  ]
+	"$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": false
+	},
+	"formatter": {
+		"enabled": true,
+		"formatWithErrors": true,
+		"indentStyle": "tab",
+		"indentWidth": 4,
+		"lineEnding": "lf",
+		"lineWidth": 80,
+		"attributePosition": "auto"
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"complexity": {
+				"noStaticOnlyClass": "off",
+				"noBannedTypes": "off"
+			},
+			"correctness": {
+				"noUnusedVariables": "off",
+				"noUnusedFunctionParameters": "off",
+				"noUnusedPrivateClassMembers": "off"
+			},
+			"style": {
+				"useImportType": "off",
+				"useNodejsImportProtocol": "off",
+				"useTemplate": "off",
+				"noNonNullAssertion": "off",
+				"useLiteralEnumMembers": "off"
+			},
+			"suspicious": {
+				"noExplicitAny": "off",
+				"noImplicitAnyLet": "off",
+				"noAssignInExpressions": "off",
+				"useIterableCallbackReturn": "off",
+				"noShadowRestrictedNames": "off"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double"
+		},
+		"parser": {
+			"unsafeParameterDecoratorsEnabled": true
+		}
+	},
+	"overrides": [
+		{
+			"includes": [
+				"dist/**",
+				"node_modules/**",
+				"data/**",
+				".husky/**",
+				"src/prisma/client/**"
+			],
+			"linter": {
+				"enabled": false
+			},
+			"formatter": {
+				"enabled": false
+			}
+		}
+	]
 }

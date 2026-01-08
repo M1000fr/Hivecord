@@ -16,25 +16,25 @@ import { RoleConfigService } from "./services/RoleConfigService";
 
 @Global()
 @Module({
-  name: "Configuration",
-  imports: [DatabaseModule],
-  providers: [
-    // Services
-    ConfigCacheService,
-    ChannelConfigService,
-    RoleConfigService,
-    ConfigService,
-    // Commands
-    ModulesCommand,
-    // Interactions
-    ModuleConfigInteractions,
-    BooleanConfigInteractions,
-    StringConfigInteractions,
-    StringChoiceConfigInteractions,
-    RoleChannelConfigInteractions,
-    AttachmentConfigInteractions,
-    StringArrayConfigInteractions,
-  ],
-  exports: [ConfigService],
+	name: "Configuration",
+	imports: [DatabaseModule],
+	providers: [
+		// Services
+		ConfigCacheService,
+		ChannelConfigService,
+		RoleConfigService,
+		ConfigService,
+		// Commands
+		ModulesCommand,
+		// Interactions
+		ModuleConfigInteractions,
+		BooleanConfigInteractions,
+		StringConfigInteractions,
+		StringChoiceConfigInteractions,
+		RoleChannelConfigInteractions,
+		AttachmentConfigInteractions,
+		StringArrayConfigInteractions,
+	],
+	exports: [ConfigService],
 })
 export class ConfigurationModule {}

@@ -5,13 +5,13 @@ import type { TFunction } from "i18next";
  * Provides both the locale string and translation function.
  */
 export interface GuildLanguageContext {
-  /**
-   * The locale code (e.g., "en", "fr", "es")
-   */
-  locale: string;
+	/**
+	 * The locale code (e.g., "en", "fr", "es")
+	 */
+	locale: string;
 
-  /**
-   * Translation function for the guild's language
-   */
-  t: TFunction;
+	/**
+	 * Translation function for the guild's language
+	 */
+	t: TFunction;
 }

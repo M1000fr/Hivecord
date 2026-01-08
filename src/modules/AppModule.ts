@@ -20,35 +20,35 @@ import { ConfigValueResolverService } from "@utils/ConfigValueResolverService";
 import { ConfigValueService } from "@utils/ConfigValueService";
 
 @Module({
-  name: "App",
-  imports: [DatabaseModule, GeneralModule, ConfigurationModule],
-  providers: [
-    HivecordClient,
-    CommandHandlerEvent,
-    PagerHandlerEvent,
-    InteractionRegistryHandler,
-    CommandDeploymentService,
-    ModuleLoader,
-    I18nService,
-    CommandService,
-    PagerService,
-    ConfigValueService,
-    ConfigFormatterService,
-    ConfigUIBuilderService,
-    ConfigValueResolverService,
-  ],
-  exports: [HivecordClient],
+	name: "App",
+	imports: [DatabaseModule, GeneralModule, ConfigurationModule],
+	providers: [
+		HivecordClient,
+		CommandHandlerEvent,
+		PagerHandlerEvent,
+		InteractionRegistryHandler,
+		CommandDeploymentService,
+		ModuleLoader,
+		I18nService,
+		CommandService,
+		PagerService,
+		ConfigValueService,
+		ConfigFormatterService,
+		ConfigUIBuilderService,
+		ConfigValueResolverService,
+	],
+	exports: [HivecordClient],
 })
 export class AppModule {
-  static async init(container: DependencyContainer) {
-    const prismaService = container.resolve(PrismaService);
-    const redisService = container.resolve(RedisService);
+	static async init(container: DependencyContainer) {
+		const prismaService = container.resolve(PrismaService);
+		const redisService = container.resolve(RedisService);
 
-    // Initialize all services in parallel
-    await Promise.all([
-      prismaService.checkDatabaseConnection(),
-      redisService.checkConnection(),
-      I18nService.init(),
-    ]);
-  }
+		// Initialize all services in parallel
+		await Promise.all([
+			prismaService.checkDatabaseConnection(),
+			redisService.checkConnection(),
+			I18nService.init(),
+		]);
+	}
 }

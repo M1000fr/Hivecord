@@ -4,21 +4,21 @@ import { type IContextMenuCommandClass } from "@interfaces/IContextMenuCommandCl
 import "reflect-metadata";
 
 export interface UserCommandOptions {
-  name: string;
-  defaultMemberPermissions?: string;
+	name: string;
+	defaultMemberPermissions?: string;
 }
 
 export function UserCommand(options: UserCommandOptions): ClassDecorator {
-  return ((target: Function) => {
-    // Apply @Injectable() automatically
-    Injectable()(target as any);
-    // Mark as command provider
-    Reflect.defineMetadata(PROVIDER_TYPE_METADATA_KEY, "command", target);
+	return ((target: Function) => {
+		// Apply @Injectable() automatically
+		Injectable()(target as any);
+		// Mark as command provider
+		Reflect.defineMetadata(PROVIDER_TYPE_METADATA_KEY, "command", target);
 
-    const commandClass = target as unknown as IContextMenuCommandClass;
-    commandClass.contextMenuOptions = {
-      ...options,
-      type: "user",
-    };
-  }) as ClassDecorator;
+		const commandClass = target as unknown as IContextMenuCommandClass;
+		commandClass.contextMenuOptions = {
+			...options,
+			type: "user",
+		};
+	}) as ClassDecorator;
 }

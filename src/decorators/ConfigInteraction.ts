@@ -11,22 +11,22 @@ import "reflect-metadata";
  * Automatically injects required services for configuration management.
  */
 export function ConfigInteraction(): ClassDecorator {
-  return ((target: Constructor) => {
-    // Apply Injectable decorator
-    Injectable()(target);
+	return ((target: Constructor) => {
+		// Apply Injectable decorator
+		Injectable()(target);
 
-    // Define explicit parameter types for dependency injection
-    Reflect.defineMetadata(
-      "design:paramtypes",
-      [
-        ConfigValueService,
-        ConfigUIBuilderService,
-        ConfigValueResolverService,
-        ConfigService,
-      ],
-      target,
-    );
+		// Define explicit parameter types for dependency injection
+		Reflect.defineMetadata(
+			"design:paramtypes",
+			[
+				ConfigValueService,
+				ConfigUIBuilderService,
+				ConfigValueResolverService,
+				ConfigService,
+			],
+			target,
+		);
 
-    return target;
-  }) as ClassDecorator;
+		return target;
+	}) as ClassDecorator;
 }

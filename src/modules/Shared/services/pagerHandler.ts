@@ -11,28 +11,29 @@ import { DiscordAPIError } from "discord.js";
 
 @EventController()
 export default class PagerHandlerEvent {
-  constructor(@Inject(PagerService) private _pagerService: PagerService) {}
+	constructor(@Inject(PagerService) private _pagerService: PagerService) {}
 
-  @On(BotEvents.InteractionCreate)
-  async run(
-    @Client() client: HivecordClient<true>,
-    @Context() [interaction]: ContextOf<typeof BotEvents.InteractionCreate>,
-  ) {
-    if (!interaction.isButton() && !interaction.isStringSelectMenu()) return;
+	@On(BotEvents.InteractionCreate)
+	async run(
+		@Client() client: HivecordClient<true>,
+		@Context() [interaction]: ContextOf<typeof BotEvents.InteractionCreate>,
+	) {
+		if (!interaction.isButton() && !interaction.isStringSelectMenu())
+			return;
 
-    // Try to handle as pager interaction
-    // If it returns true, it was handled
-    try {
-      await this._pagerService.handleInteraction(interaction);
-    } catch (error: unknown) {
-      // Ignore unknown interaction errors, as they might happen if the interaction was already handled
-      if (
-        error instanceof DiscordAPIError &&
-        error.code !== 10062 &&
-        error.code !== 40060
-      ) {
-        console.error("Error handling pager interaction:", error);
-      }
-    }
-  }
+		// Try to handle as pager interaction
+		// If it returns true, it was handled
+		try {
+			await this._pagerService.handleInteraction(interaction);
+		} catch (error: unknown) {
+			// Ignore unknown interaction errors, as they might happen if the interaction was already handled
+			if (
+				error instanceof DiscordAPIError &&
+				error.code !== 10062 &&
+				error.code !== 40060
+			) {
+				console.error("Error handling pager interaction:", error);
+			}
+		}
+	}
 }

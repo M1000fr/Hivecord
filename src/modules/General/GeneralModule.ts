@@ -5,14 +5,14 @@ import ReadyEvent from "./events/ready/log";
 import { GeneralConfig } from "./GeneralConfig";
 
 @Module({
-  name: "General",
-  imports: [ConfigurationModule],
-  config: GeneralConfig,
-  providers: [
-    // Events
-    ReadyEvent,
-    PingCommand,
-  ],
-  exports: [],
+	name: "General",
+	imports: [ConfigurationModule],
+	config: GeneralConfig,
+	providers: [
+		// Events
+		ReadyEvent,
+		PingCommand,
+	],
+	exports: [],
 })
 export class GeneralModule {}
