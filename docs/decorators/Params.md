@@ -67,7 +67,7 @@ export default class CopyCommand {
 		@CommandInteraction() interaction: MessageContextMenuCommandInteraction,
 		@TargetMessage() message: Message,
 	) {
-		await interaction.reply({ content: message.content, ephemeral: true });
+		await interaction.reply({ content: message.content, flags: [MessageFlags.Ephemeral] });
 	}
 }
 ```

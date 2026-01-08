@@ -15,6 +15,7 @@ import {
 	type Interaction,
 	type InteractionCollector,
 	type MentionableSelectMenuBuilder,
+	MessageFlags,
 	type RepliableInteraction,
 	type RoleSelectMenuBuilder,
 	type StringSelectMenuBuilder,
@@ -176,7 +177,7 @@ export class Pager<T> {
 			if (this.userId && i.user.id !== this.userId) {
 				await i.reply({
 					content: this.t("utils.pager.not_allowed"),
-					ephemeral: true,
+					flags: [MessageFlags.Ephemeral],
 				});
 				return;
 			}

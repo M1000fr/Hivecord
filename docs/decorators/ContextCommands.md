@@ -30,7 +30,7 @@ export default class GetAvatarCommand {
 		const avatarUrl = user.displayAvatarURL({ size: 1024 });
 		await interaction.reply({
 			content: `Avatar of ${user.username}: ${avatarUrl}`,
-			ephemeral: true,
+			flags: [MessageFlags.Ephemeral],
 		});
 	}
 }
@@ -58,7 +58,7 @@ export default class CopyMessageCommand {
 	) {
 		await interaction.reply({
 			content: `Content copied: \`\`\`${message.content}\`\`\``,
-			ephemeral: true,
+			flags: [MessageFlags.Ephemeral],
 		});
 	}
 }

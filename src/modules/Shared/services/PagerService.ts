@@ -37,7 +37,7 @@ export class PagerService {
 		if (state.userId && interaction.user.id !== state.userId) {
 			await interaction.reply({
 				content: t("utils.pager.not_allowed"),
-				ephemeral: true,
+				flags: [MessageFlags.Ephemeral],
 			});
 			return false;
 		}
