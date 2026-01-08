@@ -1,3 +1,10 @@
+## [2.4.3](https://github.com/M1000fr/Hivecord/compare/v2.4.2...v2.4.3) (2026-01-08)
+
+
+### Bug Fixes
+
+* ensure public directory exists before creating CNAME ([ca5a53e](https://github.com/M1000fr/Hivecord/commit/ca5a53e15160957a0f951f730cdf074934e9dfac))
+
 ## [2.4.2](https://github.com/M1000fr/Hivecord/compare/v2.4.1...v2.4.2) (2026-01-08)
 
 
