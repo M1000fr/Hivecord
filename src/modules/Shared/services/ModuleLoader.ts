@@ -88,6 +88,19 @@ export class ModuleLoader {
 
 		// Continue with module loading
 		for (const [name, { options, moduleClass }] of registeredModules) {
+			// Associate providers with their module name for interaction resolution
+			if (options.providers) {
+				for (const ProviderClass of options.providers) {
+					if (typeof ProviderClass === "function") {
+						Reflect.defineMetadata(
+							"hivecord:module_name",
+							options.name,
+							ProviderClass,
+						);
+					}
+				}
+			}
+
 			let moduleInstance: IModuleInstance | undefined;
 
 			if (moduleClass) {
@@ -360,6 +373,13 @@ export class ModuleLoader {
 				this.container.registerProviders([ProviderClass], {
 					moduleName: moduleName,
 				});
+
+				// Update module name metadata for interactions
+				Reflect.defineMetadata(
+					"hivecord:module_name",
+					moduleName,
+					ProviderClass,
+				);
 
 				if (type === "command") {
 					const relativePath = path.relative(process.cwd(), filePath);

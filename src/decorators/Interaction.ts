@@ -13,8 +13,13 @@ type InteractionHandler = (interaction: unknown) => Promise<void>;
 function createHandler(target: object, propertyKey: string) {
 	return async (interaction: unknown) => {
 		const container = DependencyContainer.getInstance();
+		const moduleName = Reflect.getMetadata(
+			"hivecord:module_name",
+			target.constructor,
+		);
 		const instance = container.resolve(
 			target.constructor as Constructor,
+			moduleName,
 		) as Record<string, (...args: unknown[]) => Promise<void>>;
 		const method = instance[propertyKey];
 		if (method) {
@@ -33,6 +38,9 @@ function createHandler(target: object, propertyKey: string) {
 						break;
 					case CommandParamType.Interaction:
 						args[param.index] = interaction;
+						break;
+					case CommandParamType.Context:
+						args[param.index] = [interaction];
 						break;
 					// Ajoutez d'autres cas si nécessaire
 					default:
@@ -118,3 +126,5 @@ export function AutocompleteInteraction(): ParameterDecorator {
 		);
 	};
 }
+
+export { Context } from "./params/Context";
