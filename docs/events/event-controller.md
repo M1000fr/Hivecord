@@ -76,6 +76,3 @@ export class WelcomeController {
 3.  **Scoped Context**: Every event handler has access to the same class-level services and state.
 
 ---
-
-[!ref text="Back to Modal" icon="arrow-left"](../components/modal.md)
-[!ref text="On" icon="arrow-right"](on.md)

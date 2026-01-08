@@ -141,6 +141,3 @@ export class WelcomeService {
 ```
 
 ---
-
-[!ref text="Back to Module" icon="arrow-left"](module.md)
-[!ref text="Custom Config Types" icon="arrow-right"](config-types.md)

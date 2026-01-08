@@ -60,6 +60,3 @@ export class TestCommand {
 For most cases, you don't need manual decorators for injection. Simply typing your constructor parameter with the class is enough for Hivecord to find it.
 
 ---
-
-[!ref text="Back to Interceptors" icon="arrow-left"](../core/interceptors.md)
-[!ref text="Inject" icon="arrow-right"](inject.md)

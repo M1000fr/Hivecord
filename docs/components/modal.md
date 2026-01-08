@@ -96,6 +96,3 @@ Modal handlers support the standard injection system.
 3.  **Response**: You must acknowledge the modal submission (reply or defer) within 3 seconds.
 
 ---
-
-[!ref text="Back to SelectMenu" icon="arrow-left"](select-menu.md)
-[!ref text="Event Controller" icon="arrow-right"](../events/event-controller.md)

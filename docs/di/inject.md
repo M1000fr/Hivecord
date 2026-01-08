@@ -67,6 +67,3 @@ constructor(@Inject(MyService) private readonly myService: MyService) {}
 ```
 
 ---
-
-[!ref text="Back to Injectable" icon="arrow-left"](injectable.md)
-[!ref text="Repository" icon="arrow-right"](repository.md)

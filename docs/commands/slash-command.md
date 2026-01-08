@@ -63,6 +63,3 @@ Check the [Parameters Injection](../utils/params.md) guide for the full list of 
 5. **Response**: Your code handles the interaction (reply, defer, edit, etc.).
 
 ---
-
-[!ref text="Back to Controller" icon="arrow-left"](slash-command-controller.md)
-[!ref text="Subcommands" icon="arrow-right"](subcommand.md)

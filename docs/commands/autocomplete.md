@@ -94,6 +94,3 @@ async handleSearch(
 ```
 
 ---
-
-[!ref text="Back to Subcommand" icon="arrow-left"](subcommand.md)
-[!ref text="ContextMenu Overview" icon="arrow-right"](../context-menu/overview.md)

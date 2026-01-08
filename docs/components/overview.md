@@ -61,6 +61,3 @@ export class ActionHandler {
 *   **Type Safety**: Specialized context types for each component (e.g., `StringSelectContext`, `ModalContext`).
 
 ---
-
-[!ref text="Back to MessageCommand" icon="arrow-left"](../context-menu/message-command.md)
-[!ref text="Button" icon="arrow-right"](button.md)

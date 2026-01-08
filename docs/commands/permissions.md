@@ -65,6 +65,3 @@ async banUser(@CommandInteraction() interaction: ChatInputCommandInteraction) {
 | `ManageRoles` | Role assignment or server setup. |
 
 ---
-
-[!ref text="Back to MessageCommand" icon="arrow-left"](message-command.md)
-[!ref text="Interactions Overview" icon="arrow-right"](../components/overview.md)

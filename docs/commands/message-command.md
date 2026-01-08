@@ -65,6 +65,3 @@ When handling a `@MessageCommand`, you can use the `@TargetMessage()` decorator 
 *   **Validation**: Useful for moderation tools (e.g., "Report Message", "Copy ID") or utility tools (e.g., "Translate Message").
 
 ---
-
-[!ref text="Back to UserCommand" icon="arrow-left"](user-command.md)
-[!ref text="Permissions" icon="arrow-right"](permissions.md)

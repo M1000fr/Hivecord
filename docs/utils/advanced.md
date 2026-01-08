@@ -103,6 +103,3 @@ It automatically injects:
 This allows creating complex configuration interaction handlers with minimal repetitive code.
 
 ---
-
-[!ref text="Back to Home" icon="arrow-left"](../README.md)
-[!ref text="Parameter Decorators" icon="arrow-right"](params.md)

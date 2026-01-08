@@ -40,6 +40,3 @@ export class GeneralModule {}
 ===
 
 ---
-
-[!ref text="Back to Home" icon="arrow-left"](../README.md)
-[!ref text="Module Configuration" icon="arrow-right"](configuration.md)

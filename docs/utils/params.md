@@ -124,5 +124,3 @@ async doSomething(@Client() client: HivecordClient) {
 3. **Automation**: These decorators only work within classes registered as `providers` in a `@Module`.
 
 ---
-
-[!ref text="Back to Advanced Decorators" icon="arrow-left"](advanced.md)
