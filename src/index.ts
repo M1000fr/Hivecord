@@ -8,6 +8,7 @@ const logger = new Logger("ShardingManager");
 const manager = new ShardingManager(path.join(__dirname, "bot.ts"), {
 	token: env.DISCORD_TOKEN,
 	totalShards: "auto",
+	shardArgs: process.argv.slice(2),
 });
 
 manager.on("shardCreate", (shard) => {
