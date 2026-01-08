@@ -1,3 +1,13 @@
+## [2.4.5](https://github.com/M1000fr/Hivecord/compare/v2.4.4...v2.4.5) (2026-01-08)
+
+
+### Bug Fixes
+
+* change output directory to .retype to avoid build issues ([23dd349](https://github.com/M1000fr/Hivecord/commit/23dd3495faf1adfd4c63af2fff3e24654c6080c0))
+* ensure public directory exists before creating CNAME ([722c2aa](https://github.com/M1000fr/Hivecord/commit/722c2aae49c520d642a08a7b2e5726f3968832d6))
+* resolve rebase issues and update retype config ([74234f6](https://github.com/M1000fr/Hivecord/commit/74234f6fc0a7c6d4fa7384d6e5e6224df9bb1ca4))
+* use a more robust deployment action for GitHub Pages ([98b0552](https://github.com/M1000fr/Hivecord/commit/98b0552f371a4e19a91ebef4337dd6c08fcca08d))
+
 ## [2.4.4](https://github.com/M1000fr/Hivecord/compare/v2.4.3...v2.4.4) (2026-01-08)
 
 
