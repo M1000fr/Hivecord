@@ -159,7 +159,7 @@ export class ModuleLoader {
 						: ApplicationCommandType.Message,
 				defaultMemberPermissions:
 					contextMenuOptions.defaultMemberPermissions,
-			} as CommandOptions & { type: ApplicationCommandType };
+			};
 
 			client.commands.set(
 				`${commandData.type}:${contextMenuOptions.name}`,
@@ -180,8 +180,7 @@ export class ModuleLoader {
 			CommandClass as unknown as Constructor<object>,
 			moduleName,
 		);
-		const type =
-			(cmdOptions as any).type ?? ApplicationCommandType.ChatInput;
+		const type = cmdOptions.type ?? ApplicationCommandType.ChatInput;
 		client.commands.set(`${type}:${cmdOptions.name}`, {
 			instance,
 			options: cmdOptions,
