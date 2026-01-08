@@ -2,6 +2,10 @@
 
 Hivecord simplifies the creation of Discord slash commands using class and method decorators. This system automatically handles command registration with the Discord API and interaction routing.
 
+!!! success
+Hivecord automatically handles Global vs Guild commands registration based on your bot's configuration.
+!!!
+
 ## @SlashCommandController
 
 This decorator is placed on a class to define it as a command container.
@@ -10,9 +14,11 @@ This decorator is placed on a class to define it as a command container.
 
 It accepts an object of type `CommandOptions`:
 
-- `name`: Command name (lowercase, no spaces).
-- `description`: Description displayed in the Discord interface.
-- `contexts`: (Optional) Defines whether the command is available in DMs, Guilds, etc.
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `name` | `string` | **Required.** Command name (lowercase, no spaces). |
+| `description` | `string` | **Required.** Description displayed in the Discord interface. |
+| `contexts` | `InteractionContext[]` | (Optional) Defines whether the command is available in DMs, Guilds, etc. |
 
 ```ts
 @SlashCommandController({
@@ -24,18 +30,30 @@ export default class PingCommand {
 }
 ```
 
+---
+
 ## @SlashCommand
 
 This decorator is placed on a method of the class to define the command entry point. By default, the `execute` method (or any method decorated without a specific name) is called when the base command is executed.
 
+=== :icon-terminal: Code
 ```ts
     @SlashCommand()
     async execute(@CommandInteraction() interaction: ChatInputCommandInteraction) {
-        await interaction.reply("Pong! 🏓");
+        await interaction.reply("Pong! :ping_pong:");
     }
 ```
+=== :icon-info: Note
+If you have subcommands, a method decorated with `@SlashCommand()` without a specific name will only be called if the user runs the base command without subcommands (if allowed by Discord).
+===
 
-## @Subcommand
+---
+
+## Subcommands & Routing
+
+Retype allows multiple ways to organize complex commands.
+
+### @Subcommand
 
 To create subcommands (e.g., `/config set` and `/config view`), use the `@Subcommand` decorator.
 
@@ -63,9 +81,11 @@ export default class ConfigCommand {
 }
 ```
 
-## @OptionRoute
+### @OptionRoute
 
 The `@OptionRoute` decorator allows you to route an interaction to different methods based on the value of a specific option. This is particularly useful for commands that use a "type" or "action" option to determine their behavior without using full subcommands.
+
+[!ref target="danger" text="Caution: OptionRoute is strictly for String/Integer choice routing."]
 
 ```ts
 @SlashCommandController({
@@ -99,11 +119,11 @@ export default class ManageCommand {
 }
 ```
 
+---
+
 ## @Autocomplete
 
-The `@Autocomplete` decorator allows you to provide real-time suggestions for a specific option in your Slash command. It is a method decorator that links a handler to an option name.
-
-To receive the autocomplete interaction, use the `@AutocompleteInteraction()` parameter decorator.
+The `@Autocomplete` decorator allows you to provide real-time suggestions for a specific option in your Slash command.
 
 ```ts
 @SlashCommandController({
@@ -136,14 +156,22 @@ export default class SearchCommand {
 }
 ```
 
+---
+
 ## Parameter Injection
 
-Command methods support automatic parameter injection to facilitate access to Discord objects:
+Command methods support automatic parameter injection to facilitate access to Discord objects.
 
-- `@CommandInteraction()`: The `ChatInputCommandInteraction` interaction.
-- `@Context()`: The `IExecutionContext` (i18n, guild config).
-- `@Client()`: The `HivecordClient` instance.
+| Decorator | Description |
+| :--- | :--- |
+| `@CommandInteraction()` | The `ChatInputCommandInteraction` interaction. |
+| `@Context()` | The `IExecutionContext` (i18n, guild config). |
+| `@Client()` | The `HivecordClient` instance. |
+
+!!! info
+Check the [Params Injection guide](./Params.md) for a full list of available injectors.
+!!!
 
 ---
 
-[Back to table of contents](./README.md)
+[!ref text="Back to table of contents" icon="arrow-left"](./README.md)
