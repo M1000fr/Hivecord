@@ -1,7 +1,9 @@
+import type { PermissionResolvable } from "discord.js";
+
 export interface ContextMenuOptions {
 	name: string;
 	type: "user" | "message";
-	defaultMemberPermissions?: string;
+	defaultMemberPermissions?: PermissionResolvable;
 }
 
 export interface IContextMenuCommandClass {

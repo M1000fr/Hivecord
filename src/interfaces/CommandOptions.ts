@@ -1,5 +1,6 @@
 import {
 	type ApplicationCommandOptionData,
+	ApplicationCommandType,
 	InteractionContextType,
 	type LocalizationMap,
 	type PermissionResolvable,
@@ -8,6 +9,7 @@ import {
 export interface CommandOptions {
 	name: string;
 	description: string;
+	type?: ApplicationCommandType;
 	nameLocalizations?: LocalizationMap;
 	descriptionLocalizations?: LocalizationMap;
 	options?: ApplicationCommandOptionData[];

@@ -40,7 +40,9 @@ export default class InteractionCreateEvent {
 		@Context() [interaction]: ContextOf<typeof BotEvents.InteractionCreate>,
 	) {
 		if (interaction.isAutocomplete()) {
-			const command = client.commands.get(interaction.commandName);
+			const command = client.commands.get(
+				`${interaction.commandType}:${interaction.commandName}`,
+			);
 			if (!command) return;
 
 			try {
@@ -59,7 +61,9 @@ export default class InteractionCreateEvent {
 		}
 
 		if (interaction.isChatInputCommand()) {
-			const command = client.commands.get(interaction.commandName);
+			const command = client.commands.get(
+				`${interaction.commandType}:${interaction.commandName}`,
+			);
 
 			if (!command) {
 				this.logger.error(
@@ -88,7 +92,9 @@ export default class InteractionCreateEvent {
 			interaction.isUserContextMenuCommand() ||
 			interaction.isMessageContextMenuCommand()
 		) {
-			const command = client.commands.get(interaction.commandName);
+			const command = client.commands.get(
+				`${interaction.commandType}:${interaction.commandName}`,
+			);
 
 			if (!command) {
 				this.logger.error(

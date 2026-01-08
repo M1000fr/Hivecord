@@ -3,7 +3,11 @@ import { Injectable } from "@decorators/Injectable";
 import { RedisService } from "@modules/Database/services/RedisService";
 import { I18nService } from "@modules/Shared/services/I18nService";
 import { PagerRegistry, type PagerState } from "@registers/PagerRegistry";
-import { ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
+import {
+	ButtonInteraction,
+	MessageFlags,
+	StringSelectMenuInteraction,
+} from "discord.js";
 
 @Injectable({ scope: "global" })
 export class PagerService {
@@ -37,7 +41,7 @@ export class PagerService {
 		if (state.userId && interaction.user.id !== state.userId) {
 			await interaction.reply({
 				content: t("utils.pager.not_allowed"),
-				ephemeral: true,
+				flags: [MessageFlags.Ephemeral],
 			});
 			return false;
 		}

@@ -27,7 +27,7 @@ export class PingInteractions {
 	) {
 		await interaction.reply({
 			content: "You clicked the button!",
-			ephemeral: true,
+			flags: [MessageFlags.Ephemeral],
 		});
 	}
 }

@@ -159,12 +159,15 @@ export class ModuleLoader {
 						: ApplicationCommandType.Message,
 				defaultMemberPermissions:
 					contextMenuOptions.defaultMemberPermissions,
-			} as CommandOptions & { type: ApplicationCommandType };
+			};
 
-			client.commands.set(contextMenuOptions.name, {
-				instance,
-				options: commandData,
-			});
+			client.commands.set(
+				`${commandData.type}:${contextMenuOptions.name}`,
+				{
+					instance,
+					options: commandData,
+				},
+			);
 			return;
 		}
 
@@ -177,7 +180,8 @@ export class ModuleLoader {
 			CommandClass as unknown as Constructor<object>,
 			moduleName,
 		);
-		client.commands.set(cmdOptions.name, {
+		const type = cmdOptions.type ?? ApplicationCommandType.ChatInput;
+		client.commands.set(`${type}:${cmdOptions.name}`, {
 			instance,
 			options: cmdOptions,
 		});
@@ -369,9 +373,14 @@ export class ModuleLoader {
 						ProviderClass as unknown as IContextMenuCommandClass
 					).contextMenuOptions;
 					const name = cmdOptions?.name ?? ctxOptions?.name;
+					const type = ctxOptions
+						? ctxOptions.type === "user"
+							? ApplicationCommandType.User
+							: ApplicationCommandType.Message
+						: ApplicationCommandType.ChatInput;
 
 					if (name) {
-						client.commands.delete(name);
+						client.commands.delete(`${type}:${name}`);
 						this.registerCommand(client, moduleName, ProviderClass);
 					}
 				} else if (type === "event") {
@@ -449,8 +458,14 @@ export class ModuleLoader {
 				.commandOptions;
 
 			const name = contextMenuOptions?.name ?? cmdOptions?.name;
+			const type = contextMenuOptions
+				? contextMenuOptions.type === "user"
+					? ApplicationCommandType.User
+					: ApplicationCommandType.Message
+				: ApplicationCommandType.ChatInput;
+
 			if (name) {
-				client.commands.delete(name);
+				client.commands.delete(`${type}:${name}`);
 			}
 		}
 
