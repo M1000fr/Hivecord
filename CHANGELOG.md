@@ -1,3 +1,10 @@
+## [2.4.4](https://github.com/M1000fr/Hivecord/compare/v2.4.3...v2.4.4) (2026-01-08)
+
+
+### Bug Fixes
+
+* use a more robust deployment action for GitHub Pages ([21ef480](https://github.com/M1000fr/Hivecord/commit/21ef4803b97002df06d088904856fa17f5f272d2))
+
 ## [2.4.3](https://github.com/M1000fr/Hivecord/compare/v2.4.2...v2.4.3) (2026-01-08)
 
 
