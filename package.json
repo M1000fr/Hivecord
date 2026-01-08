@@ -41,7 +41,8 @@
 		"typecheck": "tsc -p tsconfig.json --noEmit",
 		"lint": "biome check .",
 		"check:errors": "bun run typecheck && bun run lint",
-		"i18n:info": "bun scripts/i18n.ts",
+		"i18n:info": "bun scripts/i18n.ts --info",
+		"i18n:clean": "bun scripts/i18n.ts --clean:unused",
 		"prepare": "husky",
 		"format": "biome check --write ."
 	},
