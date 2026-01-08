@@ -352,6 +352,7 @@ export class ModuleLoader {
 				(val) => typeof val === "function" && "prototype" in val,
 			) as Constructor[];
 
+			const reloadedClasses: string[] = [];
 			for (const ProviderClass of providers) {
 				// Check if this is a Module class
 				const isModule = Reflect.hasMetadata(
@@ -361,6 +362,7 @@ export class ModuleLoader {
 
 				if (isModule) {
 					await this.reloadModule(client, ProviderClass);
+					reloadedClasses.push(`${ProviderClass.name} (Module)`);
 					continue;
 				}
 
@@ -382,10 +384,7 @@ export class ModuleLoader {
 				);
 
 				if (type === "command") {
-					const relativePath = path.relative(process.cwd(), filePath);
-					this.logger.log(
-						`Hot-reloaded command class ${ProviderClass.name} from ${relativePath}`,
-					);
+					reloadedClasses.push(`${ProviderClass.name} (Command)`);
 					const cmdOptions = (
 						ProviderClass as unknown as ICommandClass
 					).commandOptions;
@@ -404,10 +403,7 @@ export class ModuleLoader {
 						this.registerCommand(client, moduleName, ProviderClass);
 					}
 				} else if (type === "event") {
-					const relativePath = path.relative(process.cwd(), filePath);
-					this.logger.log(
-						`Hot-reloaded event class ${ProviderClass.name} from ${relativePath}`,
-					);
+					reloadedClasses.push(`${ProviderClass.name} (Event)`);
 					const moduleListeners =
 						this.eventListeners.get(moduleName) ?? [];
 
@@ -429,9 +425,8 @@ export class ModuleLoader {
 					);
 					this.eventListeners.set(moduleName, remainingListeners);
 				} else if (type === "config-handler") {
-					const relativePath = path.relative(process.cwd(), filePath);
-					this.logger.log(
-						`Hot-reloaded config handler class ${ProviderClass.name} from ${relativePath}`,
+					reloadedClasses.push(
+						`${ProviderClass.name} (ConfigHandler)`,
 					);
 					const instance = this.container.resolve(ProviderClass);
 
@@ -442,6 +437,13 @@ export class ModuleLoader {
 						instance.registerInteractions();
 					}
 				}
+			}
+
+			if (reloadedClasses.length > 0) {
+				const relativePath = path.relative(process.cwd(), filePath);
+				this.logger.log(
+					`Hot-reloaded ${reloadedClasses.length} class(es) from ${relativePath}: ${reloadedClasses.join(", ")}`,
+				);
 			}
 		} catch (error) {
 			this.logger.error(
