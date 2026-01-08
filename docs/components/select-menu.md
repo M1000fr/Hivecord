@@ -89,6 +89,3 @@ Select menu handlers support the full injection system to access the interaction
 3. **Multi-select**: If your menu allows multiple selections, `interaction.values` will contain all selected items.
 
 ---
-
-[!ref text="Back to Button" icon="arrow-left"](button.md)
-[!ref text="Modal" icon="arrow-right"](modal.md)

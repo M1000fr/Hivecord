@@ -113,5 +113,3 @@ export class AppearanceConfig {
 4. **Dynamic UI**: Hivecord's configuration system uses these handlers to dynamically build interaction menus allowing administrators to modify settings without leaving Discord.
 
 ---
-
-[!ref text="Back to Configuration" icon="arrow-left"](configuration.md)

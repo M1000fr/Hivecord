@@ -70,6 +70,3 @@ export class AdminController {
 4. **Routing**: When a user runs `/name`, Hivecord identifies the controller and calls the appropriate method.
 
 ---
-
-[!ref text="Back to Repository" icon="arrow-left"](../di/repository.md)
-[!ref text="SlashCommand" icon="arrow-right"](slash-command.md)

@@ -67,6 +67,3 @@ When handling a `@UserCommand`, you can use the `@TargetUser()` decorator to ins
 *   **Global/Guild**: Supports both global registration and guild-specific registration.
 
 ---
-
-[!ref text="Back to Context Menu Overview" icon="arrow-left"](overview.md)
-[!ref text="MessageCommand" icon="arrow-right"](message-command.md)

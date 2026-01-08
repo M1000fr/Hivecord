@@ -101,6 +101,3 @@ export class ConfigController {
 *   **Parameters**: Each subcommand method can have its own specific [Parameters Injection](../utils/params.md).
 
 ---
-
-[!ref text="Back to SlashCommand" icon="arrow-left"](slash-command.md)
-[!ref text="Autocomplete" icon="arrow-right"](autocomplete.md)

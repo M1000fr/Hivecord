@@ -40,21 +40,3 @@ export class GeneralModule {}
 ===
 
 ---
-
-## :icon-workflow: Lifecycle
-
-Modules can hook into the bot's lifecycle. If your module class implements `OnModuleInit`, the `onModuleInit` method will be called when the bot starts and the module is loaded.
-
-```typescript
-@Module({...})
-export class MyModule implements OnModuleInit {
-    onModuleInit() {
-        console.log("MyModule has been initialized!");
-    }
-}
-```
-
----
-
-[!ref text="Back to Home" icon="arrow-left"](../README.md)
-[!ref text="Module Configuration" icon="arrow-right"](configuration.md)

@@ -41,6 +41,3 @@ export class CoreModule {}
 3. **Registration**: The global module must still be registered in the main `Bootstrap` or imported once in the root module to be initialized.
 
 ---
-
-[!ref text="Back to Module" icon="arrow-left"](../module/module.md)
-[!ref text="Injectable" icon="arrow-right"](injectable.md)

@@ -79,6 +79,3 @@ export class LoggingInterceptor implements IInterceptor {
 | **Validation** | Check if the guild has enough "Gold" before allowing a purchase command. |
 
 ---
-
-[!ref text="Back to Global" icon="arrow-left"](global.md)
-[!ref text="Injectable" icon="arrow-right"](../di/injectable.md)

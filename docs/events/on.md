@@ -68,6 +68,3 @@ For example, `messageCreate` returns `[Message]`, while `guildMemberUpdate` retu
 *   **Service Integration**: Easily call business logic inside your events by injecting services into the controller's constructor.
 
 ---
-
-[!ref text="Back to EventController" icon="arrow-left"](event-controller.md)
-[!ref text="Configuration" icon="arrow-right"](../config/configuration.md)

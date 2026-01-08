@@ -67,6 +67,3 @@ export class UserModule {}
 ```
 
 ---
-
-[!ref text="Back to Inject" icon="arrow-left"](inject.md)
-[!ref text="Slash Command Controller" icon="arrow-right"](../commands/slash-command-controller.md)

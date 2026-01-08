@@ -73,6 +73,3 @@ Button handlers support automatic parameter injection.
 3. **Response**: You must respond to the interaction (reply, defer, or edit) within 3 seconds.
 
 ---
-
-[!ref text="Back to Overview" icon="arrow-left"](overview.md)
-[!ref text="SelectMenu" icon="arrow-right"](select-menu.md)
