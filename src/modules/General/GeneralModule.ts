@@ -1,8 +1,8 @@
 import { Module } from "@decorators/Module";
-import GetAvatarCommand, {
+import GetAvatarUserCommand, {
 	GetAvatarMessageCommand,
 	PingCommand,
-} from "./commands/ping";
+} from "./commands/examples";
 import ReadyEvent from "./events/ready/log";
 import { GeneralConfig } from "./GeneralConfig";
 
@@ -12,7 +12,7 @@ import { GeneralConfig } from "./GeneralConfig";
 	providers: [
 		ReadyEvent,
 		PingCommand,
-		GetAvatarCommand,
+		GetAvatarUserCommand,
 		GetAvatarMessageCommand,
 	],
 })

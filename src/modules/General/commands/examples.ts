@@ -31,7 +31,7 @@ export class PingCommand {
 @UserCommand({
 	name: "Get User Avatar",
 })
-export default class GetAvatarCommand {
+export default class GetAvatarUserCommand {
 	async execute(
 		@CommandInteraction() interaction: UserContextMenuCommandInteraction,
 		@TargetUser() user: User,
