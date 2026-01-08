@@ -19,7 +19,9 @@ jobs:
         uses: retypeapp/action-build@v3
 
       - name: Add CNAME
-        run: echo "hivecord.m1000.fr" > public/CNAME
+        run: |
+          mkdir -p public
+          echo "hivecord.m1000.fr" > public/CNAME
 
       - name: Push to gh-pages
         uses: retypeapp/action-github-pages@v3
