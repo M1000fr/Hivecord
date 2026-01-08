@@ -1,3 +1,9 @@
+---
+order: 70
+title: "Autocomplete"
+icon: list-unordered
+---
+
 # :icon-list-unordered: Autocomplete
 
 The `@Autocomplete` decorator allows you to provide real-time suggestions to users as they type an option in a Slash command. This is essential for providing a great user experience when dealing with dynamic lists (like a database of items or a list of server roles).
@@ -89,5 +95,5 @@ async handleSearch(
 
 ---
 
-[!ref text="Back to Subcommand" icon="arrow-left"](Subcommand.md)
-[!ref text="ContextMenu" icon="arrow-right"](ContextCommands.md)
+[!ref text="Back to Subcommand" icon="arrow-left"](subcommand.md)
+[!ref text="ContextMenu Overview" icon="arrow-right"](../context-menu/overview.md)

@@ -1,23 +1,32 @@
-# Advanced Decorators (@Autocomplete, @Repository, @ConfigInteraction)
+---
+order: 90
+title: Advanced Decorators
+icon: tools
+---
+
+# :icon-tools: Advanced Decorators
 
 This section covers decorators used for specific features such as dynamic autocomplete management, database abstraction, and configuration interface automation.
 
-## Interceptors (@UseInterceptors)
+---
+
+## :icon-shield: Interceptors (`@UseInterceptors`)
 
 Interceptors allow executing logic before or after command execution. Since this feature is very extensive, it has its own documentation page.
 
-👉 **[See detailed Interceptors documentation](./Interceptors.md)**
+[!ref text="See detailed Interceptors documentation" icon="arrow-right"](../core/interceptors.md)
 
 ---
 
-## Autocomplete (@Autocomplete)
+## :icon-list-unordered: Autocomplete (`@Autocomplete`)
 
 The `@Autocomplete` decorator is a **method decorator** that links a specific method to a Slash command option to provide real-time suggestions. To receive the interaction object, use the `@AutocompleteInteraction()` **parameter decorator** on one of the method's arguments.
 
-### Configuration
+### :icon-gear: Configuration
 
 Takes an `AutocompleteOptions` object containing the `optionName` (the name of the argument defined in the command options).
 
+=== :icon-code: Example
 ```typescript
 import { Autocomplete } from "@decorators/commands/Autocomplete";
 import { AutocompleteInteraction } from "@decorators/Interaction";
@@ -47,19 +56,21 @@ export default class SearchCommand {
 	}
 }
 ```
+===
 
 ---
 
-## Data Repositories (@Repository)
+## :icon-database: Data Repositories (`@Repository`)
 
 The `@Repository` decorator is a specialized utility for data access classes. It simplifies Prisma usage by automatically handling database service injection.
 
-### Benefits
+### :icon-star: Benefits
 
 - Automatically applies `@Injectable()`.
 - Automatically injects `PrismaService` into the constructor.
 - Prepares the class to be used as a singleton in your services.
 
+=== :icon-code: Example
 ```typescript
 import { Repository } from "@decorators/Repository";
 import { PrismaService } from "@modules/Shared/services/PrismaService";
@@ -73,17 +84,17 @@ export class UserRepository {
 	}
 }
 ```
+===
 
 ---
 
-## Configuration Interface (@ConfigInteraction)
+## :icon-zap: Configuration Interface (`@ConfigInteraction`)
 
 The `@ConfigInteraction` decorator is used for classes managing the user interface (buttons, selects) of the configuration system. It automates the injection of all services required for resolving and modifying configuration values.
 
-### How it works
+### :icon-workflow: How it works
 
 It automatically injects:
-
 - `ConfigValueService`
 - `ConfigUIBuilderService`
 - `ConfigValueResolverService`
@@ -93,4 +104,5 @@ This allows creating complex configuration interaction handlers with minimal rep
 
 ---
 
-[Back to table of contents]/)
+[!ref text="Back to Home" icon="arrow-left"](../README.md)
+[!ref text="Parameter Decorators" icon="arrow-right"](params.md)

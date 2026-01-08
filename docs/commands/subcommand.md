@@ -1,3 +1,9 @@
+---
+order: 80
+title: "Subcommand"
+icon: stack
+---
+
 # :icon-stack: Subcommand
 
 The `@Subcommand` decorator allows you to organize complex commands into logical groups. Instead of having a single flat command, you can create a hierarchy (e.g., `/config view` and `/config edit`).
@@ -21,9 +27,24 @@ Subcommands are defined as methods within a class decorated with `@SlashCommandC
 
 === :icon-code: Example
 ```typescript
+import { SlashCommandController, Subcommand, CommandInteraction } from "@decorators/Interaction";
+import { ChatInputCommandInteraction, ApplicationCommandOptionType } from "discord.js";
+
 @SlashCommandController({
     name: "user",
-    description: "User management commands"
+    description: "User management commands",
+    options: [
+        {
+            name: "info",
+            description: "Show information about a user",
+            type: ApplicationCommandOptionType.Subcommand
+        },
+        {
+            name: "avatar",
+            description: "Show a user's avatar",
+            type: ApplicationCommandOptionType.Subcommand
+        }
+    ]
 })
 export class UserController {
     @Subcommand({
@@ -77,9 +98,9 @@ export class ConfigController {
 
 *   **Cleaner UX**: Users can easily find related actions under a single main command.
 *   **Method Routing**: Hivecord automatically routes the interaction to the correct method, so you don't have to check `interaction.options.getSubcommand()`.
-*   **Parameters**: Each subcommand method can have its own specific [Parameters Injection](Params.md).
+*   **Parameters**: Each subcommand method can have its own specific [Parameters Injection](../utils/params.md).
 
 ---
 
-[!ref text="Back to SlashCommand" icon="arrow-left"](SlashCommand.md)
-[!ref text="Autocomplete" icon="arrow-right"](Autocomplete.md)
+[!ref text="Back to SlashCommand" icon="arrow-left"](slash-command.md)
+[!ref text="Autocomplete" icon="arrow-right"](autocomplete.md)

@@ -1,3 +1,9 @@
+---
+order: 100
+title: "Injectable"
+icon: link
+---
+
 # :icon-link: Injectable
 
 The `@Injectable` decorator marks a class as a "provider" that can be managed by Hivecord's Dependency Injection (DI) system. This allows you to easily share instances of services, repositories, or utilities across your modules.
@@ -50,46 +56,10 @@ export class TestCommand {
 
 ---
 
-## :icon-tools: Manual Injection (@Inject)
-
-In some cases (like when using interfaces or specific tokens), automatic type-based injection might not be enough. You can use the `@Inject` decorator to manually specify what should be injected.
-
-```typescript
-import { Injectable, Inject } from "@decorators/Injectable";
-
-@Injectable()
-export class MyService {
-    constructor(
-        @Inject("DATABASE_CONNECTION") private readonly db: any
-    ) {}
-}
-```
-
-!!! tip "Standard Injection"
-For most cases, you don't need `@Inject`. Simply typing your constructor parameter with the class is enough for Hivecord to find it.
-!!!
+## :icon-light-bulb: Tip
+For most cases, you don't need manual decorators for injection. Simply typing your constructor parameter with the class is enough for Hivecord to find it.
 
 ---
 
-## :icon-shield: Repositories
-
-For data access with Prisma, Hivecord provides a specialized `@Repository` decorator. It works exactly like `@Injectable` but is semantically clearer for data layers.
-
-```typescript
-import { Repository } from "@decorators/Repository";
-import { PrismaService } from "@src/prisma/PrismaService";
-
-@Repository()
-export class UserRepository {
-    constructor(private readonly prisma: PrismaService) {}
-
-    async findById(id: string) {
-        return this.prisma.user.findUnique({ where: { id } });
-    }
-}
-```
-
----
-
-[!ref text="Back to Home" icon="arrow-left"](/)
-[!ref text="Interceptors" icon="arrow-right"](Interceptors.md)
+[!ref text="Back to Interceptors" icon="arrow-left"](../core/interceptors.md)
+[!ref text="Inject" icon="arrow-right"](inject.md)

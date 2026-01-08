@@ -1,3 +1,9 @@
+---
+order: 80
+title: "MessageCommand"
+icon: mail
+---
+
 # :icon-mail: MessageCommand
 
 The `@MessageCommand` decorator defines a context menu command that appears when a user right-clicks on a **Message** in the Discord interface (under the "Apps" sub-menu).
@@ -55,10 +61,10 @@ When handling a `@MessageCommand`, you can use the `@TargetMessage()` decorator 
 ## :icon-light-bulb: Key Features
 
 *   **Automatic Registration**: Hivecord automatically handles the registration and synchronization of Message commands with Discord.
-*   **Permissions**: Apply `@Permissions` to restrict usage to specific roles or administrative rights.
+*   **Permissions**: Apply [`@Permissions`](permissions.md) to restrict usage to specific roles or administrative rights.
 *   **Validation**: Useful for moderation tools (e.g., "Report Message", "Copy ID") or utility tools (e.g., "Translate Message").
 
 ---
 
-[!ref text="Back to UserCommand" icon="arrow-left"](UserCommand.md)
-[!ref text="Permissions" icon="arrow-right"](Permissions.md)
+[!ref text="Back to UserCommand" icon="arrow-left"](user-command.md)
+[!ref text="Permissions" icon="arrow-right"](permissions.md)

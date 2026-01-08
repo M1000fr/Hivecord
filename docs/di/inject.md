@@ -1,3 +1,9 @@
+---
+order: 90
+title: "Inject"
+icon: link-external
+---
+
 # :icon-link-external: Inject
 
 The `@Inject` decorator is used for manual dependency injection when the automatic type-based resolution is not sufficient or when you need to inject a specific token.
@@ -62,5 +68,5 @@ constructor(@Inject(MyService) private readonly myService: MyService) {}
 
 ---
 
-[!ref text="Back to Injectable" icon="arrow-left"](Injectable.md)
-[!ref text="Repositories" icon="arrow-right"](Repository.md)
+[!ref text="Back to Injectable" icon="arrow-left"](injectable.md)
+[!ref text="Repository" icon="arrow-right"](repository.md)

@@ -1,3 +1,9 @@
+---
+order: 70
+title: "Modal"
+icon: columns
+---
+
 # :icon-columns: Modal
 
 The `@Modal` decorator is used to handle submissions from Discord modals. Modals are pop-up windows containing text inputs, allowing you to collect structured information from users.
@@ -91,5 +97,5 @@ Modal handlers support the standard injection system.
 
 ---
 
-[!ref text="Back to SelectMenu" icon="arrow-left"](SelectMenu.md)
-[!ref text="Events" icon="arrow-right"](Events.md)
+[!ref text="Back to SelectMenu" icon="arrow-left"](select-menu.md)
+[!ref text="Event Controller" icon="arrow-right"](../events/event-controller.md)

@@ -28,6 +28,7 @@
         "husky": "^9.1.7",
         "lint-staged": "^16.2.7",
         "node-gyp": "^12.1.0",
+        "retypeapp": "^3.11.0",
         "sed-lite": "^1.1.0",
         "semantic-release": "^25.0.2",
       },
@@ -35,12 +36,6 @@
         "typescript": "^5.9.3",
       },
     },
-  },
-  "trustedDependencies": [
-    "@napi-rs/canvas",
-  ],
-  "overrides": {
-    "canvas": "npm:@napi-rs/canvas@^0.1.83",
   },
   "packages": {
     "@actions/core": ["@actions/core@2.0.1", "", { "dependencies": { "@actions/exec": "^2.0.0", "@actions/http-client": "^3.0.0" } }, "sha512-oBfqT3GwkvLlo1fjvhQLQxuwZCGTarTE5OuZ2Wg10hvhBj7LRIlF611WT4aZS6fDhO5ZKlY7lCAZTlpmyaHaeg=="],
@@ -1088,6 +1083,8 @@
     "restore-cursor": ["restore-cursor@5.1.0", "", { "dependencies": { "onetime": "^7.0.0", "signal-exit": "^4.1.0" } }, "sha512-oMA2dcrw6u0YfxJQXm342bFKX/E4sG9rbTzO9ptUcR/e8A33cHuvStiYOwH7fszkZlZ1z/ta9AAoPk2F4qIOHA=="],
 
     "retry": ["retry@0.12.0", "", {}, "sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow=="],
+
+    "retypeapp": ["retypeapp@3.11.0", "", { "bin": { "retype": "retype.js" } }, "sha512-emjLMnmAu3jNLUeM+6OEj0CUlW6GmAq2yXEsf2n40YEDEBu7U2n32pLCFpd6w9Y+MIDmV+1rffN96parLT9uZw=="],
 
     "reusify": ["reusify@1.1.0", "", {}, "sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw=="],
 

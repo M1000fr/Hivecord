@@ -1,3 +1,9 @@
+---
+order: 100
+title: "EventController"
+icon: broadcast
+---
+
 # :icon-broadcast: EventController
 
 The `@EventController` decorator is used to mark a class as a container for Discord event listeners. This allows you to group related event handlers (like logging, moderation, or member tracking) into a single, modular class.
@@ -71,5 +77,5 @@ export class WelcomeController {
 
 ---
 
-[!ref text="Back to Home" icon="arrow-left"](/)
-[!ref text="On" icon="arrow-right"](Events.md)
+[!ref text="Back to Modal" icon="arrow-left"](../components/modal.md)
+[!ref text="On" icon="arrow-right"](on.md)

@@ -1,4 +1,10 @@
-# Hivecord
+---
+order: 1000
+title: Introduction
+icon: home
+---
+
+# :icon-workflow: Hivecord
 
 A modular and high-performance Discord bot framework written in TypeScript, optimized for [Bun](https://bun.sh).
 
@@ -14,8 +20,8 @@ A modular and high-performance Discord bot framework written in TypeScript, opti
 
 Dive into the documentation to learn how to build your own modules.
 
-[!ref icon="book" text="Architecture Overview" variant="primary"](Module.md)
-[!ref icon="zap" text="Slash Commands" variant="success"](SlashCommand.md)
+[!ref icon="book" text="Architecture Overview" variant="primary"](module/module.md)
+[!ref icon="zap" text="Slash Commands" variant="success"](commands/slash-command.md)
 
 ---
 
@@ -38,23 +44,22 @@ Built-in multi-language support. Translate your bot easily with `guild.i18n()` a
 ## :icon-package: Core Components
 
 :::grid
-{ "columns": 2 }
 
 > ### :icon-terminal: SlashCommand
 > Define commands using decorators. Supports subcommands, autocomplete, and parameter injection.
-> [Learn more](SlashCommand.md)
+> [Learn more](commands/slash-command.md)
 
 > ### :icon-zap: Interactions
 > Handle buttons, select menus, and modals with simple method decorators and wildcard routing.
-> [Learn more](Interactions.md)
+> [Learn more](components/overview.md)
 
 > ### :icon-database: Persistence
 > Powered by **Prisma** (MariaDB/MySQL) and high-performance caching with **Redis**.
-> [Learn more](Advanced.md)
+> [Learn more](utils/advanced.md)
 
 > ### :icon-shield: Interceptors
 > Apply middleware-like logic for permissions, logging, or validation at the class or method level.
-> [Learn more](Interceptors.md)
+> [Learn more](core/interceptors.md)
 :::
 
 ---
@@ -94,7 +99,7 @@ bun start # Production
 
 ---
 
-[!ref text="View Decorators API" icon="arrow-right"](Module.md)
+[!ref text="View Decorators API" icon="arrow-right"](module/module.md)
 
 :::footer
 &copy; {{ year }} Hivecord. Built with :icon-heart: using Bun and Retype.

@@ -1,3 +1,15 @@
+---
+order: 90
+title: "On / @Once"
+icon: clock
+---
+
+# :icon-clock: @On / @Once
+
+Methods within an `@EventController` can be decorated with `@On` or `@Once` to listen for Discord events.
+
+=== :icon-code: @On
+```typescript
 import { EventController, On, Context } from "@decorators/Interaction";
 import { Events, Message } from "discord.js";
 
@@ -57,5 +69,5 @@ For example, `messageCreate` returns `[Message]`, while `guildMemberUpdate` retu
 
 ---
 
-[!ref text="Back to EventController" icon="arrow-left"](EventController.md)
-[!ref text="Configuration" icon="arrow-right"](Configuration.md)
+[!ref text="Back to EventController" icon="arrow-left"](event-controller.md)
+[!ref text="Configuration" icon="arrow-right"](../config/configuration.md)

@@ -1,3 +1,9 @@
+---
+order: 90
+title: "Global"
+icon: globe
+---
+
 # :icon-globe: Global
 
 The `@Global` decorator marks a module as globally available across the entire application.
@@ -36,5 +42,5 @@ export class CoreModule {}
 
 ---
 
-[!ref text="Back to Module" icon="arrow-left"](Module.md)
-[!ref text="Injectable" icon="arrow-right"](Injectable.md)
+[!ref text="Back to Module" icon="arrow-left"](../module/module.md)
+[!ref text="Injectable" icon="arrow-right"](injectable.md)
