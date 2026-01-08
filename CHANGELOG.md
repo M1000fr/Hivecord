@@ -1,3 +1,17 @@
+# [2.3.0](https://github.com/M1000fr/Hivecord/compare/v2.2.0...v2.3.0) (2026-01-08)
+
+
+### Bug Fixes
+
+* resolve command collisions by indexing by type and name ([ea65aba](https://github.com/M1000fr/Hivecord/commit/ea65aba728eb5af1cd67641af85ed5c66991641a))
+* **types:** use PermissionResolvable for context menu commands ([72ef375](https://github.com/M1000fr/Hivecord/commit/72ef375ba192a074320973413a39a8c7657418a8))
+
+
+### Features
+
+* add user and message command examples with identical names to test collision fix ([5d76506](https://github.com/M1000fr/Hivecord/commit/5d76506b92421f42a6e950508cc3d3bd998baa67))
+* **interfaces:** add type property to CommandOptions and clean up ModuleLoader ([c45f02c](https://github.com/M1000fr/Hivecord/commit/c45f02c0295a1bfe6393f794afe1d19ad81d05b6))
+
 # [2.2.0](https://github.com/M1000fr/Hivecord/compare/v2.1.0...v2.2.0) (2026-01-08)
 
 
