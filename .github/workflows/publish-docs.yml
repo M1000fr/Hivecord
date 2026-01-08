@@ -10,10 +10,16 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Build and Deploy Retype
+      - name: Build Retype
         uses: retypeapp/action-build@v3
+
+      - name: Add CNAME
+        run: echo "hivecord.m1000.fr" > public/CNAME
 
       - name: Push to gh-pages
         uses: retypeapp/action-github-pages@v3
