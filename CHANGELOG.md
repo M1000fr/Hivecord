@@ -1,3 +1,19 @@
+# [2.2.0](https://github.com/M1000fr/Hivecord/compare/v2.1.0...v2.2.0) (2026-01-08)
+
+
+### Bug Fixes
+
+* **husky:** convert pre-push line endings to LF for CI compatibility ([c762a80](https://github.com/M1000fr/Hivecord/commit/c762a8061403674ba0fe4e2523d556c0e21c34e0))
+
+
+### Features
+
+* **client:** initialize hot-reload and pass arguments to shards ([4e74b1e](https://github.com/M1000fr/Hivecord/commit/4e74b1ece155a80fb37894c7e1cfa1505fd4e32d))
+* **di:** add support for clearing modules and instances ([db11ba6](https://github.com/M1000fr/Hivecord/commit/db11ba6f775b4c008da0193ec30cc6e58e0ec3bc))
+* **hot-reload:** add HotReloadService for file watching and module swapping ([8bf60e2](https://github.com/M1000fr/Hivecord/commit/8bf60e25867eb03e1df3e0ab3923973fe62b6995))
+* **i18n:** unify audit and clean logic into a single script with flags ([d9c8aef](https://github.com/M1000fr/Hivecord/commit/d9c8aef04e9fff3467898de0b4379f4723bba674))
+* **loader:** implement granular provider and module hot-reloading ([8778994](https://github.com/M1000fr/Hivecord/commit/8778994878f50e10442b98940b9cfebdc7b2423b))
+
 # [2.1.0](https://github.com/M1000fr/Hivecord/compare/v2.0.0...v2.1.0) (2026-01-07)
 
 
