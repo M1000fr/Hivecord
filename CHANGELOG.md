@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/M1000fr/Hivecord/compare/v2.4.1...v2.4.2) (2026-01-08)
+
+
+### Bug Fixes
+
+* force update of gh-pages branch and restore CNAME ([697b180](https://github.com/M1000fr/Hivecord/commit/697b18017927259c0faa32fa8566d60bc66dcf9e)), closes [#pages](https://github.com/M1000fr/Hivecord/issues/pages)
+
 ## [2.4.1](https://github.com/M1000fr/Hivecord/compare/v2.4.0...v2.4.1) (2026-01-08)
 
 
