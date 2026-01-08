@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/M1000fr/Hivecord/compare/v2.4.0...v2.4.1) (2026-01-08)
+
+
+### Bug Fixes
+
+* update Retype to v2 and fix output directory ([70d26f6](https://github.com/M1000fr/Hivecord/commit/70d26f69a9ae6e2e965eb8b885bad229677bf3da))
+
 # [2.4.0](https://github.com/M1000fr/Hivecord/compare/v2.3.0...v2.4.0) (2026-01-08)
 
 
