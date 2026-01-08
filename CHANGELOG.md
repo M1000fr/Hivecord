@@ -1,3 +1,11 @@
+## [2.4.8](https://github.com/M1000fr/Hivecord/compare/v2.4.7...v2.4.8) (2026-01-08)
+
+
+### Bug Fixes
+
+* explicit output directory for Retype build and cleanup config ([fdf32f4](https://github.com/M1000fr/Hivecord/commit/fdf32f4672e787f5a5fff7f8f81cd28e0c430079))
+* use npx retypeapp and debug build output ([a54f4ff](https://github.com/M1000fr/Hivecord/commit/a54f4ffd02993a2d30dcda0fb3a63f29d5e02e30))
+
 ## [2.4.7](https://github.com/M1000fr/Hivecord/compare/v2.4.6...v2.4.7) (2026-01-08)
 
 

@@ -4,7 +4,7 @@
 	"type": "module",
 	"private": false,
 	"license": "CC-BY-NC-SA-4.0",
-	"version": "2.4.7",
+	"version": "2.4.8",
 	"devDependencies": {
 		"@biomejs/biome": "2.3.11",
 		"@semantic-release/changelog": "^6.0.3",
