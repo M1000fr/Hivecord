@@ -1,3 +1,10 @@
+## [2.4.9](https://github.com/M1000fr/Hivecord/compare/v2.4.8...v2.4.9) (2026-01-08)
+
+
+### Bug Fixes
+
+* quote YAML strings starting with @ ([aed411b](https://github.com/M1000fr/Hivecord/commit/aed411b8040c585cedc786754903c64a20105e7d))
+
 ## [2.4.8](https://github.com/M1000fr/Hivecord/compare/v2.4.7...v2.4.8) (2026-01-08)
 
 
