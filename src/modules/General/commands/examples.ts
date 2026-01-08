@@ -4,9 +4,18 @@ import {
 	SlashCommandController,
 } from "@src/decorators/commands/SlashCommand";
 import { UserCommand } from "@src/decorators/commands/UserCommand";
-import { CommandInteraction } from "@src/decorators/Interaction";
-import { TargetMessage, TargetUser } from "@src/decorators/params";
+import { Injectable } from "@src/decorators/Injectable";
 import {
+	Button,
+	CommandInteraction,
+	Context,
+} from "@src/decorators/Interaction";
+import { TargetMessage, TargetUser } from "@src/decorators/params";
+import { type ButtonContext } from "@src/types/InteractionContexts";
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
 	type ChatInputCommandInteraction,
 	Message,
 	MessageContextMenuCommandInteraction,
@@ -24,7 +33,27 @@ export class PingCommand {
 	public async ping(
 		@CommandInteraction() interaction: ChatInputCommandInteraction,
 	) {
-		await interaction.reply("Pong!");
+		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder()
+				.setCustomId("my_unique_button")
+				.setLabel("Push me!")
+				.setStyle(ButtonStyle.Primary),
+		);
+
+		await interaction.reply({
+			content: "Pong!",
+			components: [row],
+		});
+	}
+
+	@Button("my_unique_button")
+	public async onMyUniqueButtonPress(
+		@Context() [interaction]: ButtonContext,
+	) {
+		await interaction.reply({
+			content: "You pushed the button!",
+			flags: [MessageFlags.Ephemeral],
+		});
 	}
 }
 
