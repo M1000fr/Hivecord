@@ -13,6 +13,7 @@ import { DependencyContainer } from "@di/DependencyContainer";
 import {
 	type Constructor,
 	INJECTABLE_METADATA_KEY,
+	MODULE_OPTIONS_METADATA_KEY,
 	PROVIDER_TYPE_METADATA_KEY,
 } from "@di/types";
 import { type CommandOptions } from "@interfaces/CommandOptions.ts";
@@ -335,6 +336,17 @@ export class ModuleLoader {
 			) as Constructor[];
 
 			for (const ProviderClass of providers) {
+				// Check if this is a Module class
+				const isModule = Reflect.hasMetadata(
+					MODULE_OPTIONS_METADATA_KEY,
+					ProviderClass,
+				);
+
+				if (isModule) {
+					await this.reloadModule(client, ProviderClass);
+					continue;
+				}
+
 				const type = Reflect.getMetadata(
 					PROVIDER_TYPE_METADATA_KEY,
 					ProviderClass,

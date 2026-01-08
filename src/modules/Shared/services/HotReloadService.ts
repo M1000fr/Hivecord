@@ -15,12 +15,10 @@ export class HotReloadService {
 	/**
 	 * Initializes the hot-reload service.
 	 * It watches for changes in the src/modules directory and reloads the corresponding module
-	 * without restarting the entire application.
+	 * or provider without restarting the entire application.
 	 */
 	public init(client: HivecordClient) {
 		// Check for --watch flag in process arguments.
-		// Note: If 'bun --watch' is used, Bun will restart the process by default.
-		// This service is designed to handle reloads programmatically if the process persists.
 		const isWatchMode = process.argv.includes("--watch");
 
 		if (!isWatchMode) return;
@@ -56,71 +54,19 @@ export class HotReloadService {
 				return;
 			}
 
-			// If the module file itself changed, we do a full module reload
-			if (filename.endsWith(`${moduleName}Module.ts`)) {
-				changedFiles.set(absolutePath, `MODULE:${moduleName}`);
-			} else {
-				changedFiles.set(absolutePath, moduleName);
-			}
+			changedFiles.set(absolutePath, moduleName);
 
 			if (timeout) clearTimeout(timeout);
 			timeout = setTimeout(async () => {
 				for (const [filePath, modName] of changedFiles.entries()) {
-					if (modName.startsWith("MODULE:")) {
-						const name = modName.split(":")[1];
-						if (name) await this.reloadModule(client, name);
-					} else {
-						await this.moduleLoader.reloadProvider(
-							client,
-							modName,
-							filePath,
-						);
-					}
+					await this.moduleLoader.reloadProvider(
+						client,
+						modName,
+						filePath,
+					);
 				}
 				changedFiles.clear();
 			}, 100);
 		});
-	}
-
-	/**
-	 * Reloads a specific module by re-importing its main class and updating the container.
-	 */
-	private async reloadModule(client: HivecordClient, moduleName: string) {
-		this.logger.log(
-			`Change detected in module configuration: ${moduleName}. Reloading entire module...`,
-		);
-
-		try {
-			const modulesPath = path.join(process.cwd(), "src", "modules");
-			const moduleFilePath = path.join(
-				modulesPath,
-				moduleName,
-				`${moduleName}Module.ts`,
-			);
-
-			// Use a cache buster (timestamp) to bypass Bun's module cache.
-			// This ensures the new code and its decorators are re-evaluated.
-			const moduleUrl = `file://${moduleFilePath.replace(/\\/g, "/")}?update=${Date.now()}`;
-			const imported = await import(moduleUrl);
-
-			// The module class is expected to be exported as [ModuleName]Module (e.g., GeneralModule)
-			const ModuleClass = imported[`${moduleName}Module`];
-
-			if (!ModuleClass) {
-				this.logger.error(
-					`Could not find class "${moduleName}Module" in ${moduleFilePath}`,
-				);
-				return;
-			}
-
-			// Perform the actual swap of events and commands
-			await this.moduleLoader.reloadModule(client, ModuleClass);
-			this.logger.log(`Module ${moduleName} reloaded successfully.`);
-		} catch (error) {
-			this.logger.error(
-				`Failed to hot-reload module ${moduleName}:`,
-				error instanceof Error ? error.message : String(error),
-			);
-		}
 	}
 }
