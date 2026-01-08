@@ -1,11 +1,12 @@
 import { Injectable } from "@decorators/Injectable";
 import { PROVIDER_TYPE_METADATA_KEY } from "@di/types";
 import type { IContextMenuCommandClass } from "@interfaces/IContextMenuCommandClass";
+import type { PermissionResolvable } from "discord.js";
 import "reflect-metadata";
 
 export interface MessageCommandOptions {
 	name: string;
-	defaultMemberPermissions?: string;
+	defaultMemberPermissions?: PermissionResolvable;
 }
 
 export function MessageCommand(options: MessageCommandOptions): ClassDecorator {
