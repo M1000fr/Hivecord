@@ -13,10 +13,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build and Deploy Retype
-        uses: retypeapp/action-build@v1
+        uses: retypeapp/action-build@v3
 
       - name: Push to gh-pages
-        uses: retypeapp/action-github-pages@v1
+        uses: retypeapp/action-github-pages@v3
         with:
           branch: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}

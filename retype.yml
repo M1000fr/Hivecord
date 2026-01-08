@@ -1,5 +1,5 @@
 input: .
-output: .retype
+output: public
 exclude:
   - .github
   - .husky
@@ -20,6 +20,7 @@ exclude:
   - package.json
   - prisma.config.ts
   - tsconfig.json
+  - public
 branding:
   title: Hivecord
   label: Docs
