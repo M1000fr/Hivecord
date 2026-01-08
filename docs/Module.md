@@ -1,65 +1,73 @@
-# @Module
+# :icon-package: Module
 
-The `@Module` decorator is the cornerstone of Hivecord's architecture. It allows grouping domain-related components (commands, services, events) and managing dependencies between different parts of the bot.
+The `@Module` decorator is the heart of Hivecord's architecture. It defines a logical unit of your bot, grouping together commands, events, services, and configuration.
 
-## Properties
-
-The decorator accepts a configuration object with the following properties:
-
-| Property    | Type     | Description                                                                     |
-| :---------- | :------- | :------------------------------------------------------------------------------ |
-| `name`      | `string` | The unique name of the module (used for logging and debugging).                 |
-| `imports`   | `Array`  | List of other modules this module depends on.                                   |
-| `providers` | `Array`  | List of classes (Services, Commands, Events) instantiated by the module.        |
-| `config`    | `Class`  | (Optional) Configuration class associated with the module.                      |
-| `exports`   | `Array`  | (Optional) List of providers to make available to modules that import this one. |
-
-## Usage Example
-
-```typescript
-import { Module } from "@decorators/Module";
-import { ExampleService } from "./services/ExampleService";
-import { ExampleCommand } from "./commands/ExampleCommand";
-import { DatabaseModule } from "@modules/Database/DatabaseModule";
-
-@Module({
-	name: "Example",
-	imports: [DatabaseModule],
-	providers: [ExampleService, ExampleCommand],
-	exports: [ExampleService],
-})
-export class ExampleModule {}
-```
-
-## @Global
-
-The `@Global` decorator marks a module as global. When a module is global, its exported providers are available in all other modules without the need to import the global module in their `imports` array.
-
-### Usage Example
-
-```typescript
-import { Module } from "@decorators/Module";
-import { Global } from "@decorators/Global";
-import { SharedService } from "./services/SharedService";
-
-@Global()
-@Module({
-	name: "Shared",
-	providers: [SharedService],
-	exports: [SharedService],
-})
-export class SharedModule {}
-```
-
-## How it Works
-
-When the bot starts via the `Bootstrap`, each module is analyzed:
-
-1. `providers` instances are created via the dependency injection (DI) container.
-2. Commands are registered with the command registry.
-3. Event listeners are attached to the Discord client.
-4. Configurations are loaded into the database if necessary.
+!!! success "Modular by Design"
+A modular structure makes your bot easier to maintain, test, and scale. Each feature should generally reside in its own module.
+!!!
 
 ---
 
-[Back to table of contents]/)
+## :icon-gear: Configuration
+
+To create a module, apply the `@Module` decorator to a class. This class acts as the entry point and registry for all components belonging to that module.
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `controllers` | `Class[]` | Classes decorated with `@SlashCommandController` or `@EventController`. |
+| `providers` | `Class[]` | Services decorated with `@Injectable` or Interaction handlers. |
+| `imports` | `Module[]` | Other modules whose exported providers you want to use. |
+| `exports` | `Class[]` | Providers that should be available to modules importing this one. |
+
+=== :icon-code: Example
+```typescript
+import { Module } from "@decorators/Module";
+import { PingCommand } from "./commands/ping";
+import { PingService } from "./services/pingService";
+
+@Module({
+    controllers: [PingCommand],
+    providers: [PingService],
+})
+export class GeneralModule {}
+```
+===
+
+---
+
+## :icon-globe: Global Modules
+
+By default, modules are scoped. If you want a module's providers to be available everywhere without importing the module in every other module, use the `@Global()` decorator.
+
+```typescript
+@Global()
+@Module({
+    providers: [SharedService],
+    exports: [SharedService],
+})
+export class CoreModule {}
+```
+
+!!! warning "Use Sparingly"
+Overusing global modules can make dependency tracking difficult. Reserve this for truly universal services like Database or Logging.
+!!!
+
+---
+
+## :icon-workflow: Lifecycle
+
+Modules can hook into the bot's lifecycle. If your module class implements `OnModuleInit`, the `onModuleInit` method will be called when the bot starts and the module is loaded.
+
+```typescript
+@Module({...})
+export class MyModule implements OnModuleInit {
+    onModuleInit() {
+        console.log("MyModule has been initialized!");
+    }
+}
+```
+
+---
+
+[!ref text="Back to Home" icon="arrow-left"](/)
+[!ref text="Slash Commands" icon="arrow-right"](SlashCommand.md)

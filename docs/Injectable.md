@@ -1,50 +1,95 @@
-# Dependency Injection (@Injectable & @Inject)
+# :icon-link: Injectable
 
-Hivecord integrates a powerful Dependency Injection (DI) system that helps manage object lifecycles and facilitates testing and modularity.
+The `@Injectable` decorator marks a class as a "provider" that can be managed by Hivecord's Dependency Injection (DI) system. This allows you to easily share instances of services, repositories, or utilities across your modules.
 
-## @Injectable
-
-The `@Injectable` decorator marks a class as manageable by the service container. A class marked this way can be automatically injected into other classes via their constructor.
-
-### Example
-
-```typescript
-import { Injectable } from "@src/decorators/Injectable";
-
-@Injectable()
-export class DataService {
-	getData() {
-		return "Important data";
-	}
-}
-```
-
-## @Inject
-
-The `@Inject` decorator is used in a class constructor to request the injection of a specific instance. The container will handle providing the corresponding instance (Singleton by default).
-
-### Example
-
-```typescript
-import { Inject } from "@decorators/Inject";
-import { DataService } from "../services/DataService";
-
-export class MyCommand {
-	constructor(@Inject(DataService) private dataService: DataService) {}
-
-	async execute() {
-		const data = this.dataService.getData();
-		console.log(data);
-	}
-}
-```
-
-## Key Points
-
-1. **Singleton**: By default, each injected class is a Singleton within the application.
-2. **Lifecycle**: Instances are created when the module declaring them is loaded.
-3. **Recursion**: The system automatically handles dependency chains (if Service A requires Service B, both will be instantiated in the correct order).
+!!! info "Dependency Injection"
+DI is a design pattern where a class receives its dependencies from an external source rather than creating them itself. This makes your code more modular, testable, and easier to maintain.
+!!!
 
 ---
 
-[Back to table of contents]/)
+## :icon-pencil: Usage
+
+To make a class injectable, simply apply the `@Injectable` decorator to it. Once marked, Hivecord will automatically manage its lifecycle and provide it to other components that require it.
+
+=== :icon-code: Service Example
+```typescript
+import { Injectable } from "@decorators/Injectable";
+
+@Injectable()
+export class LoggerService {
+    log(message: string) {
+        console.log(`[LOG] ${message}`);
+    }
+}
+```
+===
+
+---
+
+## :icon-sign-in: Constructor Injection
+
+The most common way to use an injectable class is by requesting it in the constructor of another component (like a Controller or another Service). Hivecord uses TypeScript's reflection to automatically resolve and inject the correct instance.
+
+```typescript
+import { SlashCommandController, SlashCommand, CommandInteraction } from "@decorators/Interaction";
+import { LoggerService } from "./services/LoggerService";
+
+@SlashCommandController({ name: "test" })
+export class TestCommand {
+    // Hivecord automatically injects the LoggerService instance here
+    constructor(private readonly logger: LoggerService) {}
+
+    @SlashCommand()
+    async execute(@CommandInteraction() interaction: ChatInputCommandInteraction) {
+        this.logger.log("Executing test command...");
+        await interaction.reply("Check the console!");
+    }
+}
+```
+
+---
+
+## :icon-tools: Manual Injection (@Inject)
+
+In some cases (like when using interfaces or specific tokens), automatic type-based injection might not be enough. You can use the `@Inject` decorator to manually specify what should be injected.
+
+```typescript
+import { Injectable, Inject } from "@decorators/Injectable";
+
+@Injectable()
+export class MyService {
+    constructor(
+        @Inject("DATABASE_CONNECTION") private readonly db: any
+    ) {}
+}
+```
+
+!!! tip "Standard Injection"
+For most cases, you don't need `@Inject`. Simply typing your constructor parameter with the class is enough for Hivecord to find it.
+!!!
+
+---
+
+## :icon-shield: Repositories
+
+For data access with Prisma, Hivecord provides a specialized `@Repository` decorator. It works exactly like `@Injectable` but is semantically clearer for data layers.
+
+```typescript
+import { Repository } from "@decorators/Repository";
+import { PrismaService } from "@src/prisma/PrismaService";
+
+@Repository()
+export class UserRepository {
+    constructor(private readonly prisma: PrismaService) {}
+
+    async findById(id: string) {
+        return this.prisma.user.findUnique({ where: { id } });
+    }
+}
+```
+
+---
+
+[!ref text="Back to Home" icon="arrow-left"](/)
+[!ref text="Interceptors" icon="arrow-right"](Interceptors.md)
