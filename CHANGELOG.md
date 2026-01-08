@@ -1,3 +1,46 @@
+# [2.4.0](https://github.com/M1000fr/Hivecord/compare/v2.3.0...v2.4.0) (2026-01-08)
+
+
+### Bug Fixes
+
+* **core:** ensure interaction handlers resolve from the correct module context ([9b46466](https://github.com/M1000fr/Hivecord/commit/9b464668f2cd8ee56e44caecbca11a3fdf9e7cfa))
+
+
+### Features
+
+* **examples:** add Modal example with LabelBuilder syntax ([bf70500](https://github.com/M1000fr/Hivecord/commit/bf70500fdd66f0fa048b2b80ea60c1c8b06dcfe6))
+* **types:** add interaction context types and update button example ([0f24121](https://github.com/M1000fr/Hivecord/commit/0f24121aa9546f8169f66c39d5113eca63863a95))
+
+# [2.3.0](https://github.com/M1000fr/Hivecord/compare/v2.2.0...v2.3.0) (2026-01-08)
+
+
+### Bug Fixes
+
+* resolve command collisions by indexing by type and name ([ea65aba](https://github.com/M1000fr/Hivecord/commit/ea65aba728eb5af1cd67641af85ed5c66991641a))
+* **types:** use PermissionResolvable for context menu commands ([72ef375](https://github.com/M1000fr/Hivecord/commit/72ef375ba192a074320973413a39a8c7657418a8))
+
+
+### Features
+
+* add user and message command examples with identical names to test collision fix ([5d76506](https://github.com/M1000fr/Hivecord/commit/5d76506b92421f42a6e950508cc3d3bd998baa67))
+* **interfaces:** add type property to CommandOptions and clean up ModuleLoader ([c45f02c](https://github.com/M1000fr/Hivecord/commit/c45f02c0295a1bfe6393f794afe1d19ad81d05b6))
+
+# [2.2.0](https://github.com/M1000fr/Hivecord/compare/v2.1.0...v2.2.0) (2026-01-08)
+
+
+### Bug Fixes
+
+* **husky:** convert pre-push line endings to LF for CI compatibility ([c762a80](https://github.com/M1000fr/Hivecord/commit/c762a8061403674ba0fe4e2523d556c0e21c34e0))
+
+
+### Features
+
+* **client:** initialize hot-reload and pass arguments to shards ([4e74b1e](https://github.com/M1000fr/Hivecord/commit/4e74b1ece155a80fb37894c7e1cfa1505fd4e32d))
+* **di:** add support for clearing modules and instances ([db11ba6](https://github.com/M1000fr/Hivecord/commit/db11ba6f775b4c008da0193ec30cc6e58e0ec3bc))
+* **hot-reload:** add HotReloadService for file watching and module swapping ([8bf60e2](https://github.com/M1000fr/Hivecord/commit/8bf60e25867eb03e1df3e0ab3923973fe62b6995))
+* **i18n:** unify audit and clean logic into a single script with flags ([d9c8aef](https://github.com/M1000fr/Hivecord/commit/d9c8aef04e9fff3467898de0b4379f4723bba674))
+* **loader:** implement granular provider and module hot-reloading ([8778994](https://github.com/M1000fr/Hivecord/commit/8778994878f50e10442b98940b9cfebdc7b2423b))
+
 # [2.1.0](https://github.com/M1000fr/Hivecord/compare/v2.0.0...v2.1.0) (2026-01-07)
 
 
