@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
 
+# Skip hook in CI environments to avoid conflicts with automated processes (like semantic-release)
+if [ "$CI" = "true" ]; then
+    exit 0
+fi
+
 # 1. Error checking (lint + typecheck)
 echo "🔍 Checking for errors..."
 bun run check:errors || exit 1
