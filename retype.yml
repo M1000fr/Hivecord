@@ -1,0 +1,31 @@
+input: .
+output: .retype
+exclude:
+  - .github
+  - .husky
+  - .vscode
+  - .zed
+  - data
+  - node_modules
+  - prisma
+  - scripts
+  - src
+  - .dockerignore
+  - .gitignore
+  - .releaserc
+  - biome.json
+  - bun.lock
+  - docker-compose.dev.yml
+  - docker-compose.yml
+  - package.json
+  - prisma.config.ts
+  - tsconfig.json
+branding:
+  title: Hivecord
+  label: Docs
+  color: "#f6ad55"
+footer:
+  copyright: "&copy; {{ year }} Hivecord. Built with Retype."
+links:
+  - text: GitHub
+    link: https://github.com/M1000fr/Hivecord
