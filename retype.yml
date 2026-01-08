@@ -10,7 +10,7 @@ branding:
 footer:
   copyright: "&copy; {{ year }} Hivecord Project. Built with Retype."
 
-# Sidebar organization - Simplified names for direct access
+# Sidebar organization - Granular structure for every decorator and concept
 sidebar:
   links:
     - text: GitHub
@@ -24,46 +24,90 @@ sidebar:
           icon: home
     - text: Core Architecture
       items:
-        - text: Module
+        - text: @Module
           link: Module.md
           icon: package
-        - text: Injectable
-          link: Injectable.md
-          icon: link
-        - text: Interceptors
+        - text: @Global
+          link: Global.md
+          icon: globe
+        - text: @UseInterceptors
           link: Interceptors.md
           icon: shield
-    - text: Commands
+    - text: Dependency Injection
       items:
-        - text: SlashCommand
+        - text: @Injectable
+          link: Injectable.md
+          icon: link
+        - text: @Inject
+          link: Inject.md
+          icon: link-external
+        - text: @Repository
+          link: Repository.md
+          icon: database
+    - text: Slash Commands
+      items:
+        - text: @SlashCommandController
+          link: SlashCommandController.md
+          icon: gear
+        - text: @SlashCommand
           link: SlashCommand.md
           icon: terminal
-        - text: ContextMenu
+        - text: @Subcommand
+          link: Subcommand.md
+          icon: stack
+        - text: @Autocomplete
+          link: Autocomplete.md
+          icon: list-unordered
+    - text: Context Menu
+      items:
+        - text: Overview
           link: ContextCommands.md
           icon: diff
-        - text: Permissions
-          link: Permissions.md
-          icon: lock
-    - text: Components & Events
+        - text: @UserCommand
+          link: UserCommand.md
+          icon: person
+        - text: @MessageCommand
+          link: MessageCommand.md
+          icon: mail
+    - text: Components (UI)
       items:
-        - text: Interactions (Button/Modal)
+        - text: Overview
           link: Interactions.md
           icon: zap
-        - text: Events
-          link: Events.md
-          icon: broadcast
-    - text: Configuration & Data
+        - text: @Button
+          link: Button.md
+          icon: zap
+        - text: @SelectMenu
+          link: SelectMenu.md
+          icon: list-unordered
+        - text: @Modal
+          link: Modal.md
+          icon: columns
+    - text: Events
       items:
-        - text: Configuration
+        - text: @EventController
+          link: EventController.md
+          icon: broadcast
+        - text: @On / @Once
+          link: On.md
+          icon: clock
+    - text: Configuration
+      items:
+        - text: @ModuleConfig
           link: Configuration.md
           icon: gear
-        - text: ConfigTypes
+        - text: @ConfigType
           link: ConfigTypes.md
           icon: code
-        - text: Parameters
+    - text: Security & Utils
+      items:
+        - text: @Permissions
+          link: Permissions.md
+          icon: lock
+        - text: Parameter Injection
           link: Params.md
           icon: sign-in
-        - text: Advanced
+        - text: Advanced Concepts
           link: Advanced.md
           icon: rocket
 
