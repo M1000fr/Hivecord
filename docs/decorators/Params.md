@@ -39,14 +39,23 @@ async onMessage(@Context() [message]: ContextOf<"messageCreate">) {
 }
 ```
 
-#### For Commands
-In a command, `@Context()` returns an array containing the interaction.
+#### For Commands & Interactions
+In a command or a component interaction (`@Button`, `@SelectMenu`, `@Modal`), `@Context()` returns an array containing the interaction object.
 
 ```typescript
+// Slash Command
 async execute(@Context() [interaction]: [ChatInputCommandInteraction]) {
     await interaction.reply("Hello!");
 }
+
+// Button Interaction
+@Button("my_button")
+async onButtonClick(@Context() [interaction]: ButtonContext) {
+    await interaction.reply("Button clicked!");
+}
 ```
+
+Hivecord provides specific types for these contexts: `ButtonContext`, `SelectMenuContext`, and `ModalContext`.
 
 ## Target
 

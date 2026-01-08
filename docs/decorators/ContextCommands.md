@@ -69,6 +69,7 @@ export default class CopyMessageCommand {
 1. **Specific Parameters**: Use `@TargetUser()` to retrieve the target user and `@TargetMessage()` for the target message.
 2. **Interaction Types**: Ensure you use the correct Discord.js types (`UserContextMenuCommandInteraction` or `MessageContextMenuCommandInteraction`) to benefit from autocompletion.
 3. **Registration**: As with Slash commands, these classes must be declared in the `providers` of a `@Module`.
+4. **Shared Names**: You can have a `UserCommand` and a `MessageCommand` (and a Slash Command) with the same name. Hivecord automatically distinguishes them based on their interaction type.
 
 ---
 
