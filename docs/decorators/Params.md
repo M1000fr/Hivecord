@@ -27,11 +27,24 @@ async handleAutocomplete(@AutocompleteInteraction() interaction: AutocompleteInt
 
 ### @Context()
 
-Injects the execution context (`IExecutionContext`), which contains utility methods for internationalization (`i18n`) and access to the guild's configuration.
+Injects the raw arguments array of the event or interaction. This is particularly useful for events where you need to access Discord objects (like `Message`, `GuildMember`, etc.).
+
+#### For Events
+In an `@On` event handler, `@Context()` returns an array containing all arguments passed by `discord.js`.
 
 ```typescript
-async execute(@Context() context: IExecutionContext) {
-    const text = context.i18n("WELCOME");
+@On(BotEvents.MessageCreate)
+async onMessage(@Context() [message]: ContextOf<"messageCreate">) {
+    console.log(message.content);
+}
+```
+
+#### For Commands
+In a command, `@Context()` returns an array containing the interaction.
+
+```typescript
+async execute(@Context() [interaction]: [ChatInputCommandInteraction]) {
+    await interaction.reply("Hello!");
 }
 ```
 
