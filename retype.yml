@@ -10,7 +10,7 @@ branding:
 footer:
   copyright: "&copy; {{ year }} Hivecord Project. Built with Retype."
 
-# Sidebar organization - Paths are relative to the 'input' folder (docs/)
+# Sidebar organization - Simplified names for direct access
 sidebar:
   links:
     - text: GitHub
@@ -21,32 +21,51 @@ sidebar:
       items:
         - text: Introduction
           link: README.md
+          icon: home
     - text: Core Architecture
       items:
-        - text: Modules
+        - text: Module
           link: Module.md
-        - text: Dependency Injection
+          icon: package
+        - text: Injectable
           link: Injectable.md
+          icon: link
         - text: Interceptors
           link: Interceptors.md
-    - text: Discord Interactions
+          icon: shield
+    - text: Commands
       items:
-        - text: Slash Commands
+        - text: SlashCommand
           link: SlashCommand.md
-        - text: Context Commands
+          icon: terminal
+        - text: ContextMenu
           link: ContextCommands.md
-        - text: UI Components (Buttons/Modals)
+          icon: diff
+        - text: Permissions
+          link: Permissions.md
+          icon: lock
+    - text: Components & Events
+      items:
+        - text: Interactions (Button/Modal)
           link: Interactions.md
+          icon: zap
         - text: Events
           link: Events.md
+          icon: broadcast
     - text: Configuration & Data
       items:
-        - text: Module Configuration
+        - text: Configuration
           link: Configuration.md
-        - text: Custom Types
+          icon: gear
+        - text: ConfigTypes
           link: ConfigTypes.md
-        - text: Advanced Usage
+          icon: code
+        - text: Parameters
+          link: Params.md
+          icon: sign-in
+        - text: Advanced
           link: Advanced.md
+          icon: rocket
 
 # Search settings
 search:
