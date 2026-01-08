@@ -1,0 +1,22 @@
+name: Publish Docs
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and Deploy Retype
+        uses: retypeapp/action-build@v1
+
+      - name: Push to gh-pages
+        uses: retypeapp/action-github-pages@v1
+        with:
+          branch: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
