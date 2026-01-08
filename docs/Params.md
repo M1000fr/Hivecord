@@ -101,4 +101,4 @@ async doSomething(@Client() client: HivecordClient) {
 
 ---
 
-[Back to table of contents](./README.md)
+[Back to table of contents]/)

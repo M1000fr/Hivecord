@@ -62,4 +62,4 @@ When the bot starts via the `Bootstrap`, each module is analyzed:
 
 ---
 
-[Back to table of contents](./README.md)
+[Back to table of contents]/)

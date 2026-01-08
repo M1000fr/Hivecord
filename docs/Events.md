@@ -80,4 +80,4 @@ export class MemberJoinEvent {
 
 ---
 
-[Back to table of contents](./README.md)
+[Back to table of contents]/)

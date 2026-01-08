@@ -58,4 +58,4 @@ export default class ModCommand {
 
 ---
 
-[Back to table of contents](./README.md)
+[Back to table of contents]/)

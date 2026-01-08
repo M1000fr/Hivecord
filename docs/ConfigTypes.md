@@ -96,4 +96,4 @@ export class AppearanceConfig {
 
 ---
 
-[Back to table of contents](./README.md)
+[Back to table of contents]/)

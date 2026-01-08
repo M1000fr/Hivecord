@@ -93,4 +93,4 @@ This allows creating complex configuration interaction handlers with minimal rep
 
 ---
 
-[Back to table of contents](./README.md)
+[Back to table of contents]/)

@@ -1,8 +1,8 @@
-input: .
+input: docs
 output: public
 url: hivecord.m1000.fr
 
-# Exclude technical and build folders to keep the sidebar clean
+# Exclude technical and build folders
 exclude:
   - .github
   - .husky
@@ -29,13 +29,12 @@ branding:
   title: Hivecord
   label: Framework
   color: "#f6ad55"
-  logo: /static/logo.png # Placeholder if you add one later
   repository: https://github.com/M1000fr/Hivecord
 
 footer:
   copyright: "&copy; {{ year }} Hivecord Project. Built with Retype."
 
-# Sidebar organization
+# Sidebar organization - Paths are relative to the 'input' folder (docs/)
 sidebar:
   links:
     - text: GitHub
@@ -45,33 +44,33 @@ sidebar:
     - text: Getting Started
       items:
         - text: Introduction
-          link: /
+          link: README.md
     - text: Core Architecture
       items:
         - text: Modules
-          link: docs/decorators/Module.md
+          link: Module.md
         - text: Dependency Injection
-          link: docs/decorators/Injectable.md
+          link: Injectable.md
         - text: Interceptors
-          link: docs/decorators/Interceptors.md
+          link: Interceptors.md
     - text: Discord Interactions
       items:
         - text: Slash Commands
-          link: docs/decorators/SlashCommand.md
+          link: SlashCommand.md
         - text: Context Commands
-          link: docs/decorators/ContextCommands.md
+          link: ContextCommands.md
         - text: UI Components (Buttons/Modals)
-          link: docs/decorators/Interactions.md
+          link: Interactions.md
         - text: Events
-          link: docs/decorators/Events.md
+          link: Events.md
     - text: Configuration & Data
       items:
         - text: Module Configuration
-          link: docs/decorators/Configuration.md
+          link: Configuration.md
         - text: Custom Types
-          link: docs/decorators/ConfigTypes.md
+          link: ConfigTypes.md
         - text: Advanced Usage
-          link: docs/decorators/Advanced.md
+          link: Advanced.md
 
 # Search settings
 search:
